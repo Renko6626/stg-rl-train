@@ -1,0 +1,12 @@
+title = "Stage 1 boss 露米娅 非符 1"
+source = "th06"
+origin = "东方红魔乡 Stage 1 boss 露米娅 非符 1（Sub14 + Sub15–18 随机轮转），E–L 四档"
+source_ref = "ecldata1.ecl.txt:342-566"
+ranks = [0, 3]
+marks = [0]
+time_limit = 2100
+original_time_limit = 2100
+tags = ["aimed", "ring", "stream"]
+laser_approx = false
+lower_half_blocked = false
+notes = "boss 无敌，按原作 2100 帧超时收段。尾调用链按调度循环实现。"

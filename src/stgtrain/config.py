@@ -8,7 +8,7 @@ from pathlib import Path
 
 DEFAULTS: dict = {
     "run": {"seed": 1, "device": "auto", "total_updates": 2000, "ckpt_every": 50, "eval_every": 50,
-            "torch_threads": 2},
+            "torch_threads": 2, "max_minutes": 0.0},
     "env": {"cards_dir": "cards", "eval_splits": "eval/splits.toml", "num_envs": 2048, "threads": 0,
             "frame_skip": 1, "max_frames": 3600, "warmup_max": 120, "bullets_cap": 1024, "ranks": [2],
             "mirror": True},
@@ -73,6 +73,8 @@ def validate(cfg: dict) -> None:
     for k in ("total_updates", "ckpt_every", "eval_every", "torch_threads"):
         if run[k] < 1:
             raise ValueError(f"run.{k} 须 ≥ 1")
+    if run["max_minutes"] < 0:
+        raise ValueError("run.max_minutes 须 ≥ 0（0 = 不限时）")
 
 
 def from_dict(d: dict) -> dict:

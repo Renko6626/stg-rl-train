@@ -138,6 +138,9 @@ def train(cfg: dict, run_dir: Path, resume: dict | None = None, pack_result: boo
     steps_per_iter = int(cfg["ppo"]["num_steps"]) * envw.n * envw.frame_skip
     ckpt_dir = run_dir / "checkpoints"
     phase_rows: list[dict] = []
+    budget_s = float(cfg["run"]["max_minutes"]) * 60.0  # 0 = 不限时；到点把当前 update 当最后一个
+    t_start = time.perf_counter()
+    stopped_early = None
 
     sampler.start()
     try:
@@ -158,8 +161,9 @@ def train(cfg: dict, run_dir: Path, resume: dict | None = None, pack_result: boo
                 perf_writer.write({"kind": "phase", "update": update, **row})
                 scalars.update({f"perf/{k}": v for k, v in row.items()})
             logger.log(update, env_steps, scalars)
+            last = update == total or (budget_s > 0 and time.perf_counter() - t_start >= budget_s)
 
-            if specs and (update % int(cfg["run"]["eval_every"]) == 0 or update == total):
+            if specs and (update % int(cfg["run"]["eval_every"]) == 0 or last):
                 res = evaluate(cfg, ppo, featurizer, images, specs, device)
                 (run_dir / "eval" / f"{update}.json").write_text(json.dumps(res, indent=2, ensure_ascii=False),
                                                                encoding="utf-8")
@@ -170,17 +174,22 @@ def train(cfg: dict, run_dir: Path, resume: dict | None = None, pack_result: boo
                     save_checkpoint(ckpt_dir / "best.pt", ppo=ppo, update=update, env_steps=env_steps, cfg=cfg,
                                     extra={"best": list(best), "eval": res["overall"]})
 
-            if update % int(cfg["run"]["ckpt_every"]) == 0 or update == total:
+            if update % int(cfg["run"]["ckpt_every"]) == 0 or last:
                 save_checkpoint(ckpt_dir / "latest.pt", ppo=ppo, update=update, env_steps=env_steps, cfg=cfg,
                                 extra={"best": list(best) if best is not None else None})
                 if update % int(cfg["run"]["ckpt_every"]) == 0:
                     shutil.copyfile(ckpt_dir / "latest.pt", ckpt_dir / f"u{update}.pt")
+            if last and update != total:
+                stopped_early = update
+                print(f"到达 run.max_minutes={cfg['run']['max_minutes']}，在 update {update} 停止")
+                break
     finally:
         sampler.stop()
         perf_writer.close()
         logger.close()
 
-    _update_env_json(run_dir, perf_summary=summarize(phase_rows, sampler.summary(), steps_per_iter))
+    _update_env_json(run_dir, perf_summary=summarize(phase_rows, sampler.summary(), steps_per_iter),
+                     stopped_early_at_update=stopped_early)
     plots.plot_runs({run_dir.name: read_jsonl(run_dir / "metrics.jsonl")}, run_dir / "plots")
     plots.plot_load(plots.load_perf(run_dir / "perf.jsonl"), run_dir / "plots")
     if pack_result:
