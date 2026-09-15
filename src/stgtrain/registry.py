@@ -36,7 +36,9 @@ INTENTS = Registry("intent")
 REWARD_TERMS = Registry("reward term")
 
 # 各内置实现所在模块；后续 Task 逐个追加。import 即注册。
-BUILTIN_MODULES: list[str] = []
+BUILTIN_MODULES: list[str] = [
+    "stgtrain.intent",
+]
 
 
 def load_builtins() -> None:
