@@ -1,0 +1,6 @@
+title = "测试：静场"
+source = "original"
+ranks = [0, 2]
+marks = [0]
+time_limit = 300
+tags = []
