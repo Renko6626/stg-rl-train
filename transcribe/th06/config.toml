@@ -1,0 +1,37 @@
+# TH06 转写配置。路径是本开发机的默认值，异机用环境变量覆盖：
+#   STG_TH06_SRC      renkolab local/th06nc/decoded（gitignored，ZUN 原作解码，没有就跑不了切分/摘录）
+#   STG_ENGINE_DIR    stg-engine 仓（需要 target/release/stg-harness 与 docs/）
+#   STG_TH06_DECOMP   renkolab local/vendor/th06-decomp/src（CC0 源码，对照表出处）
+
+[paths]
+decoded_dir = "/data/sunyunbo/www/renkolab/local/th06nc/decoded"
+engine_dir = "/data/sunyunbo/www/stg-engine"
+decomp_dir = "/data/sunyunbo/www/renkolab/local/vendor/th06-decomp/src"
+
+# 含这些指令的单元整体跳过（spec D3：引擎没有激光池）。
+[skip]
+instructions = [
+  "laser_create", "laser_create_aimed", "laser_index", "laser_rotate", "laser_rotate_from_player",
+  "laser_offset", "laser_test", "laser_cancel", "laser_clear_all",
+]
+# ex_ins_call / ex_ins_repeat 的这些编号需要遍历全场弹或激光，我方做不到 → 整单元跳过。
+# 编号语义见 mapping.md §10；17–19 是 NC 新增、decomp 里没有。
+ex_ins_ids = [0, 4, 7, 8, 9, 11, 12, 14, 15, 17, 18, 19]
+
+# TH06 弹型号（bullet_* 第 1 参）→ 我方图集行基址（bullets.ecl 的 const 值）与名字。
+# 判定半径由引擎表 SHAPE_RADIUS 决定，大玉/气泡偏小，见 mapping.md §3。
+[sprites]
+0 = { th06 = "PELLET",    shape = 128, name = "BULLET" }
+1 = { th06 = "RING_BALL", shape = 32,  name = "OUTLINE" }
+2 = { th06 = "RICE",      shape = 64,  name = "RICE" }
+3 = { th06 = "BALL",      shape = 48,  name = "BALL" }
+4 = { th06 = "KUNAI",     shape = 80,  name = "KUNAI" }
+5 = { th06 = "SHARD",     shape = 96,  name = "SHARD" }
+6 = { th06 = "BIG_BALL",  shape = 176, name = "LASERHEAD" }
+7 = { th06 = "FIREBALL",  shape = 112, name = "AMULET" }
+8 = { th06 = "DAGGER",    shape = 16,  name = "ARROWHEAD" }
+9 = { th06 = "BUBBLE",    shape = 176, name = "LASERHEAD" }
+
+# 32px 弹（弹型 6/7/8）只有 8 色：TH06 色号 → 我方 16 色列号。16px 弹（其余）色号原样。
+[colors32]
+map = [0, 2, 4, 6, 8, 10, 13, 15]

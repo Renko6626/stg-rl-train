@@ -26,7 +26,7 @@ build-backend = "hatchling.build"
 allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/stgtrain"]
+packages = ["src/stgtrain", "src/stgtranscribe"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
