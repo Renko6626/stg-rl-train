@@ -34,3 +34,16 @@ def test_rejects_other_action_table(tmp_path):
     torch.save(ck, p)
     with pytest.raises(ValueError, match="动作表"):
         load_checkpoint(p)
+
+
+def test_load_state_dict_keeps_lr_tensor_identity(tmp_path):
+    # CUDA 图 update 路径靠 lr.copy_() 退火；load_state_dict 若换掉 lr 张量对象，
+    # 图里捕获的旧张量不再被更新，续训后退火静默失效。
+    cfg, envw, feat, ppo, rf, tr = setup()
+    ppo.optimizer.param_groups[0]["lr"].copy_(1.23e-4)
+    p = tmp_path / "lr.pt"
+    save_checkpoint(p, ppo=ppo, update=1, env_steps=1, cfg=cfg)
+    t0 = ppo.optimizer.param_groups[0]["lr"]
+    ppo.load_state_dict(load_checkpoint(p)["state"])
+    assert ppo.optimizer.param_groups[0]["lr"] is t0
+    assert float(t0) == pytest.approx(1.23e-4)

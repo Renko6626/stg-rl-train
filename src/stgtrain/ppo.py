@@ -238,5 +238,12 @@ class PPO:
 
     def load_state_dict(self, sd: dict) -> None:
         self.agent.load_state_dict(sd["agent"])
+        # Optimizer.load_state_dict 会深拷贝 param_groups，换掉 lr 张量对象；CUDA 图在捕获时
+        # 已引用原张量，train_step 的 lr.copy_() 退火会作用在旧张量上而静默失效。
+        # 先留原张量引用，载入后把值搬回来并装回 param_group，保住身份。
+        lr_t = self.optimizer.param_groups[0]["lr"]
         self.optimizer.load_state_dict(sd["optimizer"])
+        lr_t.copy_(torch.as_tensor(self.optimizer.param_groups[0]["lr"], device=lr_t.device))
+        self.optimizer.param_groups[0]["lr"] = lr_t
         from_module(self.agent).data.to_module(self.agent_inference)
+        self.agent_inference.requires_grad_(False)
