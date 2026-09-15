@@ -46,6 +46,17 @@ pending → validated → reviewed → collected
 excluded（切分判定跳过：激光 / 不可转 ex_ins / 对话）
 ```
 
+## 试玩
+
+```bash
+transcribe/play.sh                  # 列出可试玩的卡（范例 / 流水线已验收 / cards 已收）
+transcribe/play.sh 3 [rank]         # 后台起 viewer（端口 PLAY_PORT，默认 8611），换卡再跑一次后刷新浏览器
+transcribe/play.sh status | stop
+```
+
+远程机器先开隧道 `ssh -L 8611:localhost:8611 <机器>`，浏览器开 `http://localhost:8611`。
+操作：方向键 · Z 射击 · Shift 低速；别按 X（训练用的机体 1 没有保命手段）。
+
 ## 手动工具
 
 ```bash
