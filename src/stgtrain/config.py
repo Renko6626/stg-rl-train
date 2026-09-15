@@ -1,0 +1,120 @@
+"""配置：默认值 + TOML 读写 + 校验（spec §4 / §5）。reward 项名的合法性由 reward.RewardFn 校验。"""
+from __future__ import annotations
+
+import copy
+import json
+import tomllib
+from pathlib import Path
+
+DEFAULTS: dict = {
+    "run": {"seed": 1, "device": "auto", "total_updates": 2000, "ckpt_every": 50, "eval_every": 50,
+            "torch_threads": 2},
+    "env": {"cards_dir": "cards", "eval_splits": "eval/splits.toml", "num_envs": 2048, "threads": 0,
+            "frame_skip": 1, "max_frames": 3600, "warmup_max": 120, "bullets_cap": 1024, "ranks": [2],
+            "mirror": True},
+    "intent": {"name": "lower_half_uniform_v1", "margin": 16.0, "interval": [120, 300]},
+    "featurize": {"name": "danger_topk_v1", "k_bullets": 64, "k_enemies": 8, "horizon": 60, "d_max": 128.0},
+    "model": {"name": "set_attn_v1", "d": 64, "heads": 4, "trunk": 256},
+    "reward": {"hold_radius": 24.0, "edge_margin": 16.0,
+               "terms": {"death": 10.0, "follow_shaping": 1.0, "hold": 0.01, "segment_survived": 0.0,
+                         "key_press": 0.0, "shift_toggle": 0.0, "edge_hug": 0.0}},
+    "ppo": {"num_steps": 64, "gamma": 0.995, "gae_lambda": 0.95, "num_minibatches": 8, "update_epochs": 4,
+            "clip_coef": 0.2, "clip_vloss": True, "ent_coef": 0.01, "vf_coef": 0.5, "max_grad_norm": 0.5,
+            "learning_rate": 3e-4, "anneal_lr": True, "norm_adv": True, "compile": True, "cudagraphs": True},
+    "eval": {"episodes": 32, "greedy": True, "seed": 12345},
+    "log": {"tensorboard": True, "perf_sync_every": 20, "sample_hz": 1.0},
+    "bench": {"seconds": 10.0, "num_envs": [512, 1024, 2048, 4096]},
+}
+
+# 这些 section 的子键允许自由增删（模型/特征化器/意图/reward 项各有自己的参数）。
+_FREE_SECTIONS = {("model",), ("featurize",), ("intent",), ("reward", "terms")}
+
+
+def deep_merge(base: dict, over: dict) -> dict:
+    out = copy.deepcopy(base)
+    for k, v in over.items():
+        if isinstance(v, dict) and isinstance(out.get(k), dict):
+            out[k] = deep_merge(out[k], v)
+        else:
+            out[k] = copy.deepcopy(v)
+    return out
+
+
+def _check_keys(cfg: dict, ref: dict, path: tuple[str, ...] = ()) -> None:
+    if path in _FREE_SECTIONS:
+        return
+    for k, v in cfg.items():
+        if k not in ref:
+            raise ValueError(f"未知配置键 {'.'.join(path + (k,))}")
+        if isinstance(v, dict) and isinstance(ref[k], dict):
+            _check_keys(v, ref[k], path + (k,))
+
+
+def validate(cfg: dict) -> None:
+    _check_keys(cfg, DEFAULTS)
+    run, env, ppo, feat, intent = cfg["run"], cfg["env"], cfg["ppo"], cfg["featurize"], cfg["intent"]
+    if run["device"] not in ("auto", "cuda", "cpu"):
+        raise ValueError(f"run.device 须为 auto/cuda/cpu，得 {run['device']!r}")
+    if env["num_envs"] < 1 or env["frame_skip"] < 1 or env["max_frames"] < 1:
+        raise ValueError("env.num_envs / frame_skip / max_frames 须 ≥ 1")
+    if not 1 <= env["bullets_cap"] <= 8192:
+        raise ValueError(f"env.bullets_cap 须在 1..=8192，得 {env['bullets_cap']}")
+    if not env["ranks"] or any(not 0 <= r <= 4 for r in env["ranks"]):
+        raise ValueError(f"env.ranks 须非空且每项在 0..=4，得 {env['ranks']}")
+    if not 1 <= feat["k_bullets"] <= env["bullets_cap"]:
+        raise ValueError(f"featurize.k_bullets 须在 1..=bullets_cap({env['bullets_cap']})，得 {feat['k_bullets']}")
+    if not 1 <= feat["k_enemies"] <= 256:
+        raise ValueError(f"featurize.k_enemies 须在 1..=256，得 {feat['k_enemies']}")
+    lo, hi = intent["interval"]
+    if not 0 < lo <= hi:
+        raise ValueError(f"intent.interval 须满足 0 < lo <= hi，得 {intent['interval']}")
+    if (env["num_envs"] * ppo["num_steps"]) % ppo["num_minibatches"] != 0:
+        raise ValueError("num_envs × ppo.num_steps 须能被 ppo.num_minibatches 整除（CUDA 图要求固定 minibatch 形状）")
+    for k in ("total_updates", "ckpt_every", "eval_every", "torch_threads"):
+        if run[k] < 1:
+            raise ValueError(f"run.{k} 须 ≥ 1")
+
+
+def from_dict(d: dict) -> dict:
+    cfg = deep_merge(DEFAULTS, d)
+    validate(cfg)
+    return cfg
+
+
+def load_config(path: str | Path, overrides: dict | None = None) -> dict:
+    with open(path, "rb") as f:
+        user = tomllib.load(f)
+    if overrides:
+        user = deep_merge(user, overrides)
+    return from_dict(user)
+
+
+def _toml_value(v) -> str:
+    if isinstance(v, bool):
+        return "true" if v else "false"
+    if isinstance(v, (int, float)):
+        return repr(v)
+    if isinstance(v, str):
+        return json.dumps(v, ensure_ascii=False)
+    if isinstance(v, list):
+        return "[" + ", ".join(_toml_value(x) for x in v) + "]"
+    raise TypeError(f"dump_toml 不支持的值类型 {type(v).__name__}")
+
+
+def _dump_table(d: dict, prefix: str, lines: list[str]) -> None:
+    scalars = {k: v for k, v in d.items() if not isinstance(v, dict)}
+    tables = {k: v for k, v in d.items() if isinstance(v, dict)}
+    if prefix and scalars:
+        lines.append(f"[{prefix}]")
+    for k, v in scalars.items():
+        lines.append(f"{k} = {_toml_value(v)}")
+    if scalars:
+        lines.append("")
+    for k, v in tables.items():
+        _dump_table(v, f"{prefix}.{k}" if prefix else k, lines)
+
+
+def dump_toml(cfg: dict, path: str | Path) -> None:
+    lines: list[str] = []
+    _dump_table(cfg, "", lines)
+    Path(path).write_text("\n".join(lines), encoding="utf-8")
