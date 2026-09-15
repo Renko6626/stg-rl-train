@@ -1,0 +1,42 @@
+import pytest
+import torch
+
+from conftest import FIXTURES, small_cfg
+from stgtrain.cards import compile_cards, discover, load_splits
+from stgtrain.evaluate import evaluate, score, summarize_eval
+from stgtrain.ppo import PPO
+from stgtrain.registry import FEATURIZERS, MODELS, load_builtins
+
+load_builtins()
+
+
+def rec(done, frames=100, reach=50.0, in_r=0.5):
+    return {"env": 0, "done": done, "frames": frames, "return": 1.0, "steps": frames, "in_r_frac": in_r,
+            "edge_frac": 0.0, "shift_toggles_per_s": 1.0, "dir_changes_per_s": 2.0, "reach_frames": reach}
+
+
+def test_summarize_eval_and_score():
+    s = summarize_eval([rec(2, reach=10.0), rec(1, reach=30.0, in_r=0.1), rec(2, reach=300.0), rec(3)])
+    assert s["episodes"] == 4 and s["survival"] == 0.5 and s["death"] == 0.25 and s["timeout"] == 0.25
+    assert s["reach_frames_median"] == pytest.approx(40.0)
+    assert s["in_r_frac"] == pytest.approx((0.5 + 0.1 + 0.5 + 0.5) / 4)
+    assert summarize_eval([]) == {"episodes": 0.0}
+    assert score({"survival": 0.5, "in_r_frac": 0.9}) > score({"survival": 0.4, "in_r_frac": 1.0})
+
+
+def test_evaluate_calm_card_counts_exact_episodes():
+    cfg = small_cfg()
+    device = torch.device("cpu")
+    images = compile_cards(discover(FIXTURES / "cards"))
+    specs = load_splits(FIXTURES / "eval_splits.toml", cfg["eval"]["episodes"])
+    feat = FEATURIZERS.get("danger_topk_v1")(cfg)
+    ppo = PPO(cfg, lambda: MODELS.get("set_attn_v1")(cfg, feat.spec()), device)
+    # 固定「一直按下」：测的是评测管线，不是策略（未训练的网络可能撞上 boss 本体）
+    ppo.act = lambda feats, greedy: torch.full((feats["player"].shape[0],), 10, dtype=torch.int64)
+    res = evaluate(cfg, ppo, feat, images, specs, device)
+    r2 = res["cards"]["example_calm"]["r2"]
+    assert r2["episodes"] == 4 and r2["survival"] == 1.0
+    # 静场卡脚本段在引擎第 303 帧结束；env 预热（warmup_max=120，且不占 ep_frames）会先吃掉最多 120 帧，
+    # 所以每局 183..303 帧、均值约 222。阈值放宽到 150 仍能抓住评测管线提前截断的 bug。
+    assert r2["frames_mean"] > 150
+    assert res["overall"]["episodes"] == 4
