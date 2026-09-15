@@ -38,6 +38,7 @@ REWARD_TERMS = Registry("reward term")
 # 各内置实现所在模块；后续 Task 逐个追加。import 即注册。
 BUILTIN_MODULES: list[str] = [
     "stgtrain.intent",
+    "stgtrain.featurize.danger_topk_v1",
 ]
 
 
