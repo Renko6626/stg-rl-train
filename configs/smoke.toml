@@ -1,0 +1,35 @@
+[run]
+device = "cpu"
+total_updates = 3
+ckpt_every = 2
+eval_every = 3
+torch_threads = 4
+
+[env]
+cards_dir = "tests/fixtures/cards"
+eval_splits = "tests/fixtures/eval_splits.toml"
+num_envs = 8
+threads = 4
+bullets_cap = 256
+
+[featurize]
+k_bullets = 16
+
+[model]
+d = 16
+heads = 2
+trunk = 32
+
+[ppo]
+num_steps = 16
+num_minibatches = 2
+update_epochs = 1
+compile = false
+cudagraphs = false
+
+[eval]
+episodes = 4
+
+[bench]
+seconds = 1.0
+num_envs = [8, 16]

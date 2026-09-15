@@ -1,0 +1,5 @@
+# 评测卡划分（spec §6）。卡池到位后在这里列出留出卡；训练卡 = cards/ 下其余的卡。
+# [[eval]]
+# card = "th06_s4_boss_card1"
+# ranks = [2]
+# episodes = 32

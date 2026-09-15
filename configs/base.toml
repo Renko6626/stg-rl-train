@@ -1,0 +1,81 @@
+[run]
+seed = 1
+device = "auto"
+total_updates = 2000
+ckpt_every = 50
+eval_every = 50
+torch_threads = 2
+
+[env]
+cards_dir = "cards"
+eval_splits = "eval/splits.toml"
+num_envs = 2048
+threads = 0            # 0 = 全部逻辑核；先跑 --bench 选值
+frame_skip = 1
+max_frames = 3600
+warmup_max = 120
+bullets_cap = 1024
+ranks = [2]
+mirror = true
+
+[intent]
+name = "lower_half_uniform_v1"
+margin = 16.0
+interval = [120, 300]
+
+[featurize]
+name = "danger_topk_v1"
+k_bullets = 64
+k_enemies = 8
+horizon = 60
+d_max = 128.0
+
+[model]
+name = "set_attn_v1"
+d = 64
+heads = 4
+trunk = 256
+
+[reward]
+hold_radius = 24.0
+edge_margin = 16.0
+
+[reward.terms]
+death = 10.0
+follow_shaping = 1.0
+hold = 0.01
+segment_survived = 0.0
+key_press = 0.0
+shift_toggle = 0.0
+edge_hug = 0.0
+
+[ppo]
+num_steps = 64
+gamma = 0.995
+gae_lambda = 0.95
+num_minibatches = 8
+update_epochs = 4
+clip_coef = 0.2
+clip_vloss = true
+ent_coef = 0.01
+vf_coef = 0.5
+max_grad_norm = 0.5
+learning_rate = 0.0003
+anneal_lr = true
+norm_adv = true
+compile = true
+cudagraphs = true
+
+[eval]
+episodes = 32
+greedy = true
+seed = 12345
+
+[log]
+tensorboard = true
+perf_sync_every = 20
+sample_hz = 1.0
+
+[bench]
+seconds = 10.0
+num_envs = [512, 1024, 2048, 4096]
