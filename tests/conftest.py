@@ -17,7 +17,7 @@ def small_cfg(**sections) -> dict:
         "model": {"d": 16, "heads": 2, "trunk": 32},
         "ppo": {"num_steps": 16, "num_minibatches": 2, "update_epochs": 1, "compile": False, "cudagraphs": False},
         "eval": {"episodes": 4},
-        "log": {"tensorboard": False},
+        "log": {"tensorboard": False, "perf_sync_every": 1},
         "bench": {"seconds": 0.5, "num_envs": [8]},
     }
     return from_dict(deep_merge(base, sections))

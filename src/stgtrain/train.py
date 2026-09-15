@@ -97,6 +97,9 @@ def build_components(cfg: dict, device: torch.device):
 def train(cfg: dict, run_dir: Path, resume: dict | None = None, pack_result: bool = True) -> Path:
     run_dir = Path(run_dir)
     device = pick_device(cfg["run"]["device"])
+    total = int(cfg["run"]["total_updates"])
+    if resume is not None and total <= int(resume["update"]):
+        raise ValueError(f"total_updates={total} 不大于 checkpoint 的 update={resume['update']}，没有要续训的更新")
     torch.manual_seed(int(cfg["run"]["seed"]))
     torch.set_num_threads(int(cfg["run"]["torch_threads"]))
     dump_toml(cfg, run_dir / "config.toml")
@@ -108,12 +111,14 @@ def train(cfg: dict, run_dir: Path, resume: dict | None = None, pack_result: boo
         ppo.load_state_dict(resume["state"])
         restore_rng(resume)
         start, env_steps = int(resume["update"]) + 1, int(resume["env_steps"])
-        best = tuple(resume["extra"]["best"]) if resume["extra"].get("best") is not None else None
+        # best.pt 可能比 latest.pt 新（eval 后才崩溃）：有 best.pt 以它为准，否则退回 latest.pt 里的 extra
+        best_ck = run_dir / "checkpoints" / "best.pt"
+        best_extra = load_checkpoint(best_ck)["extra"] if best_ck.exists() else resume["extra"]
+        best = tuple(best_extra["best"]) if best_extra.get("best") is not None else None
     if not (run_dir / "env.json").exists():
         _update_env_json(run_dir, stg_rl=stg_rl.build_info(), train_repo_sha=git_sha(),
                          action_table_version=ACTION_TABLE_VERSION, machine=machine_info())
 
-    total = int(cfg["run"]["total_updates"])
     envw = EnvWrapper(cfg, images, starts, device, seed=int(cfg["run"]["seed"]) + start - 1)  # Ruling 7
     reward_fn = RewardFn(cfg)
     tracker = EpisodeTracker(envw.n, device, list(reward_fn.terms), cfg["reward"]["hold_radius"],
@@ -190,7 +195,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--total-updates", type=int, default=None, help="覆盖 run.total_updates（续训加长用）")
     ap.add_argument("--no-pack", action="store_true", help="不打 tar.gz")
     args = ap.parse_args(argv)
-    overrides = {"run": {"total_updates": args.total_updates}} if args.total_updates else {}
+    overrides = {"run": {"total_updates": args.total_updates}} if args.total_updates is not None else {}
 
     if args.resume:
         run_dir = Path(args.resume)

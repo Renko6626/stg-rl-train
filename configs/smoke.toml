@@ -30,6 +30,9 @@ cudagraphs = false
 [eval]
 episodes = 4
 
+[log]
+perf_sync_every = 1
+
 [bench]
 seconds = 1.0
 num_envs = [8, 16]

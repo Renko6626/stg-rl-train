@@ -45,6 +45,15 @@ def test_train_end_to_end_then_resume(tmp_path):
     assert [r["update"] for r in rows if "ppo/pg_loss" in r] == [1, 2, 3]
     assert all(r.get("ppo/pg_loss") != 999 for r in rows)
 
+    env = json.loads((run_dir / "env.json").read_text(encoding="utf-8"))
+    assert env["perf_summary"]["phase_frac"], "分阶段计时须留下非空 phase_frac"
+    assert any("perf/env_step_s" in r for r in rows), "metrics 须记录分阶段耗时"
+
+    with pytest.raises(ValueError, match="没有要续训的更新"):
+        main(["--resume", str(run_dir), "--total-updates", "3", "--no-pack"])
+    with pytest.raises(ValueError, match="须 ≥ 1"):
+        main(["--resume", str(run_dir), "--total-updates", "0", "--no-pack"])
+
 
 def test_bench_cli(tmp_path):
     cfg_path = tmp_path / "bench.toml"
