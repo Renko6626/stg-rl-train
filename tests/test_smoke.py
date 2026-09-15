@@ -52,3 +52,10 @@ def test_bench_cli(tmp_path):
 def test_gpucheck_requires_cuda(monkeypatch, tmp_path):
     monkeypatch.setattr(torch.cuda, "is_available", lambda: False)
     assert gpucheck.main([str(REPO / "configs" / "smoke.toml")]) == 2
+
+
+def test_gpucheck_close_enough():
+    assert gpucheck.close_enough(1.0, 1.0 + 1e-5)
+    assert gpucheck.close_enough(0.0, 1e-6)
+    assert not gpucheck.close_enough(0.0, 1e-4)
+    assert not gpucheck.close_enough(1.0, 1.01)

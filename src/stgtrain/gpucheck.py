@@ -1,5 +1,11 @@
-"""GPU 验收（spec §8）：同一初始权重、同一批 rollout 数据，compile + CUDA 图 开 / 关 各做一次 train_step，
-比较损失统计量的相对误差（阈值 1e-4）。
+"""GPU 验收（spec §8）：同一初始权重、同一批 rollout 数据，比较 compile + CUDA 图 开 / 关 的
+`train_step` 损失统计量与策略输出。
+
+方法：把 ppo.learning_rate 设为 0 且关掉 anneal_lr，使 `off` / `on` 在多次调用间权重不变，
+避免 Adam 舍入误差随更新步数逐步累积放大；`on` 走 torch.compile + CudaGraphModule
+（warmup=20），调用 CALLS=25 次，比较的是第 25 次——此时才走图重放而非动态执行。
+逐项用绝对/相对混合容差 `abs(a - b) <= rel * max(|a|, |b|) + abs_`：损失可能接近 0，
+纯相对误差会把数值噪声放大成巨大百分比，故加 1e-6 绝对下限。
 
 用法：uv run --frozen python -m stgtrain.gpucheck configs/base.toml
 """
@@ -18,6 +24,12 @@ from .reward import RewardFn
 from .train import build_components
 
 TOLERANCE = 1e-4
+CALLS = 25
+
+
+def close_enough(a: float, b: float, rel: float = TOLERANCE, abs_: float = 1e-6) -> bool:
+    """绝对/相对混合容差：非零量用相对项，近零量由绝对项兜底。"""
+    return abs(a - b) <= rel * max(abs(a), abs(b)) + abs_
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -28,7 +40,9 @@ def main(argv: list[str] | None = None) -> int:
         print("gpucheck 需要 CUDA")
         return 2
     device = torch.device("cuda")
-    base = load_config(args.config, {"run": {"device": "cuda"}})
+    base = load_config(args.config, {"run": {"device": "cuda"}, "env": {"num_envs": 256},
+                                     "ppo": {"update_epochs": 1, "num_minibatches": 1,
+                                             "learning_rate": 0.0, "anneal_lr": False}})
     images, starts, _, featurizer, _ = build_components(base, device)
     spec = featurizer.spec()
 
@@ -45,18 +59,47 @@ def main(argv: list[str] | None = None) -> int:
     tracker = EpisodeTracker(envw.n, device, list(rf.terms), base["reward"]["hold_radius"],
                              base["reward"]["edge_margin"], envw.frame_skip, base["intent"]["interval"][1])
     _, container, next_value = off.rollout(envw, featurizer, rf, tracker, None, envw.reset())
+
+    # 损失：各跑 CALLS 次，只比最后一次（on 已过 warmup，走的才是图重放）
     stats = {}
     for name, ppo in (("off", off), ("on", on)):
-        torch.manual_seed(123)
-        stats[name] = ppo.train_step(container.clone(), next_value.clone(), 1, 10)
-    worst = 0.0
+        last = None
+        for _ in range(CALLS):
+            torch.manual_seed(123)
+            last = ppo.train_step(container.clone(), next_value.clone(), 1, 10)
+        stats[name] = last
+
+    # 策略：同一批 feats 各跑 CALLS 次，比最后一次的 entropy / value
+    feats = container["feats"][0]
+    policy: dict[str, tuple[torch.Tensor, torch.Tensor]] = {}
+    for name, ppo in (("off", off), ("on", on)):
+        ent = val = None
+        for _ in range(CALLS):
+            torch.compiler.cudagraph_mark_step_begin()
+            _, _, ent, val = ppo.policy(feats)
+        policy[name] = (ent, val)
+
+    checks: list[tuple[str, float, float, float, bool]] = []
     for k in ("pg_loss", "v_loss", "entropy_loss", "approx_kl"):
         a, b = stats["off"][k], stats["on"][k]
-        rel = abs(a - b) / max(abs(a), 1e-8)
-        worst = max(worst, rel)
-        print(f"{k:>14}  off={a:.8g}  on={b:.8g}  rel={rel:.3g}")
-    ok = worst <= TOLERANCE
-    print("PASS" if ok else f"FAIL（最大相对误差 {worst:.3g} > {TOLERANCE}）")
+        checks.append((k, a, b, abs(a - b), close_enough(a, b)))
+    e_off, v_off = policy["off"]
+    e_on, v_on = policy["on"]
+    checks.append(("policy_entropy_mean", e_off.mean().item(), e_on.mean().item(),
+                   abs(e_off.mean().item() - e_on.mean().item()),
+                   close_enough(e_off.mean().item(), e_on.mean().item())))
+    checks.append(("policy_value_mean", v_off.mean().item(), v_on.mean().item(),
+                   abs(v_off.mean().item() - v_on.mean().item()),
+                   close_enough(v_off.mean().item(), v_on.mean().item())))
+    v_maxabs = (v_off - v_on).abs().max().item()
+    checks.append(("policy_value_maxabs", v_off.abs().max().item(), v_on.abs().max().item(),
+                   v_maxabs, v_maxabs <= TOLERANCE))
+
+    print(f"{'key':>22} {'off':>14} {'on':>14} {'abs diff':>12}  ok")
+    for k, a, b, diff, good in checks:
+        print(f"{k:>22} {a:>14.8g} {b:>14.8g} {diff:>12.3g}  {good}")
+    ok = all(good for *_, good in checks)
+    print("PASS" if ok else f"FAIL（容差 {TOLERANCE}）")
     return 0 if ok else 1
 
 
