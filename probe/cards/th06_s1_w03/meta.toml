@@ -1,0 +1,12 @@
+title = "Stage 1 道中 第 3 波"
+source = "th06"
+origin = "东方红魔乡 Stage 1 道中，timeline 帧 1554–1762（Sub0 纵队），E–L 四档（发弹仅 Lunatic）"
+source_ref = "ecldata1.ecl.txt:1195-1236, 2-20"
+ranks = [0, 3]
+marks = [0]
+time_limit = 628
+original_time_limit = 628
+tags = ["aimed", "stream"]
+laser_approx = false
+lower_half_blocked = false
+notes = "E/N/H 小怪不发弹（原文 !L 粘滞整段）；仅 Lunatic 每 120 帧自动发 1 颗自机狙。小怪无敌（D8）。"

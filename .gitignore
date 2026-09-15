@@ -4,3 +4,5 @@ __pycache__/
 .pytest_cache/
 runs/
 *.tar.gz
+# 转写工作区：含 ZUN 原作 ECL 摘录，永不入库（spec 2026-09-16 §12）
+transcribe/work/

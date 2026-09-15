@@ -1,0 +1,24 @@
+# 探测模式（bash run.sh --probe）：测安装可达性与 CPU / GPU 负载，不追求训练效果。
+# 时长、num_envs、threads 由 stgtrain.probe 按 --minutes 与 bench 结果覆盖；纯 CPU 机器自动关 compile / CUDA 图。
+[run]
+device = "auto"
+total_updates = 1000000
+ckpt_every = 100
+eval_every = 50
+max_minutes = 15.0
+
+[env]
+cards_dir = "probe/cards"
+eval_splits = "probe/splits.toml"
+num_envs = 1024
+
+[eval]
+episodes = 16
+
+[log]
+tensorboard = false
+sample_hz = 1.0
+
+[bench]
+seconds = 5.0
+num_envs = [512, 1024, 2048, 4096]

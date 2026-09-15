@@ -1,0 +1,5 @@
+# 探测模式的评测卡（留出，不参与训练）。
+[[eval]]
+card = "th06_s1_b4"
+ranks = [2]
+episodes = 16
