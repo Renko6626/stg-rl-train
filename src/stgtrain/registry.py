@@ -39,6 +39,7 @@ REWARD_TERMS = Registry("reward term")
 BUILTIN_MODULES: list[str] = [
     "stgtrain.intent",
     "stgtrain.featurize.danger_topk_v1",
+    "stgtrain.reward",
 ]
 
 

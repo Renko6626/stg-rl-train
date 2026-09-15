@@ -75,3 +75,22 @@ def mirror_obs(o: RawObs) -> RawObs:
         player_focus=o.player_focus, bullets=neg_col(o.bullets, [0, 2]), bullets_mask=o.bullets_mask,
         enemies=neg_col(o.enemies, [0]), enemies_mask=o.enemies_mask, target_xy=neg_col(o.target_xy, [0]),
     )
+
+
+from stgagent import consts as C
+
+from stgtrain.envwrap import StepInfo
+
+
+def step_info(n=2, done=None, refreshed=None, buttons=None, prev_buttons=None, ep_frames=100) -> StepInfo:
+    def i64(v, default):
+        return torch.tensor(v, dtype=torch.int64) if v is not None else torch.full((n,), default, dtype=torch.int64)
+
+    return StepInfo(
+        done=i64(done, 0),
+        events=torch.zeros(n, 8, dtype=torch.int64),
+        ep_frames=torch.full((n,), ep_frames, dtype=torch.int64),
+        refreshed=torch.tensor(refreshed, dtype=torch.bool) if refreshed is not None else torch.zeros(n, dtype=torch.bool),
+        buttons=i64(buttons, C.BTN_SHOT),
+        prev_buttons=i64(prev_buttons, C.BTN_SHOT),
+    )

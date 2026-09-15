@@ -1,0 +1,81 @@
+"""逐局统计累加器（训练 metrics 与评测共用；计划 Ruling 2）。
+
+update 全程留在设备上不同步；pop_finished 每轮 rollout 调一次，把结束的局一次性搬回 CPU。
+"""
+from __future__ import annotations
+
+import torch
+from torch import Tensor
+
+from . import actions
+from .envwrap import RawObs, StepInfo
+
+_COLS = ("return", "steps", "in_r", "edge", "shift", "dirchg", "reach_sum", "reach_cnt")
+
+
+class EpisodeTracker:
+    def __init__(self, n: int, device, term_names: list[str], hold_radius: float, edge_margin: float,
+                 frame_skip: int, reach_cap_frames: int):
+        self.n, self.device = int(n), device
+        self.term_names = list(term_names)
+        self.hold_radius, self.edge_margin = float(hold_radius), float(edge_margin)
+        self.frame_skip, self.reach_cap = int(frame_skip), float(reach_cap_frames)
+        self.acc = torch.zeros(self.n, len(_COLS) + len(self.term_names), device=device)
+        self.since = torch.zeros(self.n, device=device)
+        self.reached = torch.zeros(self.n, dtype=torch.bool, device=device)
+        self._pending: list[tuple[Tensor, Tensor, Tensor, Tensor]] = []
+
+    def update(self, prev: RawObs, cur: RawObs, info: StepInfo, total: Tensor, raw_terms: dict[str, Tensor]) -> None:
+        alive = info.done == 0
+        d = (cur.player_xy - prev.target_xy).norm(dim=-1)
+        in_r = (d < self.hold_radius) & alive
+        m = self.edge_margin
+        x, y = cur.player_xy[:, 0].abs(), cur.player_xy[:, 1]
+        edge = ((x > 192.0 - m) | (y > 448.0 - m) | (y < m)) & alive
+        _, toggled = actions.key_changes(info.prev_buttons, info.buttons)
+        dir_chg = actions.direction_changed(info.prev_buttons, info.buttons)
+
+        self.since = self.since + 1
+        newly = in_r & ~self.reached
+        reach_add = newly.float() * self.since * self.frame_skip
+        reach_cnt = newly.float()
+        self.reached = self.reached | newly
+        seg_end = info.refreshed | ~alive
+        miss = seg_end & ~self.reached
+        reach_add = reach_add + miss.float() * self.reach_cap
+        reach_cnt = reach_cnt + miss.float()
+
+        cols = [total.to(torch.float32), torch.ones_like(total, dtype=torch.float32), in_r.float(), edge.float(),
+                toggled.float(), dir_chg.float(), reach_add, reach_cnt]
+        cols += [raw_terms[name].to(torch.float32) for name in self.term_names]
+        self.acc = self.acc + torch.stack(cols, dim=-1)
+
+        ended = ~alive
+        self._pending.append((ended, self.acc.clone(), info.done, info.ep_frames))
+        self.acc = torch.where(ended[:, None], torch.zeros_like(self.acc), self.acc)
+        self.since = torch.where(seg_end, torch.zeros_like(self.since), self.since)
+        self.reached = self.reached & ~seg_end
+
+    def pop_finished(self) -> list[dict]:
+        if not self._pending:
+            return []
+        ended = torch.stack([p[0] for p in self._pending]).cpu()
+        acc = torch.stack([p[1] for p in self._pending]).cpu()
+        done = torch.stack([p[2] for p in self._pending]).cpu()
+        frames = torch.stack([p[3] for p in self._pending]).cpu()
+        self._pending.clear()
+        out: list[dict] = []
+        for t, i in ended.nonzero().tolist():
+            a = acc[t, i].tolist()
+            steps = max(a[1], 1.0)
+            secs = steps * self.frame_skip / 60.0
+            rec = {
+                "env": i, "done": int(done[t, i]), "frames": int(frames[t, i]), "return": a[0], "steps": int(a[1]),
+                "in_r_frac": a[2] / steps, "edge_frac": a[3] / steps,
+                "shift_toggles_per_s": a[4] / secs, "dir_changes_per_s": a[5] / secs,
+                "reach_frames": a[6] / max(a[7], 1.0),
+            }
+            for k, name in enumerate(self.term_names):
+                rec[f"term/{name}"] = a[len(_COLS) + k]
+            out.append(rec)
+        return out
