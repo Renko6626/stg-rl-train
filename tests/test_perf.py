@@ -38,7 +38,19 @@ def test_load_sampler_writes_rows(tmp_path):
     rows = [json.loads(l) for l in (tmp_path / "perf.jsonl").read_text().splitlines()]
     assert len(rows) >= 2 and all(r["kind"] == "load" for r in rows)
     assert {"cpu_percent", "rss_mb", "cpu_per_core"} <= set(rows[0])
+    assert s.n_samples >= 2
     assert "load/cpu_percent" in s.summary()
+
+
+def test_load_sampler_summary_is_streaming(tmp_path):
+    w = PerfWriter(tmp_path / "perf.jsonl")
+    s = LoadSampler(w, hz=1.0)
+    s.add({"kind": "load", "wall": 0, "cpu_percent": 10.0, "cpu_per_core": [1, 2]})
+    s.add({"kind": "load", "wall": 1, "cpu_percent": 30.0, "rss_mb": 5.0})
+    assert s.summary() == {"load/cpu_percent": 20.0, "load/rss_mb": 5.0}
+    assert s.n_samples == 2
+    assert not hasattr(s, "rows")
+    w.close()
 
 
 def test_machine_info_and_summarize():

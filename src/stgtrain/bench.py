@@ -36,8 +36,9 @@ def run_bench(cfg: dict, out_dir: Path) -> dict:
     seconds = float(cfg["bench"]["seconds"])
     results = []
     print(f"{'num_envs':>8} {'threads':>7} {'env_steps/s':>12}")
+    torch.set_num_threads(int(cfg["run"]["torch_threads"]))  # 与训练一致，否则 bench 的线程数结论不可迁移
     for n in cfg["bench"]["num_envs"]:
-        for threads in grid:
+        for threads in sorted({min(t, int(n)) for t in grid}):
             c = deep_merge(cfg, {"env": {"num_envs": int(n), "threads": threads}})
             envw = EnvWrapper(c, images, starts, device, seed=int(c["run"]["seed"]))
             with torch.no_grad():

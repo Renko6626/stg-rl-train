@@ -91,7 +91,10 @@ class LoadSampler:
     def __init__(self, writer: PerfWriter, hz: float):
         self.writer = writer
         self.period = 1.0 / max(float(hz), 1e-3)
-        self.rows: list[dict] = []
+        # 长跑内存有界：只留 running sums / counts，不保留每一行样本
+        self._sums: dict[str, float] = {}
+        self._counts: dict[str, int] = {}
+        self.n_samples = 0
         self._stop = threading.Event()
         self._thread = threading.Thread(target=self._run, daemon=True, name="perf-sampler")
         self._proc = psutil.Process()
@@ -125,17 +128,27 @@ class LoadSampler:
             row["torch_max_alloc_mb"] = torch.cuda.max_memory_allocated() / 2**20
         return row
 
+    def add(self, row: dict) -> None:
+        """把一行数值流式并入 running sums：排除 kind/wall、布尔与列表（如 cpu_per_core），
+        只累加数值键；n_samples 记录采样行数。"""
+        for k, v in row.items():
+            if k in ("kind", "wall") or isinstance(v, bool) or not isinstance(v, (int, float)):
+                continue
+            self._sums[k] = self._sums.get(k, 0.0) + float(v)
+            self._counts[k] = self._counts.get(k, 0) + 1
+        self.n_samples += 1
+
     def _run(self) -> None:
         while not self._stop.wait(self.period):
             row = self.sample()
-            self.rows.append(row)
-            self.writer.write(row)
+            self.add(row)
+            # stop() 超时后 close() 会关文件，此时再写会抛 ValueError；且 stop 已置位后不再落盘
+            if not self._stop.is_set():
+                with contextlib.suppress(ValueError):
+                    self.writer.write(row)
 
     def summary(self) -> dict[str, float]:
-        keys = {k for r in self.rows for k, v in r.items()
-                if k not in ("kind", "wall") and isinstance(v, (int, float)) and not isinstance(v, bool)}
-        return {f"load/{k}": sum(r[k] for r in self.rows if k in r) / max(1, sum(1 for r in self.rows if k in r))
-                for k in sorted(keys)}
+        return {f"load/{k}": self._sums[k] / self._counts[k] for k in sorted(self._counts)}
 
 
 def machine_info() -> dict:

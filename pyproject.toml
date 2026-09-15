@@ -30,3 +30,7 @@ packages = ["src/stgtrain"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+filterwarnings = [
+  "ignore:CUDA initialization:UserWarning",
+  "ignore:.*NVIDIA driver on your system is too old.*:UserWarning",
+]

@@ -113,7 +113,7 @@ def train(cfg: dict, run_dir: Path, resume: dict | None = None, pack_result: boo
         start, env_steps = int(resume["update"]) + 1, int(resume["env_steps"])
         # best.pt 可能比 latest.pt 新（eval 后才崩溃）：有 best.pt 以它为准，否则退回 latest.pt 里的 extra
         best_ck = run_dir / "checkpoints" / "best.pt"
-        best_extra = load_checkpoint(best_ck)["extra"] if best_ck.exists() else resume["extra"]
+        best_extra = load_checkpoint(best_ck, map_location="cpu")["extra"] if best_ck.exists() else resume["extra"]
         best = tuple(best_extra["best"]) if best_extra.get("best") is not None else None
     if not (run_dir / "env.json").exists():
         _update_env_json(run_dir, stg_rl=stg_rl.build_info(), train_repo_sha=git_sha(),
@@ -127,8 +127,11 @@ def train(cfg: dict, run_dir: Path, resume: dict | None = None, pack_result: boo
         # 崩溃残留 / 上次提前退出可能在 checkpoint 之后又写了日志，续训前截掉，避免重复行与 TB 回退步
         truncate_after(run_dir / "metrics.jsonl", int(resume["update"]))
         truncate_after(run_dir / "perf.jsonl", int(resume["update"]))
+    # logger 的 x 轴是 post-increment env_steps，checkpoint 那个 update 恰好记在 resume["env_steps"]；
+    # SummaryWriter(purge_step=s) 删的是 step >= s 的点，故传 env_steps + 1，只清 checkpoint 之后的
+    # 崩溃残留，而不误删 update U 自己的 ppo/*、eval/* 点。
     logger = MetricsLogger(run_dir, bool(cfg["log"]["tensorboard"]),
-                           purge_step=env_steps if resume is not None else None)
+                           purge_step=env_steps + 1 if resume is not None else None)
     perf_writer = PerfWriter(run_dir / "perf.jsonl")
     sampler = LoadSampler(perf_writer, float(cfg["log"]["sample_hz"]))
     timer = PhaseTimer(int(cfg["log"]["perf_sync_every"]), device)

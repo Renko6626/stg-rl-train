@@ -60,6 +60,8 @@ def run_group(cfg: dict, ppo, featurizer, image, card: str, rank: int, episodes:
                 break
     for r in tracker.pop_finished():
         first.setdefault(r["env"], r)
+    if len(first) != episodes:
+        raise RuntimeError(f"评测组 {card} r{rank} 只收到 {len(first)}/{episodes} 局")
     return [first[i] for i in sorted(first)]
 
 

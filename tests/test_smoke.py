@@ -45,6 +45,14 @@ def test_train_end_to_end_then_resume(tmp_path):
     assert [r["update"] for r in rows if "ppo/pg_loss" in r] == [1, 2, 3]
     assert all(r.get("ppo/pg_loss") != 999 for r in rows)
 
+    # TensorBoard：purge_step 不能删掉 checkpoint 那一 update 的点（x 轴 = post-increment env_steps）
+    from tensorboard.backend.event_processing.event_accumulator import EventAccumulator
+
+    ea = EventAccumulator(str(run_dir / "tb"))
+    ea.Reload()
+    pg_steps = [e.step for e in ea.Scalars("ppo/pg_loss")]
+    assert pg_steps == [r["env_steps"] for r in rows if "ppo/pg_loss" in r]
+
     env = json.loads((run_dir / "env.json").read_text(encoding="utf-8"))
     assert env["perf_summary"]["phase_frac"], "分阶段计时须留下非空 phase_frac"
     assert any("perf/env_step_s" in r for r in rows), "metrics 须记录分阶段耗时"

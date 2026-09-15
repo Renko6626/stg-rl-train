@@ -4,8 +4,11 @@
 方法：把 ppo.learning_rate 设为 0 且关掉 anneal_lr，使 `off` / `on` 在多次调用间权重不变，
 避免 Adam 舍入误差随更新步数逐步累积放大；`on` 走 torch.compile + CudaGraphModule
 （warmup=20），调用 CALLS=25 次，比较的是第 25 次——此时才走图重放而非动态执行。
+比较 pg_loss / v_loss / entropy_loss / approx_kl，以及 gn（梯度范数）——lr=0 时梯度仍会计算并
+backward，从而把反向路径也纳入被捕获的图；再比较策略 entropy / value 的均值与逐元素最大绝对差。
 逐项用绝对/相对混合容差 `abs(a - b) <= rel * max(|a|, |b|) + abs_`：损失可能接近 0，
 纯相对误差会把数值噪声放大成巨大百分比，故加 1e-6 绝对下限。
+盲区：每次调用都用同一批输入，无法识别「图重放忽略新输入」这类错误。
 
 用法：uv run --frozen python -m stgtrain.gpucheck configs/base.toml
 """
@@ -80,7 +83,7 @@ def main(argv: list[str] | None = None) -> int:
         policy[name] = (ent, val)
 
     checks: list[tuple[str, float, float, float, bool]] = []
-    for k in ("pg_loss", "v_loss", "entropy_loss", "approx_kl"):
+    for k in ("pg_loss", "v_loss", "entropy_loss", "approx_kl", "gn"):
         a, b = stats["off"][k], stats["on"][k]
         checks.append((k, a, b, abs(a - b), close_enough(a, b)))
     e_off, v_off = policy["off"]

@@ -38,3 +38,12 @@ def test_truncate_after(tmp_path):
     assert [r["update"] for r in kept if "update" in r] == [1, 2, 3]
     assert not (tmp_path / "m.jsonl.tmp").exists()
     assert truncate_after(tmp_path / "missing.jsonl", 3) == 0
+
+
+def test_truncate_after_drops_half_written_last_line(tmp_path):
+    p = tmp_path / "m.jsonl"
+    lines = [json.dumps({"update": i, "env_steps": i}) for i in range(1, 4)]
+    p.write_text("\n".join(lines) + '\n{"update": 4, "env_st', encoding="utf-8")
+    assert truncate_after(p, 3) == 1
+    kept = read_jsonl(p)
+    assert [r["update"] for r in kept] == [1, 2, 3]

@@ -43,13 +43,29 @@ def read_jsonl(path) -> list[dict]:
 
 def truncate_after(path, update: int) -> int:
     """续训前把 checkpoint 之后的残留行截掉：保留无 "update" 键或 update <= 给定值的行。
-    返回被丢弃的行数；文件不存在返回 0。重写走临时文件 + os.replace，保证原子。"""
+    返回被丢弃的行数；文件不存在返回 0。重写走临时文件 + os.replace，保证原子。
+    硬杀可能留下半行 JSON：只容忍「最后一个非空行」解析失败并丢弃它，其余坏行照旧抛错。"""
     path = Path(path)
     if not path.exists():
         return 0
-    rows = read_jsonl(path)
-    keep = [r for r in rows if "update" not in r or int(r["update"]) <= int(update)]
-    dropped = len(rows) - len(keep)
+    lines = path.read_text(encoding="utf-8").splitlines()
+    last = max((i for i, line in enumerate(lines) if line.strip()), default=-1)
+    keep: list[dict] = []
+    dropped = 0
+    for i, line in enumerate(lines):
+        if not line.strip():
+            continue
+        try:
+            row = json.loads(line)
+        except json.JSONDecodeError:
+            if i == last:
+                dropped += 1
+                continue
+            raise
+        if "update" not in row or int(row["update"]) <= int(update):
+            keep.append(row)
+        else:
+            dropped += 1
     if dropped:
         tmp = path.with_name(path.name + ".tmp")
         with open(tmp, "w", encoding="utf-8") as f:
