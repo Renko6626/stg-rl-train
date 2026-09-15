@@ -40,6 +40,7 @@ BUILTIN_MODULES: list[str] = [
     "stgtrain.intent",
     "stgtrain.featurize.danger_topk_v1",
     "stgtrain.reward",
+    "stgtrain.models.set_attn_v1",
 ]
 
 
