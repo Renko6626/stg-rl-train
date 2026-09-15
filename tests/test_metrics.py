@@ -1,8 +1,9 @@
+import json
 import math
 
 import pytest
 
-from stgtrain.metrics import MetricsLogger, read_jsonl, summarize_episodes
+from stgtrain.metrics import MetricsLogger, read_jsonl, summarize_episodes, truncate_after
 
 
 def test_logger_writes_jsonl_and_tensorboard(tmp_path):
@@ -25,3 +26,15 @@ def test_summarize_episodes():
     assert s["ep/return"] == pytest.approx(2.0) and s["ep/frames"] == pytest.approx(200.0)
     assert "ep/env" not in s
     assert summarize_episodes([]) == {}
+
+
+def test_truncate_after(tmp_path):
+    p = tmp_path / "m.jsonl"
+    rows = [{"update": i, "env_steps": i} for i in range(1, 6)] + [{"wall": 0.0, "env_steps": 0}]
+    p.write_text("\n".join(json.dumps(r) for r in rows) + "\n", encoding="utf-8")
+    assert truncate_after(p, 3) == 2
+    kept = read_jsonl(p)
+    assert len(kept) == 4
+    assert [r["update"] for r in kept if "update" in r] == [1, 2, 3]
+    assert not (tmp_path / "m.jsonl.tmp").exists()
+    assert truncate_after(tmp_path / "missing.jsonl", 3) == 0

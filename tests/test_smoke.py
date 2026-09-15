@@ -34,10 +34,16 @@ def test_train_end_to_end_then_resume(tmp_path):
     env = json.loads((run_dir / "env.json").read_text(encoding="utf-8"))
     assert env["action_table_version"] == 1 and "perf_summary" in env and env["stg_rl"]["engine_ver"]
 
+    # 模拟「update 3 写了日志但 latest.pt 还是 update 2」的崩溃残留，续训须把其后行截掉
+    with open(run_dir / "metrics.jsonl", "a", encoding="utf-8") as f:
+        f.write(json.dumps({"update": 3, "env_steps": 1, "wall": 0, "ppo/pg_loss": 999}) + "\n")
+
     assert main(["--resume", str(run_dir), "--total-updates", "3", "--no-pack"]) == 0
     ck = load_checkpoint(run_dir / "checkpoints" / "latest.pt")
     assert ck["update"] == 3 and ck["cfg"]["run"]["total_updates"] == 3
-    assert [r["update"] for r in read_jsonl(run_dir / "metrics.jsonl") if "ppo/pg_loss" in r] == [1, 2, 3]
+    rows = read_jsonl(run_dir / "metrics.jsonl")
+    assert [r["update"] for r in rows if "ppo/pg_loss" in r] == [1, 2, 3]
+    assert all(r.get("ppo/pg_loss") != 999 for r in rows)
 
 
 def test_bench_cli(tmp_path):

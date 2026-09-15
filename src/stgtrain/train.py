@@ -25,7 +25,7 @@ from .config import deep_merge, dump_toml, from_dict, load_config
 from .envwrap import EnvWrapper
 from .episodes import EpisodeTracker
 from .evaluate import evaluate, score
-from .metrics import MetricsLogger, read_jsonl, summarize_episodes
+from .metrics import MetricsLogger, read_jsonl, summarize_episodes, truncate_after
 from .perf import LoadSampler, PerfWriter, PhaseTimer, machine_info, summarize
 from .ppo import PPO
 from .registry import FEATURIZERS, MODELS, check_compat, load_builtins
@@ -118,7 +118,12 @@ def train(cfg: dict, run_dir: Path, resume: dict | None = None, pack_result: boo
     reward_fn = RewardFn(cfg)
     tracker = EpisodeTracker(envw.n, device, list(reward_fn.terms), cfg["reward"]["hold_radius"],
                              cfg["reward"]["edge_margin"], envw.frame_skip, cfg["intent"]["interval"][1])
-    logger = MetricsLogger(run_dir, bool(cfg["log"]["tensorboard"]))
+    if resume is not None:
+        # 崩溃残留 / 上次提前退出可能在 checkpoint 之后又写了日志，续训前截掉，避免重复行与 TB 回退步
+        truncate_after(run_dir / "metrics.jsonl", int(resume["update"]))
+        truncate_after(run_dir / "perf.jsonl", int(resume["update"]))
+    logger = MetricsLogger(run_dir, bool(cfg["log"]["tensorboard"]),
+                           purge_step=env_steps if resume is not None else None)
     perf_writer = PerfWriter(run_dir / "perf.jsonl")
     sampler = LoadSampler(perf_writer, float(cfg["log"]["sample_hz"]))
     timer = PhaseTimer(int(cfg["log"]["perf_sync_every"]), device)

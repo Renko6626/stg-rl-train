@@ -83,7 +83,12 @@ def plot_runs(runs: dict[str, list[dict]], out_dir: Path) -> list[Path]:
         fig, axes = _grid(len(keys))
         for ax, key in zip(axes, keys):
             for name, rows in runs.items():
-                pts = [(r["env_steps"], r[key]) for r in rows if r.get(key) is not None]
+                # 同一 update 可能有多行（续训残留 / 同 update 分多次 log）：按 env_steps 排序后每个 update 只留末行
+                last: dict = {}
+                for r in sorted(rows, key=lambda r: r.get("env_steps", 0)):
+                    if r.get(key) is not None:
+                        last[r.get("update")] = r
+                pts = sorted(((r["env_steps"], r[key]) for r in last.values()), key=lambda p: p[0])
                 if pts:
                     ax.plot([p[0] for p in pts], [p[1] for p in pts], label=name)
             ax.set_title(key, fontsize=9)

@@ -3,12 +3,13 @@ from __future__ import annotations
 
 import json
 import math
+import os
 import time
 from pathlib import Path
 
 
 class MetricsLogger:
-    def __init__(self, run_dir: Path, tensorboard: bool):
+    def __init__(self, run_dir: Path, tensorboard: bool, purge_step: int | None = None):
         self.run_dir = Path(run_dir)
         self.path = self.run_dir / "metrics.jsonl"
         self._f = open(self.path, "a", encoding="utf-8")
@@ -17,7 +18,7 @@ class MetricsLogger:
         if tensorboard:
             from torch.utils.tensorboard import SummaryWriter
 
-            self.tb = SummaryWriter(str(self.run_dir / "tb"))
+            self.tb = SummaryWriter(str(self.run_dir / "tb"), purge_step=purge_step)
 
     def log(self, update: int, env_steps: int, scalars: dict[str, float]) -> None:
         row: dict = {"update": int(update), "env_steps": int(env_steps), "wall": round(time.time() - self._t0, 3)}
@@ -38,6 +39,24 @@ class MetricsLogger:
 def read_jsonl(path) -> list[dict]:
     with open(path, encoding="utf-8") as f:
         return [json.loads(line) for line in f if line.strip()]
+
+
+def truncate_after(path, update: int) -> int:
+    """续训前把 checkpoint 之后的残留行截掉：保留无 "update" 键或 update <= 给定值的行。
+    返回被丢弃的行数；文件不存在返回 0。重写走临时文件 + os.replace，保证原子。"""
+    path = Path(path)
+    if not path.exists():
+        return 0
+    rows = read_jsonl(path)
+    keep = [r for r in rows if "update" not in r or int(r["update"]) <= int(update)]
+    dropped = len(rows) - len(keep)
+    if dropped:
+        tmp = path.with_name(path.name + ".tmp")
+        with open(tmp, "w", encoding="utf-8") as f:
+            for r in keep:
+                f.write(json.dumps(r, ensure_ascii=False) + "\n")
+        os.replace(tmp, path)
+    return dropped
 
 
 def summarize_episodes(records: list[dict], prefix: str = "ep/") -> dict[str, float]:
