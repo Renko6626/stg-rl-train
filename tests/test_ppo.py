@@ -1,0 +1,90 @@
+import pytest
+import stg_rl
+import torch
+
+from conftest import FIXTURES, small_cfg
+from stgtrain.cards import compile_cards, discover
+from stgtrain.envwrap import EnvWrapper
+from stgtrain.episodes import EpisodeTracker
+from stgtrain.ppo import PPO, gae
+from stgtrain.registry import FEATURIZERS, MODELS, load_builtins
+from stgtrain.reward import RewardFn
+
+load_builtins()
+CPU = torch.device("cpu")
+
+
+def gae_oracle(r, v, d, nv, gamma, lam):
+    """逐 env 标量写法，作为 gae 的对照实现。"""
+    T, N = r.shape
+    adv = torch.zeros(T, N)
+    for i in range(N):
+        last = 0.0
+        for t in reversed(range(T)):
+            code = int(d[t, i])
+            v_next = float(nv[i]) if t == T - 1 else float(v[t + 1, i])
+            if code == 0:
+                delta = r[t, i] + gamma * v_next - v[t, i]
+                last = delta + gamma * lam * last
+            elif code == 3:
+                last = r[t, i] + gamma * v[t, i] - v[t, i]
+            else:
+                last = r[t, i] - v[t, i]
+            adv[t, i] = last
+    return adv
+
+
+def test_gae_done_codes():
+    r = torch.tensor([[1.0, 1.0, 1.0, 1.0], [1.0, 1.0, 1.0, 1.0], [1.0, 1.0, 1.0, 1.0]])
+    v = torch.tensor([[0.5, 0.5, 0.5, 0.5], [0.4, 0.4, 0.4, 0.4], [0.3, 0.3, 0.3, 0.3]])
+    d = torch.tensor([[0, 0, 0, 0], [0, 1, 3, 0], [0, 0, 0, 2]])
+    nv = torch.full((4,), 2.0)
+    adv, ret = gae(r, v, d, nv, 0.9, 0.8)
+    assert torch.allclose(adv, gae_oracle(r, v, d, nv, 0.9, 0.8), atol=1e-6)
+    assert adv[1, 1] == pytest.approx(1.0 - 0.4), "done=1：不自举"
+    assert adv[1, 2] == pytest.approx(1.0 + 0.9 * 0.4 - 0.4), "done=3：用 V(obs_t) 自举"
+    assert adv[2, 3] == pytest.approx(1.0 - 0.3), "done=2：不自举，也不用 next_value"
+    assert torch.allclose(ret, adv + v)
+
+
+def setup(num_steps=16):
+    cfg = small_cfg(ppo={"num_steps": num_steps})
+    images = compile_cards(discover(FIXTURES / "cards"))
+    envw = EnvWrapper(cfg, images, [stg_rl.Start("example_ring", 0, 2)], CPU, seed=4)
+    feat = FEATURIZERS.get("danger_topk_v1")(cfg)
+    factory = lambda: MODELS.get("set_attn_v1")(cfg, feat.spec())
+    ppo = PPO(cfg, factory, CPU)
+    rf = RewardFn(cfg)
+    tr = EpisodeTracker(envw.n, CPU, list(rf.terms), 24.0, 16.0, 1, 300)
+    return cfg, envw, feat, ppo, rf, tr
+
+
+def test_rollout_and_train_step_on_cpu():
+    torch.manual_seed(0)
+    cfg, envw, feat, ppo, rf, tr = setup()
+    assert not ppo.compile and not ppo.cudagraphs
+    obs = envw.reset()
+    before = [p.detach().clone() for p in ppo.agent.parameters()]
+    obs, container, next_value = ppo.rollout(envw, feat, rf, tr, None, obs)
+    assert container.batch_size == torch.Size([16, 8])
+    assert container["feats", "bullets"].shape == (16, 8, 16, 7)
+    assert next_value.shape == (8,)
+    stats = ppo.train_step(container, next_value, iteration=1, num_iterations=10)
+    for k in ("approx_kl", "v_loss", "pg_loss", "entropy_loss", "clipfrac", "gn", "explained_variance", "lr", "done3_frac"):
+        assert k in stats
+    assert all(v == v for k, v in stats.items() if k != "explained_variance"), "非 NaN"
+    assert any(not torch.equal(a, b) for a, b in zip(before, ppo.agent.parameters())), "参数应被更新"
+    # agent_inference 与 agent 共享数据
+    for a, b in zip(ppo.agent.parameters(), ppo.agent_inference.parameters()):
+        assert torch.equal(a.data, b.data)
+
+
+def test_act_greedy_and_lr_anneal():
+    cfg, envw, feat, ppo, rf, tr = setup()
+    f = feat(envw.reset())
+    a = ppo.act(f, greedy=True)
+    assert a.shape == (8,) and a.dtype == torch.int64 and ((0 <= a) & (a < 18)).all()
+    assert torch.equal(a, ppo.act(f, greedy=True))
+    obs, c, nv = ppo.rollout(envw, feat, rf, tr, None, envw.reset())
+    stats = ppo.train_step(c, nv, iteration=6, num_iterations=10)
+    assert stats["lr"] == pytest.approx(cfg["ppo"]["learning_rate"] * 0.5)
