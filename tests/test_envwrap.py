@@ -6,7 +6,7 @@ from stgagent import consts as C
 
 from conftest import FIXTURES, small_cfg
 from stgtrain.cards import compile_cards, discover
-from stgtrain.envwrap import EnvWrapper
+from stgtrain.envwrap import EnvWrapper, _fx
 from stgtrain.registry import load_builtins
 
 load_builtins()
@@ -112,3 +112,35 @@ def test_same_seed_is_deterministic():
     for f in ("player_xy", "bullets", "bullets_mask", "enemies", "target_xy"):
         assert torch.equal(getattr(oa, f), getattr(ob, f)), f
     assert torch.equal(ia.done, ib.done)
+
+
+def test_fx_decodes_row_strides_not_divisible_by_4():
+    """_fx 直测。bullets 表行跨步 = 30 不被 4 整除：切片 (k,4) 在 k==1 时仍是 PyTorch 眼中的
+    “连续”张量（size-1 维的步长被忽略），旧实现 `.contiguous().view(int32)` 会抛 stride 错误。
+    覆盖 (0,30)/(1,30)/(3,30)/(1,36)/(2,256,38)；单行用例取 (5,30) 的 `[:1]` 切片。
+    另测 off=22（bullets `radius` 真实偏移，非 4 对齐）：`contiguous()` 对 size-1 / 空张量是 no-op，
+    只压平不归零偏移仍会在空/单行时崩溃。"""
+    rng = np.random.default_rng(20240521)
+
+    def probe(shape, off, source_shape=None):
+        src = source_shape if source_shape is not None else shape
+        u8 = rng.integers(0, 256, size=src, dtype=np.uint8)
+        vals = rng.integers(-(2**31), 2**31, size=src[:-1], dtype=np.int64).astype("<i4")
+        u8[..., off:off + 4] = np.frombuffer(vals.tobytes(), dtype=np.uint8).reshape(src[:-1] + (4,))
+        return (u8[:1] if source_shape is not None else u8), off
+
+    cases = [
+        ("(0,30) 空表 off=4", probe((0, 30), 4)),
+        ("(0,30) 空表 off=22", probe((0, 30), 22)),
+        ("(1,30) 单行切片 off=4", probe((1, 30), 4, source_shape=(5, 30))),
+        ("(1,30) 单行切片 off=22", probe((1, 30), 22, source_shape=(5, 30))),
+        ("(3,30) 多行 off=4", probe((3, 30), 4)),
+        ("(1,36) 跨步整除 off=4", probe((1, 36), 4)),
+        ("(2,256,38) 多维 off=4", probe((2, 256, 38), 4)),
+    ]
+    for name, (u8, off) in cases:
+        want = (np.frombuffer(np.ascontiguousarray(u8[..., off:off + 4]).tobytes(), "<i4")
+                .astype(np.float64) / 65536).reshape(u8.shape[:-1])
+        got = _fx(torch.from_numpy(u8), off).numpy()
+        assert got.shape == u8.shape[:-1], name
+        assert np.array_equal(got, want.astype(np.float32)), name

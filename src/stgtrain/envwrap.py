@@ -50,13 +50,14 @@ def _off(table: str, field: str) -> int:
 
 
 def _fx(rows: Tensor, off: int) -> Tensor:
-    """rows[..., off:off+4] 小端 int32 定点 → float32 像素。"""
+    """rows[..., off:off+4] 小端 int32 定点 → float32 像素。先压平再 view：规避 size-1 维度步长不整除 4 的问题。"""
     part = rows[..., off:off + 4]
-    if part.numel() == 0:
-        # 空子弹表：`.contiguous()` 对 0 元素张量是 no-op（is_contiguous 恒真），行跨步 30 % 4 != 0，
-        # 直接 view(int32) 会报错。空表没有数据要解码，按前缀形状返回空张量即可。
-        return torch.zeros(part.shape[:-1], dtype=torch.float32, device=rows.device)
-    return part.contiguous().view(torch.int32).squeeze(-1).to(torch.float32) * FX_SCALE
+    flat = part.contiguous().reshape(-1)
+    if flat.storage_offset() % 4 != 0:
+        # size-1 / 空张量在 PyTorch 眼里“连续”，`.contiguous()` 是 no-op，会留下不整除 4 的存储偏移
+        # （如 bullets `radius` 偏移 22），`view(int32)` 仍会报错；clone 成偏移 0 的紧凑副本。
+        flat = flat.clone()
+    return flat.view(torch.int32).reshape(part.shape[:-1]).to(torch.float32) * FX_SCALE
 
 
 def _u16(rows: Tensor, off: int) -> Tensor:
