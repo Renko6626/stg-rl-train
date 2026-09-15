@@ -49,10 +49,10 @@ async sub rings() {
     var n60: int = 13;
     var ly: int = 1;
     var s2: fx = 0.3fx;
-    var a1: angle = 5461bam;               // 0.2617994f
-    if rank == RANK_NORMAL { n = 17; n60 = 17; a1 = 4096bam; }                           // 0.19634955f
-    else if rank == RANK_HARD { n = 29; n60 = 21; a1 = 3277bam; }                        // 0.15707964f
-    else if rank >= RANK_LUNATIC { n = 29; n60 = 29; ly = 2; s2 = 1.0fx; a1 = 2341bam; }  // 0.11219974f
+    var a1: angle = 2731bam;               // 0.2617994f
+    if rank == RANK_NORMAL { n = 17; n60 = 17; a1 = 2048bam; }                           // 0.19634955f
+    else if rank == RANK_HARD { n = 29; n60 = 21; a1 = 1638bam; }                        // 0.15707964f
+    else if rank >= RANK_LUNATIC { n = 29; n60 = 29; ly = 2; s2 = 1.0fx; a1 = 1170bam; }  // 0.11219974f
     sh_reset(0);
     sh_offset(0, 0.0fx, -12.0fx);
     sh_aim(0, 1);
@@ -98,7 +98,7 @@ async sub sweeps() {
             for ka in 0..12 {              // Sub31_1648：每 2 帧一发
                 wait(2);
                 sh_speed(2, f0, 0fx);
-                sh_angle(2, f1, 2048bam);
+                sh_angle(2, f1, 1024bam);
                 sh_fire(2);
                 f0 = f0 + 0.2fx;
                 f1 = f1 + 1489bam;         // 0.14279966f
@@ -108,7 +108,7 @@ async sub sweeps() {
             for kb in 0..12 {              // Sub31_1824
                 wait(2);
                 sh_speed(2, f0, 0fx);
-                sh_angle(2, f1, 2048bam);
+                sh_angle(2, f1, 1024bam);
                 sh_fire(2);
                 f0 = f0 + 0.2fx;
                 f1 = f1 - 1489bam;

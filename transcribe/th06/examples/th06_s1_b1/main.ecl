@@ -71,7 +71,7 @@ sub sub15() {
     wait(12);
     var s: fx = 3.0fx;                     // +12 只有 Easy 是 3.0
     if rank == RANK_NORMAL { s = 4.0fx; } else if rank == RANK_HARD { s = 5.0fx; } else if rank >= RANK_LUNATIC { s = 6.0fx; }
-    fan_aimed(BALL, 2, 1, 10, s, 1.0fx, 0deg, 2048bam);
+    fan_aimed(BALL, 2, 1, 10, s, 1.0fx, 0deg, 1024bam);
     var hs: fx = 4.0fx;                    // 其后 E/N 4.0、H 5.0、L 6.0
     if rank == RANK_HARD { hs = 5.0fx; } else if rank >= RANK_LUNATIC { hs = 6.0fx; }
     var nh: int = 1;
@@ -85,7 +85,7 @@ sub sub15() {
         if rank == RANK_HARD { n = nh; } else if rank >= RANK_LUNATIC { n = nl; }
         var col: int = 1;
         if i % 2 == 1 { col = 2; }
-        fan_aimed(BALL, col, n, 10, hs, 1.0fx, 0deg, 2048bam);
+        fan_aimed(BALL, col, n, 10, hs, 1.0fx, 0deg, 1024bam);
     }
     wait(120);                             // +180 调度
 }
@@ -107,8 +107,8 @@ sub sub16() {
         var nn: int = n;
         ly = 1;
         a2 = 0deg;
-        if rank >= RANK_LUNATIC { ly = 2; a2 = 2731bam; if v >= 2 { nn = 32; } }
-        if rank == RANK_HARD && v >= 2 { ly = 2; a2 = 2731bam; }
+        if rank >= RANK_LUNATIC { ly = 2; a2 = 1365bam; if v >= 2 { nn = 32; } }
+        if rank == RANK_HARD && v >= 2 { ly = 2; a2 = 1365bam; }
         if v % 2 == 1 { a2 = 0deg - a2; }
         circle_aimed(OUTLINE, 6, nn, ly, sp, 1.0fx, 0deg, a2);
         if v < 3 {
@@ -127,11 +127,11 @@ sub sub17() {
     wait(80);
     var n: int = 2;
     if rank == RANK_NORMAL { n = 3; } else if rank >= RANK_HARD { n = 5; }
-    fan_aimed(RICE, 2, n, 16, 5.0fx, 1.0fx, 0deg, 1365bam);          // +80
+    fan_aimed(RICE, 2, n, 16, 5.0fx, 1.0fx, 0deg, 683bam);          // +80
     wait(30);                                                         // +110（Easy 不发）
     if rank == RANK_NORMAL { circle_aimed(OUTLINE, 6, 16, 1, 2.0fx, 1.0fx, 0deg, 0deg); }
     else if rank == RANK_HARD { circle_aimed(OUTLINE, 6, 24, 2, 2.5fx, 1.0fx, 0deg, 0deg); }
-    else if rank >= RANK_LUNATIC { circle_aimed(OUTLINE, 6, 48, 3, 4.0fx, 1.0fx, 0deg, 1365bam); }
+    else if rank >= RANK_LUNATIC { circle_aimed(OUTLINE, 6, 48, 3, 4.0fx, 1.0fx, 0deg, 683bam); }
     wait(90);                                                         // +200 调度
 }
 
@@ -140,16 +140,16 @@ sub sub18() {
     var rank: int = global(GVAR_RANK);
     wander(3.0fx, 60);
     var f0: fx = 1.0fx;
-    var f1: angle = -5461bam;              // -0.2617994f
-    var step: angle = 1365bam;             // 0.06544985f
-    if rand(2) == 0 { f1 = 5461bam; step = 0deg - step; }   // cmp_int($I0, 0); jump_equ → Sub18_456 分支
+    var f1: angle = -2731bam;              // -0.2617994f
+    var step: angle = 683bam;             // 0.06544985f
+    if rand(2) == 0 { f1 = 2731bam; step = 0deg - step; }   // cmp_int($I0, 0); jump_equ → Sub18_456 分支
     var n: int = 1;
     var ly: int = 1;
     var s2: fx = 0fx;
     if rank == RANK_HARD { n = 2; ly = 2; s2 = 1.0fx; } else if rank >= RANK_LUNATIC { n = 3; ly = 3; s2 = 1.0fx; }
     for k1 in 0..16 {
         wait(2);
-        fan_aimed(OUTLINE, 10, n, ly, f0, s2, f1, 1365bam);
+        fan_aimed(OUTLINE, 10, n, ly, f0, s2, f1, 683bam);
         f0 = f0 + 0.25fx;
         f1 = f1 + step;
     }
