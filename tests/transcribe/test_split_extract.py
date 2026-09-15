@@ -148,6 +148,14 @@ def test_boss_subs_and_structure_render(ecl):
     assert "テスト符「甲」" in md
     assert "间隙 400" in md
     assert "**含 laser**" in md
+    assert "timer_callback→Sub3[ENHL] 阈值 1200[ENHL]" in md
+
+
+def test_structure_aggregates_repeated_refs():
+    e = parse("sub A()\n{\n    call(\"B\", 0, 0.0f);\n    call(\"B\", 1, 0.0f);\n}\nsub B()\n{\n    ret();\n}\n"
+              "timeline T()\n{\n}\n")
+    md = structure.render(e, 1, {})
+    assert "call→B×2[ENHL]" in md
 
 
 def test_extract_units_are_verbatim_and_annotated(ecl, monkeypatch):
@@ -173,6 +181,16 @@ def test_extract_units_are_verbatim_and_annotated(ecl, monkeypatch):
     assert "a7=5.625°=1024bam" in wt  # bullet 角度：π/32 = 65536/64
     assert "弹型→BULLET=128" in wt
     assert "[ENHL]" in wt
+
+
+def test_maybe_angle_annotations():
+    e = parse("sub A()\n{\n    set_float($F1, -0.57119864f);\n    math_float_add($F0, %F0, 0.2f);\n"
+              "    set_float($F2, 0.19634955f);\n    set_float($F3, 2.0f);\n}\ntimeline T()\n{\n}\n")
+    notes = [X.annotate(i) for i in e.subs["A"].instrs]
+    assert "若为角度:-32.73°=-5958bam" in notes[0]
+    assert "bam" not in notes[1]          # 0.2：速度增量常见值，不标
+    assert "a1=11.25°=2048bam" in notes[2]  # π/16：BAM 整数，直接标
+    assert "bam" not in notes[3]
 
 
 def test_write_unit(tmp_path, ecl, monkeypatch):

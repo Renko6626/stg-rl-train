@@ -40,12 +40,21 @@ X_ARGS: dict[str, tuple[int, ...]] = {
 
 
 def _angle_note(v: float, strict: bool) -> str | None:
+    """strict：参数位确定是角度。非 strict：变量赋值类，值可能是角度也可能是速度——
+    BAM 近整数（π 的整分数）直接标；否则只要不是 0.05 的整倍数（速度 / 增量常见值）就标「若为角度」。"""
     if v <= -990 or abs(v) > 7.0:
         return None
     bam = U.rad_to_bam(v)
-    if not strict and (abs(v) < 0.01 or abs(bam - round(bam)) > 0.05):
+    note = f"{math.degrees(v):.4g}°={round(bam)}bam"
+    if strict:
+        return note
+    if abs(v) < 0.01:
         return None
-    return f"{math.degrees(v):.4g}°={round(bam)}bam"
+    if abs(bam - round(bam)) <= 0.05:
+        return note
+    if abs(v * 20 - round(v * 20)) < 1e-4:
+        return None
+    return "若为角度:" + note
 
 
 def annotate(i: Instr) -> str:

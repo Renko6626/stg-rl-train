@@ -49,13 +49,16 @@ def sub_section(ecl: EclFile, bosses: set[str], loc: dict) -> list[str]:
         n_bullets = sum(1 for i in b.instrs if i.name in U.BULLET_OPS)
         if name in bosses:
             tags.append("BOSS")
+        ref_counts: dict[str, int] = {}
         for kind, target, i in refs(b):
             thr = ""
             if kind in ("life_callback", "timer_callback"):
                 thr_name = "life_callback_threshold" if kind == "life_callback" else "timer_callback_threshold"
                 thrs = [f"{j.args[0]}[{j.ranks}]" for j in b.instrs if j.name == thr_name]
                 thr = f" 阈值 {','.join(thrs)}" if thrs else ""
-            tags.append(f"{kind}→{target}[{i.ranks}]{thr}")
+            key = f"{kind}→{target}{{n}}[{i.ranks}]{thr}"
+            ref_counts[key] = ref_counts.get(key, 0) + 1
+        tags += [k.replace("{n}", f"×{c}" if c > 1 else "") for k, c in ref_counts.items()]
         for i in b.instrs:
             if i.name == "spellcard_start":
                 key = unquote(i.args[2]) or ""
