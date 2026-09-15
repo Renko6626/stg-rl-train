@@ -85,3 +85,18 @@ def test_density_counts_and_mirror_consistency():
     assert torch.allclose(b["bullets"][..., [1, 3, 4, 5, 6]], a["bullets"][..., [1, 3, 4, 5, 6]], atol=1e-6)
     assert torch.allclose(b["cond"][:, 0], -a["cond"][:, 0]) and torch.allclose(b["cond"][:, 1:], a["cond"][:, 1:])
     assert torch.allclose(b["player"][:, 0], -a["player"][:, 0])
+
+
+def test_density_mirror_exact_on_cell_edges():
+    # x 落在内部格线上（32 的整数倍），旧实现整颗记到右侧格，镜像后不等于左右翻转。
+    xs = [0.0, -160.0, 32.0, 192.0, -192.0]
+    ys = [16.0, 80.0, 144.0, 208.0, 272.0]
+    vxs = [1.0, -2.0, 3.0, -1.0, 2.0]
+    rows = [(x, y, vx, 1.0, 2.0) for x, y, vx in zip(xs, ys, vxs)]
+    o = raw_obs(n=1, player=(13.5, 371.5), target=(-41.5, 260.5), bullets=[rows])
+    f = feat(d_max=1000.0)
+    a, b = f(o), f(mirror_obs(o))
+    assert torch.equal(b["density"], a["density"].flip(-1))
+    assert a["density"][0, 0].sum() == 5
+    # x = 0.0 在内部格线上：第 0 行第 5、6 列各 0.5。
+    assert a["density"][0, 0, 0, 5] == 0.5 and a["density"][0, 0, 0, 6] == 0.5
