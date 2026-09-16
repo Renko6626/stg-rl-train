@@ -1,0 +1,12 @@
+title = "Stage 2 道中 第 6 波"
+source = "th06"
+origin = "东方红魔乡 Stage 2 道中（中 boss 退场后），timeline 帧 3498–4413（Sub7 妖精群），E–L 四档"
+source_ref = "ecldata2.ecl.txt:1336-1703, 131-140"
+ranks = [0, 3]
+marks = [0]
+time_limit = 1235
+original_time_limit = 1235
+tags = ["random"]
+laser_approx = false
+lower_half_blocked = false
+notes = "Sub7 妖精群：每 5 帧一只共 184 只，随机 x 出生、[45°,135°) 速度 3 下冲，全程不发弹，只有体碰；小怪无敌（D8），出界由守卫退场。"

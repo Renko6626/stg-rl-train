@@ -1,0 +1,12 @@
+title = "雹符「ヘイルストーム」"
+source = "th06"
+origin = "东方红魔乡 Stage 2 boss 琪露诺 符卡 雹符「ヘイルストーム」（ecldata2 Sub33/Sub34/Sub35），Hard–Lunatic"
+source_ref = "ecldata2.ecl.txt:700-704, 706-719, 721-760"
+ranks = [2, 3]
+marks = [0]
+time_limit = 2100
+original_time_limit = 2100
+tags = ["ring", "curve", "stream"]
+laser_approx = false
+lower_half_blocked = false
+notes = "boss 无敌，按原作 2100 帧超时收段。0x100 减速转向的 f0/f1 每发/每波不同、xformdef 只能收编译期常量，故减速用固定 xform、定向定速交给弹上任务（方向/波号经全局槽传递）。"

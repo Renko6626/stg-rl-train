@@ -1,0 +1,12 @@
+title = "氷符「アイシクルフォール」"
+source = "th06"
+origin = "东方红魔乡 Stage 2 boss 琪露诺 符卡 氷符「アイシクルフォール」（Sub30/31/32），E/N 两档（H/L 走 Sub33，不在本段）"
+source_ref = "ecldata2.ecl.txt:619-623, 625-638, 640-698"
+ranks = [0, 1]
+marks = [0]
+time_limit = 1800
+original_time_limit = 1800
+tags = ["stream", "curve", "aimed"]
+laser_approx = false
+lower_half_blocked = false
+notes = "boss 无敌，按原作 1800 帧超时收段。冰柱 0x40 减速→转±90°→1.6/1.4；N 档自机狙按自机 y 分档抽发（E 档不发）。"

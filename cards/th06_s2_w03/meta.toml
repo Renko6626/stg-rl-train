@@ -1,0 +1,12 @@
+title = "Stage 2 道中 第 3 波"
+source = "th06"
+origin = "东方红魔乡 Stage 2 道中，timeline 帧 1250–1506（Sub6 横扫编队 + 随机 Sub0–Sub4 散兵），E–L 四档"
+source_ref = "ecldata2.ecl.txt:1196-1241, 2-21, 23-40, 42-61, 63-80, 82-101, 113-129"
+ranks = [0, 3]
+marks = [0]
+time_limit = 676
+original_time_limit = 676
+tags = ["aimed", "ring", "stream", "curve"]
+laser_approx = false
+lower_half_blocked = false
+notes = "E 档整波无弹（原文 E 无 bullet_*）；N/H 只有 Sub0/2/4 发 4 向 offset 环，Sub1/3、Sub6 仅 Lunatic 发弹；小怪无敌（D8）。"

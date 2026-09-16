@@ -1,0 +1,12 @@
+title = "Stage 2 中 boss 琪露诺 非符"
+source = "th06"
+origin = "东方红魔乡 Stage 2 中 boss 琪露诺 非符（Sub20 + Sub14/Sub15/Sub16 + Sub17），E–L 四档"
+source_ref = "ecldata2.ecl.txt:343-381, 235-255, 257-277, 279-298, 300-325"
+ranks = [0, 3]
+marks = [0]
+time_limit = 1920
+original_time_limit = 1920
+tags = ["aimed", "spiral", "curve", "stream"]
+laser_approx = false
+lower_half_blocked = false
+notes = "中 boss 非符；8 轮 Sub14/15/16+Sub17 循环（原作约 2208 帧），1920 帧超时先到收段。"

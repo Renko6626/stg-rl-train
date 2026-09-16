@@ -1,0 +1,12 @@
+title = "Stage 2 道中 第 2 波"
+source = "th06"
+origin = "东方红魔乡 Stage 2 道中，timeline 帧 894–1150（Sub6 横扫编队 + Sub0–Sub4 随机小怪），E–L 四档"
+source_ref = "ecldata2.ecl.txt:1150-1195, 2-21, 23-40, 42-61, 63-80, 82-101, 113-129"
+ranks = [0, 3]
+marks = [0]
+time_limit = 676
+original_time_limit = 676
+tags = ["aimed", "ring", "stream"]
+laser_approx = false
+lower_half_blocked = false
+notes = "E 档全员无弹（原文 !E 无子弹行）；Sub1/Sub3 仅 Lunatic 自动射击（!L 粘滞），Sub0/2/4 为 N/H/L；Sub6 因 !L 粘滞仅 Lunatic 发弹。随机 x 与小怪出界退场近似见 report。"
