@@ -1,4 +1,13 @@
-"""--bench（spec §7.3）：扫 threads × num_envs，测端到端稳态吞吐（env + 胶水 + 未训练模型推理，不做更新）。"""
+"""--bench（spec §7.3）：扫 threads × num_envs，测**端到端**吞吐并给出推荐配置。
+
+一次 PPO 迭代 = rollout（T 步 env + 胶水 + 推理）+ 一次更新（epochs × minibatches 的前向反向）。
+`num_envs` 同时决定两边：rollout 吞吐随 env 数上升，但批量 = num_envs × num_steps 也随之变大，
+更新耗时跟着涨。只按 rollout 选会选出「rollout 快、更新慢到跑不动」的配置（笔记本 4050 实测：
+4096 env 的 rollout 77k steps/s，一次更新却要 ~425 s）。所以这里两段都测，按端到端 SPS 推荐。
+
+更新耗时用**一个 minibatch 实测 × epochs × minibatches** 外推（整次更新太贵）；
+测的是未编译路径，compile / CUDA 图的加速对各 num_envs 大致同比，不影响排序——数值本身偏保守。
+"""
 from __future__ import annotations
 
 import json
@@ -8,11 +17,15 @@ from pathlib import Path
 
 import stg_rl
 import torch
+from tensordict import TensorDict
 
 from .config import deep_merge
 from .envwrap import EnvWrapper
 from .perf import machine_info
+from .ppo import PPO
 from .train import build_components, pick_device
+
+MB_WARMUP, MB_MEASURE = 1, 3
 
 
 def _step(envw, featurizer, model, obs):
@@ -27,6 +40,34 @@ def _sync(device: torch.device) -> None:
         torch.cuda.synchronize()
 
 
+def _tile(x: torch.Tensor, rows: int) -> torch.Tensor:
+    reps = (rows + x.shape[0] - 1) // x.shape[0]
+    return x.repeat(reps, *([1] * (x.dim() - 1)))[:rows].contiguous()
+
+
+def minibatch_seconds(cfg: dict, device: torch.device, featurizer, factory, obs) -> tuple[float, int]:
+    """一个 minibatch 的前向 + 反向 + optimizer.step 的秒数，以及 minibatch 行数。"""
+    p = cfg["ppo"]
+    rows = max(1, cfg["env"]["num_envs"] * int(p["num_steps"]) // int(p["num_minibatches"]))
+    c = deep_merge(cfg, {"ppo": {"compile": False, "cudagraphs": False}})
+    ppo = PPO(c, factory, device)
+    feats = TensorDict({k: _tile(v, rows) for k, v in featurizer(obs).items()}, batch_size=[rows], device=device)
+    zeros = torch.zeros(rows, device=device)
+    args = (feats, torch.zeros(rows, dtype=torch.long, device=device), zeros, zeros, zeros, zeros)
+    for _ in range(MB_WARMUP):
+        ppo._update(*args)
+    _sync(device)
+    t0 = time.perf_counter()
+    for _ in range(MB_MEASURE):
+        ppo._update(*args)
+    _sync(device)
+    dt = (time.perf_counter() - t0) / MB_MEASURE
+    del ppo, feats
+    if device.type == "cuda":
+        torch.cuda.empty_cache()
+    return dt, rows
+
+
 def run_bench(cfg: dict, out_dir: Path) -> dict:
     device = pick_device(cfg["run"]["device"])
     images, starts, _, featurizer, factory = build_components(cfg, device)
@@ -34,32 +75,57 @@ def run_bench(cfg: dict, out_dir: Path) -> dict:
     cpu = os.cpu_count() or 1
     grid = sorted({max(1, cpu // 4), max(1, cpu // 2), cpu})
     seconds = float(cfg["bench"]["seconds"])
-    results = []
-    print(f"{'num_envs':>8} {'threads':>7} {'env_steps/s':>12}")
+    num_steps = int(cfg["ppo"]["num_steps"])
+    epochs_mb = int(cfg["ppo"]["update_epochs"]) * int(cfg["ppo"]["num_minibatches"])
+    results: list[dict] = []
+    skipped: list[dict] = []
+    print(f"{'num_envs':>8} {'threads':>7} {'rollout/s':>11} {'update_s':>9} {'端到端/s':>10}")
     torch.set_num_threads(int(cfg["run"]["torch_threads"]))  # 与训练一致，否则 bench 的线程数结论不可迁移
     for n in cfg["bench"]["num_envs"]:
+        update_s = None
         for threads in sorted({min(t, int(n)) for t in grid}):
             c = deep_merge(cfg, {"env": {"num_envs": int(n), "threads": threads}})
-            envw = EnvWrapper(c, images, starts, device, seed=int(c["run"]["seed"]))
-            with torch.no_grad():
-                obs = envw.reset()
-                for _ in range(10):
-                    obs = _step(envw, featurizer, model, obs)
-                _sync(device)
-                t0, steps = time.perf_counter(), 0
-                while time.perf_counter() - t0 < seconds:
-                    obs = _step(envw, featurizer, model, obs)
-                    steps += 1
-                _sync(device)
-                dt = time.perf_counter() - t0
+            try:
+                envw = EnvWrapper(c, images, starts, device, seed=int(c["run"]["seed"]))
+                with torch.no_grad():
+                    obs = envw.reset()
+                    for _ in range(10):
+                        obs = _step(envw, featurizer, model, obs)
+                    _sync(device)
+                    t0, steps = time.perf_counter(), 0
+                    while time.perf_counter() - t0 < seconds:
+                        obs = _step(envw, featurizer, model, obs)
+                        steps += 1
+                    _sync(device)
+                    dt = time.perf_counter() - t0
+                if update_s is None:  # 更新耗时只跟 num_envs 有关，同一 n 的各 threads 复用
+                    mb_s, mb_rows = minibatch_seconds(c, device, featurizer, factory, obs)
+                    update_s, update_rows = mb_s * epochs_mb, mb_rows
+                del envw, obs
+            except torch.OutOfMemoryError as e:
+                skipped.append({"num_envs": int(n), "threads": threads, "reason": f"显存不足：{e}".split("\n")[0]})
+                print(f"{n:>8} {threads:>7}  显存不足，跳过")
+                if device.type == "cuda":
+                    torch.cuda.empty_cache()
+                continue
+            frame_skip = int(c["env"]["frame_skip"])
+            rollout_sps = steps * int(n) * frame_skip / dt
+            iter_steps = int(n) * num_steps * frame_skip
+            end_to_end = iter_steps / (iter_steps / rollout_sps + update_s)
             row = {"num_envs": int(n), "threads": min(threads, int(n)), "steps": steps, "seconds": dt,
-                   "env_steps_per_s": steps * int(n) * envw.frame_skip / dt}
+                   "env_steps_per_s": rollout_sps, "update_s": update_s, "minibatch_rows": update_rows,
+                   "end_to_end_steps_per_s": end_to_end}
+            if device.type == "cuda":
+                row["gpu_max_alloc_mb"] = torch.cuda.max_memory_allocated() / 2**20
             results.append(row)
-            print(f"{row['num_envs']:>8} {row['threads']:>7} {row['env_steps_per_s']:>12.0f}")
-            del envw
-    best = max(results, key=lambda r: r["env_steps_per_s"])
-    out = {"machine": machine_info(), "stg_rl": stg_rl.build_info(), "results": results,
-           "recommended": {"num_envs": best["num_envs"], "threads": best["threads"]}}
+            print(f"{row['num_envs']:>8} {row['threads']:>7} {rollout_sps:>11.0f} {update_s:>9.2f} {end_to_end:>10.0f}")
+    if not results:
+        raise RuntimeError(f"bench 没有可用配置（全部失败）：{skipped}")
+    best = max(results, key=lambda r: r["end_to_end_steps_per_s"])
+    out = {"machine": machine_info(), "stg_rl": stg_rl.build_info(), "results": results, "skipped": skipped,
+           "recommended": {"num_envs": best["num_envs"], "threads": best["threads"]},
+           "note": "推荐按端到端吞吐（rollout + 一次更新）；update_s 由单 minibatch 实测 × epochs × minibatches 外推，未编译，偏保守"}
     (Path(out_dir) / "bench.json").write_text(json.dumps(out, indent=2, ensure_ascii=False), encoding="utf-8")
-    print(f"推荐：env.num_envs = {best['num_envs']}，env.threads = {best['threads']}")
+    print(f"推荐：env.num_envs = {best['num_envs']}，env.threads = {best['threads']}"
+          f"（端到端 {best['end_to_end_steps_per_s']:.0f} steps/s，一次更新 {best['update_s']:.1f} s）")
     return out

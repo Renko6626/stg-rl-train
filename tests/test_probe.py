@@ -40,7 +40,9 @@ def test_probe_cpu_end_to_end(tmp_path, monkeypatch):
     assert rc == 0
     res = json.loads((out / "probe.json").read_text(encoding="utf-8"))
     assert res["steps"]["gpucheck"]["result"].startswith("skip")
-    assert res["steps"]["train"]["result"]["num_envs"] == 8
+    tr = res["steps"]["train"]["result"]
+    assert tr["num_envs"] == 8 and tr["updates"] >= 1
+    assert tr["sps"] and tr["phase_frac"], "探测须每次更新都采分阶段计时"
     assert (out / "sysinfo" / "machine.json").exists()
     summary = (out / "SUMMARY.md").read_text(encoding="utf-8")
     assert "uv_sync_s" in summary and "训练负载" in summary

@@ -137,7 +137,9 @@ def run_bench_step(out: Path, cfg: dict) -> dict:
 
 def run_train_step(out: Path, cfg: dict, minutes: float, recommended: dict | None) -> dict:
     env_over = dict(recommended) if recommended else {}
-    c = deep_merge(cfg, {"env": env_over, "run": {"max_minutes": float(minutes), "total_updates": 1_000_000}})
+    # perf_sync_every = 1：探测只跑几次更新，按默认的 20 会一行分阶段计时都采不到
+    c = deep_merge(cfg, {"env": env_over, "log": {"perf_sync_every": 1},
+                         "run": {"max_minutes": float(minutes), "total_updates": 1_000_000}})
     run_dir = out / "train"
     for sub in ("checkpoints", "eval", "plots"):
         (run_dir / sub).mkdir(parents=True, exist_ok=True)
@@ -145,8 +147,13 @@ def run_train_step(out: Path, cfg: dict, minutes: float, recommended: dict | Non
     train(load_config(out / "probe-train-config.toml"), run_dir, pack_result=False)
     env = json.loads((run_dir / "env.json").read_text(encoding="utf-8"))
     ps = env.get("perf_summary", {})
+    rows = [json.loads(line) for line in (run_dir / "metrics.jsonl").read_text(encoding="utf-8").splitlines() if line]
+    sps = [r["perf/sps"] for r in rows if "perf/sps" in r]  # 逐次更新的端到端 SPS，不依赖分阶段采样
+    updates = max((r["update"] for r in rows), default=0)
     return {"num_envs": c["env"]["num_envs"], "threads": c["env"]["threads"], "minutes": round(float(minutes), 2),
-            "stopped_at_update": env.get("stopped_early_at_update"), "sps": ps.get("sps"),
+            "updates": updates, "stopped_at_update": env.get("stopped_early_at_update"),
+            "sps": round(sum(sps) / len(sps), 1) if sps else ps.get("sps"),
+            "sps_last": round(sps[-1], 1) if sps else None,
             "phase_frac": ps.get("phase_frac"),
             "load": {k: v for k, v in ps.items() if k.startswith("load/")}}
 

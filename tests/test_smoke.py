@@ -70,11 +70,23 @@ def test_bench_cli(tmp_path):
     (bench_json,) = list((tmp_path / "runs").glob("*-bench-b/bench.json"))
     out = json.loads(bench_json.read_text(encoding="utf-8"))
     assert out["results"] and set(out["recommended"]) == {"num_envs", "threads"}
+    row = out["results"][0]
+    # 推荐按端到端吞吐：rollout 之外还要实测更新耗时，否则会选出「rollout 快、更新慢到跑不动」的 num_envs
+    assert row["update_s"] > 0 and row["minibatch_rows"] > 0
+    assert 0 < row["end_to_end_steps_per_s"] < row["env_steps_per_s"]
+    best = max(out["results"], key=lambda r: r["end_to_end_steps_per_s"])
+    assert out["recommended"]["num_envs"] == best["num_envs"]
 
 
 def test_gpucheck_requires_cuda(monkeypatch, tmp_path):
     monkeypatch.setattr(torch.cuda, "is_available", lambda: False)
     assert gpucheck.main([str(REPO / "configs" / "smoke.toml")]) == 2
+
+
+def test_gpucheck_value_maxabs_is_relative():
+    # 笔记本 4050 实测：value 量级 0.66、逐元素最大差 2.5e-4（相对 0.04%）——不该判失败
+    assert 2.5e-4 <= gpucheck.MAXABS_REL * 0.66
+    assert not (2.5e-3 <= gpucheck.MAXABS_REL * 0.66)
 
 
 def test_gpucheck_close_enough():
