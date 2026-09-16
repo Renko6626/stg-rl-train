@@ -1,0 +1,12 @@
+title = "Stage 1 道中 第 2 波"
+source = "th06"
+origin = "东方红魔乡 Stage 1 道中，timeline 帧 1174–1354（Sub0/Sub2），E/L 两档"
+source_ref = "ecldata1.ecl.txt:1157-1194, 2-20, 43-59"
+ranks = [0, 3]
+marks = [0]
+time_limit = 600
+original_time_limit = 600
+tags = ["aimed", "stream"]
+laser_approx = false
+lower_half_blocked = false
+notes = "随机位置小怪每 10 帧一只；只有 Lunatic 发弹（原文 !L 粘滞）。小怪无敌（D8）。"
