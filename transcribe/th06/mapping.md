@@ -485,7 +485,9 @@ TH06（`EclManager.cpp:428-440`、`980-989`）：
 - `shoot_now()`：立即用 `bulletProps` 开一次火。
 
 **写法 A（常见：配一次参数、之后只靠自动射击）**——伴生任务，带「打到第几帧为止」参数
-（原文后面若有 `shoot_interval(0)` 或参数改变，按原文时间算出 `until`）：
+（原文后面若有 `shoot_interval(0)` 或参数改变，按原文时间算出 `until`）。
+**`until` 那一帧不开火**：`RunEcl` 同帧先执行指令、后走开火计时（`EclManager.cpp:428` 置 0 在前，`:980-987` Tick 在后），
+所以两处守卫都是 `>=`——写成 `>` 会在开火帧恰好等于 `until` 时多打一轮（审核按 critical 判）：
 
 ```ecl
 const KUNAI: int = 80;
@@ -500,12 +502,12 @@ async sub autoshoot(interval: int, delayed: int, until: int) {
     var t: int = 0;
     var first: int = interval;
     if delayed != 0 { first = interval - rand(interval); }
-    if first > until { return; }
+    if first >= until { return; }
     wait(first);
     t = first;
     loop {
         sh_fire(0);
-        if t + interval > until { return; }
+        if t + interval >= until { return; }
         wait(interval);
         t = t + interval;
     }
