@@ -1,0 +1,12 @@
+title = "Stage 3 道中 第 1 波"
+source = "th06"
+origin = "东方红魔乡 Stage 3 道中，timeline 帧 200–690（Sub0/Sub1/Sub2/Sub3），E–L 四档"
+source_ref = "ecldata3.ecl.txt:1428-1531, 2-20, 22-40, 42-60, 62-80"
+ranks = [0, 3]
+marks = [0]
+time_limit = 910
+original_time_limit = 910
+tags = ["aimed", "stream", "ring"]
+laser_approx = false
+lower_half_blocked = false
+notes = "E/N 小怪不发弹（原文 !H/!L 粘滞），H 单发自机狙、L 10×2 自机狙环，H/L 在 +115（Sub2/Sub3 +90）停自动射击。小怪无敌（D8）。"

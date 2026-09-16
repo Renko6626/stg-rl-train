@@ -1,0 +1,12 @@
+title = "Stage 3 道中 第 6 波"
+source = "th06"
+origin = "东方红魔乡 Stage 3 道中，timeline 帧 2622–3304（Sub0/Sub1/Sub2/Sub3 左右列 + Sub4 双翼 + Sub5 随机散兵），E–L 四档"
+source_ref = "ecldata3.ecl.txt:1677-1826, 2-20, 22-40, 42-60, 62-80, 82-114, 116-138"
+ranks = [0, 3]
+marks = [0]
+time_limit = 1162
+original_time_limit = 1162
+tags = ["aimed", "ring", "stream"]
+laser_approx = false
+lower_half_blocked = false
+notes = "小怪无敌（D8）。Sub0/1/2/3 仅 H 单发自机狙、L 10×2 自机狙环（+115/+90 停自动射击）；Sub4 H/L 额外一圈 16 颗中玉、fan 颗数/张角随难度且速度逐发 +0.21；Sub5 环玉扇 E8/N16/H24/L24×3。全部小怪出界守卫退场。L 档 Sub4 的 fan 按原作 TH06 640 弹池上限折算为前 18 轮（详见 report 近似）。"

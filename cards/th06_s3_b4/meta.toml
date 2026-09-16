@@ -1,0 +1,12 @@
+title = "幻符「華想夢葛」"
+source = "th06"
+origin = "东方红魔乡 Stage 3 boss 符卡「幻符「華想夢葛」」（ecldata3 Sub36/Sub37/Sub38），Hard–Lunatic"
+source_ref = "ecldata3.ecl.txt:916-921, 923-941, 276-288, 943-971"
+ranks = [2, 3]
+marks = [0]
+time_limit = 2400
+original_time_limit = 2400
+tags = ["aimed", "random", "stream"]
+laser_approx = false
+lower_half_blocked = false
+notes = "boss 无敌，按原作 2400 帧超时收段。ex_ins_repeat(2)=ShootStarPattern 逐帧照源码重算：每 6 帧沿五角星边发 5 组自机狙扇形（H 2 颗 / L 4 颗）；bullet_rank_influence 的 +0.15 速度已计入。"

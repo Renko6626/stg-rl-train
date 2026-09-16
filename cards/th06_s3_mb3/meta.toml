@@ -1,0 +1,12 @@
+title = "華符「セラギネラ９」"
+source = "th06"
+origin = "东方红魔乡 Stage 3 中 boss 符卡 華符「セラギネラ９」（ecldata3 Sub16/Sub17/Sub18），Hard/Lunatic"
+source_ref = "ecldata3.ecl.txt:389-394, 396-412, 276-288, 414-453"
+ranks = [2, 3]
+marks = [0]
+time_limit = 1200
+original_time_limit = 1200
+tags = ["aimed", "ring", "curve", "spiral"]
+laser_approx = false
+lower_half_blocked = false
+notes = "中 boss 符卡；boss 无敌，按原作 1200 帧超时收段（SPELL_FAILED）。双列鳞弹每 6 帧反向旋转 8.5°/−9.5°、周期 60 帧减速后转 −150°/−210°（flags 68），每 120 帧补一发自机狙环。"

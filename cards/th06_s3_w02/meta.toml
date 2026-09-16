@@ -1,0 +1,12 @@
+title = "Stage 3 道中 第 2 波"
+source = "th06"
+origin = "东方红魔乡 Stage 3 道中，timeline 帧 910–1090（Sub4，行 1532–1543 / 82–114），E–L 四档"
+source_ref = "ecldata3.ecl.txt:1532-1543, 82-114"
+ranks = [0, 3]
+marks = [0]
+time_limit = 660
+original_time_limit = 660
+tags = ["aimed", "ring", "stream", "fast"]
+laser_approx = false
+lower_half_blocked = false
+notes = "双翼由外向内收拢，每 60 帧一对 x=±128→±32 共 8 只；H/L 多一发自机狙环，fan 颗数/张角随难度。小怪无敌，出界守卫退场。"

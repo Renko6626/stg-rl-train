@@ -1,0 +1,12 @@
+title = "Stage 3 道中 第 10 波"
+source = "th06"
+origin = "东方红魔乡 Stage 3 道中，timeline 帧 5054–5174（Sub8 双翼 2 批、Sub7 双翼 5 批），E–L 四档"
+source_ref = "ecldata3.ecl.txt:2169-2188, 167-199, 201-224"
+ranks = [0, 3]
+marks = [0]
+time_limit = 600
+original_time_limit = 600
+tags = ["aimed", "random", "stream", "curve"]
+laser_approx = false
+lower_half_blocked = false
+notes = "Sub8 随机散弹（BALL 色 15，角度 [-180,0)、速度 [0.3,2)）带出生冲刺与永久 0.025 向下重力；Sub7 停住后每 2 帧一发 KUNAI 扇，H 额外 16 向自机狙环。小怪无敌（D8）。"

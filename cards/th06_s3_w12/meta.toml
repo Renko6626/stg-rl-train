@@ -1,0 +1,12 @@
+title = "Stage 3 道中 第 12 波"
+source = "th06"
+origin = "东方红魔乡 Stage 3 道中，timeline 帧 5494–5794（Sub4/Sub8/Sub7），只收 E–N 两档"
+source_ref = "ecldata3.ecl.txt:2192-2230, 82-114, 167-199, 201-224"
+ranks = [0, 1]
+marks = [0]
+time_limit = 780
+original_time_limit = 780
+tags = ["aimed", "random", "stream"]
+laser_approx = false
+lower_half_blocked = false
+notes = "小怪无敌（D8）。只收 E/N：H/L 忠实转写弹峰值 1030/1630 > 1024（TH06 原作靠 640 弹池上限压住，本引擎无此上限），不抽稀。Sub8 的 bullet_random 近似：随机速度逐颗 fire；flags 0x19 出生冲刺 + 永久 90° 重力用 xformdef 近似。"

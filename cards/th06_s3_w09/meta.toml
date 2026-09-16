@@ -1,0 +1,12 @@
+title = "Stage 3 道中 第 9 波"
+source = "th06"
+origin = "东方红魔乡 Stage 3 道中，timeline 帧 4190–4894（Sub8/Sub7 下落群 + Sub2/Sub3 高速横切四段），E–L 四档"
+source_ref = "ecldata3.ecl.txt:1939-2168, 42-60, 62-80, 167-199, 201-224"
+ranks = [0, 3]
+marks = [0]
+time_limit = 1184
+original_time_limit = 1184
+tags = ["aimed", "ring", "random", "stream", "fast"]
+laser_approx = false
+lower_half_blocked = false
+notes = "Sub2/Sub3 仅 H/L 发弹（!HL 粘滞），E/N 不发；小怪出界即删用 oob_guard 近似。"

@@ -1,0 +1,12 @@
+title = "Stage 3 道中 第 7 波"
+source = "th06"
+origin = "东方红魔乡 Stage 3 道中（中 boss 击破后），timeline 帧 3536–3770（Sub2/Sub3 左右交替小怪 + Sub7 双翼三批），E–L 四档"
+source_ref = "ecldata3.ecl.txt:1834-1877, 42-60, 62-80, 167-199"
+ranks = [0, 3]
+marks = [0]
+time_limit = 714
+original_time_limit = 714
+tags = ["aimed", "ring", "stream", "curve"]
+laser_approx = false
+lower_half_blocked = false
+notes = "小怪无敌（D8）。Sub2/Sub3：H 每 60 帧单发自机狙、L 延迟 ≤200 帧的 10×2 自机狙环，均在 +90 取消；Sub7：每隔 2 帧逐发加速扇，H 开场多一发 16 颗自机狙环。"

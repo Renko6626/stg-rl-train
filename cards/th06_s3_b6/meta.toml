@@ -1,0 +1,12 @@
+title = "彩符「彩雨」"
+source = "th06"
+origin = "东方红魔乡 Stage 3 boss 帕秋莉·诺蕾姬 符卡 彩符「彩雨」E/N 版（Sub39/40/41），ranks 0–1"
+source_ref = "ecldata3.ecl.txt:973-981, 983-998, 276-288, 1000-1037"
+ranks = [0, 1]
+marks = [0]
+time_limit = 2160
+original_time_limit = 2160
+tags = ["random", "curve", "stream"]
+laser_approx = false
+lower_half_blocked = false
+notes = "无敌 boss 按 2160 帧超时收段；逐颗随机角/速 + 固定方向永久加速度（flags 19），出生冲刺用 xformdef 表达。"
