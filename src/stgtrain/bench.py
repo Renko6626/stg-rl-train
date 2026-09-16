@@ -73,7 +73,9 @@ def run_bench(cfg: dict, out_dir: Path) -> dict:
     images, starts, _, featurizer, factory = build_components(cfg, device)
     model = factory().to(device).eval()
     cpu = os.cpu_count() or 1
-    grid = sorted({max(1, cpu // 4), max(1, cpu // 2), cpu})
+    # 线程网格：大机器上线程数远超实际并行度反而崩（255 核机实测 255 线程只有 63 线程的 1/8），
+    # 所以从小往大都要试，别只试 cpu/4 以上。
+    grid = sorted({t for t in (8, 16, 32, cpu // 8, cpu // 4, cpu // 2, cpu) if t >= 1})
     seconds = float(cfg["bench"]["seconds"])
     num_steps = int(cfg["ppo"]["num_steps"])
     epochs_mb = int(cfg["ppo"]["update_epochs"]) * int(cfg["ppo"]["num_minibatches"])

@@ -123,6 +123,12 @@ def base_cfg(config: Path, adapt: bool) -> dict:
     if adapt and not torch.cuda.is_available():
         over = {"ppo": {"compile": False, "cudagraphs": False}, "bench": {"num_envs": CPU_BENCH_GRID},
                 "env": {"num_envs": CPU_BENCH_GRID[-1]}}
+    elif adapt and torch.cuda.is_available():
+        # 显存够大就多试一档：4090 实测 4096 env 只占 10 GB / 24 GB，GPU 利用率 64%，还有余量
+        vram_gb = torch.cuda.get_device_properties(0).total_memory / 2**30
+        cfg = load_config(config)
+        if vram_gb >= 20 and max(cfg["bench"]["num_envs"]) < 8192:
+            over = {"bench": {"num_envs": [*cfg["bench"]["num_envs"], 8192]}}
     return load_config(config, over or None)
 
 

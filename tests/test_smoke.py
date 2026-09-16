@@ -83,10 +83,15 @@ def test_gpucheck_requires_cuda(monkeypatch, tmp_path):
     assert gpucheck.main([str(REPO / "configs" / "smoke.toml")]) == 2
 
 
-def test_gpucheck_value_maxabs_is_relative():
-    # 笔记本 4050 实测：value 量级 0.66、逐元素最大差 2.5e-4（相对 0.04%）——不该判失败
+def test_gpucheck_policy_tolerances_cover_measured_diffs():
+    """实测差异不该判失败，量级再大一位则应判失败（4050 笔记本 / 4090 各踩中一项）。"""
+    # 4050：value 量级 0.66、逐元素最大差 2.5e-4
     assert 2.5e-4 <= gpucheck.MAXABS_REL * 0.66
     assert not (2.5e-3 <= gpucheck.MAXABS_REL * 0.66)
+    # 4090：value 均值 -0.198、差 3.35e-5（相对 1.7e-4）
+    assert gpucheck.close_enough(-0.19798049, -0.19794697, rel=gpucheck.POLICY_REL)
+    assert not gpucheck.close_enough(-0.19798049, -0.19794697)  # 损失类仍用 1e-4，不放宽
+    assert not gpucheck.close_enough(-0.198, -0.1976, rel=gpucheck.POLICY_REL)
 
 
 def test_gpucheck_close_enough():

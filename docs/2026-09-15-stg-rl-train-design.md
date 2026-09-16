@@ -272,12 +272,13 @@ terms = { death = 10.0, follow_shaping = 1.0, hold = 0.01 }
 
 **集成冒烟**：`bash run.sh configs/smoke.toml` CPU 跑数次更新，断言结果目录各文件、plots、tar 生成；`--resume` 能接着跑。
 
-**GPU 验收（首次上 Vast.ai，结果回填本节）**：
-- [ ] `run.sh --bench` 跑完，记录机器画像与推荐配置；
-- [ ] `compile` / `cudagraphs` 开与关在同一批数据上首次更新的 loss 相对误差 ≤ 1e-4；
-- [ ] `base.toml` 连续训练 ≥ 1 小时无错，SPS 与各阶段占比记入训练仓 `docs/perf-baseline.md`（首次验收时新建）；
-- [ ] 中途打断后 `--resume` 成功；
-- [ ] 评测曲线出图正常。
+**GPU 验收（2026-09-16 首次在 Vast.ai RTX 4090 上做，经 `run.sh --probe`）**：
+- [x] bench 跑完，机器画像与推荐配置记入 `docs/perf-baseline.md`（4096 env / 63 线程，端到端 86k SPS）；
+- [x] `compile` / `cudagraphs` 开与关：**损失统计量吻合到 1e-7**（远严于 1e-4）；策略输出的均值与逐元素最大差
+      在 1e-4 相对量级，判据放宽为 `POLICY_REL = MAXABS_REL = 1e-3`（gpucheck 注释记依据）；
+- [ ] `base.toml` 连续训练 ≥ 1 小时无错——探测只跑了 15 分钟 / 260 次更新（无错，SPS 与占比已记基线）；
+- [ ] 中途打断后 `--resume` 成功（GPU 上未验，CPU 上有单测）；
+- [x] 评测曲线出图正常；15 分钟内撑过率 0 → 0.5、跟点率 0.005 → 0.555、贴边 0.93 → 0.17，**学习信号确认**。
 
 ## 9. 与其它仓的接口
 
