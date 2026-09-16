@@ -31,6 +31,11 @@ async sub sub4(mirror: int) {
     set_hitbox(9.33fx);
     spawn oob_guard();
     var rank: int = global(GVAR_RANK);
+    // H/L 按 TH06 640 弹池等效截止（feedback 2026-09-17）：只截扇形苦无的“轮次”，
+    // 圆弹 ring、Sub8、E/N 一律不动。截止比较用 $frame（首次出现帧口径，见 report 自检）。
+    var cut4: int = 100000;                // E/N：不截止
+    if rank == RANK_HARD { cut4 = 250; }   // H：Sub4 苦无首次出现帧 ≥ 250 的轮次不发
+    else if rank >= RANK_LUNATIC { cut4 = 234; }  // L：≥ 234 的轮次不发
     var ang: angle = 90deg;
     var spd: fx = 1.5fx;
     var acc: fx = 0fx;
@@ -65,8 +70,11 @@ async sub sub4(mirror: int) {
     sh_count(1, ways, 1);
     sh_angle(1, f0, spread);
     for k2 in 0..i4 {
-        sh_speed(1, f1, 0fx);
-        sh_fire(1);
+        // 被截掉的轮次仍 wait(2) 占时；f1 照轮次递增，保证保留下来的轮次速度与原文一致
+        if $frame < cut4 {
+            sh_speed(1, f1, 0fx);
+            sh_fire(1);
+        }
         f1 = f1 + 0.21fx;
         wait(2);
     }
@@ -117,6 +125,9 @@ async sub sub7(mirror: int) {
     set_hitbox(9.33fx);
     spawn oob_guard();
     var rank: int = global(GVAR_RANK);
+    // L 按 TH06 640 弹池等效截止：Sub7 扇形苦无首次出现帧 ≥ 508 的轮次不发（H/E/N 不截止）。
+    var cut7: int = 100000;
+    if rank >= RANK_LUNATIC { cut7 = 508; }
     var ang: angle = 90deg;
     var spd: fx = 1.5fx;
     var acc: fx = 0fx;
@@ -151,8 +162,10 @@ async sub sub7(mirror: int) {
     sh_count(1, ways, 1);
     sh_angle(1, f0, spread);
     for k2 in 0..i4 {
-        sh_speed(1, f1, 0fx);
-        sh_fire(1);
+        if $frame < cut7 {
+            sh_speed(1, f1, 0fx);
+            sh_fire(1);
+        }
         f1 = f1 + 0.3fx;
         wait(2);
     }

@@ -81,7 +81,9 @@ $P collect --stage N           # 然后 git add cards/ && git commit
 - **locals 超 64**：xformdef 按物理槽 × 3 字算进引用它的 sub；拆并行任务。
 - **停火边界用 `>=`**：开火帧恰好 = `until` 时原作不开火（同帧先执行 `shoot_interval(0)` 再走计时）。对照表 §4.3 曾写成 `>`，
   改对照表后要**刷新所有单元的 `mapping-excerpt.md`**（`extract` 不覆盖已往下走的单元），并 grep 已入库卡。
-- **弹峰值超 1024 且无法保真压缩**（TH06 靠 640 弹池上限压画面，我方池 8192）：卡体不改，`meta.toml` `ranks` 收窄到能过的档，notes 写原因。
+- **弹峰值超 1024**：先看是不是 TH06 的 640 弹池在压画面（我方池 8192，屏内弹数照样超）。做法见设计 §13.4 第 2 条：
+  离线复现 640 池（`work/units/th06_s3_w12/pool640/poolsim.py`，要临时放开 harness `AT_DUMP_LIMIT`）→ 拟合「某类弹 `$frame ≥ N` 的轮次不发」→
+  返工派 dsh 实现 → 主会话用同一脚本复核曲线误差。不要随手抽稀颗数，也不要只收窄 ranks 了事。
 - **一台机器只跑一个 `pipeline` 进程**：两个进程同秒起 dsh 会撞 `~/.dsh` 配置（`config file must be a top-level array`），并发靠 `--jobs`。
 - `validate` 要求**目录名 = 卡 id**，所以 pipeline 把 `out/` 拷到 `card/<id>/` 再验。
 - 别提交 `transcribe/work/`（含原文摘录，gitignore 已挡）。

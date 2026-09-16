@@ -1,12 +1,12 @@
 title = "Stage 3 道中 第 12 波"
 source = "th06"
-origin = "东方红魔乡 Stage 3 道中，timeline 帧 5494–5794（Sub4/Sub8/Sub7），只收 E–N 两档"
+origin = "东方红魔乡 Stage 3 道中，timeline 帧 5494–5794（Sub4/Sub8/Sub7），E–L 四档"
 source_ref = "ecldata3.ecl.txt:2192-2230, 82-114, 167-199, 201-224"
-ranks = [0, 1]
+ranks = [0, 3]
 marks = [0]
 time_limit = 780
 original_time_limit = 780
 tags = ["aimed", "random", "stream"]
 laser_approx = false
 lower_half_blocked = false
-notes = "小怪无敌（D8）。只收 E/N：H/L 忠实转写弹峰值 1030/1630 > 1024（TH06 原作靠 640 弹池上限压住，本引擎无此上限），不抽稀。Sub8 的 bullet_random 近似：随机速度逐颗 fire；flags 0x19 出生冲刺 + 永久 90° 重力用 xformdef 近似。"
+notes = "小怪无敌（D8）。H/L 按 TH06 640 弹池等效截止：只跳过 Sub4/Sub7 扇形苦无（KUNAI, sprite 86）首次出现帧超过阈值的轮次（H: Sub4 ≥250；L: Sub4 ≥234、Sub7 ≥508），圆弹 ring / Sub8 / E–N 一律照原文；被截轮次仍 wait(2) 占时、f1 照常递增，故保留下来的轮次速度/时序与原作一致。原作靠 640 发弹池整批丢弃压画面（BulletManager.hpp:125），本引擎无此上限；截止规则按离线复现拟合（曲线误差 H 1.1% / L 2.9%）。Sub8 的 bullet_random 近似：随机速度逐颗 fire；flags 0x19 出生冲刺 + 永久 90° 重力用 xformdef 近似。"
