@@ -1,5 +1,50 @@
-# 评测卡划分（spec §6）。卡池到位后在这里列出留出卡；训练卡 = cards/ 下其余的卡。
-# [[eval]]
-# card = "th06_s4_boss_card1"
-# ranks = [2]
-# episodes = 32
+# 评测卡划分（spec §6）：这里列出的是留出卡，训练卡 = cards/ 下其余的卡。
+# 2026-09-16 TH06 第 1–3 关 45 张卡里留出 9 张（全部可跑 rank 2），分层原则：
+#   每关都有道中和 boss（含符卡）；弹幕标签覆盖 aimed/stream/ring/curve/spiral/random/fast/mixed；
+#   训练侧保留每个标签至少一张（spiral: s3_b1/b2/mb3，dense: s2_b6/s3_b8）。
+# th06_s1_b4 与 probe/splits.toml 相同，方便和探测 run 对照。
+
+[[eval]]
+card = "th06_s1_b4"      # 第 1 关 符卡 · aimed ring curve
+ranks = [2]
+episodes = 32
+
+[[eval]]
+card = "th06_s1_w03"     # 第 1 关 道中 · aimed stream
+ranks = [2]
+episodes = 32
+
+[[eval]]
+card = "th06_s2_mb1"     # 第 2 关 中 boss 非符 · spiral curve
+ranks = [2]
+episodes = 32
+
+[[eval]]
+card = "th06_s2_b3"      # 第 2 关 符卡 · ring curve stream
+ranks = [2]
+episodes = 32
+
+[[eval]]
+card = "th06_s2_w06"     # 第 2 关 道中 · random
+ranks = [2]
+episodes = 32
+
+[[eval]]
+card = "th06_s3_b5"      # 第 3 关 boss 非符 · random ring curve stream
+ranks = [2]
+episodes = 32
+
+[[eval]]
+card = "th06_s3_b7"      # 第 3 关 符卡 · random curve mixed
+ranks = [2]
+episodes = 32
+
+[[eval]]
+card = "th06_s3_w02"     # 第 3 关 道中 · aimed ring stream fast
+ranks = [2]
+episodes = 32
+
+[[eval]]
+card = "th06_s3_w09"     # 第 3 关 道中 · aimed ring random stream fast
+ranks = [2]
+episodes = 32
