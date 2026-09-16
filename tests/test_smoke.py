@@ -5,7 +5,7 @@ import pytest
 import torch
 
 from conftest import small_cfg
-from stgtrain import gpucheck
+from stgtrain import bench, gpucheck
 from stgtrain.checkpoint import load_checkpoint
 from stgtrain.config import dump_toml, from_dict, load_config
 from stgtrain.metrics import read_jsonl
@@ -74,8 +74,26 @@ def test_bench_cli(tmp_path):
     # 推荐按端到端吞吐：rollout 之外还要实测更新耗时，否则会选出「rollout 快、更新慢到跑不动」的 num_envs
     assert row["update_s"] > 0 and row["minibatch_rows"] > 0
     assert 0 < row["end_to_end_steps_per_s"] < row["env_steps_per_s"]
-    best = max(out["results"], key=lambda r: r["end_to_end_steps_per_s"])
-    assert out["recommended"]["num_envs"] == best["num_envs"]
+    pick, best = bench.recommend(out["results"])
+    assert out["recommended"]["num_envs"] == pick["num_envs"]
+    assert out["fastest"]["num_envs"] == best["num_envs"]
+
+
+def _row(n, sps):
+    return {"num_envs": n, "threads": 63, "update_s": 1.0, "end_to_end_steps_per_s": sps}
+
+
+def test_bench_recommend_prefers_small_batch_within_tolerance():
+    """4090 实测：2048→4096 只快 18%（该升档）；若再加 8192 仅微涨，则不该继续升。"""
+    measured = [_row(1024, 52728), _row(2048, 65739), _row(4096, 77681)]
+    pick, best = bench.recommend(measured)
+    assert pick["num_envs"] == 4096 and best["num_envs"] == 4096
+    pick, best = bench.recommend([*measured, _row(8192, 78000)])
+    assert best["num_envs"] == 8192, "最快的仍如实记录"
+    assert pick["num_envs"] == 4096, "只快 0.4% ⇒ 不值得把批量翻倍"
+    # 同一 num_envs 内仍取最快线程数
+    rows = [_row(2048, 65739), {**_row(2048, 40000), "threads": 255}]
+    assert bench.recommend(rows)[0]["threads"] == 63
 
 
 def test_gpucheck_requires_cuda(monkeypatch, tmp_path):

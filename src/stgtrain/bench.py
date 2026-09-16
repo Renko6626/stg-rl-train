@@ -26,6 +26,10 @@ from .ppo import PPO
 from .train import build_components, pick_device
 
 MB_WARMUP, MB_MEASURE = 1, 3
+# 推荐规则：端到端吞吐在最优的 RECOMMEND_TOL 以内时，取 **num_envs 最小**的那档。
+# 批量 = num_envs × num_steps，同样帧数下批量越大梯度更新次数越少、每帧学习效率越低；
+# 吞吐差几个百分点不值得拿样本效率换（4090 实测 2048 → 4096 吞吐只 +18%，批量却翻倍）。
+RECOMMEND_TOL = 0.95
 
 
 def _step(envw, featurizer, model, obs):
@@ -123,11 +127,26 @@ def run_bench(cfg: dict, out_dir: Path) -> dict:
             print(f"{row['num_envs']:>8} {row['threads']:>7} {rollout_sps:>11.0f} {update_s:>9.2f} {end_to_end:>10.0f}")
     if not results:
         raise RuntimeError(f"bench 没有可用配置（全部失败）：{skipped}")
-    best = max(results, key=lambda r: r["end_to_end_steps_per_s"])
+    pick, best = recommend(results)
     out = {"machine": machine_info(), "stg_rl": stg_rl.build_info(), "results": results, "skipped": skipped,
-           "recommended": {"num_envs": best["num_envs"], "threads": best["threads"]},
-           "note": "推荐按端到端吞吐（rollout + 一次更新）；update_s 由单 minibatch 实测 × epochs × minibatches 外推，未编译，偏保守"}
+           "recommended": {"num_envs": pick["num_envs"], "threads": pick["threads"]},
+           "fastest": {"num_envs": best["num_envs"], "threads": best["threads"],
+                       "end_to_end_steps_per_s": best["end_to_end_steps_per_s"]},
+           "note": f"端到端吞吐（rollout + 一次更新）在最快的 {RECOMMEND_TOL:.0%} 以内时取 num_envs 最小的一档"
+                   "（同等速度下小批量的样本效率更好）；update_s 由单 minibatch 实测 × epochs × minibatches 外推，未编译，偏保守"}
     (Path(out_dir) / "bench.json").write_text(json.dumps(out, indent=2, ensure_ascii=False), encoding="utf-8")
-    print(f"推荐：env.num_envs = {best['num_envs']}，env.threads = {best['threads']}"
-          f"（端到端 {best['end_to_end_steps_per_s']:.0f} steps/s，一次更新 {best['update_s']:.1f} s）")
+    print(f"推荐：env.num_envs = {pick['num_envs']}，env.threads = {pick['threads']}"
+          f"（端到端 {pick['end_to_end_steps_per_s']:.0f} steps/s，一次更新 {pick['update_s']:.1f} s）")
+    if pick["num_envs"] != best["num_envs"]:
+        print(f"（最快的是 {best['num_envs']} env / {best['end_to_end_steps_per_s']:.0f} steps/s，"
+              f"只快 {best['end_to_end_steps_per_s'] / pick['end_to_end_steps_per_s'] - 1:.1%}，不值得把批量翻倍）")
     return out
+
+
+def recommend(results: list[dict], tol: float = RECOMMEND_TOL) -> tuple[dict, dict]:
+    """→ (推荐行, 最快行)。推荐 = 吞吐在最快的 tol 以内的那些档里 num_envs 最小的，同档取最快线程数。"""
+    best = max(results, key=lambda r: r["end_to_end_steps_per_s"])
+    floor = tol * best["end_to_end_steps_per_s"]
+    min_n = min(r["num_envs"] for r in results if r["end_to_end_steps_per_s"] >= floor)
+    pick = max((r for r in results if r["num_envs"] == min_n), key=lambda r: r["end_to_end_steps_per_s"])
+    return pick, best
