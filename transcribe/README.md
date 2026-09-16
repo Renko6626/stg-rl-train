@@ -57,6 +57,18 @@ transcribe/play.sh status | stop
 远程机器先开隧道 `ssh -L 8611:localhost:8611 <机器>`，浏览器开 `http://localhost:8611`。
 操作：方向键 · Z 射击 · Shift 低速；别按 X（训练用的机体 1 没有保命手段）。
 
+## 出图（弹幕预览 PNG / GIF）
+
+```bash
+uv run python -m stgtranscribe.preview                                   # cards/ 全部卡 × 卡内各档，每档一张 8 帧拼图（45 张卡约 5 秒）
+uv run python -m stgtranscribe.preview cards/th06_s3_w12 --ranks 2-3 --gif   # 指定卡 / 档，另出 GIF（20 fps，每个约 6–10 MB）
+uv run python -m stgtranscribe.preview --serve                           # 静态页 127.0.0.1:8612，远程 ssh -L 8612:localhost:8612 <机器>
+```
+
+产物在 `work/preview/<卡 id>/`（`sheet_r<档>.png`、`anim_r<档>.gif`）+ `work/preview/index.html`。
+拼图取「第一颗弹到最后一颗弹」时间窗均匀 8 帧，弹数峰值帧标题栏标红；贴图用 stg-engine `godot/assets/bullets.png`
+（原作弹片切的，产物别提交）。自机停在场底中心不动，自机狙都瞄这个点；harness `--at` 每帧最多列 1024 颗弹。
+
 ## 手动工具
 
 ```bash
