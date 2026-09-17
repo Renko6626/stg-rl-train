@@ -86,4 +86,9 @@ def summarize_episodes(records: list[dict], prefix: str = "ep/") -> dict[str, fl
         if key in ("env", "done"):
             continue
         out[f"{prefix}{key}"] = sum(float(r[key]) for r in records) / n
+    for side in ("in_r", "out_r"):  # 点内 / 点外方向变化率：按总时长合并，不对各局比率取平均
+        c, s = f"dir_changes_{side}", f"secs_{side}"
+        if c in records[0]:
+            secs = sum(float(r[s]) for r in records)
+            out[f"{prefix}dir_changes_{side}_per_s"] = sum(float(r[c]) for r in records) / secs if secs > 0 else 0.0
     return out

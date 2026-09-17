@@ -12,7 +12,8 @@ load_builtins()
 
 def rec(done, frames=100, reach=50.0, in_r=0.5):
     return {"env": 0, "done": done, "frames": frames, "return": 1.0, "steps": frames, "in_r_frac": in_r,
-            "edge_frac": 0.0, "shift_toggles_per_s": 1.0, "dir_changes_per_s": 2.0, "reach_frames": reach}
+            "edge_frac": 0.0, "shift_toggles_per_s": 1.0, "dir_changes_per_s": 2.0, "reach_frames": reach,
+            "key_presses_per_s": 3.0, "dir_changes_in_r": 0, "secs_in_r": 0.0, "dir_changes_out_r": 0, "secs_out_r": 0.0}
 
 
 def test_summarize_eval_and_score():
@@ -40,3 +41,13 @@ def test_evaluate_calm_card_counts_exact_episodes():
     # 所以每局 183..303 帧、均值约 222。阈值放宽到 150 仍能抓住评测管线提前截断的 bug。
     assert r2["frames_mean"] > 150
     assert res["overall"]["episodes"] == 4
+
+
+def test_summarize_pools_radius_split_rates():
+    a = {**rec(2), "key_presses_per_s": 4.0, "dir_changes_in_r": 6, "secs_in_r": 1.0, "dir_changes_out_r": 1, "secs_out_r": 2.0}
+    b = {**rec(2), "key_presses_per_s": 2.0, "dir_changes_in_r": 0, "secs_in_r": 0.0, "dir_changes_out_r": 3, "secs_out_r": 2.0}
+    s = summarize_eval([a, b])
+    assert s["key_presses_per_s"] == pytest.approx(3.0)
+    assert s["dir_changes_in_r_per_s"] == pytest.approx(6 / 1.0), "按总时长合并，不对各局比率取平均"
+    assert s["dir_changes_out_r_per_s"] == pytest.approx(4 / 4.0)
+    assert summarize_eval([b])["dir_changes_in_r_per_s"] == 0.0, "点内时长为 0 时记 0"

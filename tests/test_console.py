@@ -35,14 +35,16 @@ def test_progress_line_without_finished_episodes():
 
 def test_eval_block_marks_best_and_lists_cards():
     res = {"overall": {"episodes": 288.0, "survival": 0.84375, "in_r_frac": 0.72728, "reach_frames_median": 38.2,
-                       "dir_changes_per_s": 39.67, "shift_toggles_per_s": 6.086, "edge_frac": 0.0454},
+                       "dir_changes_per_s": 39.67, "shift_toggles_per_s": 6.086, "edge_frac": 0.0454,
+                       "dir_changes_in_r_per_s": 45.2, "dir_changes_out_r_per_s": 21.3, "key_presses_per_s": 30.5},
            "cards": {"th06_s1_b4": {"r2": {"survival": 0.75, "in_r_frac": 0.7, "frames_mean": 1200.0,
                                            "dir_changes_per_s": 35.0, "shift_toggles_per_s": 5.0}}}}
     text = C.eval_block(update=800, res=res, is_best=True, elapsed=3000.0)
     lines = text.splitlines()
     assert "评测 @ u800" in lines[0] and "★ 新 best" in lines[0]
     assert "撑过 84.4%" in lines[1] and "跟点 72.7%" in lines[1] and "到达 38 帧" in lines[1]
-    assert "方向 39.7/s" in lines[1] and "shift 6.1/s" in lines[1] and "贴边 4.5%" in lines[1]
+    assert "方向 39.7/s（点内 45.2 / 点外 21.3）" in lines[1] and "按键 30.5/s" in lines[1]
+    assert "shift 6.1/s" in lines[1] and "贴边 4.5%" in lines[1]
     assert any(l.strip().startswith("th06_s1_b4 r2") and "撑过  75%" in l for l in lines[2:])
     assert "新 best" not in C.eval_block(update=800, res=res, is_best=False, elapsed=3000.0)
 

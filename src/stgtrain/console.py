@@ -87,8 +87,11 @@ def eval_block(update: int, res: dict, is_best: bool, elapsed: float) -> str:
     head += ("★ 新 best " if is_best else "")
     head = head.ljust(72, "─")
     summary = (f"  撑过 {o['survival'] * 100:.1f}% · 跟点 {o['in_r_frac'] * 100:.1f}% · "
-               f"到达 {o['reach_frames_median']:.0f} 帧 · 方向 {o['dir_changes_per_s']:.1f}/s · "
-               f"shift {o['shift_toggles_per_s']:.1f}/s · 贴边 {o['edge_frac'] * 100:.1f}%")
+               f"到达 {o['reach_frames_median']:.0f} 帧 · 方向 {o['dir_changes_per_s']:.1f}/s"
+               + (f"（点内 {o['dir_changes_in_r_per_s']:.1f} / 点外 {o['dir_changes_out_r_per_s']:.1f}）"
+                  if "dir_changes_in_r_per_s" in o else "")
+               + (f" · 按键 {o['key_presses_per_s']:.1f}/s" if "key_presses_per_s" in o else "")
+               + f" · shift {o['shift_toggles_per_s']:.1f}/s · 贴边 {o['edge_frac'] * 100:.1f}%")
     rows = []
     names = [f"{card} {rank}" for card, per in res.get("cards", {}).items() for rank in per]
     w = max((len(n) for n in names), default=0)

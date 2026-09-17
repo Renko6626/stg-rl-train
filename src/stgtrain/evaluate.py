@@ -28,8 +28,15 @@ def summarize_eval(records: list[dict]) -> dict[str, float]:
         "frames_mean": mean("frames"), "return_mean": mean("return"), "in_r_frac": mean("in_r_frac"),
         "reach_frames_median": float(statistics.median(float(r["reach_frames"]) for r in records)),
         "shift_toggles_per_s": mean("shift_toggles_per_s"), "dir_changes_per_s": mean("dir_changes_per_s"),
-        "edge_frac": mean("edge_frac"),
+        "edge_frac": mean("edge_frac"), "key_presses_per_s": mean("key_presses_per_s"),
+        "dir_changes_in_r_per_s": pooled_rate(records, "dir_changes_in_r", "secs_in_r"),
+        "dir_changes_out_r_per_s": pooled_rate(records, "dir_changes_out_r", "secs_out_r"),
     }
+
+
+def pooled_rate(records: list[dict], count_key: str, secs_key: str) -> float:
+    secs = sum(float(r[secs_key]) for r in records)
+    return sum(float(r[count_key]) for r in records) / secs if secs > 0 else 0.0
 
 
 def score(overall: dict) -> tuple[float, float]:

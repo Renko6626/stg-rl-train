@@ -10,7 +10,8 @@ from torch import Tensor
 from . import actions
 from .envwrap import RawObs, StepInfo
 
-_COLS = ("return", "steps", "in_r", "edge", "shift", "dirchg", "reach_sum", "reach_cnt")
+_COLS = ("return", "steps", "in_r", "edge", "shift", "dirchg", "reach_sum", "reach_cnt",
+         "keys", "dir_in", "dir_out", "steps_in", "steps_out")
 
 
 class EpisodeTracker:
@@ -32,8 +33,11 @@ class EpisodeTracker:
         m = self.edge_margin
         x, y = cur.player_xy[:, 0].abs(), cur.player_xy[:, 1]
         edge = ((x > 192.0 - m) | (y > 448.0 - m) | (y < m)) & alive
-        _, toggled = actions.key_changes(info.prev_buttons, info.buttons)
+        pressed, toggled = actions.key_changes(info.prev_buttons, info.buttons)
         dir_chg = actions.direction_changed(info.prev_buttons, info.buttons)
+        # 决策时（本步动作是看着 prev 选的）是否在 R 内；只切分存活步，两边互补
+        at_r = ((prev.player_xy - prev.target_xy).norm(dim=-1) < self.hold_radius) & alive
+        at_out = ~at_r & alive
 
         self.since = self.since + 1
         newly = in_r & ~self.reached
@@ -46,7 +50,8 @@ class EpisodeTracker:
         reach_cnt = reach_cnt + miss.float()
 
         cols = [total.to(torch.float32), torch.ones_like(total, dtype=torch.float32), in_r.float(), edge.float(),
-                toggled.float(), dir_chg.float(), reach_add, reach_cnt]
+                toggled.float(), dir_chg.float(), reach_add, reach_cnt,
+                pressed.float(), (dir_chg & at_r).float(), (dir_chg & at_out).float(), at_r.float(), at_out.float()]
         cols += [raw_terms[name].to(torch.float32) for name in self.term_names]
         self.acc = self.acc + torch.stack(cols, dim=-1)
 
@@ -74,6 +79,10 @@ class EpisodeTracker:
                 "in_r_frac": a[2] / steps, "edge_frac": a[3] / steps,
                 "shift_toggles_per_s": a[4] / secs, "dir_changes_per_s": a[5] / secs,
                 "reach_frames": a[6] / max(a[7], 1.0),
+                "key_presses_per_s": a[8] / secs,
+                # 点内 / 点外方向变化：记计数与时长，汇总时按总时长合并（单局点内时长可能为 0）
+                "dir_changes_in_r": int(a[9]), "dir_changes_out_r": int(a[10]),
+                "secs_in_r": a[11] * self.frame_skip / 60.0, "secs_out_r": a[12] * self.frame_skip / 60.0,
             }
             for k, name in enumerate(self.term_names):
                 rec[f"term/{name}"] = a[len(_COLS) + k]

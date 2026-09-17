@@ -1,0 +1,20 @@
+# 实验 D（2026-09-17）：实验 A + 按键惩罚 key_press = -0.001（按下新键数计，方向键与 shift 都算，松开不算）。
+# 其余与 A 完全一致，直接与 A 叠图对比。登记与判读标准见 docs/experiments.md。
+# 量级：A 的贪心策略约 31 次按键/s → −0.031/s；跟点停留收入约 0.45/s、死亡 −10，惩罚只够打破「停 / 晃」的平局。
+[run]
+total_updates = 2000
+ckpt_every = 100
+eval_every = 200
+
+[env]
+num_envs = 4096
+threads = 63           # 换机器先 bash run.sh <本配置> x --bench（上次那台 bench 推荐 32，实测差别不大）
+
+[reward.terms]
+death = 10.0
+follow_shaping = 1.0
+hold = 0.01
+segment_survived = 0.0
+key_press = -0.001
+shift_toggle = 0.0
+edge_hug = 0.0

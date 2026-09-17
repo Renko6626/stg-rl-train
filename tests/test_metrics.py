@@ -47,3 +47,11 @@ def test_truncate_after_drops_half_written_last_line(tmp_path):
     assert truncate_after(p, 3) == 1
     kept = read_jsonl(p)
     assert [r["update"] for r in kept] == [1, 2, 3]
+
+
+def test_summarize_episodes_pools_radius_split():
+    recs = [{"env": 0, "done": 2, "dir_changes_in_r": 6, "secs_in_r": 1.0, "dir_changes_out_r": 1, "secs_out_r": 2.0},
+            {"env": 1, "done": 2, "dir_changes_in_r": 0, "secs_in_r": 0.0, "dir_changes_out_r": 3, "secs_out_r": 2.0}]
+    s = summarize_episodes(recs)
+    assert s["ep/dir_changes_in_r_per_s"] == pytest.approx(6.0)
+    assert s["ep/dir_changes_out_r_per_s"] == pytest.approx(1.0)

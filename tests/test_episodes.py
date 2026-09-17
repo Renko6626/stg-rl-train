@@ -52,3 +52,28 @@ def test_unreached_segment_counts_cap_and_key_rates():
     assert r["reach_frames"] == pytest.approx(300.0), "两段都没到达，各记上限"
     assert r["shift_toggles_per_s"] == pytest.approx(2 / (2 / 60))
     assert r["dir_changes_per_s"] == pytest.approx(1 / (2 / 60))
+
+
+def test_direction_changes_split_by_radius_at_decision_time():
+    """按决策时（prev 自机 vs prev 目标）是否在 R 内切分方向变化；存活步两边互补，死亡步不计。"""
+    t = tracker(n=1, fs=2)
+    target = (0.0, 300.0)
+    inside, outside = (0.0, 305.0), (0.0, 400.0)
+    L, R, S = C.BTN_SHOT | C.BTN_LEFT, C.BTN_SHOT | C.BTN_RIGHT, C.BTN_SHOT
+    # (prev 位置, cur 位置, prev 键, 键, done)
+    seq = [
+        (outside, outside, S, L, 0),   # 点外，变向
+        (outside, inside, L, L, 0),    # 点外，不变
+        (inside, inside, L, R, 0),     # 点内，变向
+        (inside, inside, R, L, 0),     # 点内，变向
+        (inside, inside, L, S, 1),     # 死亡步：不计
+    ]
+    for p, c, pb, b, done in seq:
+        prev = raw_obs(n=1, player=p, target=target)
+        cur = raw_obs(n=1, player=c, target=target)
+        feed(t, prev, cur, step_info(n=1, done=[done], prev_buttons=[pb], buttons=[b]), [0.0])
+    r = t.pop_finished()[0]
+    assert r["dir_changes_in_r"] == 2 and r["dir_changes_out_r"] == 1
+    assert r["secs_in_r"] == pytest.approx(2 * 2 / 60) and r["secs_out_r"] == pytest.approx(2 * 2 / 60)
+    # 按下新键数（松开不算）：S→L 1、L→R 1、R→L 1、L→S 0
+    assert r["key_presses_per_s"] == pytest.approx(3 / (5 * 2 / 60))
