@@ -1,4 +1,4 @@
-// th06_s3_mb1 —— 东方红魔乡 Stage 3 中 boss（爱丽丝）非符
+// th06_s3_mb1 —— 东方红魔乡 Stage 3 中 boss（红美铃）非符
 // 原文：ecldata3.ecl.txt Sub9（登场 + Sub10 定时 100 帧 + 从 +30 起的攻击循环）+ Sub11 + Sub12 + Sub10 + Sub20，
 // timer_callback_threshold(1800)。逐条对照见 report.md。
 const TIME_LIMIT: int = 1800;

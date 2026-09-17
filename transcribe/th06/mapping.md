@@ -403,7 +403,10 @@ shoot_offset_polar(a, r, _)      →  sh_offset(k, 0fx, 0fx); sh_offset_rad(k, a
 | `bullet_random` (75) | 角度 `[a2, a1)`、速度 `[s2, s1)` 都随机 | 逐颗 `fire` |
 
   fan 的展开方式与我方 `sh_ring(k,0)` 逐位同构（奇数颗正中一颗对准中轴），ring 与 `sh_ring(k,1)` 同构。
-- `flags` 低位：`1` = 出生冲刺（§5）；`2/4/8` = 出生特效（TH06 期间弹以 1/3 速度移动若干帧，**我方不模拟**）；
+- `flags` 低位：`1` = 出生冲刺（§5）；`2/4/8` = 出生特效，**我方有意不模拟**（训练目标是泛化躲弹，不追原作逐帧时序）。
+  TH06 出生特效期间弹**降速且无判定**（`BulletManager.cpp:683-707`，碰撞只在飞行状态做），16px 弹的时长取自
+  `etama3.anm` script14–16：`2` = 10 帧 ×1/2、`4` = 16 帧 ×1/2.5、`8` = 32 帧 ×1/3。我方从第 1 帧起全速、有判定，
+  所以弹的位置永久领先原作约 `5v` / `9.6v` / `21.3v` 像素（v = 弹速），出生即可伤人。部署侧要处理，见 stg-engine follow-ups D23#9；
   `0x200` = 带音效（丢弃）；其余位见 §5。
 
 ```ecl
@@ -479,15 +482,19 @@ sub main() {
 
 TH06（`EclManager.cpp:428-440`、`980-989`）：
 
-- `shoot_interval(n)`：此后每 `n` 帧用**当时的** `bulletProps` 自动开一次火（计时从 0 起，第 `n` 帧首发）；`n = 0` 停。
-- `shoot_interval_delayed(n)`：同上，但计时器初值随机 `[0, n)`，首发在 `n − rand(n)` 帧后。
+- `shoot_interval(n)`：此后每 `n` 帧用**当时的** `bulletProps` 自动开一次火；`n = 0` 停。
+- `shoot_interval_delayed(n)`：同上，但计时器初值随机 `[0, n)`。
+- **帧对齐**：`RunEcl` 同一帧先执行到期指令、再走移动与开火计时（`EclManager.cpp:116` 起的主循环、`:980-987`），
+  设定帧本身就 tick 一次——原作首发在设定帧之后第 `n − 1` 帧（delayed：第 `n − 1 − rand(n)` 帧）。
+  我方写法 A 用 `first = n`（delayed：`n − rand(n)`）再 `wait(first)`，**统一晚 1 帧、开火次数与原作一致**，这是接受的近似。
 - 自动开火与块时间轴无关，只要敌活着就一直打；`shoot_disable` 期间不发。
 - `shoot_now()`：立即用 `bulletProps` 开一次火。
 
 **写法 A（常见：配一次参数、之后只靠自动射击）**——伴生任务，带「打到第几帧为止」参数
 （原文后面若有 `shoot_interval(0)` 或参数改变，按原文时间算出 `until`）。
-**`until` 那一帧不开火**：`RunEcl` 同帧先执行指令、后走开火计时（`EclManager.cpp:428` 置 0 在前，`:980-987` Tick 在后），
-所以两处守卫都是 `>=`——写成 `>` 会在开火帧恰好等于 `until` 时多打一轮（审核按 critical 判）：
+**停火守卫用 `>`**：原作在 `until` 那一帧先执行 `shoot_interval(0)` 再计时，所以原作开火帧 `k` 须满足 `k < until`；
+我方 `first = k + 1`（见上「帧对齐」），等价于 `first ≤ until` 才开火 ⇒ 守卫写 `first > until` / `t + interval > until`。
+（2026-09-16 曾误改成 `>=`、2026-09-17 核实同帧 tick 后改回；`>=` 会在边界上少打一轮，概率约 1/n。）
 
 ```ecl
 const KUNAI: int = 80;
@@ -502,12 +509,12 @@ async sub autoshoot(interval: int, delayed: int, until: int) {
     var t: int = 0;
     var first: int = interval;
     if delayed != 0 { first = interval - rand(interval); }
-    if first >= until { return; }
+    if first > until { return; }
     wait(first);
     t = first;
     loop {
         sh_fire(0);
-        if t + interval >= until { return; }
+        if t + interval > until { return; }
         wait(interval);
         t = t + interval;
     }

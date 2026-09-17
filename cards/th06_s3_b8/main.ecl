@@ -1,4 +1,4 @@
-// th06_s3_b8 —— 东方红魔乡 Stage 3 boss（爱丽丝·玛格特罗伊德）符卡 彩符「極彩颱風」
+// th06_s3_b8 —— 东方红魔乡 Stage 3 boss（红美铃）符卡 彩符「極彩颱風」
 // 原文：ecldata3.ecl.txt Sub45（入口 +60）→ Sub46（宣言 / 移到中央 / Sub10 延时 120）→ Sub47（6 帧一循环的多向随机曲射流），时限 2160。
 
 const TIME_LIMIT: int = 2160;

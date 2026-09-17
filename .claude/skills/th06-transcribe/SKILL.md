@@ -79,8 +79,8 @@ $P collect --stage N           # 然后 git add cards/ && git commit
 - **角度心算翻倍**：π/32 = 1024bam，不是 2048。worker 被要求照抄 `source.txt` 注释；审核发现角度整体差 2 倍就是这个。
 - **粘滞难度前缀**：`!L shoot_disable();` 之后的行都是 L-only，直到下一个前缀。
 - **locals 超 64**：xformdef 按物理槽 × 3 字算进引用它的 sub；拆并行任务。
-- **停火边界用 `>=`**：开火帧恰好 = `until` 时原作不开火（同帧先执行 `shoot_interval(0)` 再走计时）。对照表 §4.3 曾写成 `>`，
-  改对照表后要**刷新所有单元的 `mapping-excerpt.md`**（`extract` 不覆盖已往下走的单元），并 grep 已入库卡。
+- **自动射击停火守卫用 `>`**：原作设定帧当帧就 tick，首发在第 `n−1` 帧；我方 `wait(n)` 统一晚 1 帧，`first > until` 才停（对照表 §4.3）。
+  2026-09-16 曾误改成 `>=`，审核若再提「until 帧多打一轮」，先核这条。改对照表后要**刷新所有单元的 `mapping-excerpt.md`**（`extract` 不覆盖已往下走的单元）。
 - **弹峰值超 1024**：先看是不是 TH06 的 640 弹池在压画面（我方池 8192，屏内弹数照样超）。做法见设计 §13.4 第 2 条：
   离线复现 640 池（`work/units/th06_s3_w12/pool640/poolsim.py`，要临时放开 harness `AT_DUMP_LIMIT`）→ 拟合「某类弹 `$frame ≥ N` 的轮次不发」→
   返工派 dsh 实现 → 主会话用同一脚本复核曲线误差。不要随手抽稀颗数，也不要只收窄 ranks 了事。
