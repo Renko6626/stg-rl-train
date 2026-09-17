@@ -17,7 +17,7 @@ from pathlib import Path
 import stg_rl
 import torch
 
-from . import plots
+from . import console, plots
 from .actions import ACTION_TABLE_VERSION
 from .cards import compile_cards, discover, load_splits, train_starts
 from .checkpoint import load_checkpoint, restore_rng, save_checkpoint
@@ -141,6 +141,9 @@ def train(cfg: dict, run_dir: Path, resume: dict | None = None, pack_result: boo
     budget_s = float(cfg["run"]["max_minutes"]) * 60.0  # 0 = 不限时；到点把当前 update 当最后一个
     t_start = time.perf_counter()
     stopped_early = None
+    say = lambda text: print(text, flush=True)  # noqa: E731 —— 接 tee 时 stdout 块缓冲，必须 flush
+    progress = console.Throttle(console.PROGRESS_EVERY_S)
+    say(console.banner(run_dir, device, len(images), len(starts), sum(len(s.ranks) for s in specs), cfg, start))
 
     sampler.start()
     try:
@@ -161,39 +164,51 @@ def train(cfg: dict, run_dir: Path, resume: dict | None = None, pack_result: boo
                 perf_writer.write({"kind": "phase", "update": update, **row})
                 scalars.update({f"perf/{k}": v for k, v in row.items()})
             logger.log(update, env_steps, scalars)
-            last = update == total or (budget_s > 0 and time.perf_counter() - t_start >= budget_s)
+            now = time.perf_counter()
+            last = update == total or (budget_s > 0 and now - t_start >= budget_s)
+            if progress.ready(now) or last:
+                done = update - start + 1
+                say(console.progress_line(update, total, env_steps, now - t_start,
+                                          console.eta(done, total - update, now - t_start), scalars))
 
             if specs and (update % int(cfg["run"]["eval_every"]) == 0 or last):
+                t_eval = time.perf_counter()
                 res = evaluate(cfg, ppo, featurizer, images, specs, device)
                 (run_dir / "eval" / f"{update}.json").write_text(json.dumps(res, indent=2, ensure_ascii=False),
                                                                encoding="utf-8")
                 logger.log(update, env_steps, {f"eval/{k}": v for k, v in res["overall"].items()})
                 sc = score(res["overall"])
-                if best is None or sc > best:
+                is_best = best is None or sc > best
+                if is_best:
                     best = sc
                     save_checkpoint(ckpt_dir / "best.pt", ppo=ppo, update=update, env_steps=env_steps, cfg=cfg,
                                     extra={"best": list(best), "eval": res["overall"]})
+                say(console.eval_block(update, res, is_best, time.perf_counter() - t_eval))
 
             if update % int(cfg["run"]["ckpt_every"]) == 0 or last:
                 save_checkpoint(ckpt_dir / "latest.pt", ppo=ppo, update=update, env_steps=env_steps, cfg=cfg,
                                 extra={"best": list(best) if best is not None else None})
+                saved = ["latest.pt"]
                 if update % int(cfg["run"]["ckpt_every"]) == 0:
                     shutil.copyfile(ckpt_dir / "latest.pt", ckpt_dir / f"u{update}.pt")
+                    saved.append(f"u{update}.pt")
+                say(console.ckpt_line(update, saved))
             if last and update != total:
                 stopped_early = update
-                print(f"到达 run.max_minutes={cfg['run']['max_minutes']}，在 update {update} 停止")
+                say(f"到达 run.max_minutes={cfg['run']['max_minutes']}，在 update {update} 停止")
                 break
     finally:
         sampler.stop()
         perf_writer.close()
         logger.close()
 
+    say(console.finish_line(update, env_steps, time.perf_counter() - t_start, best, stopped_early is not None))
     _update_env_json(run_dir, perf_summary=summarize(phase_rows, sampler.summary(), steps_per_iter),
                      stopped_early_at_update=stopped_early)
     plots.plot_runs({run_dir.name: read_jsonl(run_dir / "metrics.jsonl")}, run_dir / "plots")
     plots.plot_load(plots.load_perf(run_dir / "perf.jsonl"), run_dir / "plots")
     if pack_result:
-        print(pack(run_dir))
+        print(f"结果包：{pack(run_dir)}", flush=True)
     return run_dir
 
 
