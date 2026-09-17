@@ -186,7 +186,8 @@ class Renderer:
             self._rot[key] = img
         return img
 
-    def draw(self, snap: Snapshot, title: str, highlight: bool = False) -> Image.Image:
+    def draw(self, snap: Snapshot, title: str, highlight: bool = False,
+             player_xy: tuple[float, float] = PLAYER_XY) -> Image.Image:
         im = Image.new("RGB", (FIELD_W, FIELD_H + HEADER_H), BG)
         d = ImageDraw.Draw(im)
         d.rectangle((0, 0, FIELD_W - 1, HEADER_H - 1), fill=(150, 30, 30) if highlight else (40, 40, 56))
@@ -195,7 +196,7 @@ class Renderer:
             cx, cy = e.x + HALF_W, e.y + HEADER_H
             d.ellipse((cx - 10, cy - 10, cx + 10, cy + 10), outline=(120, 220, 140), width=2)
         if self.player is not None:
-            px, py = PLAYER_XY[0] + HALF_W, PLAYER_XY[1] + HEADER_H
+            px, py = player_xy[0] + HALF_W, player_xy[1] + HEADER_H
             im.paste(self.player, (round(px - self.player.width / 2), round(py - self.player.height / 2)), self.player)
         for b in snap.bullets:
             spr = self.sprite(b.sprite, b.deg)

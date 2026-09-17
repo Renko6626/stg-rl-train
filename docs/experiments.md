@@ -13,6 +13,8 @@
 - **对比图**：`uv run --frozen python -m stgtrain.plots runs/<甲> runs/<乙> --out runs/cmp-<甲乙>`（横轴 env_steps = 游戏帧）。
 - **补测**：`uv run --frozen python -m stgtrain.eval_ckpt runs/<run>/checkpoints/best.pt [--all-cards --ranks 2,3]`。
   注意 CPU 补测和训练时的 GPU 评测同种子但浮点不同，撑过率会差 ±1–2 个百分点。
+- **看操作**：`uv run --frozen python -m stgtrain.replay_gif runs/<run>/checkpoints/best.pt [--cards …] [--episodes 0,1]`
+  → `runs/<run>/replay/<卡>_r<档>_e<局>.gif`，与评测同一局；黄圈 = 指令点、底部色带 = 最近 64 步方向键。
 
 ## 总表
 
@@ -51,6 +53,8 @@
   - **抖动**：贪心方向变化在各 checkpoint 间 19–42/s 来回跳 ⇒ reward 对「停 / 晃」无所谓，抖多少随机漂。
     补测 best.pt（CPU，`eval-best-split-radius.json`）：**点内 25.0/s、点外 23.2/s**，按键 31.3/s ⇒ 抖动不是「停在点上原地晃」，而是全程都在抖（推翻了立项 D 时的猜测）。
   - 采样熵 2.89 → 2.47（几乎没降）；EV 0.94 → 0.66 → 0.70。
+  - **操作回放**（`runs/20260917-030045-exp-a/replay/`，9 卡各第 0 局）：8 撑过 1 死。`th06_s2_mb1` 那局自机离开下半屏的指令点，
+    一路跑到右上角 boss 出弹口附近（y≈40）被刚发出的弹打死——有「往上逃」的倾向，待多看几局确认；`th06_s3_b5` 按键带逐帧换色，按键 48 次/秒。
 - **结论**：作为后续基线。能力够用，问题在操作频率完全不像人。
 
 ## C frame_skip = 2（2026-09-17）
