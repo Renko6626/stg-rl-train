@@ -1,0 +1,24 @@
+# 实验 C（2026-09-17）：frame_skip = 2（每个决策压 2 帧），模型与卡池同实验 A。
+# 与 A 同样的**游戏帧预算**：1000 × 4096 × 64 × 2 = 5.24 亿帧；lr 在同样的帧数上退火完。
+# 按「每秒」对齐 A：gamma 与 hold 都是按决策步计的，一步 = 2 帧 ⇒ gamma 0.995² ≈ 0.990、hold ×2。
+[run]
+total_updates = 1000
+ckpt_every = 50
+eval_every = 100       # 与 A 同样按帧数每 1.05 亿帧评一次
+
+[env]
+num_envs = 4096
+threads = 63
+frame_skip = 2
+
+[reward.terms]
+death = 10.0
+follow_shaping = 1.0
+hold = 0.02
+segment_survived = 0.0
+key_press = 0.0
+shift_toggle = 0.0
+edge_hug = 0.0
+
+[ppo]
+gamma = 0.990

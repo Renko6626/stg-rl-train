@@ -1,0 +1,10 @@
+# 实验 A（2026-09-17）：当前模型 × TH06 第 1–3 关卡池基线。4090 约 1.7 h + 评测约 20 min。
+# 其余键取 stgtrain.config.DEFAULTS（reward 不改、ranks = [2]、model = set_attn_v1 64/4/256）。
+[run]
+total_updates = 2000   # 2000 × 4096 env × 64 步 = 5.24 亿帧
+ckpt_every = 100
+eval_every = 200       # 评测集 9 卡 × 32 局，一轮约 2 分钟；默认 50 会多出 1 个多小时
+
+[env]
+num_envs = 4096
+threads = 63           # 4090 / EPYC 255 核实测最快档；换机器先 bash run.sh <本配置> x --bench
