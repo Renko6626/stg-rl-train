@@ -1,0 +1,23 @@
+# 实验 F（2026-09-17）：实验 E + key_press = -0.003（×3）。与 E 只差 reward.terms.key_press。
+# 动机：E 的滞回扫描显示 τ=0.5 能免费砍掉 44% 的方向变化（平局来回翻），看加大惩罚能否让策略自己学会「平局时保持」。
+# 判据：F 不加滞回能否达到 E + τ0.5 的水平（方向约 6–7/s、撑过 ≥ 0.92）。见 docs/experiments.md。
+[run]
+total_updates = 2000
+ckpt_every = 100
+eval_every = 200
+
+[env]
+num_envs = 4096
+threads = 63           # scripts/run-exp.sh 会按机器改写（EPYC 7742 → 32）
+
+[featurize]
+name = "danger_topk_v2"
+
+[reward.terms]
+death = 10.0
+follow_shaping = 1.0
+hold = 0.01
+segment_survived = 0.0
+key_press = -0.003
+shift_toggle = 0.0
+edge_hug = 0.0
