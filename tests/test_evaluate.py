@@ -52,3 +52,18 @@ def test_summarize_pools_radius_split_rates():
     assert s["dir_changes_in_r_per_s"] == pytest.approx(6 / 1.0), "按总时长合并，不对各局比率取平均"
     assert s["dir_changes_out_r_per_s"] == pytest.approx(4 / 4.0)
     assert summarize_eval([b])["dir_changes_in_r_per_s"] == 0.0, "点内时长为 0 时记 0"
+
+
+def test_hysteresis_keeps_prev_action_unless_margin_exceeds_tau():
+    import torch
+
+    from stgtrain.evaluate import hysteresis_action
+
+    logits = torch.tensor([[0.0, 1.0, 0.5],    # 最优 1，上一步 2：差 0.5
+                           [0.0, 1.0, 0.5],
+                           [3.0, 1.0, 0.0],    # 最优 0，上一步 2：差 3.0
+                           [0.0, 2.0, 0.0]])   # 上一步就是最优
+    prev = torch.tensor([2, 2, 2, 1])
+    assert hysteresis_action(logits, prev, 0.0).tolist() == [1, 1, 0, 1], "τ = 0 等价 argmax"
+    assert hysteresis_action(logits, prev, 0.6).tolist() == [2, 2, 0, 1]
+    assert hysteresis_action(logits, prev, 5.0).tolist() == [2, 2, 2, 1]

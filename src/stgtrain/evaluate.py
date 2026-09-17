@@ -5,6 +5,8 @@ from __future__ import annotations
 import statistics
 
 import stg_rl
+import torch
+from torch import Tensor
 
 from .cards import EvalSpec
 from .envwrap import EnvWrapper
@@ -44,7 +46,15 @@ def score(overall: dict) -> tuple[float, float]:
     return float(overall.get("survival", 0.0)), float(overall.get("in_r_frac", 0.0))
 
 
-def run_group(cfg: dict, ppo, featurizer, image, card: str, rank: int, episodes: int, device) -> list[dict]:
+def hysteresis_action(logits: Tensor, prev: Tensor, tau: float) -> Tensor:
+    """诊断用滞回：只有最优动作的 logit 比上一步动作高出 **超过** τ 才换，否则保持上一步。τ = 0 等价 argmax。"""
+    best = logits.argmax(-1)
+    keep = logits.max(-1).values - logits.gather(-1, prev.unsqueeze(-1)).squeeze(-1) <= tau
+    return torch.where(keep & (tau > 0), prev, best)
+
+
+def run_group(cfg: dict, ppo, featurizer, image, card: str, rank: int, episodes: int, device,
+              hysteresis: float = 0.0) -> list[dict]:
     envw = EnvWrapper(cfg, {card: image}, [stg_rl.Start(card, 0, rank)], device,
                       seed=int(cfg["eval"]["seed"]), num_envs=episodes, mirror=False)
     reward_fn = RewardFn(cfg)
@@ -56,7 +66,11 @@ def run_group(cfg: dict, ppo, featurizer, image, card: str, rank: int, episodes:
     # 每个 env 的第一局最迟在 max_frames 帧内结束（预热发生在 step 内部，不占步数）
     max_steps = int(cfg["env"]["max_frames"]) // envw.frame_skip + 2
     for step in range(max_steps):
-        action = ppo.act(featurizer(obs), greedy)
+        if hysteresis > 0:
+            logits, _ = ppo.agent_inference.model(featurizer(obs))
+            action = hysteresis_action(logits, obs.prev_action.to(logits.device), hysteresis)
+        else:
+            action = ppo.act(featurizer(obs), greedy)
         nxt, info = envw.step(action)
         total, raw = reward_fn(obs, nxt, info)
         tracker.update(obs, nxt, info, total, raw)
@@ -73,13 +87,13 @@ def run_group(cfg: dict, ppo, featurizer, image, card: str, rank: int, episodes:
     return [first[i] for i in sorted(first)]
 
 
-def evaluate(cfg: dict, ppo, featurizer, images: dict, specs: list[EvalSpec], device) -> dict:
+def evaluate(cfg: dict, ppo, featurizer, images: dict, specs: list[EvalSpec], device, hysteresis: float = 0.0) -> dict:
     result: dict = {"cards": {}, "overall": {}}
     everything: list[dict] = []
     for spec in specs:
         per: dict[str, dict] = {}
         for rank in spec.ranks:
-            recs = run_group(cfg, ppo, featurizer, images[spec.card], spec.card, rank, spec.episodes, device)
+            recs = run_group(cfg, ppo, featurizer, images[spec.card], spec.card, rank, spec.episodes, device, hysteresis)
             per[f"r{rank}"] = summarize_eval(recs)
             everything.extend(recs)
         result["cards"][spec.card] = per

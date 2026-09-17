@@ -32,6 +32,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--all-cards", action="store_true", help="评卡池里所有卡（含训练卡），不用评测划分")
     ap.add_argument("--ranks", default="2", help="--all-cards 时评哪些档，逗号分隔（默认 2）")
     ap.add_argument("--episodes", type=int, default=None, help="每组局数（默认取配置 eval.episodes / 划分文件）")
+    ap.add_argument("--hysteresis", type=float, default=0.0,
+                    help="诊断用：最优动作 logit 比上一步高出超过 τ 才换（0 = 纯 argmax）")
     ap.add_argument("--out", default=None, help="结果 json（默认 checkpoint 同目录 eval-<名>-<时间>.json）")
     a = ap.parse_args(argv)
 
@@ -57,8 +59,9 @@ def main(argv: list[str] | None = None) -> int:
     ppo = PPO(cfg, factory, device)
     ppo.load_state_dict(ck["state"])
     t0 = time.perf_counter()
-    res = evaluate(cfg, ppo, featurizer, images, specs, device)
-    res["checkpoint"] = {"path": str(a.checkpoint), "update": int(ck["update"]), "env_steps": int(ck["env_steps"])}
+    res = evaluate(cfg, ppo, featurizer, images, specs, device, hysteresis=a.hysteresis)
+    res["checkpoint"] = {"path": str(a.checkpoint), "update": int(ck["update"]), "env_steps": int(ck["env_steps"]),
+                         "hysteresis": a.hysteresis}
     print(console.eval_block(int(ck["update"]), res, False, time.perf_counter() - t0), flush=True)
 
     ckp = Path(a.checkpoint)
