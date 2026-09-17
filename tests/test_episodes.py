@@ -77,3 +77,24 @@ def test_direction_changes_split_by_radius_at_decision_time():
     assert r["secs_in_r"] == pytest.approx(2 * 2 / 60) and r["secs_out_r"] == pytest.approx(2 * 2 / 60)
     # 按下新键数（松开不算）：S→L 1、L→R 1、R→L 1、L→S 0
     assert r["key_presses_per_s"] == pytest.approx(3 / (5 * 2 / 60))
+
+
+def test_near_miss_metrics_graze_and_close_fractions():
+    """神穿指标：每秒擦弹（events 第 1 列）、存活步里离最近弹边缘 < 4 / < 12 px 的占比（死亡步不计，掩码外的弹不算）。"""
+    t = tracker(n=1, fs=1)
+    p = (0.0, 300.0)
+    hit_r, br = 2.0, 3.0
+    def at(edge):  # 弹心在自机正右方，边缘距离 = edge
+        return (edge + hit_r + br, 300.0, 0.0, 0.0, br)
+    seq = [([at(2.0)], 0, 1), ([at(8.0)], 0, 0), ([at(40.0)], 0, 2), ([], 0, 0), ([at(1.0)], 1, 0)]
+    prev = raw_obs(n=1, player=p, hit_r=hit_r)
+    for rows, done, graze in seq:
+        cur = raw_obs(n=1, player=p, hit_r=hit_r, bullets=[rows])
+        info = step_info(n=1, done=[done])
+        info.events[0, 1] = graze
+        feed(t, prev, cur, info, [0.0])
+        prev = cur
+    r = t.pop_finished()[0]
+    assert r["graze_per_s"] == pytest.approx(3 / (5 / 60))
+    assert r["close4_frac"] == pytest.approx(1 / 4), "存活 4 步里只有第 1 步 < 4 px"
+    assert r["close12_frac"] == pytest.approx(2 / 4)

@@ -11,7 +11,8 @@ from . import actions
 from .envwrap import RawObs, StepInfo
 
 _COLS = ("return", "steps", "in_r", "edge", "shift", "dirchg", "reach_sum", "reach_cnt",
-         "keys", "dir_in", "dir_out", "steps_in", "steps_out")
+         "keys", "dir_in", "dir_out", "steps_in", "steps_out", "graze", "close4", "close12")
+CLOSE_PX = (4.0, 12.0)  # 神穿指标：自机判定边缘到最近弹边缘的距离阈值
 
 
 class EpisodeTracker:
@@ -38,6 +39,11 @@ class EpisodeTracker:
         # 决策时（本步动作是看着 prev 选的）是否在 R 内；只切分存活步，两边互补
         at_r = ((prev.player_xy - prev.target_xy).norm(dim=-1) < self.hold_radius) & alive
         at_out = ~at_r & alive
+        # 本步之后离最近（有判定的）弹边缘多远；没有弹 = inf
+        edge_d = ((cur.bullets[..., :2] - cur.player_xy[:, None, :]).norm(dim=-1)
+                  - cur.bullets[..., 4] - cur.player_hit_r[:, None])
+        near = edge_d.masked_fill(~cur.bullets_mask, float("inf")).min(dim=1).values if cur.bullets.shape[1] else \
+            torch.full_like(d, float("inf"))
 
         self.since = self.since + 1
         newly = in_r & ~self.reached
@@ -51,7 +57,9 @@ class EpisodeTracker:
 
         cols = [total.to(torch.float32), torch.ones_like(total, dtype=torch.float32), in_r.float(), edge.float(),
                 toggled.float(), dir_chg.float(), reach_add, reach_cnt,
-                pressed.float(), (dir_chg & at_r).float(), (dir_chg & at_out).float(), at_r.float(), at_out.float()]
+                pressed.float(), (dir_chg & at_r).float(), (dir_chg & at_out).float(), at_r.float(), at_out.float(),
+                info.events[:, 1].to(torch.float32), ((near < CLOSE_PX[0]) & alive).float(),
+                ((near < CLOSE_PX[1]) & alive).float()]
         cols += [raw_terms[name].to(torch.float32) for name in self.term_names]
         self.acc = self.acc + torch.stack(cols, dim=-1)
 
@@ -83,6 +91,9 @@ class EpisodeTracker:
                 # 点内 / 点外方向变化：记计数与时长，汇总时按总时长合并（单局点内时长可能为 0）
                 "dir_changes_in_r": int(a[9]), "dir_changes_out_r": int(a[10]),
                 "secs_in_r": a[11] * self.frame_skip / 60.0, "secs_out_r": a[12] * self.frame_skip / 60.0,
+                # 神穿：每秒擦弹、存活步中离弹边缘 < 4 / < 12 px 的占比
+                "graze_per_s": a[13] / secs,
+                "close4_frac": a[14] / max(a[11] + a[12], 1.0), "close12_frac": a[15] / max(a[11] + a[12], 1.0),
             }
             for k, name in enumerate(self.term_names):
                 rec[f"term/{name}"] = a[len(_COLS) + k]

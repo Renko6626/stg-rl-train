@@ -29,6 +29,7 @@ def summarize_eval(records: list[dict]) -> dict[str, float]:
         "reach_frames_median": float(statistics.median(float(r["reach_frames"]) for r in records)),
         "shift_toggles_per_s": mean("shift_toggles_per_s"), "dir_changes_per_s": mean("dir_changes_per_s"),
         "edge_frac": mean("edge_frac"), "key_presses_per_s": mean("key_presses_per_s"),
+        "graze_per_s": mean("graze_per_s"), "close4_frac": mean("close4_frac"), "close12_frac": mean("close12_frac"),
         "dir_changes_in_r_per_s": pooled_rate(records, "dir_changes_in_r", "secs_in_r"),
         "dir_changes_out_r_per_s": pooled_rate(records, "dir_changes_out_r", "secs_out_r"),
     }

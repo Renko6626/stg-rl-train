@@ -13,11 +13,12 @@ load_builtins()
 def rec(done, frames=100, reach=50.0, in_r=0.5):
     return {"env": 0, "done": done, "frames": frames, "return": 1.0, "steps": frames, "in_r_frac": in_r,
             "edge_frac": 0.0, "shift_toggles_per_s": 1.0, "dir_changes_per_s": 2.0, "reach_frames": reach,
-            "key_presses_per_s": 3.0, "dir_changes_in_r": 0, "secs_in_r": 0.0, "dir_changes_out_r": 0, "secs_out_r": 0.0}
+            "key_presses_per_s": 3.0, "graze_per_s": 1.0, "close4_frac": 0.1, "close12_frac": 0.3, "dir_changes_in_r": 0, "secs_in_r": 0.0, "dir_changes_out_r": 0, "secs_out_r": 0.0}
 
 
 def test_summarize_eval_and_score():
     s = summarize_eval([rec(2, reach=10.0), rec(1, reach=30.0, in_r=0.1), rec(2, reach=300.0), rec(3)])
+    assert (s["graze_per_s"], s["close4_frac"], s["close12_frac"]) == pytest.approx((1.0, 0.1, 0.3))
     assert s["episodes"] == 4 and s["survival"] == 0.5 and s["death"] == 0.25 and s["timeout"] == 0.25
     assert s["reach_frames_median"] == pytest.approx(40.0)
     assert s["in_r_frac"] == pytest.approx((0.5 + 0.1 + 0.5 + 0.5) / 4)
