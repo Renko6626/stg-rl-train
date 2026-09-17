@@ -117,3 +117,12 @@ def test_gpucheck_close_enough():
     assert gpucheck.close_enough(0.0, 1e-6)
     assert not gpucheck.close_enough(0.0, 1e-4)
     assert not gpucheck.close_enough(1.0, 1.01)
+
+
+def test_train_with_featurizer_v2(tmp_path):
+    cfg = small_cfg(run={"total_updates": 1, "ckpt_every": 1, "eval_every": 1}, featurize={"name": "danger_topk_v2"})
+    run_dir = make_run_dir(tmp_path, "v2")
+    train(cfg, run_dir, pack_result=False)
+    ck = load_checkpoint(run_dir / "checkpoints" / "latest.pt")
+    assert ck["cfg"]["featurize"]["name"] == "danger_topk_v2"
+    assert (run_dir / "eval" / "1.json").exists()

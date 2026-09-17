@@ -144,3 +144,26 @@ def test_fx_decodes_row_strides_not_divisible_by_4():
         got = _fx(torch.from_numpy(u8), off).numpy()
         assert got.shape == u8.shape[:-1], name
         assert np.array_equal(got, want.astype(np.float32)), name
+
+
+def test_prev_action_tracks_agent_frame_and_resets():
+    w = ring(mirror=False)
+    obs = w.reset()
+    assert obs.prev_action.eq(0).all()
+    w.mirrored[:4] = True
+    ids = torch.tensor([6, 7, 2, 0, 6, 7, 2, 0], dtype=torch.int64)
+    obs, info = w.step(ids)
+    assert torch.equal(obs.prev_action, ids), "记智能体坐标系的动作 id（镜像前），不是发给游戏的按键"
+    obs, info = w.step(torch.zeros(8, dtype=torch.int64))
+    assert obs.prev_action.eq(0).all()
+
+
+def test_prev_action_cleared_on_episode_end():
+    cfg = small_cfg(env={"mirror": True, "warmup_max": 0})
+    w = EnvWrapper(cfg, IMAGES, [stg_rl.Start("example_calm", 0, 2)], CPU, seed=2)
+    w.reset()
+    for _ in range(400):
+        obs, info = w.step(torch.full((8,), 10, dtype=torch.int64))
+        if (info.done == 2).all():
+            break
+    assert obs.prev_action.eq(0).all()

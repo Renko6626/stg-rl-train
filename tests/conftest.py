@@ -38,7 +38,7 @@ def _per_env(v, n):
 
 
 def raw_obs(n=2, cap=16, e=8, player=(0.0, 384.0), target=(0.0, 300.0), speed=4.0, hit_r=2.0,
-            bullets=None, enemies=None, focus=False) -> RawObs:
+            bullets=None, enemies=None, focus=False, prev_action=0) -> RawObs:
     """手搓 RawObs。bullets / enemies：按 env 给行列表，弹行 (x, y, vx, vy, r)、敌行 (x, y, r, is_boss)。"""
     b = torch.zeros(n, cap, 5)
     bm = torch.zeros(n, cap, dtype=torch.bool)
@@ -59,6 +59,7 @@ def raw_obs(n=2, cap=16, e=8, player=(0.0, 384.0), target=(0.0, 300.0), speed=4.
         player_focus=torch.full((n,), bool(focus)),
         bullets=b, bullets_mask=bm, enemies=en, enemies_mask=em,
         target_xy=torch.tensor(_per_env(target, n), dtype=torch.float32),
+        prev_action=torch.tensor(prev_action if isinstance(prev_action, list) else [prev_action] * n, dtype=torch.int64),
     )
 
 
@@ -74,7 +75,14 @@ def mirror_obs(o: RawObs) -> RawObs:
         player_xy=neg_col(o.player_xy, [0]), player_hit_r=o.player_hit_r, player_speed=o.player_speed,
         player_focus=o.player_focus, bullets=neg_col(o.bullets, [0, 2]), bullets_mask=o.bullets_mask,
         enemies=neg_col(o.enemies, [0]), enemies_mask=o.enemies_mask, target_xy=neg_col(o.target_xy, [0]),
+        prev_action=None if o.prev_action is None else _mirror_actions(o.prev_action),
     )
+
+
+def _mirror_actions(a):
+    from stgtrain import actions
+
+    return actions.mirror_table(a.device)[a]
 
 
 from stgagent import consts as C

@@ -1,0 +1,22 @@
+# 实验 E（2026-09-17）：实验 D + 特征化器 danger_topk_v2（player 向量追加上一步动作：方向 one-hot 9 + 低速 1）。
+# 与 D 只差 featurize.name；reward 沿用 D 的 key_press = -0.001。登记与判读见 docs/experiments.md。
+[run]
+total_updates = 2000
+ckpt_every = 100
+eval_every = 200
+
+[env]
+num_envs = 4096
+threads = 63           # scripts/run-exp.sh 会按机器改写（EPYC 7742 → 32）
+
+[featurize]
+name = "danger_topk_v2"
+
+[reward.terms]
+death = 10.0
+follow_shaping = 1.0
+hold = 0.01
+segment_survived = 0.0
+key_press = -0.001
+shift_toggle = 0.0
+edge_hug = 0.0

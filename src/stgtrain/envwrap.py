@@ -33,6 +33,7 @@ class RawObs:
     enemies: Tensor
     enemies_mask: Tensor
     target_xy: Tensor
+    prev_action: Tensor | None = None  # 上一步动作 id（智能体坐标系、镜像前），新局首步为 0（不动）；v2 特征化用
 
 
 @dataclass
@@ -88,6 +89,7 @@ class EnvWrapper:
         self._mirror_gen.manual_seed((int(seed) * 2654435761 + 97) % (2**63))
         self.mirrored = torch.zeros(self.n, dtype=torch.bool, device=device)
         self.prev_buttons = torch.zeros(self.n, dtype=torch.int64, device=device)
+        self.prev_action = torch.zeros(self.n, dtype=torch.int64, device=device)
         self._buttons = actions.buttons_table(device)
         self._mirror = actions.mirror_table(device)
         self._arange_n = torch.arange(self.n, device=device)
@@ -109,6 +111,7 @@ class EnvWrapper:
         self.intent.reset_all()
         self._draw_mirror(torch.ones(self.n, dtype=torch.bool, device=self.device))
         self.prev_buttons = torch.zeros(self.n, dtype=torch.int64, device=self.device)
+        self.prev_action = torch.zeros(self.n, dtype=torch.int64, device=self.device)
         return self._decode()
 
     def step(self, action_ids: Tensor, timer=None) -> tuple[RawObs, StepInfo]:
@@ -127,6 +130,8 @@ class EnvWrapper:
             info = StepInfo(done=done, events=events, ep_frames=ep_frames, refreshed=refreshed,
                             buttons=buttons, prev_buttons=self.prev_buttons)
             self.prev_buttons = torch.where(ended, torch.zeros_like(buttons), buttons)
+            # 智能体坐标系的动作 id：镜像只在新局重抽，而新局这里清零，所以不会与镜像标志错位
+            self.prev_action = torch.where(ended, torch.zeros_like(action_ids), action_ids.to(torch.int64))
             obs = self._decode()
         return obs, info
 
@@ -170,4 +175,5 @@ class EnvWrapper:
         return RawObs(
             player_xy=torch.stack([px, py], dim=-1), player_hit_r=hit_r, player_speed=speed, player_focus=focus,
             bullets=bullets, bullets_mask=bmask, enemies=enemies, enemies_mask=emask, target_xy=target,
+            prev_action=self.prev_action.clone(),
         )
