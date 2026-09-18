@@ -26,6 +26,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from . import config
+from . import density as D
 from . import notes as N
 from . import structure, split_check, usage, validate
 from . import extract as X
@@ -351,6 +352,31 @@ def do_collect(stage: int) -> list[str]:
     return done
 
 
+def measure_density() -> list[dict]:
+    """跑一遍卡池，记每张卡 × 每档的弹峰值与场上均值（采样表的 10 个点求平均）。"""
+    import tomllib
+
+    from .preview import parse_counts, parse_summary
+
+    def one(args):
+        d, rank = args
+        meta = tomllib.loads((d / "meta.toml").read_text(encoding="utf-8"))
+        lo, hi = meta["ranks"]
+        if not lo <= rank <= hi:
+            return None
+        out = subprocess.run([str(config.harness_bin()), "run", str(d), "--rank", str(rank),
+                              "--frames", str(int(meta["time_limit"]) + 30)],
+                             capture_output=True, text=True, timeout=600).stdout
+        vals = [b for _, b in parse_counts(out)]
+        return {"id": d.name, "rank": rank, "peak": parse_summary(out).peak_bullets,
+                "mean": round(sum(vals) / max(len(vals), 1), 1)}
+
+    cards = sorted(p for p in config.CARDS_DIR.iterdir() if (p / "meta.toml").exists())
+    jobs = [(d, r) for d in cards for r in (0, 1, 2, 3)]
+    with ThreadPoolExecutor(max_workers=16) as ex:
+        return [r for r in ex.map(one, jobs) if r]
+
+
 def _usage_rows() -> list[dict]:
     p = state_path()
     if not p.exists():
@@ -408,6 +434,8 @@ def main(argv: list[str] | None = None) -> int:
         s.add_argument("--ids"); s.add_argument("--jobs", type=int, default=8)
     s = sub.add_parser("sample"); s.add_argument("--stage", type=int, required=True); s.add_argument("--rate", type=float, default=0.2)
     s = sub.add_parser("status"); s.add_argument("--stage", type=int)
+    s = sub.add_parser("density"); s.add_argument("--rank", type=int, default=2)
+    s.add_argument("--out", default="cards/density.json")
     s = sub.add_parser("notes"); s.add_argument("--all", action="store_true", help="含已分诊的")
     s.add_argument("--mark", action="store_true", help="把本次列出的标记为已分诊")
     s = sub.add_parser("usage"); s.add_argument("--stage", type=int); s.add_argument("--since", default=None,
@@ -444,6 +472,15 @@ def main(argv: list[str] | None = None) -> int:
         print("\n".join(f"  {u}" for u in chosen))
     elif a.cmd == "status":
         print(status_table(a.stage))
+    elif a.cmd == "density":
+        rows = measure_density()
+        Path(a.out).write_text(json.dumps(rows, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+        print(D.render(rows, a.rank))
+        empty = D.low(rows, a.rank)
+        if empty:
+            print(f"\n⚠ rank {a.rank} 下弹量为空的卡（别放进评测集；训练里只练体碰）："
+                  + "、".join(r["id"] for r in empty))
+        print(f"\n画像写入 {a.out}")
     elif a.cmd == "notes":
         found = N.collect(config.WORK_DIR)
         show = found if a.all else N.new_only(found, config.WORK_DIR)
