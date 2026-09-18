@@ -165,6 +165,8 @@ class EnvWrapper:
             ((eflags & ENEMY_FLAG_BOSS) != 0).to(torch.float32),
         ], dim=-1)
 
+        if hasattr(self.intent, "track"):   # 自由躲弹诊断：目标点锁自机（未镜像坐标）
+            self.intent.track(torch.stack([px, py], dim=-1))
         target = self.intent.target.clone()
         sign = torch.where(self.mirrored, -1.0, 1.0)
         px = px * sign

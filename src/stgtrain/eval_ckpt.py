@@ -32,6 +32,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--all-cards", action="store_true", help="评卡池里所有卡（含训练卡），不用评测划分")
     ap.add_argument("--ranks", default="2", help="--all-cards 时评哪些档，逗号分隔（默认 2）")
     ap.add_argument("--episodes", type=int, default=None, help="每组局数（默认取配置 eval.episodes / 划分文件）")
+    ap.add_argument("--intent", default=None,
+                    help="覆盖意图生成器（如 follow_player_v1 = 目标点锁自机的自由躲弹诊断）")
     ap.add_argument("--hysteresis", type=float, default=0.0,
                     help="诊断用：最优动作 logit 比上一步高出超过 τ 才换（0 = 纯 argmax）")
     ap.add_argument("--out", default=None, help="结果 json（默认 checkpoint 同目录 eval-<名>-<时间>.json）")
@@ -41,6 +43,8 @@ def main(argv: list[str] | None = None) -> int:
     over: dict = {"run": {"device": a.device}}
     if a.cards_dir:
         over["env"] = {"cards_dir": a.cards_dir}
+    if a.intent:
+        over["intent"] = {"name": a.intent}
     cfg = from_dict(deep_merge(ck["cfg"], over))
     device = pick_device(cfg["run"]["device"])
     torch.set_num_threads(int(cfg["run"]["torch_threads"]))
