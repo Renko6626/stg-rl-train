@@ -55,3 +55,36 @@ class FixedPoint:
 
     def advance(self, frames: int, active: Tensor) -> Tensor:
         return torch.zeros(self.n, dtype=torch.bool, device=self.device)
+
+
+@INTENTS.register("under_boss_v1")
+class UnderBoss:
+    """目标点 = boss 正下方（跟 boss 的 x，y 固定在下半屏）——「指挥模型空闲时发保守锚点」的那种用法。
+
+    没有 boss（或 boss 不在场）时退回场底中央。y 可在配置里调（默认 384 = 自机出生高度）。
+    """
+
+    def __init__(self, cfg: dict, num_envs: int, device: torch.device, seed: int):
+        c = cfg["intent"]
+        self.n, self.device = int(num_envs), device
+        self.y = float(c.get("y", 384.0))
+        self.x_limit = 192.0 - float(c.get("margin", 16.0))
+        self.target = torch.stack([torch.zeros(self.n, device=device),
+                                   torch.full((self.n,), self.y, device=device)], dim=-1)
+        self.countdown = torch.zeros(self.n, dtype=torch.int64, device=device)
+
+    def track_world(self, player_xy: Tensor, enemy_xy: Tensor, is_boss: Tensor, mask: Tensor) -> None:
+        live = is_boss & mask
+        first = live.float().argmax(dim=1)                       # 取池序最前的 boss
+        bx = enemy_xy[torch.arange(self.n, device=self.device), first, 0]
+        x = torch.where(live.any(dim=1), bx, torch.zeros_like(bx)).clamp(-self.x_limit, self.x_limit)
+        self.target = torch.stack([x, torch.full_like(x, self.y)], dim=-1)
+
+    def reset_all(self) -> None:
+        pass
+
+    def reset(self, mask: Tensor) -> None:
+        pass
+
+    def advance(self, frames: int, active: Tensor) -> Tensor:
+        return torch.zeros(self.n, dtype=torch.bool, device=self.device)

@@ -206,6 +206,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--device", default="cpu", choices=("auto", "cpu", "cuda"))
     ap.add_argument("--cards", default=None, help="逗号分隔的卡 id（默认评测划分里的全部卡）")
     ap.add_argument("--rank", type=int, default=2)
+    ap.add_argument("--intent", default=None, help="覆盖意图生成器（如 under_boss_v1 = 目标点锁 boss 正下方）")
     ap.add_argument("--episodes", default="0", help="评测组里第几局，逗号分隔（默认 0）")
     ap.add_argument("--every", type=int, default=2, help="每几个决策步出一帧 GIF（默认 2 = 30 fps）")
     ap.add_argument("--max-frames", type=int, default=None, help="最多录多少游戏帧（默认录到局结束）")
@@ -218,7 +219,10 @@ def main(argv: list[str] | None = None) -> int:
             raise SystemExit(f"缺 {need}（stg-engine 路径见 STG_ENGINE_DIR）")
     ckp = Path(a.checkpoint)
     ck = load_checkpoint(ckp, map_location="cpu")
-    cfg = from_dict(deep_merge(ck["cfg"], {"run": {"device": a.device}}))
+    over = {"run": {"device": a.device}}
+    if a.intent:
+        over["intent"] = {"name": a.intent}
+    cfg = from_dict(deep_merge(ck["cfg"], over))
     device = pick_device(cfg["run"]["device"])
     torch.set_num_threads(int(cfg["run"]["torch_threads"]))
     images, _starts, specs, featurizer, factory = build_components(cfg, device)

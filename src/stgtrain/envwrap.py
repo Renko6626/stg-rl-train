@@ -202,6 +202,9 @@ class EnvWrapper:
 
         if hasattr(self.intent, "track"):   # 自由躲弹诊断：目标点锁自机（未镜像坐标）
             self.intent.track(torch.stack([px, py], dim=-1))
+        if hasattr(self.intent, "track_world"):   # 跟随场上实体的意图（如 boss 正下方），同样用未镜像坐标
+            self.intent.track_world(torch.stack([px, py], dim=-1), enemies[..., 0:2],
+                                    enemies[..., 3] != 0, emask)
         target = self.intent.target.clone()
         sign = torch.where(self.mirrored, -1.0, 1.0)
         px = px * sign

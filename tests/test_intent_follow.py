@@ -43,3 +43,14 @@ def test_fixed_point_is_constant_and_configurable():
     it.reset(torch.ones(2, dtype=torch.bool))
     assert not it.advance(1, torch.ones(2, dtype=torch.bool)).any()
     assert it.target.tolist() == [[-30.0, 400.0], [-30.0, 400.0]]
+
+
+def test_under_boss_tracks_boss_x_and_falls_back():
+    cfg = small_cfg(intent={"name": "under_boss_v1", "y": 384.0})
+    it = INTENTS.get("under_boss_v1")(cfg, 2, torch.device("cpu"), seed=1)
+    xy = torch.tensor([[[-40.0, 100.0], [60.0, 90.0]], [[10.0, 50.0], [0.0, 0.0]]])
+    is_boss = torch.tensor([[False, True], [False, False]])
+    mask = torch.tensor([[True, True], [True, False]])
+    it.track_world(torch.zeros(2, 2), xy, is_boss, mask)
+    assert it.target[0].tolist() == [60.0, 384.0], "跟 boss 的 x，y 固定在下半屏"
+    assert it.target[1].tolist() == [0.0, 384.0], "没有 boss 时退回场底中央"
