@@ -186,10 +186,34 @@ def build_units(split: dict, ecl: EclFile, stage: int, loc: dict) -> list[tuple[
     return out
 
 
+def builtins_cheatsheet(reference_md: Path) -> str:
+    """把 `docs/ecl-lang/7-reference.md` 压成「签名 + 一句话」的速查（6.3k → 2.2k token）。
+
+    worker 每次整篇读参考手册都会把 6k token 压进上下文、并被后续每一步重发；
+    真正需要反复查的只是内建函数的签名。拿不准语义时再去 grep 原文。
+    """
+    import re
+
+    lines = ["# 内建函数签名速查（自动生成自 docs/ecl-lang/7-reference.md）",
+             "# 只有签名 + 一句话；要完整语义去 grep 原手册，别整篇 read。", ""]
+    for ln in Path(reference_md).read_text(encoding="utf-8").splitlines():
+        m = re.match(r"^- (`[^`]+`)\s*(?:—\s*(.*))?$", ln.strip())
+        if m:
+            desc = (m.group(2) or "").split("；")[0].split(";")[0][:70]
+            lines.append(f"- {m.group(1)}" + (f" — {desc}" if desc else ""))
+    return "\n".join(lines) + "\n"
+
+
 def write_unit(unit: Unit, source_text: str, units_dir: Path, mapping_text: str) -> Path:
     d = units_dir / unit.id
     (d / "out").mkdir(parents=True, exist_ok=True)
     (d / "source.txt").write_text(source_text, encoding="utf-8")
     (d / "unit.json").write_text(json.dumps(asdict(unit), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     (d / "mapping-excerpt.md").write_text(M.excerpt(mapping_text, set(unit.used_instructions)), encoding="utf-8")
+    try:   # 没配 stg-engine 路径（如单测夹具）就跳过速查表，不影响摘录本身
+        ref = config.engine_dir() / "docs" / "ecl-lang" / "7-reference.md"
+    except Exception:
+        ref = None
+    if ref is not None and ref.exists():
+        (d / "builtins.md").write_text(builtins_cheatsheet(ref), encoding="utf-8")
     return d

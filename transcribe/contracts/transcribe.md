@@ -16,8 +16,19 @@
 
 1. `mapping-excerpt.md` 全文——语义只认它，别凭 ZUN 指令名猜。
 2. `unit.json` 里 `examples` 指向的范例卡：`main.ecl` + `notes.md`。**照范例的写法和结构写**。
-3. 我方语言：prompt 里给的 `docs/ecl-lang.md`（索引）、`docs/ecl-lang/7-reference.md`（内建签名），
-   `writing-danmaku-ecl/SKILL.md` 的「跨机制的静默坑」一节。
+3. 我方语言：cwd 里的 `builtins.md`（内建签名速查，**看这个，别整篇读参考手册**）。
+   语法 / 静默坑拿不准时，用 `grep -n 关键词 <文件>` + `sed -n 'A,Bp'` 取需要的十几行，
+   目标文件见 prompt 的「省 token 的硬规矩」。
+
+## 省 token（硬规矩）
+
+上下文里每多 1k token，后面每一步都要重发一遍，代价随步数二次增长。所以：
+
+- **禁止整篇 `read`**：ECL 手册、`SKILL.md`、`rl-card-pool.md`、th06-decomp 源码，一律先 `grep -n` 再按行号取。
+- **禁止读验收器源码**：判据就是下面「自检循环」里那几条，跑一次 `validate` 看输出即可。
+- **自检有上限**：每档最多 `run` 一次；`--at` 弹表 dump **最多 4 次**（挑最值得核的帧，优先多层 / 带变换 / 难度差异）。
+  改完卡重跑时，只重跑**受影响**的那一档，不要四档全刷。
+- 想不清楚就先写下来再动手，别靠反复跑 harness 试探。
 
 ## 产出
 

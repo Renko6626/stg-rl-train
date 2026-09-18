@@ -26,7 +26,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from . import config
-from . import structure, split_check, validate
+from . import structure, split_check, usage, validate
 from . import extract as X
 from . import units as U
 from .thecl import parse_file
@@ -35,6 +35,8 @@ MAX_SPLIT_RETRIES = 2
 MAX_VALIDATE_RETRIES = 2
 MAX_REVIEW_ROUNDS = 2
 DSH_TIMEOUT = 1800
+# 推理强度：成本大头之一（1–3 关那批输出里 86% 是推理）。按阶段给默认值，STG_DSH_REASONING 可整体覆盖。
+DSH_REASONING = {"split": "medium", "transcribe": "medium", "review": "medium"}
 
 # ── 状态 ─────────────────────────────────────────────────────────────────────
 
@@ -75,12 +77,27 @@ def dsh_bin() -> str:
     return os.environ.get("STG_DSH_BIN", str(Path.home() / ".local/bin/dsh-flash"))
 
 
-def run_worker(cwd: Path, prompt: str, log: Path) -> int:
+def _record_usage(uid: str, kind: str, cwd: Path) -> None:
+    """worker 跑完后从 dsh 会话复原这次的用量，追加进 state.jsonl（失败不影响流水线）。"""
+    try:
+        s = usage.stats_for_cwd(cwd)
+    except Exception as e:  # zstd 缺失 / 会话格式变了：记一行就算了
+        s = {"error": f"{type(e).__name__}: {e}"}
+    if s:
+        record(uid, "usage", kind=kind, reasoning_effort=reasoning_for(kind), **s)
+
+
+def reasoning_for(kind: str) -> str:
+    return os.environ.get("STG_DSH_REASONING") or DSH_REASONING.get(kind, "medium")
+
+
+def run_worker(cwd: Path, prompt: str, log: Path, kind: str = "transcribe") -> int:
     """派一个一次性 dsh worker。prompt 同时落盘 brief.md 便于事后查。"""
     (cwd / "brief.md").write_text(prompt, encoding="utf-8")
     log.parent.mkdir(parents=True, exist_ok=True)
     env = {**os.environ, "PYTHONDONTWRITEBYTECODE": "1"}
-    cmd = [dsh_bin(), "--cwd", str(cwd), "--timeout", str(DSH_TIMEOUT), "--log", str(log), prompt]
+    cmd = [dsh_bin(), "--cwd", str(cwd), "--timeout", str(DSH_TIMEOUT),
+           "--reasoning", reasoning_for(kind), "--log", str(log), prompt]
     with (log.with_suffix(".stdout")).open("w", encoding="utf-8") as out:
         p = subprocess.run(cmd, cwd=cwd, env=env, stdout=out, stderr=subprocess.STDOUT, timeout=DSH_TIMEOUT + 120)
     return p.returncode
@@ -92,12 +109,17 @@ def _paths_block() -> str:
     return "\n".join([
         f"- 训练仓（只读）：{config.REPO_ROOT}",
         f"- 对照表全文：{config.TH06_DIR / 'mapping.md'}",
-        f"- 我方 ECL 手册：{e / 'docs/ecl-lang.md'}（索引）、{e / 'docs/ecl-lang/7-reference.md'}（签名）",
-        f"- 静默坑：{e / '.claude/skills/writing-danmaku-ecl/SKILL.md'}",
-        f"- 卡池约束：{e / 'docs/rl-card-pool.md'}",
+        f"- 内建签名速查（cwd 里，**先看它**）：builtins.md",
         f"- harness：{config.harness_bin()}",
         f"- 验收器：cd {config.REPO_ROOT} && PYTHONDONTWRITEBYTECODE=1 {py} -m stgtranscribe.validate <卡目录>",
-        f"- th06-decomp 源码（审核查语义）：{config.decomp_dir()}",
+        "",
+        "**省 token 的硬规矩**（上下文每多一次整篇读，后面每一步都要重发一遍）：",
+        f"- 下面这些**不许整篇 read**，只能用 `grep -n 关键词 <文件>` 再 `sed -n 'A,Bp'` 取需要的十几行：",
+        f"  {e / 'docs/ecl-lang'}/*.md、{e / '.claude/skills/writing-danmaku-ecl/SKILL.md'}、"
+        f"{e / 'docs/rl-card-pool.md'}、{config.decomp_dir()}/*.cpp",
+        f"- **不要读验收器源码**（`stgtranscribe/validate.py`）：判据已写在契约里，跑一次 `validate` 看输出即可。",
+        "- 语义以 `mapping-excerpt.md` 为准；它没有的才去 grep 对照表全文 "
+        f"{config.TH06_DIR / 'mapping.md'}。",
     ])
 
 
@@ -142,7 +164,8 @@ def do_split(stage: int, force: bool = False) -> bool:
         if feedback:
             (d / "feedback.md").write_text(feedback, encoding="utf-8")
             extra += f"\n上一次的 split.json 没过机械校验，错误清单在 {d / 'feedback.md'}，改完再交。"
-        run_worker(d, prompt_for("split", d, extra), config.WORK_DIR / "logs" / f"split_s{stage}.{attempt}.log")
+        run_worker(d, prompt_for("split", d, extra), config.WORK_DIR / "logs" / f"split_s{stage}.{attempt}.log", "split")
+        _record_usage(f"split_s{stage}", "split", d)
         errs = check_stage_split(stage)
         if not errs:
             record(f"split_s{stage}", "split_ok", round=attempt)
@@ -205,7 +228,8 @@ def transcribe_one(uid: str, validator=run_validate, worker=run_worker) -> str:
         if (d / "feedback.md").exists():
             extra += f"\n这是返工：先读 {d / 'feedback.md'}（验收失败或审核发现），逐条改。"
         worker(d, prompt_for("transcribe", d, extra),
-               config.WORK_DIR / "logs" / f"{uid}.transcribe.{rnd}.{attempt}.log")
+               config.WORK_DIR / "logs" / f"{uid}.transcribe.{rnd}.{attempt}.log", "transcribe")
+        _record_usage(uid, "transcribe", d)
         if _report_status(out) == "blocked":
             record(uid, "blocked", round=rnd, reason="worker 报告 blocked（见 out/report.md）")
             return "blocked"
@@ -237,14 +261,15 @@ def review_one(uid: str, worker=run_worker) -> str:
     if d.exists():
         shutil.rmtree(d)
     d.mkdir(parents=True)
-    for name in ("source.txt", "unit.json", "mapping-excerpt.md", "validate.json"):
+    for name in ("source.txt", "unit.json", "mapping-excerpt.md", "builtins.md", "validate.json"):
         if (src / name).exists():
             shutil.copy2(src / name, d / name)
     shutil.copytree(src / "out", d / "out")
     st = states().get(uid, {})
     rnd = int(st.get("round", 0))
     worker(d, prompt_for("review", d, f"单元：{uid}。待审的卡在 {d / 'out'}/。结论写到 {d / 'verdict.json'}。"),
-           config.WORK_DIR / "logs" / f"{uid}.review.{rnd}.log")
+           config.WORK_DIR / "logs" / f"{uid}.review.{rnd}.log", "review")
+    _record_usage(uid, "review", d)
     verdict = _load_verdict(d / "verdict.json")
     if verdict is None:
         record(uid, "needs_human", round=rnd, reason="审核没有产出合法 verdict.json")
@@ -320,6 +345,20 @@ def do_collect(stage: int) -> list[str]:
     return done
 
 
+def _usage_rows() -> list[dict]:
+    p = state_path()
+    if not p.exists():
+        return []
+    out = []
+    for line in p.read_text(encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        r = json.loads(line)
+        if r.get("state") == "usage":
+            out.append(r)
+    return out
+
+
 def status_table(stage: int | None) -> str:
     st = states()
     rows = sorted((u, r) for u, r in st.items() if U.ID_RE.match(u) and (stage is None or stage_of(u) == stage))
@@ -363,6 +402,8 @@ def main(argv: list[str] | None = None) -> int:
         s.add_argument("--ids"); s.add_argument("--jobs", type=int, default=8)
     s = sub.add_parser("sample"); s.add_argument("--stage", type=int, required=True); s.add_argument("--rate", type=float, default=0.2)
     s = sub.add_parser("status"); s.add_argument("--stage", type=int)
+    s = sub.add_parser("usage"); s.add_argument("--stage", type=int); s.add_argument("--since", default=None,
+        help="只算这个时间戳之后的记录（state.jsonl 的 ts 前缀，如 2026-09-18）")
     s = sub.add_parser("collect"); s.add_argument("--stage", type=int, required=True)
     a = ap.parse_args(argv)
     config.WORK_DIR.mkdir(parents=True, exist_ok=True)
@@ -395,6 +436,18 @@ def main(argv: list[str] | None = None) -> int:
         print("\n".join(f"  {u}" for u in chosen))
     elif a.cmd == "status":
         print(status_table(a.stage))
+    elif a.cmd == "usage":
+        rows = [r for r in _usage_rows() if (a.stage is None or f"_s{a.stage}" in r["id"])
+                and (a.since is None or r.get("ts", "") >= a.since)]
+        if not rows:
+            print("没有用量记录（旧批次跑在加统计之前；新批次每个 worker 结束后会记一行）")
+            return 0
+        print(usage.render(usage.summarize(rows)))
+        worst = sorted(rows, key=lambda r: -r.get("billed_in", 0))[:5]
+        print("\n最贵的 5 次：")
+        for r in worst:
+            print(f"  {r['id']:20} {r.get('kind',''):10} 步 {r.get('steps',0):3} · 输入 {r.get('billed_in',0)/1e6:5.2f}M"
+                  f" · 末上下文 {r.get('ctx_end',0)/1000:5.0f}k · 推理 {r.get('reasoning',0)/1000:5.0f}k")
     elif a.cmd == "collect":
         done = do_collect(a.stage)
         print(f"收进 cards/ {len(done)} 张。提交：\n  git add cards/ && git commit -m 'cards: th06 Stage {a.stage} 转写卡 {len(done)} 张'")

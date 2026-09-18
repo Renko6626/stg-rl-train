@@ -110,7 +110,7 @@ def test_transcribe_retries_then_validates(work, monkeypatch):
     calls = []
     monkeypatch.setattr(validate, "asdict", lambda r: {"errors": r.errors})
 
-    def worker(cwd, prompt, log):
+    def worker(cwd, prompt, log, kind="transcribe"):
         calls.append(prompt)
         (cwd / "out" / "main.ecl").write_text("// x\n")
 
@@ -125,14 +125,14 @@ def test_transcribe_blocked_after_retries(work, monkeypatch):
     fake_unit()
     monkeypatch.setattr(validate, "asdict", lambda r: {"errors": r.errors})
     res = pipeline.transcribe_one("th06_s1_w01", validator=lambda c: Rep(False),
-                                  worker=lambda cwd, p, log: (cwd / "out" / "main.ecl").write_text("x"))
+                                  worker=lambda cwd, p, log, kind="transcribe": (cwd / "out" / "main.ecl").write_text("x"))
     assert res == "blocked"
 
 
 def test_worker_reported_blocked(work):
     fake_unit()
 
-    def worker(cwd, prompt, log):
+    def worker(cwd, prompt, log, kind="transcribe"):
         (cwd / "out" / "report.md").write_text("status: blocked\n原因：用了激光\n")
 
     assert pipeline.transcribe_one("th06_s1_w01", validator=lambda c: Rep(True), worker=worker) == "blocked"
@@ -148,7 +148,7 @@ def test_review_pass_fail_and_rounds(work):
     fail = verdict("fail", [{"severity": "major", "src_line": 3, "ecl_line": 9, "expected": "16", "actual": "8"}])
 
     def worker_with(v):
-        return lambda cwd, p, log: (cwd / "verdict.json").write_text(json.dumps(v))
+        return lambda cwd, p, log, kind="review": (cwd / "verdict.json").write_text(json.dumps(v))
 
     assert pipeline.review_one("th06_s1_w01", worker=worker_with(fail)) == "revise"
     assert "期望 16，实际 8" in (d / "feedback.md").read_text()
@@ -162,7 +162,7 @@ def test_review_pass_fail_and_rounds(work):
 def test_pass_verdict_without_volleys_is_rejected(work):
     fake_unit()
     pipeline.record("th06_s1_w01", "validated")
-    w = lambda cwd, p, log: (cwd / "verdict.json").write_text(json.dumps(verdict("pass", volleys=1)))  # noqa: E731
+    w = lambda cwd, p, log, kind="review": (cwd / "verdict.json").write_text(json.dumps(verdict("pass", volleys=1)))  # noqa: E731
     assert pipeline.review_one("th06_s1_w01", worker=w) == "needs_human"
 
 
