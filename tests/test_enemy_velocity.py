@@ -39,3 +39,22 @@ def test_v3_uses_enemy_velocity_in_closest_approach():
     d3 = f3["enemies"][0, 0, 3].item()
     assert d1 > 0.4 and d3 < 0.05, f"v1 看不出会撞上（{d1:.3f}），v3 应预测到贴近（{d3:.3f}）"
     assert f3["enemies"][0, 0, 6:8].tolist() == pytest.approx([0.0, 0.5]), "末两列 = 速度 / 8"
+
+
+def test_teleport_is_not_read_as_velocity():
+    """`move_to(0, …)` 让敌人当帧跳过去（咲夜时停压平后每轮一次，最远 112px）——
+    差分会读成上百 px/帧，归一化后是十几倍的离群值。单帧位移超阈值的一律记 0。"""
+    ids = torch.tensor([[7, 9]], dtype=torch.int64)
+    prev = torch.tensor([[[0.0, 0.0], [10.0, 10.0]]])
+    cur = torch.tensor([[[3.0, 4.0], [122.0, 10.0]]])          # 7 号正常走，9 号瞬移 112px
+    v = enemy_velocity(ids, prev, ids, cur, 1, torch.tensor([True]))
+    assert v[0, 0].tolist() == [3.0, 4.0]
+    assert v[0, 1].tolist() == [0.0, 0.0]
+
+
+def test_threshold_scales_with_frame_skip():
+    ids = torch.tensor([[1]], dtype=torch.int64)
+    prev, cur = torch.tensor([[[0.0, 0.0]]]), torch.tensor([[[24.0, 0.0]]])
+    # frame_skip=1 时 24px 一帧算瞬移；frame_skip=2 时是每帧 12px，仍在阈值内
+    assert enemy_velocity(ids, prev, ids, cur, 1, torch.tensor([True]))[0, 0].tolist() == [0.0, 0.0]
+    assert enemy_velocity(ids, prev, ids, cur, 2, torch.tensor([True]))[0, 0].tolist() == [12.0, 0.0]

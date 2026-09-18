@@ -23,6 +23,7 @@ from .cards import compile_cards, discover, load_splits, train_starts
 from .checkpoint import load_checkpoint, restore_rng, save_checkpoint
 from .config import deep_merge, dump_toml, from_dict, load_config
 from .envwrap import EnvWrapper
+from .curriculum import Curriculum
 from .episodes import EpisodeTracker
 from .evaluate import evaluate, score
 from .metrics import MetricsLogger, read_jsonl, summarize_episodes, truncate_after
@@ -120,6 +121,7 @@ def train(cfg: dict, run_dir: Path, resume: dict | None = None, pack_result: boo
                          action_table_version=ACTION_TABLE_VERSION, machine=machine_info())
 
     envw = EnvWrapper(cfg, images, starts, device, seed=int(cfg["run"]["seed"]) + start - 1)  # Ruling 7
+    curriculum = Curriculum(len(starts), cfg["curriculum"])
     reward_fn = RewardFn(cfg)
     tracker = EpisodeTracker(envw.n, device, list(reward_fn.terms), cfg["reward"]["hold_radius"],
                              cfg["reward"]["edge_margin"], envw.frame_skip, cfg["intent"]["interval"][1])
@@ -156,7 +158,13 @@ def train(cfg: dict, run_dir: Path, resume: dict | None = None, pack_result: boo
                 stats = ppo.train_step(container, next_value, update, total)
             env_steps += steps_per_iter
             scalars = {f"ppo/{k}": v for k, v in stats.items()}
-            scalars.update(summarize_episodes(tracker.pop_finished(), "ep/"))
+            finished = tracker.pop_finished()
+            scalars.update(summarize_episodes(finished, "ep/"))
+            if curriculum.enabled:
+                curriculum.observe(finished)
+                if curriculum.due(update):
+                    envw.set_start_weights(curriculum.weights())
+                scalars.update(curriculum.stats())
             scalars["perf/sps"] = steps_per_iter / (time.perf_counter() - t0)
             row = timer.pop_iteration()
             if row is not None:

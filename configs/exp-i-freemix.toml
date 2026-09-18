@@ -1,0 +1,31 @@
+# 实验 I（2026-09-19）：G0 + **自由躲弹混合意图**。与 G0 只差 [intent].name（mix 用默认 6/3/1）。
+#
+# 动机：现在的训练分布里，模型永远被一个每 120–300 帧就换位置的目标圈拉着跑。部署时上层
+# 指挥不会这么密，"给个大致位置、别催你动" 才是常态。诊断实测（同一模型、同一评测集）：
+#   固定锚点 0.972 > 随机目标 0.931 > 目标锁自机 0.760（贴边 21%）
+# 所以混合里主力给 anchor（开局抽一个点、整局不刷新），free（锁自机）只留 10% 做鲁棒性——
+# 它没有位置先验，训练分布里给多了会把策略往边上带。
+#
+# 判据：eval 的 anchor / free 两种意图下撑过率（用 eval_ckpt --intent 跑）相对 G0 提升多少，
+# 且跟点档（ep/follow/*）的撑过与 reach_frames 没有明显退化——不能为了自由躲弹把听指挥的能力弄丢。
+# 注意：ep/in_r_frac 与 reach_frames 在 anchor/free 档是退化指标（恒在圈内），看 ep/follow/* 那一组。
+[run]
+total_updates = 2000
+ckpt_every = 100
+eval_every = 200
+
+[env]
+num_envs = 4096
+threads = 63
+
+[intent]
+name = "mixed_v1"
+
+[reward.terms]
+death = 10.0
+follow_shaping = 1.0
+hold = 0.01
+segment_survived = 0.0
+key_press = -0.003
+shift_toggle = 0.0
+edge_hug = 0.0

@@ -64,7 +64,12 @@ class EpisodeTracker:
         self.acc = self.acc + torch.stack(cols, dim=-1)
 
         ended = ~alive
-        self._pending.append((ended, self.acc.clone(), info.done, info.ep_frames))
+        zero = torch.zeros_like(info.done)
+        # 起点下标与意图模式：env 在自动 reset 前写 start_index，所以 done≠0 这一步读到的正是
+        # 刚结束那局的起点（课程采样按它归因）；意图模式只有混合意图才有。
+        self._pending.append((ended, self.acc.clone(), info.done, info.ep_frames,
+                              info.start_index if info.start_index is not None else zero,
+                              info.intent_mode if info.intent_mode is not None else zero))
         self.acc = torch.where(ended[:, None], torch.zeros_like(self.acc), self.acc)
         self.since = torch.where(seg_end, torch.zeros_like(self.since), self.since)
         self.reached = self.reached & ~seg_end
@@ -76,6 +81,8 @@ class EpisodeTracker:
         acc = torch.stack([p[1] for p in self._pending]).cpu()
         done = torch.stack([p[2] for p in self._pending]).cpu()
         frames = torch.stack([p[3] for p in self._pending]).cpu()
+        start = torch.stack([p[4] for p in self._pending]).cpu()
+        mode = torch.stack([p[5] for p in self._pending]).cpu()
         self._pending.clear()
         out: list[dict] = []
         for t, i in ended.nonzero().tolist():
@@ -84,6 +91,7 @@ class EpisodeTracker:
             secs = steps * self.frame_skip / 60.0
             rec = {
                 "env": i, "done": int(done[t, i]), "frames": int(frames[t, i]), "return": a[0], "steps": int(a[1]),
+                "start": int(start[t, i]), "mode": int(mode[t, i]),
                 "in_r_frac": a[2] / steps, "edge_frac": a[3] / steps,
                 "shift_toggles_per_s": a[4] / secs, "dir_changes_per_s": a[5] / secs,
                 "reach_frames": a[6] / max(a[7], 1.0),

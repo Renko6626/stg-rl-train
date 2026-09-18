@@ -40,3 +40,13 @@ def test_compile_cards():
     images = compile_cards(discover(FIXTURES / "cards"))
     assert set(images) == {"example_calm", "example_ring"}
     assert all(isinstance(i, stg_rl.Image) for i in images.values())
+
+
+def test_training_ranks_clamps_instead_of_dropping():
+    from stgtrain.cards import training_ranks
+    cards = discover(FIXTURES / "cards")
+    calm = cards["example_calm"]                       # meta ranks = [0, 2]
+    assert allowed_ranks(calm, [3, 4]) == []           # 严格过滤：这张卡没有 3/4 档
+    assert training_ranks(calm, [3, 4]) == [2]         # 训练：钳到它最高的一档，不丢卡
+    assert training_ranks(calm, [1]) == [1]            # 区间内原样
+    assert training_ranks(calm, [0, 1, 2, 3]) == [0, 1, 2]   # 3 钳成 2 后与已有的 2 去重

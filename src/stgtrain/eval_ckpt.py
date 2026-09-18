@@ -44,7 +44,7 @@ def main(argv: list[str] | None = None) -> int:
     if a.cards_dir:
         over["env"] = {"cards_dir": a.cards_dir}
     if a.intent:
-        over["intent"] = {"name": a.intent}
+        over["eval"] = {**over.get("eval", {}), "intent": a.intent}
     cfg = from_dict(deep_merge(ck["cfg"], over))
     device = pick_device(cfg["run"]["device"])
     torch.set_num_threads(int(cfg["run"]["torch_threads"]))

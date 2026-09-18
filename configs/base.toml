@@ -23,8 +23,27 @@ name = "lower_half_uniform_v1"
 margin = 16.0
 interval = [120, 300]
 
+# 只有 name = "mixed_v1" 时生效：每局开局按这个比例抽一档（跟点 / 锚点 / 自由），整局不变。
+# anchor = 开局抽一个点、整局不刷新（"给个大致位置，不催你跑"）；free = 目标锁自机（纯活下去）。
+[intent.mix]
+follow = 0.6
+anchor = 0.3
+free = 0.1
+
+# 起点难度采样（课程学习）：按每起点死亡率 EMA 调权重，不会的多练。口径见 curriculum.py。
+[curriculum]
+enabled = false
+interval = 20          # 每多少次更新重算一次权重（下一次 reset 生效）
+ema_decay = 0.98
+alpha = 1.0
+fail_floor = 0.05
+fail_ceil = 0.95
+w_lo = 0.25            # 相对均匀权重的下限
+w_hi = 4.0             # 上限：挡住近乎必死的卡把采样吸干
+min_episodes = 30      # 样本不足的起点权重保持 1
+
 [featurize]
-name = "danger_topk_v1"
+name = "danger_topk_v3"
 k_bullets = 64
 k_enemies = 8
 horizon = 60
@@ -70,6 +89,7 @@ cudagraphs = true
 episodes = 32
 greedy = true
 seed = 12345
+intent = "lower_half_uniform_v1"   # 评测意图钉死，与训练意图解耦（空串 = 跟训练一致）
 
 [log]
 tensorboard = true

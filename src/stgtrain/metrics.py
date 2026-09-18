@@ -75,6 +75,9 @@ def truncate_after(path, update: int) -> int:
     return dropped
 
 
+MODE_NAMES = ("follow", "anchor", "free")   # 混合意图的档名（intent.MixedIntent.MODES）
+
+
 def summarize_episodes(records: list[dict], prefix: str = "ep/") -> dict[str, float]:
     if not records:
         return {}
@@ -83,9 +86,17 @@ def summarize_episodes(records: list[dict], prefix: str = "ep/") -> dict[str, fl
     for code in (1, 2, 3):
         out[f"{prefix}done{code}"] = sum(1 for r in records if r["done"] == code) / n
     for key in records[0]:
-        if key in ("env", "done"):
+        if key in ("env", "done", "start", "mode"):
             continue
         out[f"{prefix}{key}"] = sum(float(r[key]) for r in records) / n
+    modes = {r["mode"] for r in records} if "mode" in records[0] else set()
+    if len(modes) > 1:   # 混合意图：分档再汇总一份（跟点档之外，in_r_frac / reach_frames 是退化的）
+        for m in sorted(modes):
+            sub = [r for r in records if r["mode"] == m]
+            out[f"{prefix}{MODE_NAMES[m]}/count"] = float(len(sub))
+            for k in ("return", "in_r_frac", "edge_frac", "dir_changes_per_s", "key_presses_per_s", "frames"):
+                out[f"{prefix}{MODE_NAMES[m]}/{k}"] = sum(float(r[k]) for r in sub) / len(sub)
+            out[f"{prefix}{MODE_NAMES[m]}/done1"] = sum(1 for r in sub if r["done"] == 1) / len(sub)
     for side in ("in_r", "out_r"):  # 点内 / 点外方向变化率：按总时长合并，不对各局比率取平均
         c, s = f"dir_changes_{side}", f"secs_{side}"
         if c in records[0]:

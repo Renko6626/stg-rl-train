@@ -12,8 +12,11 @@ DEFAULTS: dict = {
     "env": {"cards_dir": "cards", "eval_splits": "eval/splits.toml", "num_envs": 2048, "threads": 0,
             "frame_skip": 1, "max_frames": 3600, "warmup_max": 120, "bullets_cap": 1024, "ranks": [2],
             "mirror": True},
-    "intent": {"name": "lower_half_uniform_v1", "margin": 16.0, "interval": [120, 300]},
-    "featurize": {"name": "danger_topk_v1", "k_bullets": 64, "k_enemies": 8, "horizon": 60, "d_max": 128.0},
+    "intent": {"name": "lower_half_uniform_v1", "margin": 16.0, "interval": [120, 300],
+               "mix": {"follow": 0.6, "anchor": 0.3, "free": 0.1}},
+    "curriculum": {"enabled": False, "interval": 20, "ema_decay": 0.98, "alpha": 1.0, "fail_floor": 0.05,
+                   "fail_ceil": 0.95, "w_lo": 0.25, "w_hi": 4.0, "min_episodes": 30},
+    "featurize": {"name": "danger_topk_v3", "k_bullets": 64, "k_enemies": 8, "horizon": 60, "d_max": 128.0},
     "model": {"name": "set_attn_v1", "d": 64, "heads": 4, "trunk": 256},
     "reward": {"hold_radius": 24.0, "edge_margin": 16.0,
                "terms": {"death": 10.0, "follow_shaping": 1.0, "hold": 0.01, "segment_survived": 0.0,
@@ -21,7 +24,9 @@ DEFAULTS: dict = {
     "ppo": {"num_steps": 64, "gamma": 0.995, "gae_lambda": 0.95, "num_minibatches": 8, "update_epochs": 4,
             "clip_coef": 0.2, "clip_vloss": True, "ent_coef": 0.01, "vf_coef": 0.5, "max_grad_norm": 0.5,
             "learning_rate": 3e-4, "anneal_lr": True, "norm_adv": True, "compile": True, "cudagraphs": True},
-    "eval": {"episodes": 32, "greedy": True, "seed": 12345},
+    # eval.intent 把**评测用的意图钉死**，与训练意图解耦：实验 I 用 mixed_v1 训练，评测仍走规范的
+    # 跟点档，撑过率才跟 G0/H 同口径可比（锚点 / 自由档的数字用 eval_ckpt --intent 单独跑）。
+    "eval": {"episodes": 32, "greedy": True, "seed": 12345, "intent": "lower_half_uniform_v1"},
     "log": {"tensorboard": True, "perf_sync_every": 20, "sample_hz": 1.0},
     "bench": {"seconds": 10.0, "num_envs": [512, 1024, 2048, 4096]},
 }
@@ -65,6 +70,18 @@ def validate(cfg: dict) -> None:
         raise ValueError(f"featurize.k_bullets 须在 1..=bullets_cap({env['bullets_cap']})，得 {feat['k_bullets']}")
     if not 1 <= feat["k_enemies"] <= 256:
         raise ValueError(f"featurize.k_enemies 须在 1..=256，得 {feat['k_enemies']}")
+    cur = cfg["curriculum"]
+    if not 0.0 < cur["ema_decay"] < 1.0:
+        raise ValueError(f"curriculum.ema_decay 须在 (0,1)，得 {cur['ema_decay']}")
+    if not 0.0 <= cur["fail_floor"] < cur["fail_ceil"] <= 1.0:
+        raise ValueError("curriculum 须满足 0 <= fail_floor < fail_ceil <= 1")
+    if not 0.0 < cur["w_lo"] <= 1.0 <= cur["w_hi"]:
+        raise ValueError("curriculum 须满足 0 < w_lo <= 1 <= w_hi")
+    if cur["interval"] < 1 or cur["min_episodes"] < 1 or cur["alpha"] <= 0:
+        raise ValueError("curriculum.interval / min_episodes 须 ≥ 1，alpha 须 > 0")
+    mix = intent["mix"]
+    if any(v < 0 for v in mix.values()) or sum(mix.values()) <= 0:
+        raise ValueError(f"intent.mix 须非负且和 > 0，得 {mix}")
     lo, hi = intent["interval"]
     if not 0 < lo <= hi:
         raise ValueError(f"intent.interval 须满足 0 < lo <= hi，得 {intent['interval']}")

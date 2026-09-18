@@ -44,6 +44,8 @@ class StepInfo:
     refreshed: Tensor
     buttons: Tensor
     prev_buttons: Tensor
+    start_index: Tensor | None = None   # 本步所属那一局的起点下标（done≠0 时是**刚结束**那局的，env 在 reset 前取）
+    intent_mode: Tensor | None = None   # 混合意图的模式（0 跟点 / 1 锚点 / 2 自由），无混合时 None
 
 
 def _off(table: str, field: str) -> int:
@@ -72,18 +74,27 @@ def _u32(rows: Tensor, off: int) -> Tensor:
     return v
 
 
+TELEPORT_PX = 16.0   # 单帧位移超过它 = 瞬移（不是运动），速度记 0
+
+
 def enemy_velocity(prev_ids: Tensor, prev_xy: Tensor, cur_ids: Tensor, cur_xy: Tensor,
-                   frame_skip: int, valid: Tensor) -> Tensor:
+                   frame_skip: int, valid: Tensor, teleport_px: float = TELEPORT_PX) -> Tensor:
     """按 `enemies.id` 把当前帧的敌人对上上一帧，差分出每帧速度（env 只导出坐标，不导出敌人 vx/vy）。
 
     对不上的（新出现的敌）与 `valid=False` 的 env（新局第一步）记 0——不能拿上一局的坐标差分。
     id 是 u32 且同一只敌在池里换槽也不变，所以按 id 匹配比按槽位稳。
+
+    **瞬移守卫**：`move_to(0, …)` 会让敌人当帧跳过去（第 5 关咲夜那六张卡把时停窗口压平后，boss
+    每轮都要跳一次，最远一跳 112px）。差分把它读成上百 px/帧的速度，`/8` 归一化后是个十几倍的
+    离群值，还会让最近接近算出「这敌人瞬间飞走了」。单帧位移超过 `teleport_px` 的一律记 0——
+    敌人正常移动远达不到这个量级（原作 boss 游走 2.5 px/帧）。
     """
     same = (cur_ids[:, :, None] == prev_ids[:, None, :]) & (cur_ids[:, :, None] != 0)
     hit, idx = same.max(dim=-1)
     matched = torch.gather(prev_xy, 1, idx.unsqueeze(-1).expand(-1, -1, 2))
-    v = (cur_xy - matched) / max(1, int(frame_skip))
-    keep = hit & valid[:, None]
+    step = cur_xy - matched
+    v = step / max(1, int(frame_skip))
+    keep = hit & valid[:, None] & (step.abs().amax(dim=-1) <= float(teleport_px) * max(1, int(frame_skip)))
     return torch.where(keep.unsqueeze(-1), v, torch.zeros_like(v))
 
 
@@ -132,6 +143,10 @@ class EnvWrapper:
         flips = torch.rand(self.n, generator=self._mirror_gen, device=self.device) < 0.5
         self.mirrored = torch.where(mask, flips, self.mirrored)
 
+    def set_start_weights(self, w: list[float]) -> None:
+        """课程学习：改起点采样权重（下一次 reset 生效，即各 env 下一局才换分布）。"""
+        self.env.set_start_weights(list(w))
+
     def reset(self) -> RawObs:
         self.env.reset()
         self.intent.reset_all()
@@ -155,7 +170,9 @@ class EnvWrapper:
             self._draw_mirror(ended)
             refreshed = self.intent.advance(self.frame_skip, ~ended)
             info = StepInfo(done=done, events=events, ep_frames=ep_frames, refreshed=refreshed,
-                            buttons=buttons, prev_buttons=self.prev_buttons)
+                            buttons=buttons, prev_buttons=self.prev_buttons,
+                            start_index=self._dev(self.buf["start_index"]).to(torch.int64),
+                            intent_mode=getattr(self.intent, "mode", None))
             self.prev_buttons = torch.where(ended, torch.zeros_like(buttons), buttons)
             # 智能体坐标系的动作 id：镜像只在新局重抽，而新局这里清零，所以不会与镜像标志错位
             self.prev_action = torch.where(ended, torch.zeros_like(action_ids), action_ids.to(torch.int64))

@@ -67,3 +67,14 @@ def test_hysteresis_keeps_prev_action_unless_margin_exceeds_tau():
     assert hysteresis_action(logits, prev, 0.0).tolist() == [1, 1, 0, 1], "τ = 0 等价 argmax"
     assert hysteresis_action(logits, prev, 0.6).tolist() == [2, 2, 0, 1]
     assert hysteresis_action(logits, prev, 5.0).tolist() == [2, 2, 2, 1]
+
+
+def test_eval_intent_is_pinned_and_does_not_mutate_the_training_cfg():
+    """训练意图换成混合档时，评测仍走 eval.intent 那一档——尺子不跟着实验变。"""
+    from stgtrain.evaluate import eval_cfg
+    cfg = {"intent": {"name": "mixed_v1", "mix": {"follow": 1.0}}, "eval": {"intent": "lower_half_uniform_v1"}}
+    out = eval_cfg(cfg)
+    assert out["intent"]["name"] == "lower_half_uniform_v1"
+    assert cfg["intent"]["name"] == "mixed_v1", "不得就地改调用方的配置"
+    same = {"intent": {"name": "lower_half_uniform_v1"}, "eval": {"intent": ""}}
+    assert eval_cfg(same) is same, "空串 = 跟训练一致，直接返回原配置"

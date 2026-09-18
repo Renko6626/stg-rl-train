@@ -1,0 +1,29 @@
+# 实验 H（2026-09-19）：G0 + **起点难度采样**。与 G0 只差 [curriculum] 那一段。
+#
+# 动机：74 个起点难度差一个数量级（弹量峰值从 0 到 872），均匀采样等于把大半算力花在
+# 早就会了的道中卡上。按每起点死亡率 EMA 加权 —— 不会的多练。
+# 口径与两级钳位的理由见 src/stgtrain/curriculum.py；w_hi 是关键的那一道：
+# 近乎必死的卡（th06_s5_b9 rank 3 一屏 731 颗弹）会稳定拿最高死亡率，没有上限就会把采样吸干。
+#
+# 判据：撑过率相对 G0 是否上升，且**难卡的分档撑过率**（eval 里 s3_w12 / s2_b6 / s3_mb3 那几张密档）
+# 是否明显改善；同时看 curr/w_max 有没有长期贴着上限（贴着 = 上限在起作用，可能要调 alpha）。
+[run]
+total_updates = 2000
+ckpt_every = 100
+eval_every = 200
+
+[env]
+num_envs = 4096
+threads = 63
+
+[curriculum]
+enabled = true
+
+[reward.terms]
+death = 10.0
+follow_shaping = 1.0
+hold = 0.01
+segment_survived = 0.0
+key_press = -0.003
+shift_toggle = 0.0
+edge_hug = 0.0

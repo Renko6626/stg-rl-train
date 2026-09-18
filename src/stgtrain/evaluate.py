@@ -2,6 +2,8 @@
 env 种子与意图种子固定、不镜像，每个 env 只取第一局 ⇒ 不同 checkpoint 之间可直接比较。"""
 from __future__ import annotations
 
+import copy
+
 import statistics
 
 import stg_rl
@@ -53,8 +55,19 @@ def hysteresis_action(logits: Tensor, prev: Tensor, tau: float) -> Tensor:
     return torch.where(keep & (tau > 0), prev, best)
 
 
+def eval_cfg(cfg: dict) -> dict:
+    """评测用的配置：`eval.intent` 非空时覆盖意图（训练意图换了，尺子不跟着换）。"""
+    name = cfg["eval"].get("intent") or cfg["intent"]["name"]
+    if name == cfg["intent"]["name"]:
+        return cfg
+    c = copy.deepcopy(cfg)
+    c["intent"]["name"] = name
+    return c
+
+
 def run_group(cfg: dict, ppo, featurizer, image, card: str, rank: int, episodes: int, device,
               hysteresis: float = 0.0) -> list[dict]:
+    cfg = eval_cfg(cfg)
     envw = EnvWrapper(cfg, {card: image}, [stg_rl.Start(card, 0, rank)], device,
                       seed=int(cfg["eval"]["seed"]), num_envs=episodes, mirror=False)
     reward_fn = RewardFn(cfg)
