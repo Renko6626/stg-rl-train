@@ -60,6 +60,8 @@ def main(argv: list[str] | None = None) -> int:
     if not specs:
         raise SystemExit("没有可评的 (卡, 档)")
 
+    print(f"评测划分：{cfg['env']['eval_splits']}（{len(specs)} 组；**读的是当前文件，不是 run 当时那份**）"
+          + (f" · 滞回 τ={a.hysteresis}" if a.hysteresis else "") + (f" · 意图 {a.intent}" if a.intent else ""), flush=True)
     ppo = PPO(cfg, factory, device)
     ppo.load_state_dict(ck["state"])
     t0 = time.perf_counter()
