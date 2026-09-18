@@ -871,150 +871,106 @@ TH06 的段落靠回调串起来（`EnemyManager.cpp:340-447`）：
 
 跳过编号的机器可读表在 `config.toml` 的 `[skip] ex_ins_ids`。
 
-### §10.1 `ex_ins_4` 两个分支的写法（2026-09-19 新增，原判 skip-unit 是错的）
+### §10.1 `ex_ins_4`（咲夜的时停）的写法：**把窗口压平**（2026-09-19 重写）
 
-原判的理由是「需要遍历全场弹」。但我方有两件工具能表达它，**已用原型卡实测过**
-（`transcribe/work/proto/timestop/`，验证输出见下）：`xformdef` 里的 `wait_signal(ch)` + `pulse_signal(ch)`
-（全场同时放行，零任务槽），以及**弹挂任务**（`sh_task` / `fire` 的 `task` 位，能 `rand()` 并改这颗弹自己）。
+**decomp 事实**（`EnemyEclInstr.cpp:562` 写 `isTimeStopped`）：窗口期间
+`Player::OnUpdate`（`Player.cpp:158`）与 `BulletManager::OnUpdate`（`BulletManager.cpp:668`）
+**整帧早退** —— 自机不能动、不能开火、不会被撞死，全场弹一格不挪、也不判定；
+`bossTimer` 不 tick（`EnemyManager.cpp:735`）。还在跑的只有**敌方 ECL 与敌人自身的移动**。
 
-**① 时停（`ex_ins_call(4, 1)` 开 / `(4, 0)` 关）**
+⇒ **整个窗口对玩家是纯空转，等价于「瞬间把弹摆好、boss 瞬移」**。所以默认写法不是「停驻再放行」，
+而是**把窗口压成 1 帧**（`wait(1)` 让子任务落弹，实际 2 帧）：
 
-decomp：`isTimeStopped = 1` 时 `BulletManager::OnUpdate`（`BulletManager.cpp:668`）与 `Player::OnUpdate`
-（`Player.cpp:158`）**整个 return**——弹不动不判定、自机也不能动；boss 的 ECL 照常跑，继续摆弹。
-即「世界冻住、boss 继续摆」。
+1. 算出 boss 在窗口里那条滑行的**终点**（§7.3 的 `move_rand_in_bounds + move_speed + move_time_decelerate(T)`），
+   但**不真的滑**；
+2. 窗口里每一批弹的出弹原点 = 滑行曲线上那一刻的采样点。`move_to(…, easing 2)` 是 **QuadOut**，
+   即 `e(t) = 1 − (1−t)²`；第 k 批在 `t = (批间隔·k)/T`，位置 `p0 + (p1−p0)·e(t)`；
+3. 弹**直接按真速出生**（不再 0 速 + `wait_signal`），boss 用 `move_to(0, x, y, 0)` 瞬移到终点；
+4. `ex_ins_call(4, 2)` 在窗口里调 N 次 ⇒ 每颗弹累计被改一次的概率是 `1 − (3/4)^N`，压成**一次抽签**
+   （每次抽中都是均匀角，分布等价）。N=6 → `3367/4096`；N=7 → `3549/4096`。
 
-写法：**时停窗口内发的弹，速度发 0、挂 `wait_signal` 变换；关时停那一句换成 `pulse_signal`**。
+**压平白捡的四件事**：① 符卡时限不再烧窗口那 78–152 帧，**总轮数自动与原作一致**（原作 `bossTimer`
+本来就不 tick；旧的停驻写法会少三分之一轮）；② 自机不再白得一段无威胁的免费走位；③ 停驻变换、
+「随机速度弹靠常驻任务冻结」（旧 §10.1①b）、「刀停在平均冻结半径」这些近似全部消失；
+④ 任务槽压力消失——改向任务变成一次性，抽完即退。
 
-⚠ **原作停的是全场弹，不只是窗口内新发的**（`BulletManager::OnUpdate` 整个 return）。
-**窗口前发出、还在飞的弹也要停**——漏了就位置/启动时刻都对不上（第 5 关 b6 的便笺）。写法是
-**两条信号通道 + 四槽 xform，零任务槽**（`xformdef` 的 `@N` 是后置延迟，表达不了「飞一阵再定时停」，
-但 `wait_signal` 可以）：
-
-```ecl
-xformdef PARKABLE {      // 挂给窗口前就发出去的弹
-    wait_signal(0);      // 0 号 = 时停开始（停车令）
-    set_speed(0.0fx);
-    wait_signal(1);      // 1 号 = 时停结束（放行令）
-    set_speed(2.0fx);    // 恢复本波速率（编译期常量，一波一个 xformdef）
-}
-sub main() {
-    wait(60); pulse_signal(0);
-    wait(60); pulse_signal(1);
-}
-```
-
-实测（`transcribe/work/proto/prestop`）：16 颗环弹帧 40 `speed 2.000`、帧 90 全 `0.000`、帧 140 回 `2.000`。
-**速度随机的波次**改用 ①b 的任务；本来就要挂任务的弹（如 ② 的随机改向大玉）顺手在任务里停车即可。
+**两个工程约束**（都实测过）：
+- **任务指令预算 1024 op/任务/帧**：一批 9 点 × 3 颗的刀阵约 200 op，7–10 批放一个任务里会被截断 ⇒
+  **一批派一个 `spawn` 任务**。`spawn` 出来的子任务**下一帧**才执行，且同帧派的会**在同一帧**一起落弹。
+- **发射器槽是每任务私有的四个**（0..3）：子任务各用自己的 0 号，不会互相踩。用 `sh_*(4, …)` 会
+  静默 no-op 并计 `contract_viol`。
 
 ```ecl
-const BALL: int = 48;
+const KNIFE: int = 16;
 
-xformdef PARKED {           // 停驻弹：等 0 号信号 → 恢复到本波的速度（每波速度是常量，写死即可）
-    wait_signal(0);
-    set_speed(2.0fx);
+// 一批 = 滑行曲线上一个采样点摆一圈弹；(sx, sy) 是那一刻的 boss 位置，boss 实体已在终点，
+// 所以出弹口偏移要补上 (sample − self)。
+async sub wave(sx: fx, sy: fx, k: int) {
+    sh_reset(0);
+    sh_sprite(0, KNIFE, 6);
+    sh_aim(0, 1);                       // 原作 aimMode = FAN_AIMED：自机狙（从出弹点算）
+    sh_ring(0, 0);
+    sh_count(0, 3, 1);
+    sh_angle(0, 0deg, 5461bam);         // ±π/6
+    sh_speed(0, 2.0fx, 0fx);            // 真速，不停驻
+    var a: angle = 0deg;
+    for i in 0..9 {
+        a = a + 7281bam;                // 每点 40°，示意用
+        sh_offset(0, sx - $self_x + 96.0fx * cos(a), sy - $self_y + 96.0fx * sin(a));
+        sh_fire(0);
+    }
 }
 
 async sub boss() {
     set_invuln(65535);
-    // —— ex_ins_call(4, 1)：时停开始。此后照原文时序摆弹，只是速度发 0 + 挂 PARKED ——
-    sh_reset(0);
-    sh_sprite(0, BALL, 6);
-    sh_aim(0, 0);
-    sh_ring(0, 1);
-    sh_count(0, 12, 1);
-    sh_speed(0, 0fx, 0fx);
-    sh_angle(0, 0deg, 0deg);
-    sh_xform(0, PARKED);
-    sh_fire(0);
+    var ex: fx = $self_x;
+    var ey: fx = $self_y;
+    var tx: fx = 64.0fx;                // 实战里按 §7.3 的随机游走算，这里写死示意
+    var ty: fx = 120.0fx;
+    var t: fx = 0fx;
+    var u: fx = 0fx;
     wait(60);
-    pulse_signal(0);        // —— ex_ins_call(4, 0)：时停结束，全场同时启动 ——
-    wait(300);
-}
-
-sub main() {
-    _ = spawn_enemy(0.0fx, 120.0fx, 1000, 0, 0, 1, boss);
-    loop { wait(600); }
-}
-```
-
-**已知偏差（写进 report）**：①我方时停窗口里**自机仍能动**——引擎其实有 `time_stop_player(frames)`（自机不能动/不能发弹，等价于原作的 `Player.cpp:158`），但卡里**故意不调**：这批卡是 RL 训练素材，冻自机 = 一段动作无效的死帧，对信用分配有害。要追求还原时，在窗口起点调一次即可；②**原作时停期间 boss 计时器不走**（`EnemyManager.cpp:735`），我方 spell 时限照走 ⇒ 同样的 `time_limit` 里总轮数少于原作（第 5 关 b5 实测约 4.3 轮 vs 原作约 6 轮）；`TIME_LIMIT` 仍照 `unit.json` 写、逐帧编排不动。这对训练是可接受甚至更好的——
-原作那几十帧对玩家是空帧。弹的落位与启动时刻逐帧一致。
-
-**①b 随机速度的弹要用任务冻结，不能用 xform**（2026-09-19 由第 5 关 b3 的审核暴露）
-
-`xformdef` 里的 `set_speed(v)` 只能写**编译期常量**，所以「等信号 → 恢复速度」这条只适用于**整波同速**的弹。
-`bullet_random` / `bullet_random_speed` 那种**逐颗随机速度**的波次，冻结与恢复都必须由**弹挂任务**做——
-任务把自己的速度记在变量里，冻结时置 0、放行时写回：
-
-```ecl
-const EPOCH: int = 20;      // 0 = 正常，奇数 = 冻结中，偶数（≥2）= 已放行
-const BUBBLE: int = 176;
-
-async sub randbullet() {    // 挂在弹上：出生抽随机速度，之后常驻轮询冻结纪元
-    var sp: fx = 1.7fx + 1.3fx / 256 * rand(256);
-    set_speed(0, sp);
-    set_angle(0, rand(65536) as angle);
-    var seen: int = global(EPOCH);
-    loop {
-        var now: int = global(EPOCH);
-        if now != seen {
-            seen = now;
-            if now % 2 == 1 { set_speed(0, 0fx); } else { set_speed(0, sp); }
-        }
-        wait(1);
+    // ── ex_ins_call(4,1) …… ex_ins_call(4,0)：整窗压成下面这 1 帧 ──
+    for k in 0..7 {
+        t = k * 9.0fx / 60;             // 原作每 9 帧一批、滑行 60 帧
+        u = 1.0fx - t;
+        spawn wave(ex + (tx - ex) * (1.0fx - u * u), ey + (ty - ey) * (1.0fx - u * u), k);
     }
-}
-
-async sub boss3() {
-    set_invuln(65535);
-    set_global(EPOCH, 0);
-    sh_reset(0);
-    sh_sprite(0, BUBBLE, 6);
-    sh_aim(0, 0);
-    sh_ring(0, 1);
-    sh_count(0, 20, 1);
-    sh_speed(0, 0fx, 0fx);
-    sh_angle(0, 0deg, 0deg);
-    sh_task(0, randbullet);
-    sh_fire(0);
-    wait(60);
-    set_global(EPOCH, 1);      // ex_ins_call(4, 1)：时停开始 → 逐颗置 0
-    wait(120);
-    set_global(EPOCH, 2);      // ex_ins_call(4, 0)：时停结束 → 逐颗写回各自速度
-    wait(300);
+    move_to(0, tx, ty, 0);              // boss 瞬移到滑行终点
+    wait(1);                            // 让各批当帧落弹
+    // ── 窗口结束 ──
+    loop { wait(60); }
 }
 
 sub main() {
-    _ = spawn_enemy(0.0fx, 120.0fx, 1000, 0, 0, 1, boss3);
+    _ = spawn_enemy(0.0fx, 112.0fx, 1000, 0, 0, 1, boss);
     loop { wait(600); }
 }
 ```
 
-**选哪条**：整波同速 → xform（零任务槽，优先）；逐颗随机速度 → 任务（一颗一槽，注意 256 上限）。
-两者可以在同一张卡里按波次混用。**任务抽完随机值就 `return` 是错的**——时停期间它必须还活着。
+**实测**（`transcribe/work/proto/collapse`）：同一帧内 `move_to(0,…)` 三次、每次 `sh_fire`，
+三颗弹准确落在三个瞬移点。全池落地见第 5 关 b2/b3/b5/b6/b8/b9 六张卡——峰值与旧的停驻版一致
+（b3 290/305、b5 63/191、b9 503→500 / 729→731），均值下降是因为弹不再被冻在场上。
 
 **② 大弹随机改向（`ex_ins_call(4, 2)`）**
 
-decomp（`EnemyEclInstr.cpp:564-648`）：扫全场弹，只挑**大玉级**（`heightPx ≥ 30`）且没改过色的，
-每颗 **1/4 概率**命中，最多改 **14 颗（E/N）/ 52 颗（H/L）**；命中后改色并重设角度——
-离自机 > 128px 时取随机角（E/N 限 `[π/4, π]`，H/L 全周），≤ 128px 时取「自机反方向 + π/2 + 随机全周」。
+decomp（`EnemyEclInstr.cpp:564-648`）：扫全场弹，只挑 `heightPx ≥ 30`（即**所有 32px 弹型**：
+6 大玉 / 7 火球 / 8 小刀）且没改过色的，每颗 **1/4 概率**命中，一次调用最多改
+**14 颗（E/N）/ 52 颗（H/L）**；命中后改色并重设角度——离自机 > 128px 时取随机角
+（E/N 限 `[π/4, π]`，H/L 全周），≤ 128px 时取「自机方向 + π/2 + 随机全周」（两支都是均匀分布）。
 
-写法：给大弹挂任务，用一个全局槽当**纪元计数**，boss 改一次纪元 = 触发一次。
+压平后写法分两种：
+- **弹在窗口里出生**（刀阵）：角度在发射那一刻就定 ⇒ 在摆弹循环里直接抽，不用任务。
+- **弹在窗口前就在场**（先发的大玉环）：给它挂一个**一次性**任务，等纪元跳变抽一次就退。
 
 ```ecl
-const EPOCH: int = 20;                    // 脚本可写全局槽（≥16）
-const BIG: int = 176;                     // 大玉级弹型
+const EPOCH: int = 20;                  // 脚本可写全局槽（≥16）
+const BIG: int = 176;
 
-async sub bigball() {                     // 挂在弹上：sh_task(k, bigball)
+async sub bigball() {                   // sh_task(k, bigball)：一次性，抽完即退
     var seen: int = global(EPOCH);
-    loop {
-        var now: int = global(EPOCH);
-        if now != seen {
-            seen = now;
-            if rand(4) == 0 { set_angle(0, rand(65536) as angle); }   // 首参是占位，恒作用于自身
-        }
-        wait(1);
-    }
+    while global(EPOCH) == seen { wait(1); }
+    if rand(4096) < 3367 { set_angle(0, rand(65536) as angle); }   // N=6 次 ⇒ 1−(3/4)^6
 }
 
 async sub boss2() {
@@ -1030,8 +986,8 @@ async sub boss2() {
     sh_task(1, bigball);
     sh_fire(1);
     wait(60);
-    set_global(EPOCH, global(EPOCH) + 1);   // —— ex_ins_call(4, 2)：触发一次随机改向 ——
-    wait(300);
+    set_global(EPOCH, global(EPOCH) + 1);   // —— 压平后的 ex_ins_call(4,2)：一次抽签 ——
+    loop { wait(60); }
 }
 
 sub main() {
@@ -1040,13 +996,16 @@ sub main() {
 }
 ```
 
-**注意**：① 原作的过滤条件是 `heightPx >= 30`，即**所有 32px 弹型**（6 大玉 / 7 火球 / 8 小刀），不只是大玉；但任务池只有 256、`sh_task` 一颗弹一个槽，颗数挂不下时（第 5 关 b6 的刀有 189 颗）只给主要那一类挂、其余在 report 里声明从简；原作上限 14/52 颗，
-我方按概率命中即可，颗数超过上限的情形在 report 里说明。② 「离自机 128px 分支」按 §2.3 的 `aim_player`
-写；拿不准就都用随机角并在 report 声明。
+**注意**：① 每次调用的 14/52 上限在我方按概率近似（原作扫描按池序，先吃到的是先发的弹）；
+颗数远超上限时在 report 里说明。② 窗口前就飞出屏幕的弹，任务再调 `set_angle` 会计一次
+`contract_viol`（悬垂句柄，P4-b 吞成 no-op）——与原作「那颗弹已经没了」同义，只是引擎会计数，
+在 report 里说明即可。
 
-**实测（原型卡）**：停驻期第 60–100 帧 36 颗弹 `speed 0.000` 定在出弹口；`pulse_signal` 后第 130 帧全部
-`speed 2.000` 同时启动。大玉环 16 颗在纪元触发前角度是 22.5° 均分，触发后有 2 颗变成 60.44° / 75.14°（1/4 概率）。
+**已知偏差（写进 report）**：boss 在窗口里的滑行变成瞬移。窗口内自机被冻、看得见但动不了，
+对玩家不可反应，故等价；只有在做**有头录像**时能看出是「瞬移」而不是「滑行」。
 
+**什么时候仍然要用「停驻 + 放行」**：只有**不冻自机**的冻弹机制，典型是琪露诺的 `ex_ins_0`
+（见 §10.2，decomp 里它根本不写 `isTimeStopped`）。那种窗口里玩家照常能动，时间不能压。
 
 ### §10.2 `ex_ins_0`（琪露诺「パーフェクトフリーズ」）的写法（2026-09-19 新增）
 

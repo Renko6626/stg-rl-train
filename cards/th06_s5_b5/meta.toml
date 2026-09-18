@@ -9,4 +9,4 @@ original_time_limit = 1800
 tags = ["random", "ring"]
 laser_approx = false
 lower_half_blocked = false
-notes = "时停用 wait_signal/pulse_signal 模拟（停驻期自机仍可动、spell 计时不暂停）；大弹随机改向用弹任务+纪元槽模拟，引擎无改色接口故只改向不变色。"
+notes = "时停窗口（120 帧）按 mapping §10.1 压平成 1 帧：boss 按滑行曲线 7 个采样点定位摆弹、弹以 2.0 真速出生并补上 FAN_AIMED 的自机狙（旧版漏了）。ex_ins_call(4,2) 的 6 次改向压成一次 p=3367/4096 抽签。引擎无改色接口故只改向不变色。"

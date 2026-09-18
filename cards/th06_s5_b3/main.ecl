@@ -4,17 +4,17 @@ const TIME_LIMIT: int = 1800;
 const SPELL_ID: int = 90;    // 原文 spellcard_start(2, H=90 / L=91, "ST_ECLDATA5_SUB45_0")：本卡取 H 的 90（仅 UI/计分）
 const ARROWHEAD: int = 16;   // TH06 弹型 8 DAGGER（半边长 4.5）→ mapping §3
 const LASERHEAD: int = 176;  // TH06 弹型 9 BUBBLE（半边长 16）→ mapping §3（判定严重偏小，已知限制）
-const EPOCH: int = 20;       // 时停冻结纪元全局槽（§10.1①b，脚本可写槽 ≥16）：0 正常 / 奇数冻结 / 偶放行
 
-// ex_ins_call(4, 1) 时停期间摆下的弹：速度 0 停在原地，等 ex_ins_call(4, 0) 的 pulse 统一启动（mapping §10.1）
-xformdef PARKED {
-    wait_signal(0);
-    set_speed(2.0fx);
-}
+// 【时停窗口压平】原作 //74→//198 那 152 帧 `isTimeStopped=1`：自机与全场弹整帧早退
+// （Player.cpp:158 / BulletManager.cpp:668），对玩家是纯空转 ⇒ 等价于瞬间摆弹。按 mapping §10.1
+// 压成 1 帧：boss 按滑行曲线的 10 个采样点定位摆刀、刀以 2.0 真速直接出生。
+// 随之省掉的：停驻变换、以及 §10.1①b 那套「随机速度弹靠常驻任务冻结」——窗口不占时间，
+// 随机大玉抽完速度/角度就退，不再占任务槽。符卡时限也不烧这 152 帧（与原作 bossTimer 一致）。
 
 // Sub51 t=74：move_rand_in_bounds(-π, π) + move_speed(2.5f) + move_time_decelerate(90)（mapping §7.3）
 // 边界取 §7.3 的 boss 标准界 TH06 (32,48)-(352,144) → (-160,48)-(160,144)。
-sub wander(spd: fx, t: int) {
+// 压平后 boss 不真的滑，本 sub 只用来**算终点**（滑行曲线用于给 10 波定位），最后一步瞬移过去。
+sub wander_to(spd: fx, t: int) {
     var bx0: fx = -160.0fx;
     var by0: fx = 48.0fx;
     var bx1: fx = 160.0fx;
@@ -34,15 +34,17 @@ sub wander(spd: fx, t: int) {
     var ty: fx = $self_y + sin(v as angle) * d;
     if tx < bx0 { tx = bx0; } else if tx > bx1 { tx = bx1; }
     if ty < by0 { ty = by0; } else if ty > by1 { ty = by1; }
-    move_to(t, tx, ty, 2);
+    move_to(0, tx, ty, 0);   // 瞬移到滑行终点（窗口压平）
 }
 
 // Sub51 的 ex_ins_repeat(5)（ExInsStage5Func5，EnemyEclInstr.cpp:655）：var2 每帧 +1，var2%9==0 时
 // 在 9 个弧形点上各开一个「以自机方向为中轴、±π/6、3 颗、速度 2.0」的扇形（H/L：count1=3，中轴=自机方向）。
 // pp = var2 / 9（0..9）。位置公式逐行照抄源码，推导见 report.md。
-sub volley(pp: int) {
-    var dx: fx = $player_x - $self_x;
-    var dy: fx = $player_y - $self_y;
+// 压平后「敌位置」取滑行曲线上的采样点 (px0, py0)，boss 实体已瞬移到终点；一波一个任务
+// （单任务每帧 1024 op 的预算装不下 270 颗；发射器槽是每任务私有的四个）。
+async sub volley(px0: fx, py0: fx, pp: int) {
+    var dx: fx = $player_x - px0;
+    var dy: fx = $player_y - py0;
     var dist0: fx = dist(dx, dy);
     var nx: fx = dx / dist0;
     var ny: fx = dy / dist0;
@@ -68,23 +70,21 @@ sub volley(pp: int) {
     sh_aim(1, 1);
     sh_ring(1, 0);
     sh_count(1, 3, 1);
-    sh_speed(1, 0fx, 0fx);
+    sh_speed(1, 2.0fx, 0fx);
     sh_angle(1, 0deg, 5461bam);
-    sh_xform(1, PARKED);
     for i in 0..9 {
         tx = rx * cos(1820bam) - ry * sin(1820bam);
         ty = rx * sin(1820bam) + ry * cos(1820bam);
         rx = tx;
         ry = ty;
-        sh_offset(1, bx + rx, by + ry);
+        sh_offset(1, px0 - $self_x + bx + rx, py0 - $self_y + by + ry);
         sh_fire(1);
     }
 }
 
 // bullet_random 的逐颗随机改由弹任务在出生后取（主任务逐颗 fire 35 颗会烧穿单帧
 // 1024 条指令预算，同 th06_s5_b2 的处理）：弹出生当帧速度 0，下一帧才赋随机角/速（差 1 帧）。
-// 任务抽完随机速后**不返回**：常驻轮询 EPOCH 纪元，时停开始（奇数）置 0 冻住、收窗（偶数）写回各自原速
-// （mapping §10.1①b：逐颗随机速度的波次只能用任务冻结，xformdef 的 set_speed 只收编译期常量）。
+// 窗口压平后不需要冻结，任务抽完就退（不占任务槽）。
 async sub rand_bullet() {
     var rank: int = global(GVAR_RANK);
     var lo: fx = 2.2fx;                 // !H 速度下界
@@ -93,15 +93,6 @@ async sub rand_bullet() {
     var sp: fx = lo + (hi - lo) / 256 * rand(256);        // [lo, hi)
     set_speed(0, sp);
     set_angle(0, rand(32768) as angle);                   // [0, π)：下半周
-    var seen: int = global(EPOCH);
-    loop {
-        var now: int = global(EPOCH);
-        if now != seen {
-            seen = now;
-            if now % 2 == 1 { set_speed(0, 0fx); } else { set_speed(0, sp); }
-        }
-        wait(1);
-    }
 }
 
 async sub pattern() {
@@ -114,7 +105,10 @@ async sub pattern() {
     var rank: int = global(GVAR_RANK);
     var n: int = 20;                    // !H count1=20
     if rank >= RANK_LUNATIC { n = 35; }   // !L count1=35
-    set_global(EPOCH, 0);               // 冻结纪元归零（§10.1①b）；此后每轮 1(冻)→2(放)
+    var ex: fx = 0fx;
+    var ey: fx = 0fx;
+    var tq: fx = 0fx;
+    var uq: fx = 0fx;
     loop {
         // Sub51_0 / Sub51_36：32 次 effect_particle，每 4 帧一次 = 128 帧充能（纯表现，全丢）
         wait(128);
@@ -131,16 +125,23 @@ async sub pattern() {
         sh_fire(0);
         // +50 //74：ex_ins_call(4, 1) 时停开始 + enemy_flag_interactable(0) + 随机游走
         wait(50);
+
+        // ══ 时停窗口（原作 //74→//198 共 152 帧）压平成这 1 帧 ══
         set_enemy_flag(ENEMY_NO_BODY, 1);
-        set_global(EPOCH, 1);           // 时停开始：已在飞行的随机大玉由各自任务置 0 冻结（含本波 20/35 颗）
-        wander(2.5fx, 90);
-        // ex_ins_repeat(5)：窗口 //74→//164 共 90 帧，每 9 帧一轮 = 10 轮（pp=0..9）
-        for v in 0..10 { volley(v); wait(9); }
-        // 到 +90 //164 的 ex_ins_repeat(-1) 与 +30 //198 的 ex_ins_call(4, 0)：停窗共 152 帧
-        wait(62);
-        pulse_signal(0);                     // ex_ins_call(4, 0)：时停结束，停驻弹同时启动
-        set_global(EPOCH, 2);                // 放行：随机大玉任务按各自原速写回（§10.1①b）
+        ex = $self_x;
+        ey = $self_y;
+        wander_to(2.5fx, 90);                // 算终点并瞬移过去（原作是 90 帧滑行）
+        // ex_ins_repeat(5)：原作窗口前 90 帧每 9 帧一轮 = 10 轮（pp=0..9），
+        // 出弹原点取滑行曲线 move_to(…, easing 2 = QuadOut) 的采样：e = 1 − (1−t)²，t = 9pp/90
+        for v in 0..10 {
+            tq = v * 9.0fx / 90;
+            uq = 1.0fx - tq;
+            spawn volley(ex + ($self_x - ex) * (1.0fx - uq * uq),
+                         ey + ($self_y - ey) * (1.0fx - uq * uq), v);
+        }
+        wait(1);                             // 让 10 个波次任务当帧落弹
         set_enemy_flag(ENEMY_NO_BODY, 0);    // enemy_flag_interactable(1)
+        // ══ 窗口结束 ══
         // +60 //258、+40 //298：jump(0, Sub51_0) 回到循环头
         wait(60);
         wait(40);

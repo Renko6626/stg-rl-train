@@ -9,4 +9,4 @@ original_time_limit = 1800
 tags = ["ring", "random", "dense"]
 laser_approx = false
 lower_half_blocked = false
-notes = "boss 无敌按原作 1800 帧超时收段；刀刃用发射器 + 0 速停驻 xformdef 复刻 ex_ins_call(4,1/0) 时停，ex_ins_call(4,2) 大弹改向用弹挂任务轮询纪元近似。"
+notes = "时停窗口（78 帧）按 mapping §10.1 压平成 1 帧，并因此销掉本卡最大的近似：刀刃不再「出生即 0 速挂在平均冻结半径」，而是按各层真速正常飞出、半径由飞行时间自然决定。ex_ins_call(4,2) 压成一次 p=3549/4096 的整周改向。boss 无敌按原作 1800 帧超时收段，一轮 268 → 191 帧。"

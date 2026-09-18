@@ -9,4 +9,4 @@ original_time_limit = 1800
 tags = ["aimed", "ring", "random", "curve"]
 laser_approx = false
 lower_half_blocked = false
-notes = "时停用「停驻弹 + 信号放行」近似：刀速 0 挂 PARKED，大弹任务停 120 帧后恢复；自机在时停窗口仍能动。"
+notes = "时停窗口压平成 1 帧（mapping §10.1）：原作 120 帧窗口里自机与全场弹都冻结，等价于瞬间摆弹。boss 按滑行曲线 7 个采样点瞬移摆刀、刀以 2.0 真速直接出生，6 次随机改向压成一次 p=3367/4096 的抽签。符卡时限因此不烧这 120 帧，与原作 bossTimer 不 tick 一致（约 5.6 轮）。E/N 的 Stage5Func5 是 1 颗/点（原作 count1）。"

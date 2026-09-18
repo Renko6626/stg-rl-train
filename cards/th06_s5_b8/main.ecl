@@ -2,44 +2,27 @@
 // 原文：ecldata5 Sub60 → Sub61（宣言 + 移到中央）+ Sub62（时停循环）+ Sub58/Sub59（两组自机狙扇），时限 1800。
 // 逐段对照 / 近似见 report.md。
 //
-// 时停（ex_ins_call(4,1) 开 / (4,0) 关）用 mapping §10.1 的写法：弹自带 freeze xform，
-// 停下 wait_signal(0)、放走 wait_signal(1)；中间的 ex_ins_call(4,2) 大弹随机改向挂弹任务 + 全局纪元。
+// 【时停窗口压平】原作 wall 75→153 那 78 帧 `isTimeStopped=1`：自机与全场弹整帧早退
+// （Player.cpp:158 / BulletManager.cpp:668），对玩家是纯空转；而本卡窗口内**不摆任何新弹**，
+// 只有 boss 滑行 + 7 次 ex_ins_call(4,2) 随机改向 ⇒ 等价于「boss 瞬移 + 全体掷一次骰」。
+// 按 mapping §10.1 压成 1 帧：弹不再需要 freeze 变换，7 次改向合成一次 p = 1−(3/4)^7 = 3549/4096
+// 的抽签。符卡时限因此不烧这 78 帧（与原作 bossTimer 不 tick 一致），一轮 253 → 176 帧。
 const TIME_LIMIT: int = 1800;
 const SPELL_ID: int = 96;      // 原文 E 的 spellcard_start id（N 为 97）；纯脚本词汇，引擎不登记
 const ARROWHEAD: int = 16;     // TH06 弹型 8 DAGGER（32px）
 const EPOCH: int = 20;         // 脚本可写全局槽，用作 ex_ins_call(4,2) 的触发纪元
 
 // 32px 弹色号查表：原文色号 3 → 我方 6（Sub58）、1 → 2（Sub59）（mapping §3）。
-// 弹型节奏：飞到 wall 75 被时停冻住（bounce 的弹再等反弹），wall 153 放走、恢复原速。
-// ⚠️ @N 是后置延迟；这里全 wait=0，靠 wait_signal 阻塞。
-xformdef F58_E_15  { bounce_arm(7, 1); wait_signal(0); set_speed(0.0fx); wait_signal(1); set_speed(1.5fx); }
-xformdef F58_E_125 { bounce_arm(7, 1); wait_signal(0); set_speed(0.0fx); wait_signal(1); set_speed(1.25fx); }
-xformdef F58_N_20  { bounce_arm(7, 1); wait_signal(0); set_speed(0.0fx); wait_signal(1); set_speed(2.0fx); }
-xformdef F58_N_15  { bounce_arm(7, 1); wait_signal(0); set_speed(0.0fx); wait_signal(1); set_speed(1.5fx); }
-xformdef F59_E_18  { wait_signal(0); set_speed(0.0fx); wait_signal(1); set_speed(1.8fx); }
-xformdef F59_E_14  { wait_signal(0); set_speed(0.0fx); wait_signal(1); set_speed(1.4fx); }
-xformdef F59_N_28  { wait_signal(0); set_speed(0.0fx); wait_signal(1); set_speed(2.8fx); }
-xformdef F59_N_22  { wait_signal(0); set_speed(0.0fx); wait_signal(1); set_speed(2.2fx); }
-xformdef F59_N_16  { wait_signal(0); set_speed(0.0fx); wait_signal(1); set_speed(1.6fx); }
+// Sub58 的弹会反弹一次（原文 flags 含 bounce）；Sub59 的不反弹。窗口压平后不再需要冻结变换。
+xformdef F58_BOUNCE { bounce_arm(7, 1); }
 
 // ex_ins_call(4,2)：大弹（此符卡全为 32px DAGGER）1/4 概率改向，每颗最多改一次（改过色后原作不再选）。
 // decomp：E/N 档新角 = 随机 ∈ [π/4, π) = [8192, 32768) bam；离自机 ≤128px 的分支近似为同一分布。
+// 原作一个窗口调 7 次 ⇒ 每颗弹累计 1−(3/4)^7 = 3549/4096 被改一次；压平后就地抽一次，抽完即退。
 async sub redirect() {
     var seen: int = global(EPOCH);
-    var done: int = 0;
-    loop {
-        var now: int = global(EPOCH);
-        if now != seen {
-            seen = now;
-            if done == 0 {
-                if rand(4) == 0 {
-                    set_angle(0, (8192 + rand(24576)) as angle);
-                    done = 1;
-                }
-            }
-        }
-        wait(1);
-    }
+    while global(EPOCH) == seen { wait(1); }
+    if rand(4096) < 3549 { set_angle(0, (8192 + rand(24576)) as angle); }
 }
 
 // 原文 Sub58（E/N）：4 轮自机狙扇，wall 0/5/10/15，中心角在 Sub58 开始时取一次、E/N 不转。全程 wall 40。
@@ -53,7 +36,7 @@ sub burst58_e() {
         sh_count(0, 3, 1);
         sh_speed(0, 1.5fx, 0fx);
         sh_angle(0, a, 1638bam);
-        sh_xform(0, F58_E_15);
+        sh_xform(0, F58_BOUNCE);
         sh_task(0, redirect);
         sh_fire(0);
 
@@ -64,7 +47,7 @@ sub burst58_e() {
         sh_count(1, 3, 1);
         sh_speed(1, 1.25fx, 0fx);
         sh_angle(1, a, 1638bam);
-        sh_xform(1, F58_E_125);
+        sh_xform(1, F58_BOUNCE);
         sh_task(1, redirect);
         sh_fire(1);
         if k < 3 { wait(5); }
@@ -82,7 +65,7 @@ sub burst58_n() {
         sh_count(0, 4, 1);
         sh_speed(0, 2.0fx, 0fx);
         sh_angle(0, a, 1638bam);
-        sh_xform(0, F58_N_20);
+        sh_xform(0, F58_BOUNCE);
         sh_task(0, redirect);
         sh_fire(0);
 
@@ -93,7 +76,7 @@ sub burst58_n() {
         sh_count(1, 4, 1);
         sh_speed(1, 1.5fx, 0fx);
         sh_angle(1, a, 1638bam);
-        sh_xform(1, F58_N_15);
+        sh_xform(1, F58_BOUNCE);
         sh_task(1, redirect);
         sh_fire(1);
         if k < 3 { wait(5); }
@@ -112,7 +95,6 @@ sub burst59_e() {
         sh_count(0, 3, 1);
         sh_speed(0, 1.8fx, 0fx);
         sh_angle(0, a, 819bam);
-        sh_xform(0, F59_E_18);
         sh_task(0, redirect);
         sh_fire(0);
 
@@ -123,7 +105,6 @@ sub burst59_e() {
         sh_count(1, 3, 1);
         sh_speed(1, 1.4fx, 0fx);
         sh_angle(1, a, 819bam);
-        sh_xform(1, F59_E_14);
         sh_task(1, redirect);
         sh_fire(1);
         if j < 4 { wait(3); }
@@ -141,7 +122,6 @@ sub burst59_n() {
         sh_count(0, 4, 1);
         sh_speed(0, 2.8fx, 0fx);
         sh_angle(0, a, 819bam);
-        sh_xform(0, F59_N_28);
         sh_task(0, redirect);
         sh_fire(0);
 
@@ -152,7 +132,6 @@ sub burst59_n() {
         sh_count(1, 4, 1);
         sh_speed(1, 2.2fx, 0fx);
         sh_angle(1, a, 819bam);
-        sh_xform(1, F59_N_22);
         sh_task(1, redirect);
         sh_fire(1);
 
@@ -163,7 +142,6 @@ sub burst59_n() {
         sh_count(2, 4, 1);
         sh_speed(2, 1.6fx, 0fx);
         sh_angle(2, a, 819bam);
-        sh_xform(2, F59_N_16);
         sh_task(2, redirect);
         sh_fire(2);
         if j < 4 { wait(3); }
@@ -176,7 +154,7 @@ async sub fire_e() {
     loop {
         burst58_e();      // 0 -> 40
         burst59_e();      // 40 -> 75
-        wait(178);        // 75 -> 253
+        wait(101);        // 75 -> 176（原作 178；窗口 78 帧压平成 1 帧）
     }
 }
 
@@ -184,7 +162,7 @@ async sub fire_n() {
     loop {
         burst58_n();
         burst59_n();
-        wait(178);
+        wait(101);
     }
 }
 
@@ -194,23 +172,22 @@ async sub fire_n() {
 async sub driver() {
     loop {
         wait(75);                              // Sub58/Sub59 两段 call 占 75 wall 帧（40 + 35）
-        pulse_signal(0);                       // ex_ins_call(4,1)：时停开始
+
+        // ══ 时停窗口（原作 wall 75→153 共 78 帧）压平成这 1 帧 ══
         set_enemy_flag(ENEMY_NO_BODY, 1);      // enemy_flag_interactable(0)
-        wander(2.5fx, 60);                     // move_rand_in_bounds + move_speed(2.5) + move_time_decelerate(60)
-        wait(20);                              // 75 -> 95
-        for r in 0..7 {
-            set_global(EPOCH, global(EPOCH) + 1);   // ex_ins_call(4,2)
-            wait(4);                           // 95/99/…/119，之后到 123
-        }
-        wait(30);                              // 123 -> 153
-        pulse_signal(1);                       // ex_ins_call(4,0)：时停结束，全场弹恢复
+        wander(2.5fx, 60);                     // 原作窗口里滑行 60 帧；窗口内自机冻结 ⇒ 等价于瞬移
+        set_global(EPOCH, global(EPOCH) + 1);  // ex_ins_call(4,2) ×7 → 一次抽签
+        wait(1);                               // 让各弹任务当帧抽完
         set_enemy_flag(ENEMY_NO_BODY, 0);      // enemy_flag_interactable(1)
+        // ══ 窗口结束 ══
+
         wait(60);                              // 153 -> 213
-        wait(40);                              // 213 -> 253
+        wait(40);                              // 213 -> 253（压平后 = 176 帧一轮）
     }
 }
 
 // §7.3 boss 随机游走。原文 unit 未给 move_bounds（在前一段 sub 里），按 §7.3 惯例取 (-160,48)-(160,144)。
+// 压平后不滑行，直接瞬移到终点（窗口里自机被冻，滑行过程对玩家不可见也不可反应）。
 sub wander(spd: fx, t: int) {
     var bx0: fx = -160.0fx;
     var by0: fx = 48.0fx;
@@ -231,7 +208,7 @@ sub wander(spd: fx, t: int) {
     var ty: fx = $self_y + sin(v as angle) * d;
     if tx < bx0 { tx = bx0; } else if tx > bx1 { tx = bx1; }
     if ty < by0 { ty = by0; } else if ty > by1 { ty = by1; }
-    move_to(t, tx, ty, 2);
+    move_to(0, tx, ty, 0);   // 瞬移到滑行终点（窗口压平）
 }
 
 async sub pattern() {

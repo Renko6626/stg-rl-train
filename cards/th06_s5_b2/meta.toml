@@ -9,4 +9,4 @@ original_time_limit = 1800
 tags = ["aimed", "random", "curve"]
 laser_approx = false
 lower_half_blocked = false
-notes = "时停(ex_ins_4)按 mapping §10.1 用 0 速弹 + 信号脉冲近似：窗口内自机仍可动。"
+notes = "时停窗口（152 帧）按 mapping §10.1 压平成 1 帧：原作窗口里自机与全场弹都冻结，等价于瞬间摆弹。boss 按滑行曲线 10 个采样点定位摆刀、刀以 2.0 真速直接出生（并补上原作 FAN_AIMED 的自机狙），札不再冻结。符卡时限不烧这 152 帧，与原作 bossTimer 不 tick 一致。"

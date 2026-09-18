@@ -9,4 +9,4 @@ original_time_limit = 1800
 tags = ["aimed", "random", "dense"]
 laser_approx = false
 lower_half_blocked = false
-notes = "时停用 wait_signal/pulse_signal 冻结已飞的弹并恢复原速；ex_ins_call(4,2) 改向用弹任务+纪元近似（仅一次、1/4 概率、E/N 角域 [π/4,π)）。"
+notes = "时停窗口（78 帧）按 mapping §10.1 压平成 1 帧：窗口内不摆新弹，只有 boss 滑行（等价瞬移）+ 7 次 ex_ins_call(4,2)（压成一次 p=3549/4096 抽签，E/N 角域 [π/4,π)）。弹不再需要冻结变换，Sub58 的反弹保留。一轮 253 → 176 帧。"
