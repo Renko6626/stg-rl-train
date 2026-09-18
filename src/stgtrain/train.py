@@ -22,8 +22,8 @@ from .actions import ACTION_TABLE_VERSION
 from .cards import compile_cards, discover, load_splits, train_starts
 from .checkpoint import load_checkpoint, restore_rng, save_checkpoint
 from .config import deep_merge, dump_toml, from_dict, load_config
-from .envwrap import EnvWrapper
 from .curriculum import Curriculum
+from .envwrap import EnvWrapper
 from .episodes import EpisodeTracker
 from .evaluate import evaluate, score
 from .metrics import MetricsLogger, read_jsonl, summarize_episodes, truncate_after
