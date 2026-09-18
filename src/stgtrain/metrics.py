@@ -97,7 +97,7 @@ def summarize_episodes(records: list[dict], prefix: str = "ep/") -> dict[str, fl
             for k in ("return", "in_r_frac", "edge_frac", "dir_changes_per_s", "key_presses_per_s", "frames"):
                 out[f"{prefix}{MODE_NAMES[m]}/{k}"] = sum(float(r[k]) for r in sub) / len(sub)
             out[f"{prefix}{MODE_NAMES[m]}/done1"] = sum(1 for r in sub if r["done"] == 1) / len(sub)
-    for side in ("in_r", "out_r"):  # 点内 / 点外方向变化率：按总时长合并，不对各局比率取平均
+    for side in ("in_r", "out_r", "near", "far"):  # 点内 / 点外方向变化率：按总时长合并，不对各局比率取平均
         c, s = f"dir_changes_{side}", f"secs_{side}"
         if c in records[0]:
             secs = sum(float(r[s]) for r in records)
