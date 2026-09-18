@@ -1,0 +1,25 @@
+# 实验 G（2026-09-18）：实验 F + 特征化 danger_topk_v3（敌人速度）。与 F 只差 featurize.name。
+# 动机：v1/v2 把敌人当静止（ve = -vp），而敌人有体碰判定；绝大多数道中卡的小怪在动，
+# 第 2 关「妖精雨」整段无弹、死因全是体碰，是最干净的判别式。env 不导出敌人 vx/vy，
+# 由 envwrap 按 enemies.id 差分上一帧得到（部署侧 C 端同样要做，见 stg-engine follow-ups D23#9）。
+# 注意：评测集 2026-09-18 已重建（补密档、去掉两张无弹卡），G 的撑过率与实验 A–F 不可直接比。
+[run]
+total_updates = 2000
+ckpt_every = 100
+eval_every = 200
+
+[env]
+num_envs = 4096
+threads = 63           # scripts/run-exp.sh 会按机器改写（EPYC 7742 → 32）
+
+[featurize]
+name = "danger_topk_v3"
+
+[reward.terms]
+death = 10.0
+follow_shaping = 1.0
+hold = 0.01
+segment_survived = 0.0
+key_press = -0.003
+shift_toggle = 0.0
+edge_hug = 0.0

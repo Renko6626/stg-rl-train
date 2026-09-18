@@ -65,6 +65,28 @@ def _u16(rows: Tensor, off: int) -> Tensor:
     return rows[..., off].to(torch.int64) | (rows[..., off + 1].to(torch.int64) << 8)
 
 
+def _u32(rows: Tensor, off: int) -> Tensor:
+    v = rows[..., off].to(torch.int64)
+    for k in (1, 2, 3):
+        v = v | (rows[..., off + k].to(torch.int64) << (8 * k))
+    return v
+
+
+def enemy_velocity(prev_ids: Tensor, prev_xy: Tensor, cur_ids: Tensor, cur_xy: Tensor,
+                   frame_skip: int, valid: Tensor) -> Tensor:
+    """按 `enemies.id` 把当前帧的敌人对上上一帧，差分出每帧速度（env 只导出坐标，不导出敌人 vx/vy）。
+
+    对不上的（新出现的敌）与 `valid=False` 的 env（新局第一步）记 0——不能拿上一局的坐标差分。
+    id 是 u32 且同一只敌在池里换槽也不变，所以按 id 匹配比按槽位稳。
+    """
+    same = (cur_ids[:, :, None] == prev_ids[:, None, :]) & (cur_ids[:, :, None] != 0)
+    hit, idx = same.max(dim=-1)
+    matched = torch.gather(prev_xy, 1, idx.unsqueeze(-1).expand(-1, -1, 2))
+    v = (cur_xy - matched) / max(1, int(frame_skip))
+    keep = hit & valid[:, None]
+    return torch.where(keep.unsqueeze(-1), v, torch.zeros_like(v))
+
+
 def _phase(timer, name: str):
     return timer.phase(name) if timer is not None else contextlib.nullcontext()
 
@@ -94,6 +116,10 @@ class EnvWrapper:
         self._mirror = actions.mirror_table(device)
         self._arange_n = torch.arange(self.n, device=device)
         self._arange_e = torch.arange(stg_rl.ENEMIES_CAP, device=device)
+        # 敌人速度靠按 id 差分（env 不导出）；新局第一步 valid=False，避免跨局差分
+        self._prev_enemy_ids = torch.zeros(self.n, stg_rl.ENEMIES_CAP, dtype=torch.int64, device=device)
+        self._prev_enemy_xy = torch.zeros(self.n, stg_rl.ENEMIES_CAP, 2, device=device)
+        self._enemy_prev_valid = torch.zeros(self.n, dtype=torch.bool, device=device)
 
     def _dev(self, t: Tensor) -> Tensor:
         # CUDA：从 pinned 缓冲异步拷贝。安全性来自下一次 step 之前 `buttons.to("cpu")` 的阻塞同步——
@@ -112,6 +138,7 @@ class EnvWrapper:
         self._draw_mirror(torch.ones(self.n, dtype=torch.bool, device=self.device))
         self.prev_buttons = torch.zeros(self.n, dtype=torch.int64, device=self.device)
         self.prev_action = torch.zeros(self.n, dtype=torch.int64, device=self.device)
+        self._enemy_prev_valid = torch.zeros(self.n, dtype=torch.bool, device=self.device)
         return self._decode()
 
     def step(self, action_ids: Tensor, timer=None) -> tuple[RawObs, StepInfo]:
@@ -132,6 +159,7 @@ class EnvWrapper:
             self.prev_buttons = torch.where(ended, torch.zeros_like(buttons), buttons)
             # 智能体坐标系的动作 id：镜像只在新局重抽，而新局这里清零，所以不会与镜像标志错位
             self.prev_action = torch.where(ended, torch.zeros_like(action_ids), action_ids.to(torch.int64))
+            self._enemy_prev_valid = self._enemy_prev_valid & ~ended
             obs = self._decode()
         return obs, info
 
@@ -160,9 +188,16 @@ class EnvWrapper:
         ecount = self._dev(b["enemies_count"]).to(torch.int64)
         eflags = _u16(en, _off("enemies", "flags"))
         emask = (self._arange_e[None, :] < ecount[:, None]) & ((eflags & ENEMY_FLAG_COLLIDABLE) != 0)
+        ex, ey = _fx(en, _off("enemies", "x")), _fx(en, _off("enemies", "y"))
+        eids = _u32(en, _off("enemies", "id"))
+        exy = torch.stack([ex, ey], dim=-1)
+        evel = enemy_velocity(self._prev_enemy_ids, self._prev_enemy_xy, eids, exy,
+                              self.frame_skip, self._enemy_prev_valid)
+        self._prev_enemy_ids, self._prev_enemy_xy = eids, exy
+        self._enemy_prev_valid = torch.ones_like(self._enemy_prev_valid)
         enemies = torch.stack([
-            _fx(en, _off("enemies", "x")), _fx(en, _off("enemies", "y")), _fx(en, _off("enemies", "hit_w")),
-            ((eflags & ENEMY_FLAG_BOSS) != 0).to(torch.float32),
+            ex, ey, _fx(en, _off("enemies", "hit_w")),
+            ((eflags & ENEMY_FLAG_BOSS) != 0).to(torch.float32), evel[..., 0], evel[..., 1],
         ], dim=-1)
 
         if hasattr(self.intent, "track"):   # 自由躲弹诊断：目标点锁自机（未镜像坐标）
@@ -173,6 +208,7 @@ class EnvWrapper:
         bullets[..., 0] *= sign[:, None]
         bullets[..., 2] *= sign[:, None]
         enemies[..., 0] *= sign[:, None]
+        enemies[..., 4] *= sign[:, None]   # 敌人速度 x 分量随镜像取反
         target[:, 0] *= sign
         return RawObs(
             player_xy=torch.stack([px, py], dim=-1), player_hit_r=hit_r, player_speed=speed, player_focus=focus,

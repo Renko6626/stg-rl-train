@@ -31,7 +31,7 @@ def test_reset_shapes():
     w = ring()
     o = w.reset()
     assert o.player_xy.shape == (8, 2) and o.bullets.shape == (8, 256, 5) and o.bullets_mask.shape == (8, 256)
-    assert o.enemies.shape == (8, 256, 4) and o.enemies_mask.shape == (8, 256) and o.target_xy.shape == (8, 2)
+    assert o.enemies.shape == (8, 256, 6) and o.enemies_mask.shape == (8, 256) and o.target_xy.shape == (8, 2)
     assert (o.player_xy[:, 0].abs() <= 192).all() and (o.player_xy[:, 1] <= 448).all()
     assert torch.allclose(o.target_xy, w.intent.target)
 
