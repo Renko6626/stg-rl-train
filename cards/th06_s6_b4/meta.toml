@@ -1,0 +1,12 @@
+title = "Stage 6 boss 非符 2"
+source = "th06"
+origin = "东方红魔乡 Stage 6 关底 boss 非符 2（ecldata6.ecl.txt Sub21 攻击段 + Sub22/Sub23/Sub24，从 +60 起）"
+source_ref = "ecldata6.ecl.txt:452-515, 517-548, 550-593, 595-638"
+ranks = [0, 3]
+marks = [0]
+time_limit = 2700
+original_time_limit = 2700
+tags = ["aimed", "random", "spiral"]
+laser_approx = false
+lower_half_blocked = false
+notes = "颗数/速度/角度照原作换算（含 rank16 的 bullet_rank_influence +0.4/+0.2）；原作 $DIFFICULTY==4/8 的追加弹支路按 decomp 语义为死代码（只 Stage6 这么写），未转写。"

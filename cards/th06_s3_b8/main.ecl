@@ -159,6 +159,7 @@ async sub pattern() {
 }
 
 async sub boss_main() {
+    set_hitbox(18.67fx);   // 段外继承：boss 初始化 Sub21 (56,56,32) → §6.1b
     set_invuln(65535);
     spell_begin(0, SPELL_ID, pattern, TIME_LIMIT, 0, 0, 0);
     wait_spell();

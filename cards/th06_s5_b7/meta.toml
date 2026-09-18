@@ -1,0 +1,12 @@
+title = "Stage 5 boss 十六夜咲夜 非符 3"
+source = "th06"
+origin = "东方红魔乡 Stage 5 boss 十六夜咲夜 非符 3（Sub43 + Sub44/Sub45 交替随机游走），E–L 四档"
+source_ref = "ecldata5.ecl.txt:1091-1137, 1139-1157, 1159-1177"
+ranks = [0, 3]
+marks = [0]
+time_limit = 2700
+original_time_limit = 2700
+tags = ["random", "ring", "curve"]
+laser_approx = false
+lower_half_blocked = false
+notes = "boss 无敌；2560 flags 的左右上反弹用 bounce_arm(7, i0) 近似（f0=-1 保持原速），32px 弹色号按表映射。"

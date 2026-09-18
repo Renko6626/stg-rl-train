@@ -1,0 +1,12 @@
+title = "幻世「ザ・ワールド」"
+source = "th06"
+origin = "东方红魔乡 Stage 5 boss 十六夜咲夜 符卡 幻世「ザ・ワールド」（Sub55/56/57），H/L 两档"
+source_ref = "ecldata5.ecl.txt:1411-1416, 1418-1435, 1437-1487"
+ranks = [2, 3]
+marks = [0]
+time_limit = 1800
+original_time_limit = 1800
+tags = ["aimed", "ring", "random", "curve"]
+laser_approx = false
+lower_half_blocked = false
+notes = "时停用「停驻弹 + 信号放行」近似：刀速 0 挂 PARKED，大弹任务停 120 帧后恢复；自机在时停窗口仍能动。"

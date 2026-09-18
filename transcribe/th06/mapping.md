@@ -687,6 +687,22 @@ sub main() {
 
 - `read_msg` / `wait_msg`（对话）：切分时排除；单元里出现 → skip-unit。
 
+### §6.1b 子敌不继承父敌状态 / 敌默认判定框（2026-09-19，第 5 关 b4 的便笺）
+
+`enemy_create*` 出来的子敌是**从模板重置**的（`EnemyManager.cpp:104` `*newEnemy = this->enemyTemplate;`），
+**不继承父敌的 `shoot_offset` 与 bullet 属性**（模板里 `shootOffset = (0,0,0)`，`EnemyManager.cpp:68`）。
+父敌设过 `shoot_offset(0,-12,0)` 再造子敌，子敌出弹口仍是自身中心——**别给子敌补 `sh_offset`**。
+
+**判定框一定要写**：我方引擎 `set_hitbox` 的默认是 **12**，TH06 敌默认 `hitboxDimensions = (12,12,12)`
+（`EnemyManager.cpp:50`）按 §8 的 `min(w,h)/3` 只有 **4**——不写就是原作的 3 倍。取值分两种：
+
+- 段内有 `enemy_set_hitbox` → 照 §8 换算。
+- **段内没有（中段起的 boss 最常见）→ 不是默认 4，而要沿 boss 的回调链往上游找**
+  （`life_callback_sub` / `timer_callback_sub` / `death_callback_sub` / `enemy_interrupt_set` 都是同一只敌接力，
+  判定框跟着敌走、不随段重置），取链上最近一次 `enemy_set_hitbox`。TH06 boss 段普遍是
+  `(56,56,32) → 18.67fx`，中 boss 的某些形态是 `(40,56,32) → 13.33fx`。
+  链上确实一次都没设过，才用默认 `set_hitbox(4.0fx)`。
+
 ## §7 敌人移动
 
 TH06 三种移动模式（`EclManager.cpp:933-977`）：
@@ -834,11 +850,11 @@ TH06 的段落靠回调串起来（`EnemyManager.cpp:340-447`）：
 
 | id | 函数 | 处置 | 写法 |
 |---|---|---|---|
-| 0 | CirnoRainbowBallJank：全场弹停住变白 / 随机方向加速 | skip-unit | 需遍历全场弹 |
+| 0 | CirnoRainbowBallJank：全场弹变色 + 停住（`param 0`）/ 随机方向加速（`param 1`） | **translate** | 见 §10.2（2026-09-19 由 skip-unit 改判）|
 | 1 | ShootAtRandomArea：在敌周围 `±p/2 × ±0.375p` 的随机点用 `bulletProps` 开火 | translate | `sh_offset(k, 随机, 随机); sh_fire(k);` |
 | 2 | ShootStarPattern：用 `$I2`/`$I3` 计数画五角星轨迹发弹（`EnemyEclInstr.cpp:480`） | translate | 逐帧照源码算，写在 `for` 里 |
 | 3 | PatchouliShottypeSetVars：按自机设 `$I1,$I2,$I3` | translate | 灵梦 A：`i1 = 0; i2 = 3; i3 = 1;` |
-| 4 | Stage56Func4：时停开关 / 大弹随机改向 | skip-unit | |
+| 4 | Stage56Func4：时停开关（`param` 0/1）/ 大弹随机改向（`param ≥ 2`） | **translate** | 见 §10.1（2026-09-19 由 skip-unit 改判）|
 | 5 | Stage5Func5：每 9 帧沿自机方向铺 9 颗弧形弹（`EnemyEclInstr.cpp:655`） | translate | 照源码算 |
 | 6 | BatWingEffect：蝠翼粒子 | drop | |
 | 7 | Stage6Func7：激光网格 | skip-unit | |
@@ -854,6 +870,249 @@ TH06 的段落靠回调串起来（`EnemyManager.cpp:340-447`）：
 | 17–19 | NC 新增，decomp 无对应 | skip-unit | |
 
 跳过编号的机器可读表在 `config.toml` 的 `[skip] ex_ins_ids`。
+
+### §10.1 `ex_ins_4` 两个分支的写法（2026-09-19 新增，原判 skip-unit 是错的）
+
+原判的理由是「需要遍历全场弹」。但我方有两件工具能表达它，**已用原型卡实测过**
+（`transcribe/work/proto/timestop/`，验证输出见下）：`xformdef` 里的 `wait_signal(ch)` + `pulse_signal(ch)`
+（全场同时放行，零任务槽），以及**弹挂任务**（`sh_task` / `fire` 的 `task` 位，能 `rand()` 并改这颗弹自己）。
+
+**① 时停（`ex_ins_call(4, 1)` 开 / `(4, 0)` 关）**
+
+decomp：`isTimeStopped = 1` 时 `BulletManager::OnUpdate`（`BulletManager.cpp:668`）与 `Player::OnUpdate`
+（`Player.cpp:158`）**整个 return**——弹不动不判定、自机也不能动；boss 的 ECL 照常跑，继续摆弹。
+即「世界冻住、boss 继续摆」。
+
+写法：**时停窗口内发的弹，速度发 0、挂 `wait_signal` 变换；关时停那一句换成 `pulse_signal`**。
+
+⚠ **原作停的是全场弹，不只是窗口内新发的**（`BulletManager::OnUpdate` 整个 return）。
+**窗口前发出、还在飞的弹也要停**——漏了就位置/启动时刻都对不上（第 5 关 b6 的便笺）。写法是
+**两条信号通道 + 四槽 xform，零任务槽**（`xformdef` 的 `@N` 是后置延迟，表达不了「飞一阵再定时停」，
+但 `wait_signal` 可以）：
+
+```ecl
+xformdef PARKABLE {      // 挂给窗口前就发出去的弹
+    wait_signal(0);      // 0 号 = 时停开始（停车令）
+    set_speed(0.0fx);
+    wait_signal(1);      // 1 号 = 时停结束（放行令）
+    set_speed(2.0fx);    // 恢复本波速率（编译期常量，一波一个 xformdef）
+}
+sub main() {
+    wait(60); pulse_signal(0);
+    wait(60); pulse_signal(1);
+}
+```
+
+实测（`transcribe/work/proto/prestop`）：16 颗环弹帧 40 `speed 2.000`、帧 90 全 `0.000`、帧 140 回 `2.000`。
+**速度随机的波次**改用 ①b 的任务；本来就要挂任务的弹（如 ② 的随机改向大玉）顺手在任务里停车即可。
+
+```ecl
+const BALL: int = 48;
+
+xformdef PARKED {           // 停驻弹：等 0 号信号 → 恢复到本波的速度（每波速度是常量，写死即可）
+    wait_signal(0);
+    set_speed(2.0fx);
+}
+
+async sub boss() {
+    set_invuln(65535);
+    // —— ex_ins_call(4, 1)：时停开始。此后照原文时序摆弹，只是速度发 0 + 挂 PARKED ——
+    sh_reset(0);
+    sh_sprite(0, BALL, 6);
+    sh_aim(0, 0);
+    sh_ring(0, 1);
+    sh_count(0, 12, 1);
+    sh_speed(0, 0fx, 0fx);
+    sh_angle(0, 0deg, 0deg);
+    sh_xform(0, PARKED);
+    sh_fire(0);
+    wait(60);
+    pulse_signal(0);        // —— ex_ins_call(4, 0)：时停结束，全场同时启动 ——
+    wait(300);
+}
+
+sub main() {
+    _ = spawn_enemy(0.0fx, 120.0fx, 1000, 0, 0, 1, boss);
+    loop { wait(600); }
+}
+```
+
+**已知偏差（写进 report）**：①我方时停窗口里**自机仍能动**——引擎其实有 `time_stop_player(frames)`（自机不能动/不能发弹，等价于原作的 `Player.cpp:158`），但卡里**故意不调**：这批卡是 RL 训练素材，冻自机 = 一段动作无效的死帧，对信用分配有害。要追求还原时，在窗口起点调一次即可；②**原作时停期间 boss 计时器不走**（`EnemyManager.cpp:735`），我方 spell 时限照走 ⇒ 同样的 `time_limit` 里总轮数少于原作（第 5 关 b5 实测约 4.3 轮 vs 原作约 6 轮）；`TIME_LIMIT` 仍照 `unit.json` 写、逐帧编排不动。这对训练是可接受甚至更好的——
+原作那几十帧对玩家是空帧。弹的落位与启动时刻逐帧一致。
+
+**①b 随机速度的弹要用任务冻结，不能用 xform**（2026-09-19 由第 5 关 b3 的审核暴露）
+
+`xformdef` 里的 `set_speed(v)` 只能写**编译期常量**，所以「等信号 → 恢复速度」这条只适用于**整波同速**的弹。
+`bullet_random` / `bullet_random_speed` 那种**逐颗随机速度**的波次，冻结与恢复都必须由**弹挂任务**做——
+任务把自己的速度记在变量里，冻结时置 0、放行时写回：
+
+```ecl
+const EPOCH: int = 20;      // 0 = 正常，奇数 = 冻结中，偶数（≥2）= 已放行
+const BUBBLE: int = 176;
+
+async sub randbullet() {    // 挂在弹上：出生抽随机速度，之后常驻轮询冻结纪元
+    var sp: fx = 1.7fx + 1.3fx / 256 * rand(256);
+    set_speed(0, sp);
+    set_angle(0, rand(65536) as angle);
+    var seen: int = global(EPOCH);
+    loop {
+        var now: int = global(EPOCH);
+        if now != seen {
+            seen = now;
+            if now % 2 == 1 { set_speed(0, 0fx); } else { set_speed(0, sp); }
+        }
+        wait(1);
+    }
+}
+
+async sub boss3() {
+    set_invuln(65535);
+    set_global(EPOCH, 0);
+    sh_reset(0);
+    sh_sprite(0, BUBBLE, 6);
+    sh_aim(0, 0);
+    sh_ring(0, 1);
+    sh_count(0, 20, 1);
+    sh_speed(0, 0fx, 0fx);
+    sh_angle(0, 0deg, 0deg);
+    sh_task(0, randbullet);
+    sh_fire(0);
+    wait(60);
+    set_global(EPOCH, 1);      // ex_ins_call(4, 1)：时停开始 → 逐颗置 0
+    wait(120);
+    set_global(EPOCH, 2);      // ex_ins_call(4, 0)：时停结束 → 逐颗写回各自速度
+    wait(300);
+}
+
+sub main() {
+    _ = spawn_enemy(0.0fx, 120.0fx, 1000, 0, 0, 1, boss3);
+    loop { wait(600); }
+}
+```
+
+**选哪条**：整波同速 → xform（零任务槽，优先）；逐颗随机速度 → 任务（一颗一槽，注意 256 上限）。
+两者可以在同一张卡里按波次混用。**任务抽完随机值就 `return` 是错的**——时停期间它必须还活着。
+
+**② 大弹随机改向（`ex_ins_call(4, 2)`）**
+
+decomp（`EnemyEclInstr.cpp:564-648`）：扫全场弹，只挑**大玉级**（`heightPx ≥ 30`）且没改过色的，
+每颗 **1/4 概率**命中，最多改 **14 颗（E/N）/ 52 颗（H/L）**；命中后改色并重设角度——
+离自机 > 128px 时取随机角（E/N 限 `[π/4, π]`，H/L 全周），≤ 128px 时取「自机反方向 + π/2 + 随机全周」。
+
+写法：给大弹挂任务，用一个全局槽当**纪元计数**，boss 改一次纪元 = 触发一次。
+
+```ecl
+const EPOCH: int = 20;                    // 脚本可写全局槽（≥16）
+const BIG: int = 176;                     // 大玉级弹型
+
+async sub bigball() {                     // 挂在弹上：sh_task(k, bigball)
+    var seen: int = global(EPOCH);
+    loop {
+        var now: int = global(EPOCH);
+        if now != seen {
+            seen = now;
+            if rand(4) == 0 { set_angle(0, rand(65536) as angle); }   // 首参是占位，恒作用于自身
+        }
+        wait(1);
+    }
+}
+
+async sub boss2() {
+    set_invuln(65535);
+    set_global(EPOCH, 0);
+    sh_reset(1);
+    sh_sprite(1, BIG, 2);
+    sh_aim(1, 0);
+    sh_ring(1, 1);
+    sh_count(1, 16, 1);
+    sh_speed(1, 1.2fx, 0fx);
+    sh_angle(1, 0deg, 0deg);
+    sh_task(1, bigball);
+    sh_fire(1);
+    wait(60);
+    set_global(EPOCH, global(EPOCH) + 1);   // —— ex_ins_call(4, 2)：触发一次随机改向 ——
+    wait(300);
+}
+
+sub main() {
+    _ = spawn_enemy(0.0fx, 120.0fx, 1000, 0, 0, 1, boss2);
+    loop { wait(600); }
+}
+```
+
+**注意**：① 原作的过滤条件是 `heightPx >= 30`，即**所有 32px 弹型**（6 大玉 / 7 火球 / 8 小刀），不只是大玉；但任务池只有 256、`sh_task` 一颗弹一个槽，颗数挂不下时（第 5 关 b6 的刀有 189 颗）只给主要那一类挂、其余在 report 里声明从简；原作上限 14/52 颗，
+我方按概率命中即可，颗数超过上限的情形在 report 里说明。② 「离自机 128px 分支」按 §2.3 的 `aim_player`
+写；拿不准就都用随机角并在 report 声明。
+
+**实测（原型卡）**：停驻期第 60–100 帧 36 颗弹 `speed 0.000` 定在出弹口；`pulse_signal` 后第 130 帧全部
+`speed 2.000` 同时启动。大玉环 16 颗在纪元触发前角度是 22.5° 均分，触发后有 2 颗变成 60.44° / 75.14°（1/4 概率）。
+
+
+### §10.2 `ex_ins_0`（琪露诺「パーフェクトフリーズ」）的写法（2026-09-19 新增）
+
+decomp `EnemyEclInstr.cpp:415-461`：扫全场弹，**每颗都**把 `spriteOffset` 设成 **15**（换色，纯表现），然后按参数：
+
+| param | 行为 |
+|---|---|
+| 0 | `speed = 0` + 速度向量清零 —— 全场弹**原地冻住** |
+| 1 | `exFlags |= 0x10`（笛卡尔加速）、`ex4Acceleration = 随机方向 × 0.01`、计时清零、`ex5Int0 = 220`<br>—— 每颗弹**朝各自随机方向以 0.01 px/帧² 加速 220 帧** |
+
+和 §10.1 是同一套工具：**换色 + 冻住**走 xform（零任务槽），**随机方向加速**要逐颗不同的方向 ⇒ 弹挂任务。
+卡内所有会被波及的弹，出生时就要带上这段变换 / 任务。
+
+```ecl
+const ICE: int = 32;
+const EPOCH: int = 20;
+
+xformdef FREEZE {            // param 0：等信号 → 变色 + 冻住（`set_color` 只换色轴，保住形状）
+    wait_signal(0);
+    set_color(15);
+    set_speed(0fx);
+}
+
+async sub scatter() {        // param 1：等纪元 → 随机方向 0.01 加速，220 帧后停
+    var seen: int = global(EPOCH);
+    loop {
+        var now: int = global(EPOCH);
+        if now != seen {
+            seen = now;
+            var a: angle = rand(65536) as angle;
+            set_gravity(0, cos(a) * 0.01fx, sin(a) * 0.01fx);
+            wait(220);
+            stop_fx(0);
+            return;
+        }
+        wait(1);
+    }
+}
+
+async sub cirno() {
+    set_invuln(65535);
+    set_global(EPOCH, 0);
+    sh_reset(0);
+    sh_sprite(0, ICE, 2);
+    sh_aim(0, 0);
+    sh_ring(0, 1);
+    sh_count(0, 24, 1);
+    sh_speed(0, 2.0fx, 0fx);
+    sh_angle(0, 0deg, 0deg);
+    sh_xform(0, FREEZE);      // 这一波会被「冻住」波及
+    sh_task(0, scatter);      // 同一波之后还要被「散开」波及时，两个都挂
+    sh_fire(0);
+    wait(120);
+    pulse_signal(0);                          // ex_ins_call(0, 0)：冻住
+    wait(120);
+    set_global(EPOCH, global(EPOCH) + 1);     // ex_ins_call(0, 1)：随机方向加速
+    wait(300);
+}
+
+sub main() {
+    _ = spawn_enemy(0.0fx, 120.0fx, 1000, 0, 0, 1, cirno);
+    loop { wait(600); }
+}
+```
+
+**注意**：① 一波弹同时要「冻」和「散」时，`sh_xform` 与 `sh_task` 都挂（变换零槽、任务一颗一槽，注意任务池 256）；② `set_gravity` 的两参是每帧加速度，原作是 `0.01`；③ **换色只有 xform 有**（`set_color` 不在弹挂任务的九个 setter 里）；反正换色是纯表现，任务分支按 §11 丢弃即可；④ 冻住后弹**仍有判定**（原作也是）。
 
 ## §11 丢弃（纯表现 / 音效 / 道具）
 

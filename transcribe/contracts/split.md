@@ -47,6 +47,7 @@
      - `hp_threshold`：进入下一段的血量阈值（仅记录，可省略）。
    - **符卡练习入口 sub**（形如 `call("Sub32"); … life_callback_threshold(0); … call("宣言"); call("模式")`，见 mapping §9）不是实战段，不单列；但它们调用的宣言 / 模式 sub 必须出现在某个实战段的闭包里。
 4. **标 skip**：`structure.md` 里标 `**含 laser**` / `**含 ex_ins_N**` / `**含 dialogue**` 的 sub 进了某个单元的闭包，该单元写 `"skip": "laser"`（或对应原因）。skip 的单元照样要列出来，只是不转写。
+   **`note` 里不要替 `ex_ins_N` 下 skip 结论**——哪些编号能翻是 `mapping.md §10` 的事（例如 0 和 4 已改判 translate），切分只如实记「含 `ex_ins_call(4,1)`」这类事实；`skip` 字段由流水线按 `config.toml` 的 `ex_ins_ids` 判，不由你写。
 5. 写 `split.json`，然后**自检**直到通过：
 
    ```bash

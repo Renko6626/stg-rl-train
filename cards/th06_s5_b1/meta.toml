@@ -1,0 +1,12 @@
+title = "Stage 5 boss 十六夜咲夜 非符 1"
+source = "th06"
+origin = "东方红魔乡 Stage 5 boss 十六夜咲夜 非符 1（Sub24 +100 起循环：Sub25 出使魔、Sub26 下向扇形、Sub27–34 使魔米弹扇），E–L 四档"
+source_ref = "ecldata5.ecl.txt:554-619, 621-633, 654-679, 681-706, 708-733, 735-760, 816-841, 843-868, 762-787, 789-814, 635-652"
+ranks = [0, 3]
+marks = [0]
+time_limit = 2700
+original_time_limit = 2700
+tags = ["aimed", "random", "ring", "dense", "spiral"]
+laser_approx = false
+lower_half_blocked = false
+notes = "boss 无敌；周期循环按调度循环实现；L 档使魔按 640 池等效每 4 轮漏 1 轮。"

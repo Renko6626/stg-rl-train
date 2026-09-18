@@ -1,0 +1,12 @@
+title = "メイド秘技「操りドール」"
+source = "th06"
+origin = "东方红魔乡 Stage 5 boss 符卡 メイド秘技「操りドール」（ecldata5 Sub60/Sub61/Sub62 + Sub58/Sub59），E/N 两档"
+source_ref = "ecldata5.ecl.txt:1529-1534, 1536-1553, 1555-1596, 1489-1507, 1509-1527"
+ranks = [0, 1]
+marks = [0]
+time_limit = 1800
+original_time_limit = 1800
+tags = ["aimed", "random", "dense"]
+laser_approx = false
+lower_half_blocked = false
+notes = "时停用 wait_signal/pulse_signal 冻结已飞的弹并恢复原速；ex_ins_call(4,2) 改向用弹任务+纪元近似（仅一次、1/4 概率、E/N 角域 [π/4,π)）。"

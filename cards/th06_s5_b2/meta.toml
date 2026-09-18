@@ -1,0 +1,12 @@
+title = "幻在「クロックコープス」"
+source = "th06"
+origin = "东方红魔乡 Stage 5 boss 十六夜咲夜 符卡 幻在「クロックコープス」（ecldata5 Sub46/Sub47/Sub48），E/N 两档"
+source_ref = "ecldata5.ecl.txt:1179-1184, 1186-1203, 1205-1255"
+ranks = [0, 1]
+marks = [0]
+time_limit = 1800
+original_time_limit = 1800
+tags = ["aimed", "random", "curve"]
+laser_approx = false
+lower_half_blocked = false
+notes = "时停(ex_ins_4)按 mapping §10.1 用 0 速弹 + 信号脉冲近似：窗口内自机仍可动。"

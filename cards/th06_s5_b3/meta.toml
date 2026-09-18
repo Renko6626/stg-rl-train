@@ -1,0 +1,12 @@
+title = "幻幽「ジャック・ザ・ルドビレ」"
+source = "th06"
+origin = "东方红魔乡 Stage 5 boss 符卡 幻幽「ジャック・ザ・ルドビレ」（ecldata5 Sub49/50/51），Hard/Lunatic"
+source_ref = "ecldata5.ecl.txt:1257-1262, 1264-1281, 1283-1332"
+ranks = [2, 3]
+marks = [0]
+time_limit = 1800
+original_time_limit = 1800
+tags = ["aimed", "random", "curve"]
+laser_approx = false
+lower_half_blocked = false
+notes = "时停（ex_ins_call(4,1)/(4,0)）按 mapping §10.1 译为：窗内新弹速度 0 + wait_signal 变换收窗 pulse_signal 启动；逐颗随机速的 20(H)/35(L) 大玉由 sh_task 挂常驻任务轮询 EPOCH 全局槽，时停置 0、收窗按各自原速写回（§10.1①b）。bullet_random 的随机角/速由弹任务取，出生当帧速度 0、下一帧起速。boss 无敌，按原作 1800 帧超时收段。"

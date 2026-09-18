@@ -1,0 +1,12 @@
+title = "Stage 6 boss 非符 1"
+source = "th06"
+origin = "东方红魔乡 Stage 6 boss 非符 1（Sub19 从 +100 起每轮 call Sub20 两次 + 随机游走，Sub20 为 32 轮三向扇），E–L 四档"
+source_ref = "ecldata6.ecl.txt:371-414, 416-450"
+ranks = [0, 3]
+marks = [0]
+time_limit = 2700
+original_time_limit = 2700
+tags = ["random", "spiral", "dense"]
+laser_approx = false
+lower_half_blocked = false
+notes = "boss 无敌，按原作 2700 帧超时收段。ex_ins_call(4,0)=关时停，卡内无时停可关，忽略；子弹 fan 的 count2=1，speed2 实际不参与。"

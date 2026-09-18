@@ -1,0 +1,12 @@
+title = "Stage 6 boss 十六夜咲夜 非符 4"
+source = "th06"
+origin = "东方红魔乡 Stage 6 关底 boss 十六夜咲夜 非符 4（Sub28 + Sub29/Sub30/Sub31），E–L 四档"
+source_ref = "ecldata6.ecl.txt:712-775, 777-833, 845-860, 835-843"
+ranks = [0, 3]
+marks = [0]
+time_limit = 3000
+original_time_limit = 3600
+tags = ["aimed", "random", "ring"]
+laser_approx = false
+lower_half_blocked = false
+notes = "boss 无敌，原作 3600 帧段钳到 3000 帧超时收段；Sub31 使魔为无害装饰，照原文生成。"

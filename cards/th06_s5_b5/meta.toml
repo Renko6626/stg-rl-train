@@ -1,0 +1,12 @@
+title = "幻象「ルナクロック」"
+source = "th06"
+origin = "东方红魔乡 Stage 5 boss 符卡 幻象「ルナクロック」（Sub52/53/54），E/N 两档"
+source_ref = "ecldata5.ecl.txt:1334-1339, 1341-1358, 1360-1409"
+ranks = [0, 1]
+marks = [0]
+time_limit = 1800
+original_time_limit = 1800
+tags = ["random", "ring"]
+laser_approx = false
+lower_half_blocked = false
+notes = "时停用 wait_signal/pulse_signal 模拟（停驻期自机仍可动、spell 计时不暂停）；大弹随机改向用弹任务+纪元槽模拟，引擎无改色接口故只改向不变色。"

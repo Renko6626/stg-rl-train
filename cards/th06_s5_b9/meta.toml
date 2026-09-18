@@ -1,0 +1,12 @@
+title = "メイド秘技「殺人ドール」"
+source = "th06"
+origin = "东方红魔乡 Stage 5 boss 十六夜咲夜 终符 メイド秘技「殺人ドール」H/L（ecldata5 Sub60 → Sub61 宣言/移中央 + Sub62 攻击循环，call Sub58/Sub59 + ex_ins_call(4,*)）"
+source_ref = "ecldata5.ecl.txt:1529-1534, 1536-1553, 1555-1596, 1489-1507, 1509-1527"
+ranks = [2, 3]
+marks = [0]
+time_limit = 1800
+original_time_limit = 1800
+tags = ["ring", "random", "dense"]
+laser_approx = false
+lower_half_blocked = false
+notes = "boss 无敌按原作 1800 帧超时收段；刀刃用发射器 + 0 速停驻 xformdef 复刻 ex_ins_call(4,1/0) 时停，ex_ins_call(4,2) 大弹改向用弹挂任务轮询纪元近似。"

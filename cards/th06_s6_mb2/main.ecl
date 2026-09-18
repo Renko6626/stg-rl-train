@@ -33,6 +33,7 @@ async sub pattern() {
 }
 
 async sub boss_main() {
+    set_hitbox(13.33fx);   // 段外继承：boss 初始化 Sub9 (40,56,32) → §6.1b
     set_invuln(65535);
     spell_begin(0, SPELL_ID, pattern, TIME_LIMIT, 0, 0, 0);   // 无 spellcard_flag_timeout → flags 0
     wait_spell();
