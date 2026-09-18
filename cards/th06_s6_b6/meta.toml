@@ -1,0 +1,12 @@
+title = "獄符「千本の針の山」"
+source = "th06"
+origin = "东方红魔乡 Stage 6 boss 十六夜咲夜 符卡 獄符「千本の針の山」（H/L 版，原文 Sub41→Sub42 宣言+移中央→Sub43 攻击循环）"
+source_ref = "ecldata6.ecl.txt:1041-1047, 1049-1068, 1070-1102"
+ranks = [2, 3]
+marks = [0]
+time_limit = 2400
+original_time_limit = 2400
+tags = ["ring", "curve", "dense"]
+laser_approx = false
+lower_half_blocked = false
+notes = "H/L 版：原作 H 波 3/4 为 12 颗、L 为 32 颗鳞弹；L 因 TH06 640 发弹池压画面、我方无此机制，按静止截止折到 18 颗（弹峰 926）。波 1/2 为 16 颗刀弹 100 帧转向，波 3/4 带一次场界反弹；0x4 出生特效不模拟。"

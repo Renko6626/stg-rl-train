@@ -1,0 +1,12 @@
+title = "Stage 5 道中 第 10 波"
+source = "th06"
+origin = "东方红魔乡 Stage 5 道中第 10 波：timeline 帧 7114–7204 每 10 帧一对双翼小怪（x 从 ∓160 收到 ∓48），由 Sub2 下落减速后连发 5 轮自机狙中玉环"
+source_ref = "ecldata5.ecl.txt:2227-2246, 48-74"
+ranks = [0, 3]
+marks = [0]
+time_limit = 510
+original_time_limit = 510
+tags = ["aimed", "ring"]
+laser_approx = false
+lower_half_blocked = false
+notes = "小怪出生特效期降速不模拟；体碰按 28/3 近似；enemy_delete 由出界守卫表达"

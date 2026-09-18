@@ -1,0 +1,12 @@
+title = "奇術「ミスディレクション」"
+source = "th06"
+origin = "东方红魔乡 Stage 5 中 boss 符卡 奇術「ミスディレクション」（Sub18/Sub19/Sub20/Sub21/Sub22），E/N 两档"
+source_ref = "ecldata5.ecl.txt:408-413, 415-430, 432-445, 447-488, 490-531"
+ranks = [0, 1]
+marks = [0]
+time_limit = 1800
+original_time_limit = 1800
+tags = ["aimed", "ring"]
+laser_approx = false
+lower_half_blocked = false
+notes = "boss 无敌，按原作 1800 帧超时收段（SPELL_FAILED）。左右镜像攻击的弹型节奏完全一致，仅平移方向镜像。"

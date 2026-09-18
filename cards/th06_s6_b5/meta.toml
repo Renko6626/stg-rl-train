@@ -1,0 +1,12 @@
+title = "冥符「紅色の冥界」"
+source = "th06"
+origin = "东方红魔乡 Stage 6 boss 符卡 冥符「紅色の冥界」（Sub38/39/40），E/N 版"
+source_ref = "ecldata6.ecl.txt:982-988, 990-1009, 1011-1039"
+ranks = [0, 1]
+marks = [0]
+time_limit = 2400
+original_time_limit = 2400
+tags = ["ring", "spiral", "curve", "dense"]
+laser_approx = false
+lower_half_blocked = false
+notes = "E/N 同型：RICE 环 0x20 前 128 帧每帧 ±256bam、SHARD 环 0x10 前 240 帧下方 0.02 加速。boss 出生点按模板取 (0,96)；移中央终点 y 被持续 move_bounds 夹到 120，随机游走沿用 (-160,48)-(160,120) 反射。"

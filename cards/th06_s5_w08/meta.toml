@@ -1,0 +1,12 @@
+title = "Stage 5 道中 第 8 波"
+source = "th06"
+origin = "东方红魔乡 Stage 5 道中长编队后半（ecldata5.ecl.txt timeline 帧 5049–6534，Sub1 / Sub9 / Sub10 / Sub11）"
+source_ref = "ecldata5.ecl.txt:2058-2217, 28-46, 259-271, 273-285, 245-257"
+ranks = [0, 3]
+marks = [0]
+time_limit = 1865
+original_time_limit = 1865
+tags = ["stream", "aimed", "random", "dense"]
+laser_approx = false
+lower_half_blocked = false
+notes = "长编队后半：小怪横向穿越、出界守卫退场；bullet_random 逐颗开火，出生冲刺/出生特效（flags 0x204）按既有惯例不模拟。"

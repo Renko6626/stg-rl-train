@@ -1,0 +1,12 @@
+title = "Stage 5 道中 第 5 波"
+source = "th06"
+origin = "东方红魔乡 Stage 5 道中，timeline 帧 2252–2432（Sub3/Sub4/Sub5），E–L 四档"
+source_ref = "ecldata5.ecl.txt:1904-1912, 76-118, 120-162, 164-206"
+ranks = [0, 3]
+marks = [0]
+time_limit = 600
+original_time_limit = 600
+tags = ["aimed", "ring", "dense"]
+laser_approx = false
+lower_half_blocked = false
+notes = "Sub3/4/5 结构相同仅弹色不同（6/2/10）；Lunatic 首个环为 2 层速度。小怪无敌（D8）。"

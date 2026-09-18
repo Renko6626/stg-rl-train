@@ -1,0 +1,12 @@
+title = "奇術「エターナルミーク」"
+source = "th06"
+origin = "东方红魔乡 Stage 6 中 boss 符卡 奇術「エターナルミーク」（Sub14/Sub15/Sub16），E–L 四档"
+source_ref = "ecldata6.ecl.txt:301-307, 309-326, 328-339"
+ranks = [0, 3]
+marks = [0]
+time_limit = 900
+original_time_limit = 900
+tags = ["random", "dense"]
+laser_approx = false
+lower_half_blocked = false
+notes = "boss 无敌，按原作 900 帧超时收段（SPELL_FAILED）。每 4 帧一轮随机弹：下半屏按难度 2/4/6/9 颗（速度 [3,6)）、上半屏固定 12 颗（速度 [3,5)）。"

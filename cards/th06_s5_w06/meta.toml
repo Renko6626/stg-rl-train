@@ -1,0 +1,12 @@
+title = "Stage 5 道中 第 6 波"
+source = "th06"
+origin = "东方红魔乡 Stage 5 道中，timeline 帧 2552–2872（Sub6），4 只顶部落下扇形弹"
+source_ref = "ecldata5.ecl.txt:1913-1920, 208-231"
+ranks = [0, 3]
+marks = [0]
+time_limit = 700
+original_time_limit = 700
+tags = ["random"]
+laser_approx = false
+lower_half_blocked = false
+notes = "小怪无敌（D8）。L 按 TH06 640 发弹池等效截止（本引擎无池上限且回收更晚，见 report.md）；H 不截止（原作仅多丢 7% 弹，峰值 837 vs 755）。flags 0x204 出生特效期降速不模拟，扇形弹从第 1 帧起全速。"

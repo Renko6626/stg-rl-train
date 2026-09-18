@@ -1,0 +1,12 @@
+title = "Stage 6 道中 第 4 波"
+source = "th06"
+origin = "东方红魔乡 Stage 6 道中，timeline 帧 1571 一对 Sub7 小怪，E–L 四档"
+source_ref = "ecldata6.ecl.txt:2274-2276, 137-154"
+ranks = [0, 3]
+marks = [0]
+time_limit = 520
+original_time_limit = 520
+tags = ["aimed", "ring", "random"]
+laser_approx = false
+lower_half_blocked = false
+notes = "小怪无敌（D8）；+40 的 -0.0667 加速度同帧被清零，原作即无减速；flags=4 出生特效不模拟（mapping §4.2）。"

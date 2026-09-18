@@ -478,6 +478,27 @@ sub main() {
 }
 ```
 
+### 4.2b TH06 的 640 发弹池与「等效截止」（密集卡必读）
+
+TH06 的弹池是**硬上限 640**（`BulletManager.hpp:125` `Bullet bullets[640]`）：池满时
+`SpawnBulletPattern` 从失败那颗起**整批放弃**（`BulletManager.cpp:534-548`）。所以原作画面里的同屏弹数
+永远 ≤ 640，密集段的后半截其实**根本没发出来**。
+
+我方弹池 8192、没有这个上限，而且出界回收更晚（64px 边距 vs 原作约 8px），照抄原文指令会得到明显更密的画面。
+**验收硬上限是 1024**（`validate` 第 2 层），撞上就 FAIL。
+
+**统一口径（2026-09-18 定，免得每个单元各自拍数）**：
+
+1. **只在无截止时该档峰值 > 1024 才做等效截止**；≤ 1024 的照抄，即便它已超过原作的 640。
+   （理由：口径一致、可复现；代价是我方同屏弹数普遍多于原作，这是**已知偏差**，写进 report 即可。）
+2. 截止方式优先级：① 离线按 640 池重放拟合「某类弹 `$frame ≥ N` 不发」的静态截止（最忠实，见
+   `th06_s3_w12` 的做法）；② 做不到时按轮数 / 颗数折减。**两种都要在 `report.md` 写明依据、改前改后的实测峰值**。
+3. 截止**只动会撞上限的那一档**，其余档照抄。
+4. 截完自检：`run --rank <档>` 峰值 ≤ 1024 且 `validate` 通过。
+
+> 更彻底的解法是引擎侧给 ECL 一个只读「当前活弹数」，让卡直接按 640 gate，不必逐单元离线拟合——
+> 已记 stg-engine follow-ups，未实现前按上面的口径来。
+
 ### 4.3 自动射击 `shoot_interval`
 
 TH06（`EclManager.cpp:428-440`、`980-989`）：
@@ -781,7 +802,7 @@ sub main() {
 | `enemy_set_hitbox(w, h, _)` | `set_hitbox((min(w,h) / 3) fx);`（TH06 体碰用 `hitbox/1.5` 的方框，`EnemyManager.cpp:585`） |
 | `enemy_flag_collision(0/1)` | `set_enemy_flag(ENEMY_NO_BODY, 1 − v);` |
 | `enemy_flag_interactable(0/1)` | 同上（不可交互的敌不参与体碰） |
-| `enemy_flag_invisible(0/1)` | 同上（不可见的敌不参与体碰，`EnemyManager.cpp:572`） |
+| `enemy_flag_invisible(0/1)` | `set_enemy_flag(ENEMY_NO_BODY, v);`（**方向与上面两条相反**：隐形 = 不体碰）<br>decomp `EnemyManager.cpp:583` 用 `!isInvisible` 门控整个体碰 / 受击块 ⇒ `v=1` 要给 `NO_BODY=1`。我方没有隐形位，同时屏蔽受击是可接受的近似。<br>2026-09-18 更正：原先写「同上（1 − v）」，方向反了（第 5–6 关 worker 便笺指出）。|
 | `enemy_flag_can_take_damage` | 丢弃（我方敌恒 `set_invuln(65535)`） |
 | `enemy_flag_death` / `enemy_life_set` | 丢弃（无敌，永不被击破） |
 | `enemy_kill_all()` | `kill_all_enemies(KILL_SILENT);`（**会跳过调用者自己**；TH06 跳过 boss，boss 调时一致） |

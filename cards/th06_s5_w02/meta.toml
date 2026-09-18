@@ -1,0 +1,12 @@
+title = "Stage 5 道中 第 2 波"
+source = "th06"
+origin = "东方红魔乡 Stage 5 道中，timeline 帧 590–750（Sub1 左侧纵队 ×8 / Sub2 顶部落下双翼 ×2），E–L 四档"
+source_ref = "ecldata5.ecl.txt:1799-1817, 28-46, 48-74"
+ranks = [0, 3]
+marks = [0]
+time_limit = 580
+original_time_limit = 580
+tags = ["aimed", "random", "ring"]
+laser_approx = false
+lower_half_blocked = false
+notes = "Sub1 用 fire 逐颗复刻 bullet_random（角度 [0,180)、速度 [0.8,1.8) 随机）；出生特效期降速不模拟。"

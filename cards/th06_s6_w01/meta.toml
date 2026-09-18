@@ -1,0 +1,12 @@
+title = "Stage 6 道中 第 1 波"
+source = "th06"
+origin = "东方红魔乡 Stage 6 道中，timeline 帧 340–1164（Sub1 / Sub3 / Sub2 / Sub4），E–L 四档"
+source_ref = "ecldata6.ecl.txt:2055-2262, 25-44, 46-65, 67-86, 88-107"
+ranks = [0, 3]
+marks = [0]
+time_limit = 1244
+original_time_limit = 1244
+tags = ["random", "stream"]
+laser_approx = false
+lower_half_blocked = false
+notes = "小怪无敌（D8）；bullet_random 逐颗随机角/速；出生特效不模拟；Sub1≡Sub2、Sub3≡Sub4（仅 anm 不同，已 drop），合为 fairy(kind,mirror)。"

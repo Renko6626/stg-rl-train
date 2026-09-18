@@ -1,0 +1,12 @@
+title = "紅符「スカーレットシュート」"
+source = "th06"
+origin = "东方红魔乡 Stage 6 boss 蕾米莉亚 符卡 紅符「スカーレットシュート」（ecldata6 Sub52/Sub53/Sub54/Sub50），Easy–Normal"
+source_ref = "ecldata6.ecl.txt:1258-1265, 1267-1290, 1292-1363, 1230-1242"
+ranks = [0, 1]
+marks = [0]
+time_limit = 1800
+original_time_limit = 1800
+tags = ["aimed", "split", "fast"]
+laser_approx = false
+lower_half_blocked = false
+notes = "boss 无敌，按原作 1800 帧超时收段。每发 = 1 颗 LASERHEAD 单发自机狙（原型 BUBBLE，判定偏小）；周期 484 帧内 5 个月点共 23 发（0/±45/±90、0/±4.5、0/±60/±120），每周期一次 60 帧随机游走。"

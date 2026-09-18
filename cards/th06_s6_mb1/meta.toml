@@ -1,0 +1,12 @@
+title = "Stage 6 中 boss 非符 1"
+source = "th06"
+origin = "东方红魔乡 Stage 6 中 boss 非符（ecldata6.ecl.txt Sub9 +30 起 Sub9_772 循环 + Sub10 + Sub11，timer 1020），E–L 四档"
+source_ref = "ecldata6.ecl.txt:177-244, 246-260, 262-277"
+ranks = [0, 3]
+marks = [0]
+time_limit = 1020
+original_time_limit = 1020
+tags = ["random", "spiral", "mixed"]
+laser_approx = false
+lower_half_blocked = false
+notes = "Sub11 苦无 0x40 减速→随机转向改成每弹私有任务（set_accel 近似线性减速，每颗独立随机角）；开场补 wait(110) 满足 120 帧安全。"

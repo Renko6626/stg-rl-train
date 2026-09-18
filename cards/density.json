@@ -976,5 +976,533 @@
   "rank": 3,
   "peak": 798,
   "mean": 272.0
+ },
+ {
+  "id": "th06_s5_mb1",
+  "rank": 0,
+  "peak": 121,
+  "mean": 75.2
+ },
+ {
+  "id": "th06_s5_mb1",
+  "rank": 1,
+  "peak": 249,
+  "mean": 156.3
+ },
+ {
+  "id": "th06_s5_mb1",
+  "rank": 2,
+  "peak": 293,
+  "mean": 181.2
+ },
+ {
+  "id": "th06_s5_mb1",
+  "rank": 3,
+  "peak": 404,
+  "mean": 252.9
+ },
+ {
+  "id": "th06_s5_mb2",
+  "rank": 0,
+  "peak": 231,
+  "mean": 118.4
+ },
+ {
+  "id": "th06_s5_mb2",
+  "rank": 1,
+  "peak": 769,
+  "mean": 365.1
+ },
+ {
+  "id": "th06_s5_mb3",
+  "rank": 2,
+  "peak": 594,
+  "mean": 337.4
+ },
+ {
+  "id": "th06_s5_mb3",
+  "rank": 3,
+  "peak": 713,
+  "mean": 423.0
+ },
+ {
+  "id": "th06_s5_w01",
+  "rank": 0,
+  "peak": 256,
+  "mean": 56.4
+ },
+ {
+  "id": "th06_s5_w01",
+  "rank": 1,
+  "peak": 480,
+  "mean": 105.5
+ },
+ {
+  "id": "th06_s5_w01",
+  "rank": 2,
+  "peak": 640,
+  "mean": 141.3
+ },
+ {
+  "id": "th06_s5_w01",
+  "rank": 3,
+  "peak": 640,
+  "mean": 131.7
+ },
+ {
+  "id": "th06_s5_w02",
+  "rank": 0,
+  "peak": 179,
+  "mean": 39.4
+ },
+ {
+  "id": "th06_s5_w02",
+  "rank": 1,
+  "peak": 357,
+  "mean": 85.6
+ },
+ {
+  "id": "th06_s5_w02",
+  "rank": 2,
+  "peak": 545,
+  "mean": 140.9
+ },
+ {
+  "id": "th06_s5_w02",
+  "rank": 3,
+  "peak": 696,
+  "mean": 192.2
+ },
+ {
+  "id": "th06_s5_w03",
+  "rank": 0,
+  "peak": 61,
+  "mean": 22.4
+ },
+ {
+  "id": "th06_s5_w03",
+  "rank": 1,
+  "peak": 119,
+  "mean": 47.4
+ },
+ {
+  "id": "th06_s5_w03",
+  "rank": 2,
+  "peak": 240,
+  "mean": 95.3
+ },
+ {
+  "id": "th06_s5_w03",
+  "rank": 3,
+  "peak": 371,
+  "mean": 150.5
+ },
+ {
+  "id": "th06_s5_w04",
+  "rank": 0,
+  "peak": 271,
+  "mean": 96.5
+ },
+ {
+  "id": "th06_s5_w04",
+  "rank": 1,
+  "peak": 510,
+  "mean": 195.0
+ },
+ {
+  "id": "th06_s5_w04",
+  "rank": 2,
+  "peak": 734,
+  "mean": 337.0
+ },
+ {
+  "id": "th06_s5_w04",
+  "rank": 3,
+  "peak": 973,
+  "mean": 479.9
+ },
+ {
+  "id": "th06_s5_w05",
+  "rank": 0,
+  "peak": 465,
+  "mean": 141.8
+ },
+ {
+  "id": "th06_s5_w05",
+  "rank": 1,
+  "peak": 672,
+  "mean": 211.9
+ },
+ {
+  "id": "th06_s5_w05",
+  "rank": 2,
+  "peak": 831,
+  "mean": 267.3
+ },
+ {
+  "id": "th06_s5_w05",
+  "rank": 3,
+  "peak": 908,
+  "mean": 325.3
+ },
+ {
+  "id": "th06_s5_w06",
+  "rank": 0,
+  "peak": 190,
+  "mean": 74.3
+ },
+ {
+  "id": "th06_s5_w06",
+  "rank": 1,
+  "peak": 387,
+  "mean": 158.9
+ },
+ {
+  "id": "th06_s5_w06",
+  "rank": 2,
+  "peak": 837,
+  "mean": 345.0
+ },
+ {
+  "id": "th06_s5_w06",
+  "rank": 3,
+  "peak": 862,
+  "mean": 416.5
+ },
+ {
+  "id": "th06_s5_w07",
+  "rank": 0,
+  "peak": 495,
+  "mean": 267.3
+ },
+ {
+  "id": "th06_s5_w07",
+  "rank": 1,
+  "peak": 525,
+  "mean": 293.8
+ },
+ {
+  "id": "th06_s5_w07",
+  "rank": 2,
+  "peak": 594,
+  "mean": 332.4
+ },
+ {
+  "id": "th06_s5_w07",
+  "rank": 3,
+  "peak": 685,
+  "mean": 397.9
+ },
+ {
+  "id": "th06_s5_w08",
+  "rank": 0,
+  "peak": 478,
+  "mean": 279.8
+ },
+ {
+  "id": "th06_s5_w08",
+  "rank": 1,
+  "peak": 515,
+  "mean": 303.4
+ },
+ {
+  "id": "th06_s5_w08",
+  "rank": 2,
+  "peak": 589,
+  "mean": 348.1
+ },
+ {
+  "id": "th06_s5_w08",
+  "rank": 3,
+  "peak": 686,
+  "mean": 400.0
+ },
+ {
+  "id": "th06_s5_w09",
+  "rank": 0,
+  "peak": 194,
+  "mean": 52.7
+ },
+ {
+  "id": "th06_s5_w09",
+  "rank": 1,
+  "peak": 387,
+  "mean": 105.1
+ },
+ {
+  "id": "th06_s5_w09",
+  "rank": 2,
+  "peak": 514,
+  "mean": 141.5
+ },
+ {
+  "id": "th06_s5_w09",
+  "rank": 3,
+  "peak": 488,
+  "mean": 127.8
+ },
+ {
+  "id": "th06_s5_w10",
+  "rank": 0,
+  "peak": 463,
+  "mean": 112.9
+ },
+ {
+  "id": "th06_s5_w10",
+  "rank": 1,
+  "peak": 723,
+  "mean": 162.4
+ },
+ {
+  "id": "th06_s5_w10",
+  "rank": 2,
+  "peak": 967,
+  "mean": 216.5
+ },
+ {
+  "id": "th06_s5_w10",
+  "rank": 3,
+  "peak": 926,
+  "mean": 198.6
+ },
+ {
+  "id": "th06_s6_b11",
+  "rank": 0,
+  "peak": 10,
+  "mean": 2.4
+ },
+ {
+  "id": "th06_s6_b11",
+  "rank": 1,
+  "peak": 10,
+  "mean": 2.4
+ },
+ {
+  "id": "th06_s6_b12",
+  "rank": 2,
+  "peak": 20,
+  "mean": 1.2
+ },
+ {
+  "id": "th06_s6_b12",
+  "rank": 3,
+  "peak": 20,
+  "mean": 1.2
+ },
+ {
+  "id": "th06_s6_b5",
+  "rank": 0,
+  "peak": 617,
+  "mean": 378.2
+ },
+ {
+  "id": "th06_s6_b5",
+  "rank": 1,
+  "peak": 617,
+  "mean": 378.2
+ },
+ {
+  "id": "th06_s6_b6",
+  "rank": 2,
+  "peak": 722,
+  "mean": 479.7
+ },
+ {
+  "id": "th06_s6_b6",
+  "rank": 3,
+  "peak": 926,
+  "mean": 617.2
+ },
+ {
+  "id": "th06_s6_mb1",
+  "rank": 0,
+  "peak": 244,
+  "mean": 150.7
+ },
+ {
+  "id": "th06_s6_mb1",
+  "rank": 1,
+  "peak": 419,
+  "mean": 260.1
+ },
+ {
+  "id": "th06_s6_mb1",
+  "rank": 2,
+  "peak": 590,
+  "mean": 369.0
+ },
+ {
+  "id": "th06_s6_mb1",
+  "rank": 3,
+  "peak": 593,
+  "mean": 363.5
+ },
+ {
+  "id": "th06_s6_mb2",
+  "rank": 0,
+  "peak": 262,
+  "mean": 169.1
+ },
+ {
+  "id": "th06_s6_mb2",
+  "rank": 1,
+  "peak": 291,
+  "mean": 196.8
+ },
+ {
+  "id": "th06_s6_mb2",
+  "rank": 2,
+  "peak": 338,
+  "mean": 222.4
+ },
+ {
+  "id": "th06_s6_mb2",
+  "rank": 3,
+  "peak": 399,
+  "mean": 268.3
+ },
+ {
+  "id": "th06_s6_w01",
+  "rank": 0,
+  "peak": 212,
+  "mean": 90.6
+ },
+ {
+  "id": "th06_s6_w01",
+  "rank": 1,
+  "peak": 410,
+  "mean": 199.2
+ },
+ {
+  "id": "th06_s6_w01",
+  "rank": 2,
+  "peak": 593,
+  "mean": 300.2
+ },
+ {
+  "id": "th06_s6_w01",
+  "rank": 3,
+  "peak": 1010,
+  "mean": 521.9
+ },
+ {
+  "id": "th06_s6_w02",
+  "rank": 0,
+  "peak": 0,
+  "mean": 0.0
+ },
+ {
+  "id": "th06_s6_w02",
+  "rank": 1,
+  "peak": 0,
+  "mean": 0.0
+ },
+ {
+  "id": "th06_s6_w02",
+  "rank": 2,
+  "peak": 0,
+  "mean": 0.0
+ },
+ {
+  "id": "th06_s6_w02",
+  "rank": 3,
+  "peak": 0,
+  "mean": 0.0
+ },
+ {
+  "id": "th06_s6_w03",
+  "rank": 0,
+  "peak": 80,
+  "mean": 27.5
+ },
+ {
+  "id": "th06_s6_w03",
+  "rank": 1,
+  "peak": 120,
+  "mean": 41.4
+ },
+ {
+  "id": "th06_s6_w03",
+  "rank": 2,
+  "peak": 120,
+  "mean": 24.4
+ },
+ {
+  "id": "th06_s6_w03",
+  "rank": 3,
+  "peak": 240,
+  "mean": 54.4
+ },
+ {
+  "id": "th06_s6_w04",
+  "rank": 0,
+  "peak": 120,
+  "mean": 40.2
+ },
+ {
+  "id": "th06_s6_w04",
+  "rank": 1,
+  "peak": 120,
+  "mean": 40.2
+ },
+ {
+  "id": "th06_s6_w04",
+  "rank": 2,
+  "peak": 120,
+  "mean": 40.2
+ },
+ {
+  "id": "th06_s6_w04",
+  "rank": 3,
+  "peak": 120,
+  "mean": 40.2
+ },
+ {
+  "id": "th06_s6_w05",
+  "rank": 0,
+  "peak": 80,
+  "mean": 28.9
+ },
+ {
+  "id": "th06_s6_w05",
+  "rank": 1,
+  "peak": 120,
+  "mean": 42.9
+ },
+ {
+  "id": "th06_s6_w05",
+  "rank": 2,
+  "peak": 120,
+  "mean": 25.2
+ },
+ {
+  "id": "th06_s6_w05",
+  "rank": 3,
+  "peak": 240,
+  "mean": 56.2
+ },
+ {
+  "id": "th06_s6_w06",
+  "rank": 0,
+  "peak": 386,
+  "mean": 111.9
+ },
+ {
+  "id": "th06_s6_w06",
+  "rank": 1,
+  "peak": 580,
+  "mean": 167.5
+ },
+ {
+  "id": "th06_s6_w06",
+  "rank": 2,
+  "peak": 493,
+  "mean": 98.4
+ },
+ {
+  "id": "th06_s6_w06",
+  "rank": 3,
+  "peak": 1006,
+  "mean": 214.7
  }
 ]

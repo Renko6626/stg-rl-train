@@ -1,0 +1,12 @@
+title = "奇術「幻惑ミスディレクション」"
+source = "th06"
+origin = "东方红魔乡 Stage 5 中 boss 符卡 奇術「幻惑ミスディレクション」（ecldata5 Sub18/19/20/21/22），Hard/Lunatic"
+source_ref = "ecldata5.ecl.txt:408-413, 415-430, 432-445, 447-488, 490-531"
+ranks = [2, 3]
+marks = [0]
+time_limit = 1800
+original_time_limit = 1800
+tags = ["aimed", "ring", "curve"]
+laser_approx = false
+lower_half_blocked = false
+notes = "中 boss 符卡；boss 无敌，按原作 1800 帧超时收段（SPELL_FAILED）。Sub21/Sub22 左右交替：自机狙环（H/L 带左右上反弹 flags 0x800）每 6 帧一发共 10 发，随后瞬移到另一侧打三连扇形（4 层、层速度 5.5/6.5→1.2、展开 18°）。"

@@ -1,0 +1,12 @@
+title = "紅符「スカーレットマイスタ」"
+source = "th06"
+origin = "东方红魔乡 Stage 6 boss 十六夜咲夜 符卡 紅符「スカーレットマイスタ」（ecldata6 Sub55/Sub56/Sub57/Sub51），Hard–Lunatic"
+source_ref = "ecldata6.ecl.txt:1365-1374, 1376-1399, 1401-1467, 1244-1256"
+ranks = [2, 3]
+marks = [0]
+time_limit = 1800
+original_time_limit = 1800
+tags = ["aimed", "spiral", "stream"]
+laser_approx = false
+lower_half_blocked = false
+notes = "boss 无敌，按原作 1800 帧超时收段。每发为 1 颗 LASERHEAD 单发自机狙（原型 BUBBLE，判定偏小）；螺旋每 3 帧 +/−22.5°、每轮 17 发，周期 368 帧。"

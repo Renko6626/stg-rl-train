@@ -1,0 +1,12 @@
+title = "Stage 5 道中 第 3 波"
+source = "th06"
+origin = "东方红魔乡 Stage 5 道中，timeline 帧 942–1082（Sub1），E–L 四档"
+source_ref = "ecldata5.ecl.txt:1818-1833, 28-46"
+ranks = [0, 3]
+marks = [0]
+time_limit = 560
+original_time_limit = 560
+tags = ["random"]
+laser_approx = false
+lower_half_blocked = false
+notes = "小怪无敌（D8）。RICE 随机弹：角度 [0,π)、速度 [0.8,1.8)，颗数/间隔随难度（3/6/8/10 颗，60/60/40/30 帧）。"

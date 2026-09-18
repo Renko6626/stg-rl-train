@@ -1,0 +1,12 @@
+title = "Stage 5 道中 第 7 波"
+source = "th06"
+origin = "东方红魔乡 Stage 5 道中，timeline 帧 3774–4959（Sub1/Sub9/Sub10/Sub11 循环），E–L 四档"
+source_ref = "ecldata5.ecl.txt:1928-2057, 28-46, 259-271, 273-285, 245-257"
+ranks = [0, 3]
+marks = [0]
+time_limit = 1565
+original_time_limit = 1565
+tags = ["aimed", "random", "stream"]
+laser_approx = false
+lower_half_blocked = false
+notes = "小怪无敌（D8）；Sub1/Sub11 的随机弹逐颗用 fire() 手发；出界守卫 + 引擎越界回收退场。"

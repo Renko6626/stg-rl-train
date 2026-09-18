@@ -1,0 +1,12 @@
+title = "Stage 6 道中 第 6 波"
+source = "th06"
+origin = "东方红魔乡 Stage 6 道中，timeline 帧 1973–2053 双翼五连（Sub5），E/N/H/L"
+source_ref = "ecldata6.ecl.txt:2280-2294, 109-129"
+ranks = [0, 3]
+marks = [0]
+time_limit = 500
+original_time_limit = 500
+tags = ["aimed", "ring", "random"]
+laser_approx = false
+lower_half_blocked = false
+notes = "双翼各 5 批小怪，+40 发一发整周自机狙环弹后随机方向飞走；小怪无敌（D8）。"
