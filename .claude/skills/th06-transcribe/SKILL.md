@@ -46,6 +46,29 @@ $P collect --stage N           # 然后 git add cards/ && git commit
 
 后台跑用 `run_in_background`；日志在 `transcribe/work/logs/<id>.<阶段>.<轮次>.log`。
 
+## 便笺分诊（每批跑完必做）
+
+worker 撞上「可能影响别的单元」的问题会写 `notes.md`（判据、格式见契约）。每批结束后：
+
+```bash
+$P notes            # 只列未分诊的，按影响面排序（疑似全池 → 疑似同关 → 只此单元）
+$P notes --mark     # 处理完把这批标记掉
+```
+
+处置：证据成立且影响面大 → 改 `mapping.md` / 契约（改完跑 `pytest tests/transcribe`，并刷新所有单元的
+`mapping-excerpt.md`），必要时把已入库的卡打回返工；属引擎缺机制 → 记 stg-engine `docs/follow-ups.md`；
+只此单元 → 确认已写进 report/verdict 即可。**1–3 关那批的三个批量扩散问题（§4.3 停火守卫、640 弹池、
+出生特效降速）都是撞了一次却影响全池，当时没有这条通道，全靠事后抽检才发现。**
+
+## 用量账
+
+```bash
+$P usage [--stage N] [--since 2026-09-18]   # 步数 / 计费输入估算 / 推理占比 / 最贵 5 次
+```
+
+成本 ≈ 步数 × 平均上下文（每步重发整段），所以省钱先砍步数与上下文，不要合并单元
+（合并只会让后面的步背上前面的痕迹，N 个单元合跑约 N 倍差）。
+
 ## 分诊
 
 `status` 列出所有没走完的单元。

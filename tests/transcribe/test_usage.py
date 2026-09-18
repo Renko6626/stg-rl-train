@@ -82,3 +82,14 @@ def test_builtins_cheatsheet_is_signatures_only(tmp_path):
     assert "`fire(shape: int) -> int` — 发一颗弹" in out and "细节一大堆" not in out
     assert "`wait(n: int)` — 等 n 帧" in out
     assert "不是签名的条目" not in out and "段落说明" not in out
+
+
+def test_reasoning_effort_is_validated(monkeypatch):
+    from stgtranscribe import pipeline
+
+    assert pipeline.reasoning_for("transcribe") in pipeline.DSH_REASONING_VALUES
+    monkeypatch.setenv("STG_DSH_REASONING", "medium")   # deepseek-flash 不支持，会让 worker 秒退
+    with pytest.raises(ValueError, match="不合法"):
+        pipeline.reasoning_for("transcribe")
+    monkeypatch.setenv("STG_DSH_REASONING", "low")
+    assert pipeline.reasoning_for("review") == "low"

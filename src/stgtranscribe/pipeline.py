@@ -26,6 +26,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from . import config
+from . import notes as N
 from . import structure, split_check, usage, validate
 from . import extract as X
 from . import units as U
@@ -35,8 +36,10 @@ MAX_SPLIT_RETRIES = 2
 MAX_VALIDATE_RETRIES = 2
 MAX_REVIEW_ROUNDS = 2
 DSH_TIMEOUT = 1800
-# 推理强度：成本大头之一（1–3 关那批输出里 86% 是推理）。按阶段给默认值，STG_DSH_REASONING 可整体覆盖。
-DSH_REASONING = {"split": "medium", "transcribe": "medium", "review": "medium"}
+# 推理强度：成本大头之一（1–3 关那批输出里 87% 是推理）。按阶段给默认值，STG_DSH_REASONING 可整体覆盖。
+# **deepseek-flash 只认 off / low / high / max**（没有 medium，传了会 UNSUPPORTED_REASONING_EFFORT 秒退）。
+DSH_REASONING_VALUES = ("off", "low", "high", "max")
+DSH_REASONING = {"split": "low", "transcribe": "low", "review": "high"}
 
 # ── 状态 ─────────────────────────────────────────────────────────────────────
 
@@ -88,7 +91,10 @@ def _record_usage(uid: str, kind: str, cwd: Path) -> None:
 
 
 def reasoning_for(kind: str) -> str:
-    return os.environ.get("STG_DSH_REASONING") or DSH_REASONING.get(kind, "medium")
+    eff = os.environ.get("STG_DSH_REASONING") or DSH_REASONING.get(kind, "low")
+    if eff not in DSH_REASONING_VALUES:
+        raise ValueError(f"reasoning effort {eff!r} 不合法，只能是 {DSH_REASONING_VALUES}")
+    return eff
 
 
 def run_worker(cwd: Path, prompt: str, log: Path, kind: str = "transcribe") -> int:
@@ -402,6 +408,8 @@ def main(argv: list[str] | None = None) -> int:
         s.add_argument("--ids"); s.add_argument("--jobs", type=int, default=8)
     s = sub.add_parser("sample"); s.add_argument("--stage", type=int, required=True); s.add_argument("--rate", type=float, default=0.2)
     s = sub.add_parser("status"); s.add_argument("--stage", type=int)
+    s = sub.add_parser("notes"); s.add_argument("--all", action="store_true", help="含已分诊的")
+    s.add_argument("--mark", action="store_true", help="把本次列出的标记为已分诊")
     s = sub.add_parser("usage"); s.add_argument("--stage", type=int); s.add_argument("--since", default=None,
         help="只算这个时间戳之后的记录（state.jsonl 的 ts 前缀，如 2026-09-18）")
     s = sub.add_parser("collect"); s.add_argument("--stage", type=int, required=True)
@@ -436,6 +444,13 @@ def main(argv: list[str] | None = None) -> int:
         print("\n".join(f"  {u}" for u in chosen))
     elif a.cmd == "status":
         print(status_table(a.stage))
+    elif a.cmd == "notes":
+        found = N.collect(config.WORK_DIR)
+        show = found if a.all else N.new_only(found, config.WORK_DIR)
+        print(N.render(show) if show else "没有待分诊的便笺")
+        if a.mark and show:
+            N.mark_triaged(show, config.WORK_DIR)
+            print(f"\n已标记 {len(show)} 条为已分诊（{config.WORK_DIR / N.TRIAGED}）")
     elif a.cmd == "usage":
         rows = [r for r in _usage_rows() if (a.stage is None or f"_s{a.stage}" in r["id"])
                 and (a.since is None or r.get("ts", "") >= a.since)]
