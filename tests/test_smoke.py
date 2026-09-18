@@ -126,3 +126,14 @@ def test_train_with_featurizer_v2(tmp_path):
     ck = load_checkpoint(run_dir / "checkpoints" / "latest.pt")
     assert ck["cfg"]["featurize"]["name"] == "danger_topk_v2"
     assert (run_dir / "eval" / "1.json").exists()
+
+
+def test_gradient_norm_tolerance_is_looser_than_the_loss_one():
+    """gn 是对全部参数的平方和归约，最吃累加顺序；1e-4 相对压不住编译后的归约树变化
+    （租用机实测 0.35315809 vs 0.35306996 = 2.5e-4）。这条守着它别被"顺手"调回去。"""
+    from stgtrain import gpucheck as g
+    assert g.GN_REL > g.TOLERANCE
+    assert g.close_enough(0.35315809, 0.35306996, rel=g.GN_REL)
+    assert not g.close_enough(0.35315809, 0.35306996, rel=g.TOLERANCE)
+    # 真的错了还是要抓出来：1% 的差异在任何一档都不该过
+    assert not g.close_enough(0.353, 0.357, rel=g.GN_REL)

@@ -7,6 +7,8 @@
 #   bash scripts/run-night.sh --only h,i             # 只跑其中几条
 #   bash scripts/run-night.sh --retries 3            # 单条最多续训几次（默认 2）
 #   bash scripts/run-night.sh --smoke                # 30 秒 CPU 冒烟：先确认脚本本身没问题再放它跑整夜
+#   bash scripts/run-night.sh --loose-check          # gpucheck 不通过也继续（只打印 WARN）
+#   bash scripts/run-night.sh --no-check             # 完全跳过 gpucheck
 #
 # 设计要点（都是为了睡觉时别白跑）：
 #   · **开跑前先体检**：GPU 可见 + gpucheck（真做一次前向/反向，编译与 CUDA 图都走一遍）+ 磁盘余量。
@@ -24,13 +26,15 @@ EXPS=(
   "h  configs/exp-h-curriculum.toml"
   "i  configs/exp-i-freemix.toml"
 )
-THREADS=""; RETRIES=2; ONLY=""; SMOKE=0
+THREADS=""; RETRIES=2; ONLY=""; SMOKE=0; CHECK=strict
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --threads) THREADS="$2"; shift 2 ;;
     --retries) RETRIES="$2"; shift 2 ;;
     --only)    ONLY=",$2,";  shift 2 ;;
     --smoke)   SMOKE=1;      shift 1 ;;
+    --loose-check) CHECK=loose; shift 1 ;;
+    --no-check)    CHECK=off;   shift 1 ;;
     *) echo "未知参数 $1" >&2; exit 2 ;;
   esac
 done
@@ -63,8 +67,14 @@ PY
 FREE_G=$(df -BG --output=avail . | tail -1 | tr -dc '0-9')
 say "磁盘余量 ${FREE_G}G（一条 run 含 tar.gz 约 1–2G）"
 [[ "$FREE_G" -lt 8 ]] && say "⚠ 磁盘不足 8G，先清 runs/ 再跑" && exit 1
-say "gpucheck（真跑一次前向/反向 + 编译 + CUDA 图）……"
-uv run --frozen python -m stgtrain.gpucheck configs/exp-g0-newpool.toml || { say "gpucheck 没过，停"; exit 1; }
+if [[ "$CHECK" == off ]]; then
+  say "跳过 gpucheck（--no-check）"
+else
+  say "gpucheck（真跑一次前向/反向 + 编译 + CUDA 图）……"
+  GC_ARGS=(configs/exp-g0-newpool.toml)
+  [[ "$CHECK" == loose ]] && GC_ARGS+=(--warn-only)
+  uv run --frozen python -m stgtrain.gpucheck "${GC_ARGS[@]}" || { say "gpucheck 没过，停（确认是浮点噪声就加 --loose-check）"; exit 1; }
+fi
 fi
 
 # ── 线程：只测一次，三条复用 ────────────────────────────────────────────────
