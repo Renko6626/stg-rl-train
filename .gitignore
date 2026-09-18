@@ -6,3 +6,5 @@ runs/
 *.tar.gz
 # 转写工作区：含 ZUN 原作 ECL 摘录，永不入库（spec 2026-09-16 §12）
 transcribe/work/
+# 导出产物（.onnx 1.4 MB + manifest）：构建物，按 rl-vX wheel 的先例走 Release 分发
+dist/

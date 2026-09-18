@@ -28,6 +28,21 @@ gpucheck（有 CUDA 才跑）→ bench 选 num_envs / threads → 用 `probe/car
 每步失败都记下来继续，照样打包。包里 `SUMMARY.md` 是汇总，`train/plots/load.png` 是负载曲线，
 `train/perf.jsonl` 是每秒一行的原始负载数据。
 
+## 导出部署用的 ONNX 图
+
+把一个 checkpoint 导成**特征化 + 网络合体**的单文件定形图，给 th06nc / TH18 的 DLL 用
+（ORT CPU 跑）。特征化也进图，所以 C 侧不必复刻 topk / 密度图 / 归一化 —— 逐位一致由
+「两边是同一张图」保证。设计见 renkolab `docs/superpowers/specs/2026-09-18-th06nc-onnx-policy-design.md`。
+
+```bash
+uv run --frozen python -m stgtrain.export_onnx runs/<run>/checkpoints/best.pt --out dist
+# → dist/f-best.onnx（约 1.4 MB，权重内联，单文件）+ dist/manifest.json（出处与图签名）
+```
+
+导出后会自动拿 onnxruntime 与 torch 对一遍 logits（偏差 > 1e-5 或 argmax 不同就退非零码）。
+只支持 `danger_topk_v2`；换特征化器（如实验 G 的 v3）要改 `DangerTopKV2Export` 并 bump
+`GRAPH_VERSION`。`dist/` 不入库，按 `rl-vX` wheel 的先例走 Release 分发。
+
 ## 开发
 
 ```bash
