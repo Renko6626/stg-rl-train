@@ -98,3 +98,28 @@ def test_near_miss_metrics_graze_and_close_fractions():
     assert r["graze_per_s"] == pytest.approx(3 / (5 / 60))
     assert r["close4_frac"] == pytest.approx(1 / 4), "存活 4 步里只有第 1 步 < 4 px"
     assert r["close12_frac"] == pytest.approx(2 / 4)
+
+
+def test_movement_segment_length_metrics():
+    """人手指标：只数**移动段**（上一步按着方向）结束时的长度；「不动」的段再短也不算点按。"""
+    from stgagent import consts as C
+
+    t = tracker(n=1)
+    o = raw_obs(n=1)
+    R, L, S = C.BTN_SHOT | C.BTN_RIGHT, C.BTN_SHOT | C.BTN_LEFT, C.BTN_SHOT
+    steps = [
+        (S, R, 1 << 20, 0),   # 不动 → 右：结束的是「不动」段，不计
+        (R, L, 2, 0),         # 右（2 帧）→ 左：移动段，≤2
+        (L, S, 3, 0),         # 左（3 帧）→ 停：移动段，≤3 但 >2；松开也算一次结束
+        (S, R, 1, 0),         # 停了 1 帧又走：结束的是「不动」段，不计
+        (R, R, 5, 0),         # 没换方向
+        (R, S, 9, 1),         # 右（9 帧）→ 停，同时死亡：那一步不再计
+    ]
+    for prev_b, cur_b, hold, done in steps:
+        info = step_info(n=1, done=[done], buttons=[cur_b], prev_buttons=[prev_b], dir_hold=[hold])
+        info.overridden = torch.tensor([hold == 5])          # 任取一步标成「运动层做主」
+        feed(t, o, o, info, [0.0])
+    (rec,) = t.pop_finished()
+    assert (rec["mv_segs"], rec["mv_le2"], rec["mv_le3"]) == (2, 1, 2)
+    assert rec["seg_le2_frac"] == 0.5 and rec["seg_le3_frac"] == 1.0
+    assert abs(rec["motor_override_frac"] - 1 / 6) < 1e-6

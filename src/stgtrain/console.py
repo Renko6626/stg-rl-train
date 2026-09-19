@@ -93,7 +93,10 @@ def eval_block(update: int, res: dict, is_best: bool, elapsed: float) -> str:
                + (f" · 按键 {o['key_presses_per_s']:.1f}/s" if "key_presses_per_s" in o else "")
                + f" · shift {o['shift_toggles_per_s']:.1f}/s · 贴边 {o['edge_frac'] * 100:.1f}%"
                + (f"\n  神穿：擦弹 {o['graze_per_s']:.2f}/s · 离弹 <4px {o['close4_frac'] * 100:.1f}% · <12px {o['close12_frac'] * 100:.1f}%"
-                  if "graze_per_s" in o else ""))
+                  if "graze_per_s" in o else "")
+               + (f"\n  人手：移动段 ≤2 帧 {o['seg_le2_frac'] * 100:.1f}% · ≤3 帧 {o['seg_le3_frac'] * 100:.1f}%"
+                  f" · 运动层做主 {o['motor_override_frac'] * 100:.1f}% 的帧"
+                  if "seg_le2_frac" in o else ""))
     rows = []
     names = [f"{card} {rank}" for card, per in res.get("cards", {}).items() for rank in per]
     w = max((len(n) for n in names), default=0)

@@ -38,3 +38,20 @@ def test_v2_mirror_maps_prev_direction():
     o = raw_obs(n=1, player=(30.0, 380.0), prev_action=[6])  # 方向 3 = 右
     m = feats()(mirror_obs(o))["player"][0, 3:]
     assert m.tolist() == [0, 0, 0, 0, 0, 0, 0, 1, 0, 0], "镜像后应为方向 7 = 左"
+
+
+def test_v4_appends_normalised_dir_held():
+    """v4 = v3 + 「当前方向已执行几帧」：封顶 16、归一化到 [0, 1]；缺席（旧调用方）按「早就可以换了」= 1。"""
+    from stgtrain.featurize.danger_topk_v4 import HELD_CAP
+
+    cfg = small_cfg(featurize={"name": "danger_topk_v4", "k_bullets": 8, "k_enemies": 4})
+    v3 = FEATURIZERS.get("danger_topk_v3")(cfg)
+    v4 = FEATURIZERS.get("danger_topk_v4")(cfg)
+    assert v4.spec()["player"] == (v3.spec()["player"][0] + 1,)
+    obs = raw_obs(n=3)
+    obs.dir_held = torch.tensor([1, 8, 1 << 20])
+    out3, out4 = v3(obs), v4(obs)
+    assert torch.equal(out4["player"][:, :-1], out3["player"]), "前 13 维与 v3 逐位相同"
+    assert torch.allclose(out4["player"][:, -1], torch.tensor([1 / HELD_CAP, 8 / HELD_CAP, 1.0]))
+    obs.dir_held = None
+    assert torch.equal(v4(obs)["player"][:, -1], torch.ones(3))

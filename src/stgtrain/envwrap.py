@@ -33,7 +33,8 @@ class RawObs:
     enemies: Tensor
     enemies_mask: Tensor
     target_xy: Tensor
-    prev_action: Tensor | None = None  # 上一步动作 id（智能体坐标系、镜像前），新局首步为 0（不动）；v2 特征化用
+    prev_action: Tensor | None = None  # 上一步**实际执行**的动作 id（智能体坐标系、镜像前），新局首步为 0（不动）；v2 特征化用
+    dir_held: Tensor | None = None     # 当前方向已经执行了多少帧（新局 = 很大）；v4 特征化用
 
 
 @dataclass
@@ -45,6 +46,7 @@ class StepInfo:
     buttons: Tensor
     prev_buttons: Tensor
     dir_hold: Tensor | None = None      # 本步做决策时，上一个方向已经保持了多少步（变向那步读它 = 上段的长度）
+    overridden: Tensor | None = None    # 本步运动层是否替策略做了主（执行的方向 != 想按的方向）；没开运动层为全 False
     start_index: Tensor | None = None   # 本步所属那一局的起点下标（done≠0 时是**刚结束**那局的，env 在 reset 前取）
     intent_mode: Tensor | None = None   # 混合意图的模式（0 跟点 / 1 锚点 / 2 自由），无混合时 None
 
@@ -100,6 +102,60 @@ def enemy_velocity(prev_ids: Tensor, prev_xy: Tensor, cur_ids: Tensor, cur_xy: T
     return torch.where(keep.unsqueeze(-1), v, torch.zeros_like(v))
 
 
+class MotorLayer:
+    """手部运动层（实验 N）：把人手的限制写进环境 —— 策略只说「想按哪个方向」，实际按出去的由这里决定。
+
+    两种**随机**约束（设计与理由见 docs/experiments.md「N1 / N2 手部运动层」）：
+
+    - `hold = [lo, hi]`：每换一次方向，为新的一段抽一个最短长度 L ~ U{lo..hi}；这一段没执行满 L 帧不许再换。
+      **L 对模型不可见**（它只看得到 `dir_held` = 已经执行了几帧）—— 想点一下，出来 2 帧还是 6 帧自己说了不算。
+    - `delay = [lo, hi]`：想换方向时，抽一个延迟 d ~ U{lo..hi}，d 帧后才生效；期间改主意就按新意图重抽，
+      改回当前方向则撤销。
+
+    确定性的「至少 N 帧」不行：那只是把时间轴量化成 N 帧一格，模型照样能在粗格子上精确操作。
+    只锁方向，低速键直通（已知漏洞：高低速交替能拼细位移，盯 shift_toggles_per_s）。
+    作用在智能体坐标系的动作 id 上（镜像之前），只做相等与计数，天然左右对称。
+    """
+
+    def __init__(self, cfg: dict, n: int, device: torch.device, seed: int):
+        m = cfg["motor"]
+        self.n, self.device = int(n), device
+        self.hold_lo, self.hold_hi = int(m["hold"][0]), int(m["hold"][1])
+        self.delay_lo, self.delay_hi = int(m["delay"][0]), int(m["delay"][1])
+        self.gen = torch.Generator(device=device)
+        self.gen.manual_seed((int(seed) * 40503 + 7919) % (2**63))
+        self.reset_all()
+
+    def reset_all(self) -> None:
+        self.need = torch.zeros(self.n, dtype=torch.int64, device=self.device)   # 本段最短长度 L；新局 0 = 第一下不受限
+        self.pend = torch.full((self.n,), -1, dtype=torch.int64, device=self.device)
+        self.wait = torch.zeros(self.n, dtype=torch.int64, device=self.device)
+
+    def reset(self, mask: Tensor) -> None:
+        self.need = torch.where(mask, torch.zeros_like(self.need), self.need)
+        self.pend = torch.where(mask, torch.full_like(self.pend, -1), self.pend)
+        self.wait = torch.where(mask, torch.zeros_like(self.wait), self.wait)
+
+    def _draw(self, lo: int, hi: int) -> Tensor:
+        if lo == hi:
+            return torch.full((self.n,), lo, dtype=torch.int64, device=self.device)
+        return torch.randint(lo, hi + 1, (self.n,), generator=self.gen, device=self.device)
+
+    def apply(self, want: Tensor, prev_exec: Tensor, held: Tensor) -> Tensor:
+        """`want` = 策略选的动作 id；`prev_exec` = 上一步实际执行的；`held` = 当前方向已执行帧数。返回本步实际执行的动作 id。"""
+        want = want.to(torch.int64)
+        want_dir, slow, cur = want // 2, want % 2, prev_exec // 2
+        diff = want_dir != cur
+        new_req = diff & (want_dir != self.pend)                 # 新意图（或改了主意）→ 重抽延迟
+        self.wait = torch.where(new_req, self._draw(self.delay_lo, self.delay_hi), self.wait)
+        self.pend = torch.where(diff, want_dir, torch.full_like(self.pend, -1))   # 想回当前方向 = 撤销
+        go = diff & (self.wait <= 0) & (held >= self.need)
+        self.wait = torch.where(diff & ~go, (self.wait - 1).clamp_min(0), self.wait)
+        self.need = torch.where(go, self._draw(self.hold_lo, self.hold_hi), self.need)
+        self.pend = torch.where(go, torch.full_like(self.pend, -1), self.pend)
+        return torch.where(go, want_dir, cur) * 2 + slow
+
+
 def _phase(timer, name: str):
     return timer.phase(name) if timer is not None else contextlib.nullcontext()
 
@@ -133,6 +189,8 @@ class EnvWrapper:
         self._prev_enemy_ids = torch.zeros(self.n, stg_rl.ENEMIES_CAP, dtype=torch.int64, device=device)
         self._prev_enemy_xy = torch.zeros(self.n, stg_rl.ENEMIES_CAP, 2, device=device)
         self._enemy_prev_valid = torch.zeros(self.n, dtype=torch.bool, device=device)
+        self.dir_hold = torch.full((self.n,), DIR_HOLD_NEVER, dtype=torch.int64, device=device)
+        self.motor = MotorLayer(cfg, self.n, device, seed) if cfg["motor"]["enabled"] else None
 
     def _dev(self, t: Tensor) -> Tensor:
         # CUDA：从 pinned 缓冲异步拷贝。安全性来自下一次 step 之前 `buttons.to("cpu")` 的阻塞同步——
@@ -157,9 +215,17 @@ class EnvWrapper:
         self.prev_action = torch.zeros(self.n, dtype=torch.int64, device=self.device)
         self.dir_hold = torch.full((self.n,), DIR_HOLD_NEVER, dtype=torch.int64, device=self.device)
         self._enemy_prev_valid = torch.zeros(self.n, dtype=torch.bool, device=self.device)
+        if self.motor is not None:
+            self.motor.reset_all()
         return self._decode()
 
     def step(self, action_ids: Tensor, timer=None) -> tuple[RawObs, StepInfo]:
+        # 运动层：策略给的是「想按的」，从这里往下（镜像、env、上一步动作、按键统计、reward）全按**实际执行的**算。
+        # dir_hold 在变向那步清零、之后每步 +1，所以「当前方向已执行帧数」= dir_hold + 1。
+        want = action_ids
+        if self.motor is not None:
+            action_ids = self.motor.apply(want, self.prev_action, self.dir_hold + 1).to(want.dtype)
+        overridden = (action_ids // 2) != (want // 2)
         ids = torch.where(self.mirrored, self._mirror[action_ids], action_ids)
         buttons = self._buttons[ids]
         with _phase(timer, "env_step"):
@@ -185,7 +251,7 @@ class EnvWrapper:
             refreshed = self.intent.advance(self.frame_skip, ~ended)
             info = StepInfo(done=done, events=events, ep_frames=ep_frames, refreshed=refreshed,
                             buttons=buttons, prev_buttons=self.prev_buttons,
-                            dir_hold=hold_now,
+                            dir_hold=hold_now, overridden=overridden,
                             start_index=self._dev(self.buf["start_index"]).to(torch.int64),
                             intent_mode=mode)
             self.prev_buttons = torch.where(ended, torch.zeros_like(buttons), buttons)
@@ -193,6 +259,8 @@ class EnvWrapper:
             # 智能体坐标系的动作 id：镜像只在新局重抽，而新局这里清零，所以不会与镜像标志错位
             self.prev_action = torch.where(ended, torch.zeros_like(action_ids), action_ids.to(torch.int64))
             self._enemy_prev_valid = self._enemy_prev_valid & ~ended
+            if self.motor is not None:
+                self.motor.reset(ended)
             obs = self._decode()
         return obs, info
 
@@ -249,5 +317,5 @@ class EnvWrapper:
         return RawObs(
             player_xy=torch.stack([px, py], dim=-1), player_hit_r=hit_r, player_speed=speed, player_focus=focus,
             bullets=bullets, bullets_mask=bmask, enemies=enemies, enemies_mask=emask, target_xy=target,
-            prev_action=self.prev_action.clone(),
+            prev_action=self.prev_action.clone(), dir_held=(self.dir_hold + 1).clone(),
         )

@@ -10,6 +10,7 @@
 #   bash scripts/run-night.sh --loose-check          # gpucheck 不通过也继续（只打印 WARN）
 #   bash scripts/run-night.sh --no-check             # 完全跳过 gpucheck
 #   bash scripts/run-night.sh --parallel 2           # 同机并行 2 条（受限于显存，见下）
+#   bash scripts/run-night.sh --no-preflight         # 跳过「每条配置真跑 2 轮」的试车
 #
 # 设计要点（都是为了睡觉时别白跑）：
 #   · **开跑前先体检**：GPU 可见 + gpucheck（真做一次前向/反向，编译与 CUDA 图都走一遍）+ 磁盘余量。
@@ -27,12 +28,13 @@
 set -uo pipefail
 cd "$(dirname "$0")/.."
 
-# 当前队列（跑完一批就换成下一批；G0/H/I 已于 2026-09-19 跑完，见 docs/experiments.md）
+# 当前队列（跑完一批就换成下一批；G0/H/I、I2/J 已于 2026-09-19 跑完，见 docs/experiments.md）
+# N1 / N2 = 手部运动层，两条同机并行：  bash scripts/run-night.sh --parallel 2
 EXPS=(
-  "i2 configs/exp-i2-stack.toml"
-  "j  configs/exp-j-quickchange.toml"
+  "n1 configs/exp-n1-motor-hold.toml"
+  "n2 configs/exp-n2-motor-delay.toml"
 )
-THREADS=""; RETRIES=2; ONLY=""; SMOKE=0; CHECK=strict; PAR=1
+THREADS=""; RETRIES=2; ONLY=""; SMOKE=0; CHECK=strict; PAR=1; PREFLIGHT=1
 VRAM_PER_RUN_MB=11000     # 单条实测峰值 10.1G，留一点余量
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -43,6 +45,7 @@ while [[ $# -gt 0 ]]; do
     --loose-check) CHECK=loose; shift 1 ;;
     --no-check)    CHECK=off;   shift 1 ;;
     --parallel)    PAR="$2";    shift 2 ;;
+    --no-preflight) PREFLIGHT=0; shift 1 ;;
     *) echo "未知参数 $1" >&2; exit 2 ;;
   esac
 done
@@ -114,6 +117,25 @@ if [[ -z "$THREADS" ]]; then
   fi
 fi
 
+# ── 试车：每条配置真跑 2 轮 ─────────────────────────────────────────────────
+# gpucheck 只验模型的前向/反向，**包装层里的新东西它碰不到**（N1/N2 的手部运动层在 GPU 上第一次跑就是这里）。
+# 每条约 1–2 分钟（主要是编译）。任何一条试车失败就整批停 —— 半夜第 1 分钟崩掉、续训再崩，等于白挂一夜。
+if [[ $SMOKE -eq 0 && $PREFLIGHT -eq 1 ]]; then
+  PF_DIR="runs/preflight-$(date +%Y%m%d-%H%M%S)"
+  for e in "${EXPS[@]}"; do
+    read -r name cfg <<<"$e"
+    [[ -n "$ONLY" && "$ONLY" != *",$name,"* ]] && continue
+    pf_cfg="$PF_DIR/$name.toml"; mkdir -p "$PF_DIR"
+    sed "s/^threads = .*/threads = $THREADS/" "$cfg" > "$pf_cfg"
+    say "试车 $name（2 轮，不打包）……"
+    uv run --frozen python -m stgtrain.train "$pf_cfg" "pf-$name" --runs-dir "$PF_DIR" --total-updates 2 --no-pack \
+      > "$PF_DIR/$name.log" 2>&1 \
+      || { say "✘ 试车 $name 失败，整批停。日志：$PF_DIR/$name.log"; tail -n 25 "$PF_DIR/$name.log"; exit 1; }
+    say "✔ 试车 $name 通过"
+  done
+  rm -rf "$PF_DIR"
+fi
+
 latest_run() { ls -td "runs/"*-"$1"/ 2>/dev/null | head -1; }
 
 run_one() {           # $1 = 名字, $2 = 配置
@@ -170,11 +192,14 @@ for d in sorted(pathlib.Path("runs").glob("*-*")):
         continue
     o = json.loads(evals[-1].read_text(encoding="utf-8"))["overall"]
     rows.append((d.name, int(evals[-1].stem), o))
-hdr = f"{'run':34}{'更新':>7}{'撑过':>8}{'跟点':>8}{'方向/s':>9}{'连击':>8}{'临危/s':>9}{'平时/s':>9}"
+hdr = (f"{'run':34}{'更新':>7}{'撑过':>8}{'跟点':>8}{'方向/s':>9}{'连击':>8}{'临危/s':>9}{'平时/s':>9}"
+       f"{'点按≤2':>9}{'shift/s':>9}{'<12px':>8}{'手做主':>8}")
 print(hdr)
 for name, upd, o in rows[-12:]:
     print(f"{name:34}{upd:7}{o.get('survival', 0):8.3f}{o.get('in_r_frac', 0):8.3f}"
           f"{o.get('dir_changes_per_s', 0):9.2f}{o.get('quick_frac', 0):8.1%}"
-          f"{o.get('dir_changes_near_per_s', 0):9.2f}{o.get('dir_changes_far_per_s', 0):9.2f}")
+          f"{o.get('dir_changes_near_per_s', 0):9.2f}{o.get('dir_changes_far_per_s', 0):9.2f}"
+          f"{o.get('seg_le2_frac', 0):9.1%}{o.get('shift_toggles_per_s', 0):9.2f}"
+          f"{o.get('close12_frac', 0):8.1%}{o.get('motor_override_frac', 0):8.1%}")
 PY
 say "打包在 runs/*.tar.gz；总日志 $NIGHT_LOG"

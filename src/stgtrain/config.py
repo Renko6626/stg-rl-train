@@ -16,6 +16,9 @@ DEFAULTS: dict = {
                "mix": {"follow": 0.6, "anchor": 0.3, "free": 0.1}},
     "curriculum": {"enabled": True, "interval": 20, "ema_decay": 0.98, "alpha": 1.0, "fail_floor": 0.05,
                    "fail_ceil": 0.95, "w_lo": 0.25, "w_hi": 4.0, "min_episodes": 30},
+    # 手部运动层（实验 N）：策略只说「想按哪个方向」，实际按出去的由 envwrap.MotorLayer 决定。
+    # hold = 每段方向最短保持帧数的抽样区间（闭区间，换段时抽，对模型不可见）；delay = 变向生效延迟的抽样区间。
+    "motor": {"enabled": False, "hold": [2, 6], "delay": [0, 0]},
     "featurize": {"name": "danger_topk_v3", "k_bullets": 64, "k_enemies": 8, "horizon": 60, "d_max": 128.0},
     "model": {"name": "set_attn_v1", "d": 64, "heads": 4, "trunk": 256},
     "reward": {"hold_radius": 24.0, "edge_margin": 16.0, "quick_frames": 3,
@@ -26,7 +29,8 @@ DEFAULTS: dict = {
             "learning_rate": 3e-4, "anneal_lr": True, "norm_adv": True, "compile": True, "cudagraphs": True},
     # eval.intent 把**评测用的意图钉死**，与训练意图解耦：实验 I 用 mixed_v1 训练，评测仍走规范的
     # 跟点档，撑过率才跟 G0/H 同口径可比（锚点 / 自由档的数字用 eval_ckpt --intent 单独跑）。
-    "eval": {"episodes": 32, "greedy": True, "seed": 12345, "intent": "lower_half_uniform_v1"},
+    # eval.motor："train" = 评测沿用 [motor]（主判据，与训练同分布）；"off" = 评测关掉运动层。
+    "eval": {"episodes": 32, "greedy": True, "seed": 12345, "intent": "lower_half_uniform_v1", "motor": "train"},
     "log": {"tensorboard": True, "perf_sync_every": 20, "sample_hz": 1.0},
     "bench": {"seconds": 10.0, "num_envs": [512, 1024, 2048, 4096]},
 }
@@ -79,6 +83,13 @@ def validate(cfg: dict) -> None:
         raise ValueError("curriculum 须满足 0 < w_lo <= 1 <= w_hi")
     if cur["interval"] < 1 or cur["min_episodes"] < 1 or cur["alpha"] <= 0:
         raise ValueError("curriculum.interval / min_episodes 须 ≥ 1，alpha 须 > 0")
+    mot = cfg["motor"]
+    for k in ("hold", "delay"):
+        lo_hi = mot[k]
+        if len(lo_hi) != 2 or not 0 <= lo_hi[0] <= lo_hi[1] <= 120:
+            raise ValueError(f"motor.{k} 须为 [lo, hi] 且 0 <= lo <= hi <= 120，得 {lo_hi}")
+    if cfg["eval"]["motor"] not in ("train", "off"):
+        raise ValueError(f"eval.motor 须为 train/off，得 {cfg['eval']['motor']!r}")
     mix = intent["mix"]
     if any(v < 0 for v in mix.values()) or sum(mix.values()) <= 0:
         raise ValueError(f"intent.mix 须非负且和 > 0，得 {mix}")

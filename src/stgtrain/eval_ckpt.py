@@ -3,7 +3,10 @@
     python -m stgtrain.eval_ckpt runs/<run>/checkpoints/best.pt                     # 用 checkpoint 配置里的评测划分
     python -m stgtrain.eval_ckpt <ckpt> --all-cards --ranks 2,3 --out all.json      # 卡池全部卡 × 指定档（与卡 meta 的 ranks 取交集）
 
-模型、特征化、reward、frame_skip 一律取 checkpoint 里的配置；只覆盖设备、卡池目录、局数。
+    python -m stgtrain.eval_ckpt <ckpt> --motor off                                 # 探针：关掉手部运动层
+    python -m stgtrain.eval_ckpt <ckpt> --motor "hold=3,7;delay=0,4"                # 探针：换一套运动层参数（旧模型也能测）
+
+模型、特征化、reward、frame_skip 一律取 checkpoint 里的配置；只覆盖设备、卡池目录、局数、意图、运动层。
 """
 from __future__ import annotations
 
@@ -23,6 +26,29 @@ from .ppo import PPO
 from .train import build_components, pick_device
 
 
+def parse_motor(spec: str) -> dict:
+    """`--motor` → 配置覆盖。`train` = 不动；`off` = 关；`hold=a,b[;delay=c,d]` = 开并换参数（没写的那项取 0,0）。
+
+    旧 checkpoint 的配置里没有 [motor]（from_dict 补的默认是关），所以给 J 补对照线也走这里。
+    """
+    if spec == "train":
+        return {}
+    if spec == "off":
+        return {"motor": {"enabled": False}, "eval": {"motor": "train"}}
+    got = {"hold": [0, 0], "delay": [0, 0]}
+    for part in spec.split(";"):
+        key, _, val = part.partition("=")
+        key = key.strip()
+        if key not in got:
+            raise SystemExit(f"--motor 不认识 {key!r}：要 train / off / hold=a,b[;delay=c,d]")
+        try:
+            lo, hi = (int(v) for v in val.split(","))
+        except ValueError:
+            raise SystemExit(f"--motor 的 {key} 要写成 {key}=lo,hi，得 {val!r}") from None
+        got[key] = [lo, hi]
+    return {"motor": {"enabled": True, **got}, "eval": {"motor": "train"}}
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="python -m stgtrain.eval_ckpt", description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -34,6 +60,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--episodes", type=int, default=None, help="每组局数（默认取配置 eval.episodes / 划分文件）")
     ap.add_argument("--intent", default=None,
                     help="覆盖意图生成器（如 follow_player_v1 = 目标点锁自机的自由躲弹诊断）")
+    ap.add_argument("--motor", default="train",
+                    help="手部运动层探针：train（默认，沿用 checkpoint 配置）/ off / hold=a,b[;delay=c,d]")
     ap.add_argument("--hysteresis", type=float, default=0.0,
                     help="诊断用：最优动作 logit 比上一步高出超过 τ 才换（0 = 纯 argmax）")
     ap.add_argument("--out", default=None, help="结果 json（默认 checkpoint 同目录 eval-<名>-<时间>.json）")
@@ -45,6 +73,7 @@ def main(argv: list[str] | None = None) -> int:
         over["env"] = {"cards_dir": a.cards_dir}
     if a.intent:
         over["eval"] = {**over.get("eval", {}), "intent": a.intent}
+    over = deep_merge(over, parse_motor(a.motor))
     cfg = from_dict(deep_merge(ck["cfg"], over))
     device = pick_device(cfg["run"]["device"])
     torch.set_num_threads(int(cfg["run"]["torch_threads"]))
@@ -67,7 +96,7 @@ def main(argv: list[str] | None = None) -> int:
     t0 = time.perf_counter()
     res = evaluate(cfg, ppo, featurizer, images, specs, device, hysteresis=a.hysteresis)
     res["checkpoint"] = {"path": str(a.checkpoint), "update": int(ck["update"]), "env_steps": int(ck["env_steps"]),
-                         "hysteresis": a.hysteresis}
+                         "hysteresis": a.hysteresis, "motor": dict(cfg["motor"]), "motor_arg": a.motor}
     print(console.eval_block(int(ck["update"]), res, False, time.perf_counter() - t0), flush=True)
 
     ckp = Path(a.checkpoint)

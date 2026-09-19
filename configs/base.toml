@@ -42,6 +42,13 @@ w_lo = 0.25            # 相对均匀权重的下限
 w_hi = 4.0             # 上限：挡住近乎必死的卡把采样吸干
 min_episodes = 30      # 样本不足的起点权重保持 1
 
+# 手部运动层（实验 N）：策略只说「想按哪个方向」，实际按出去的由 envwrap.MotorLayer 决定。
+# 约束是**随机**的、且抽到的值对模型不可见——确定性的「至少 N 帧」只是把格子变粗，挡不住精确操作。
+[motor]
+enabled = false
+hold = [2, 6]          # 每段方向的最短保持帧数 ~ U{lo..hi}（60Hz：33–100 ms），换段时抽
+delay = [0, 0]         # 变向生效延迟 ~ U{lo..hi} 帧；[0, 0] = 没有时机散布
+
 [featurize]
 name = "danger_topk_v3"
 k_bullets = 64
@@ -92,6 +99,7 @@ episodes = 32
 greedy = true
 seed = 12345
 intent = "lower_half_uniform_v1"   # 评测意图钉死，与训练意图解耦（空串 = 跟训练一致）
+motor = "train"                    # 评测沿用 [motor]（主判据）；"off" = 评测时关掉运动层
 
 [log]
 tensorboard = true

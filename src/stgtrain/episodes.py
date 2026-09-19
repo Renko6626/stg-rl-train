@@ -12,7 +12,7 @@ from .envwrap import RawObs, StepInfo
 
 _COLS = ("return", "steps", "in_r", "edge", "shift", "dirchg", "reach_sum", "reach_cnt",
          "keys", "dir_in", "dir_out", "steps_in", "steps_out", "graze", "close4", "close12",
-         "quick", "quick3", "dir_near", "steps_near")
+         "quick", "quick3", "dir_near", "steps_near", "mv_seg", "mv_le2", "mv_le3", "override")
 CLOSE_PX = (4.0, 12.0)  # 神穿指标：自机判定边缘到最近弹边缘的距离阈值
 # 连击两档都记：≤2 与历史实验（F/G0/H/I）同口径，≤3 对应 reward.quick_frames 的默认判据。
 # 指标口径固定，不跟着 reward 阈值走——否则换个惩罚参数，历史数字就全废了。
@@ -62,6 +62,10 @@ class EpisodeTracker:
         quick = dir_chg & (hold <= QUICK_STEPS) & alive
         quick3 = dir_chg & (hold <= QUICK_STEPS3) & alive
         danger = (near < DANGER_PX) & alive
+        # 「像不像人手」：刚结束的那一段若是**移动段**（上一步按着方向），它持续了几帧（= hold）。
+        # 与 quick 的区别：quick 把「不动」的段也算进去，而人手做不出来的是 1–2 帧的**点按**。
+        mv_end = dir_chg & ((info.prev_buttons & actions.DIR_MASK) != 0) & alive
+        override = (info.overridden & alive) if info.overridden is not None else torch.zeros_like(alive)
 
         self.since = self.since + 1
         newly = in_r & ~self.reached
@@ -78,7 +82,8 @@ class EpisodeTracker:
                 pressed.float(), (dir_chg & at_r).float(), (dir_chg & at_out).float(), at_r.float(), at_out.float(),
                 info.events[:, 1].to(torch.float32), ((near < CLOSE_PX[0]) & alive).float(),
                 ((near < CLOSE_PX[1]) & alive).float(),
-                quick.float(), quick3.float(), (dir_chg & danger).float(), danger.float()]
+                quick.float(), quick3.float(), (dir_chg & danger).float(), danger.float(),
+                mv_end.float(), (mv_end & (hold <= 2)).float(), (mv_end & (hold <= 3)).float(), override.float()]
         cols += [raw_terms[name].to(torch.float32) for name in self.term_names]
         self.acc = self.acc + torch.stack(cols, dim=-1)
 
@@ -128,6 +133,10 @@ class EpisodeTracker:
                 "dir_changes_near": int(a[18]), "dir_changes_far": int(a[5] - a[18]),
                 "secs_near": a[19] * self.frame_skip / 60.0,
                 "secs_far": max(a[1] - a[19], 0.0) * self.frame_skip / 60.0,
+                # 人手指标（实验 N）：移动段里 ≤2 / ≤3 帧点按的占比（计数留着给评测按总量合并）、运动层做主的帧占比
+                "mv_segs": int(a[20]), "mv_le2": int(a[21]), "mv_le3": int(a[22]),
+                "seg_le2_frac": a[21] / max(a[20], 1.0), "seg_le3_frac": a[22] / max(a[20], 1.0),
+                "motor_override_frac": a[23] / steps,
             }
             for k, name in enumerate(self.term_names):
                 rec[f"term/{name}"] = a[len(_COLS) + k]

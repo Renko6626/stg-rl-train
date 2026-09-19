@@ -27,7 +27,7 @@ def summarize_eval(records: list[dict]) -> dict[str, float]:
     def frac(code: int) -> float:
         return sum(1 for r in records if r["done"] == code) / n
 
-    return {
+    out = {
         "episodes": float(n), "survival": frac(2), "death": frac(1), "timeout": frac(3),
         "frames_mean": mean("frames"), "return_mean": mean("return"), "in_r_frac": mean("in_r_frac"),
         "reach_frames_median": float(statistics.median(float(r["reach_frames"]) for r in records)),
@@ -41,6 +41,12 @@ def summarize_eval(records: list[dict]) -> dict[str, float]:
         "quick3_per_s": mean("quick3_per_s"),
         "dir_changes_out_r_per_s": pooled_rate(records, "dir_changes_out_r", "secs_out_r"),
     }
+    if "mv_segs" in records[0]:
+        # 人手指标（实验 N 起）：按总量合并 —— 单局移动段可能很少，逐局平均会被小分母带偏
+        out["seg_le2_frac"] = pooled_rate(records, "mv_le2", "mv_segs")
+        out["seg_le3_frac"] = pooled_rate(records, "mv_le3", "mv_segs")
+        out["motor_override_frac"] = mean("motor_override_frac")
+    return out
 
 
 def pooled_rate(records: list[dict], count_key: str, secs_key: str) -> float:
@@ -62,10 +68,13 @@ def hysteresis_action(logits: Tensor, prev: Tensor, tau: float) -> Tensor:
 def eval_cfg(cfg: dict) -> dict:
     """评测用的配置：`eval.intent` 非空时覆盖意图（训练意图换了，尺子不跟着换）。"""
     name = cfg["eval"].get("intent") or cfg["intent"]["name"]
-    if name == cfg["intent"]["name"]:
+    motor_off = cfg["eval"].get("motor", "train") == "off" and cfg["motor"]["enabled"]
+    if name == cfg["intent"]["name"] and not motor_off:
         return cfg
     c = copy.deepcopy(cfg)
     c["intent"]["name"] = name
+    if motor_off:
+        c["motor"]["enabled"] = False
     return c
 
 
