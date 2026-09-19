@@ -166,13 +166,18 @@ class EnvWrapper:
             events = self._dev(self.buf["events"]).to(torch.int64)
             ep_frames = self._dev(self.buf["ep_frames"]).to(torch.int64)
             ended = done != 0
+            # **先拍下模式再 reset**：reset 会给结束的 env 抽新一局的模式，晚读就把刚结束那局
+            # 标成了下一局的档，三档统计等于随机切一刀（2026-09-19 实验 I 踩过）。
+            # start_index 没这个问题——它是 env 在自动 reset 之前写进缓冲的。
+            mode = getattr(self.intent, "mode", None)
+            mode = mode.clone() if mode is not None else None
             self.intent.reset(ended)
             self._draw_mirror(ended)
             refreshed = self.intent.advance(self.frame_skip, ~ended)
             info = StepInfo(done=done, events=events, ep_frames=ep_frames, refreshed=refreshed,
                             buttons=buttons, prev_buttons=self.prev_buttons,
                             start_index=self._dev(self.buf["start_index"]).to(torch.int64),
-                            intent_mode=getattr(self.intent, "mode", None))
+                            intent_mode=mode)
             self.prev_buttons = torch.where(ended, torch.zeros_like(buttons), buttons)
             # 智能体坐标系的动作 id：镜像只在新局重抽，而新局这里清零，所以不会与镜像标志错位
             self.prev_action = torch.where(ended, torch.zeros_like(action_ids), action_ids.to(torch.int64))

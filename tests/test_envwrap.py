@@ -167,3 +167,35 @@ def test_prev_action_cleared_on_episode_end():
         if (info.done == 2).all():
             break
     assert obs.prev_action.eq(0).all()
+
+
+def test_reported_intent_mode_is_the_finished_episode_not_the_next_one():
+    """局结束那一步，StepInfo.intent_mode 必须是**刚结束那局**的档。
+
+    intent.reset(ended) 会给结束的 env 抽下一局的模式；晚读一步就把统计全打乱——
+    三档独立抽样时，分组等于随机切一刀，三档指标会一模一样（实验 I 踩过这个坑）。
+    """
+    w = ring(max_frames=3)                      # 3 帧一局，保证很快有 ended
+    w.reset()
+
+    class Stub:                                  # 模式每次 reset 都翻面，便于分辨读的是哪一边
+        def __init__(self, n):
+            self.mode = torch.zeros(n, dtype=torch.int64)
+            self.target = torch.zeros(n, 2)
+        def reset(self, mask):
+            self.mode = torch.where(mask, 1 - self.mode, self.mode)
+        def reset_all(self):
+            pass
+        def advance(self, frames, active):
+            return torch.zeros_like(active)
+
+    w.intent = Stub(w.n)
+    seen_ended = False
+    for _ in range(12):
+        _, info = w.step(still(w.n))
+        ended = info.done != 0
+        if ended.any():
+            seen_ended = True
+            # 结束的那些 env：报的必须是翻面**之前**的值，而不是 intent 当前持有的新值
+            assert torch.equal(info.intent_mode[ended], 1 - w.intent.mode[ended])
+    assert seen_ended, "没等到任何一局结束，测试没押到东西"
