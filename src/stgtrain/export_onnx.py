@@ -8,15 +8,18 @@
 
     bullets      f32[B, 5]   x, y, vx, vy, radius
     bullets_mask bool[B]
-    enemies      f32[E, 4]   x, y, hit_w, boss
+    enemies      f32[E, 6]   x, y, hit_w, boss, vx, vy
     enemies_mask bool[E]
     player       f32[5]      x, y, hit_radius, speed, focus
     target       f32[2]      锚点
     prev_action  i64[1]      上一步动作 id，0–17
     → logits     f32[18]
 
-`enemies` 只有四列是因为 `danger_topk_v2` 只读 x / y / hit_w / boss。上实验 G 的
-`danger_topk_v3`（敌人速度）要重导一张图并 bump `GRAPH_VERSION`。
+**图版本 2（2026-09-20）**：`enemies` 从四列加到六列，多出来的 `vx, vy` 是 `danger_topk_v3` 要的敌人速度。
+env 不导出这两个量，训练侧由 `envwrap.enemy_velocity` 按 id 差分上一帧得到；部署侧 C 端
+（契约仓 `sa_model_fill` + `sa_model_track_t`）照同一口径差分后填进来 —— **差分不在图里**，图是无状态的。
+v2 的 checkpoint 也按六列签名导出（那两列进了图没人读），所以同一个 DLL 能换着装 F 与 J 的图；
+版本 1 的旧图（四列）新 DLL 会在建会话时拒掉。
 
 用法：
 
@@ -38,11 +41,12 @@ from .config import from_dict
 from .envwrap import RawObs
 from .featurize.danger_topk_v1 import _gather, closest_approach
 from .featurize.danger_topk_v2 import DangerTopKV2
+from .featurize.danger_topk_v3 import DangerTopKV3
 from .registry import FEATURIZERS, MODELS, load_builtins
 
-GRAPH_VERSION = 1
+GRAPH_VERSION = 2
 BULLET_COLS = 5
-ENEMY_COLS = 4
+ENEMY_COLS = 6
 PLAYER_COLS = 5
 #: dynamo 导出器的自然输出就是 18；请求 17 会让 onnxscript 的降级器抛
 #: `No initializer or constant input to node found`（TopK 的 axes 那类节点降不回去），
@@ -60,8 +64,8 @@ DEPLOY_BULLETS_ROWS = 640
 DEPLOY_ENEMIES_ROWS = 256
 
 
-class DangerTopKV2Export(DangerTopKV2):
-    """`danger_topk_v2` 的可导出孪生：**只重写 `_topk`**，其余计算逐行继承，杜绝两份实现漂移。
+class _ExportTopK:
+    """特征化器的可导出孪生用的 mixin：**只重写 `_topk`**，其余计算逐行继承，杜绝两份实现漂移。
 
     原版 `_topk` 有两处不适合导出：
 
@@ -84,12 +88,32 @@ class DangerTopKV2Export(DangerTopKV2):
         return idx, sel, d_norm, _gather(t, idx) / self.horizon
 
 
+class DangerTopKV2Export(_ExportTopK, DangerTopKV2):
+    pass
+
+
+class DangerTopKV3Export(_ExportTopK, DangerTopKV3):
+    """v3 的敌人行再走一遍 `_topk`（带相对速度），同样落在 mixin 重写的那一份上。"""
+
+
+#: checkpoint 的特征化器名 → 可导出孪生。不在表里的一律拒绝导出。
+EXPORT_FEATURIZERS = {"danger_topk_v2": DangerTopKV2Export, "danger_topk_v3": DangerTopKV3Export}
+
+
+def export_featurizer(cfg: dict):
+    name = cfg["featurize"]["name"]
+    if name not in EXPORT_FEATURIZERS:
+        raise ValueError(f"本导出器只支持 {sorted(EXPORT_FEATURIZERS)}，checkpoint 是 {name!r}"
+                         "（换特征化器要加一个可导出孪生；动了图签名还要 bump GRAPH_VERSION）")
+    return EXPORT_FEATURIZERS[name](cfg)
+
+
 class DeployWrapper(nn.Module):
     """原始表 → logits。把扁平输入摊成 `RawObs`（batch=1），交给导出用特征化器与训练好的模型。"""
 
     def __init__(self, cfg: dict, model: nn.Module, *, bullets_rows: int, enemies_rows: int):
         super().__init__()
-        self.feat = DangerTopKV2Export(cfg)
+        self.feat = export_featurizer(cfg)
         self.model = model
         self.bullets_rows = int(bullets_rows)
         self.enemies_rows = int(enemies_rows)
@@ -120,7 +144,7 @@ class DeployWrapper(nn.Module):
 def deploy_inputs(obs: RawObs, env: int, *, bullets_rows: int, enemies_rows: int) -> tuple[Tensor, ...]:
     """从训练侧 `RawObs` 取第 `env` 个 env，摊成图的七个输入。行数不足补零行 + 假掩码，超出则截断。
 
-    只取 `enemies` 的前四列（v2 用不到 vx / vy）。摊出来的形状与 dtype 就是 `INPUT_NAMES` 的契约，
+    `enemies` 六列全取（后两列是 `envwrap.enemy_velocity` 差分出来的速度）。摊出来的形状与 dtype 就是 `INPUT_NAMES` 的契约，
     ONNX 会话的输入校验、C 侧 `sa_model_in` 填的数组，三者必须一致。
     """
     def fit(t: Tensor, rows: int, cols: int) -> Tensor:
@@ -155,11 +179,11 @@ def build_deploy(ckpt_path, *, bullets_rows: int = DEPLOY_BULLETS_ROWS,
     """读 checkpoint，按它自带的配置重建模型并装上权重，返回 (wrapper, 元数据)。"""
     ck = load_checkpoint(ckpt_path, map_location="cpu")
     cfg = from_dict(ck["cfg"])
-    if ck["featurizer_name"] != "danger_topk_v2":
-        raise ValueError(f"本导出器只支持 danger_topk_v2，checkpoint 是 {ck['featurizer_name']!r}"
-                         "（换特征化器要重写 DangerTopKV2Export 并 bump GRAPH_VERSION）")
+    if ck["featurizer_name"] != cfg["featurize"]["name"]:
+        raise ValueError(f"checkpoint 自相矛盾：featurizer_name={ck['featurizer_name']!r}，"
+                         f"cfg 里是 {cfg['featurize']['name']!r}")
     load_builtins()
-    feat_spec = DangerTopKV2Export(cfg).spec()
+    feat_spec = export_featurizer(cfg).spec()
     model = MODELS.get(ck["model_name"])(cfg, feat_spec)
     agent_sd = ck["state"]["agent"]
     prefix = "model."
@@ -278,7 +302,7 @@ def _example_inputs(bullets_rows: int, enemies_rows: int) -> tuple[Tensor, ...]:
     bmask = torch.zeros(bullets_rows, dtype=torch.bool)
     bmask[0] = True
     enemies = torch.zeros(enemies_rows, ENEMY_COLS)
-    enemies[0] = torch.tensor([0.0, 96.0, 16.0, 1.0])
+    enemies[0] = torch.tensor([0.0, 96.0, 16.0, 1.0, 1.5, 2.0])
     emask = torch.zeros(enemies_rows, dtype=torch.bool)
     emask[0] = True
     player = torch.tensor([0.0, 384.0, 2.5, 4.5, 0.0])
@@ -290,7 +314,7 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="checkpoint → ONNX（特征化 + 网络一起）")
     ap.add_argument("checkpoint")
     ap.add_argument("--out", default="dist", help="产物目录（默认 dist/）")
-    ap.add_argument("--name", default="f-best", help="产物基名（默认 f-best → f-best.onnx / manifest.json）")
+    ap.add_argument("--name", default="best", help="产物基名（如 j-best → j-best.onnx / j-best.manifest.json）")
     ap.add_argument("--bullets-rows", type=int, default=DEPLOY_BULLETS_ROWS)
     ap.add_argument("--enemies-rows", type=int, default=DEPLOY_ENEMIES_ROWS)
     a = ap.parse_args(argv)
@@ -300,7 +324,7 @@ def main(argv: list[str] | None = None) -> int:
     onnx_path = out_dir / f"{a.name}.onnx"
     example = _example_inputs(a.bullets_rows, a.enemies_rows)
     export_graph(wrap, example, onnx_path)
-    man = write_manifest(out_dir / "manifest.json", checkpoint=a.checkpoint, onnx=onnx_path, meta=meta,
+    man = write_manifest(out_dir / f"{a.name}.manifest.json", checkpoint=a.checkpoint, onnx=onnx_path, meta=meta,
                          bullets_rows=a.bullets_rows, enemies_rows=a.enemies_rows)
 
     with torch.no_grad():

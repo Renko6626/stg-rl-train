@@ -35,13 +35,15 @@ gpucheck（有 CUDA 才跑）→ bench 选 num_envs / threads → 用 `probe/car
 「两边是同一张图」保证。设计见 renkolab `docs/superpowers/specs/2026-09-18-th06nc-onnx-policy-design.md`。
 
 ```bash
-uv run --frozen python -m stgtrain.export_onnx runs/<run>/checkpoints/best.pt --out dist
-# → dist/f-best.onnx（约 1.4 MB，权重内联，单文件）+ dist/manifest.json（出处与图签名）
+uv run --frozen python -m stgtrain.export_onnx runs/<run>/checkpoints/best.pt --out dist --name j-best
+# → dist/j-best.onnx（约 1.4 MB，权重内联，单文件）+ dist/j-best.manifest.json（出处与图签名）
 ```
 
 导出后会自动拿 onnxruntime 与 torch 对一遍 logits（偏差 > 1e-5 或 argmax 不同就退非零码）。
-只支持 `danger_topk_v2`；换特征化器（如实验 G 的 v3）要改 `DangerTopKV2Export` 并 bump
-`GRAPH_VERSION`。`dist/` 不入库，按 `rl-vX` wheel 的先例走 Release 分发。
+支持 `danger_topk_v2` / `danger_topk_v3`，两者导出的都是**图版本 2** 的同一套签名（`enemies` 六列，
+后两列是敌人速度；v2 的图不读它们），所以同一个 DLL 能换着装。敌人速度的差分**不在图里**，
+由 C 端 `sa_model_fill` 按 id 跨帧做（口径 = `envwrap.enemy_velocity`，含 16 px 瞬移守卫）。
+再换特征化器要在 `EXPORT_FEATURIZERS` 加一个可导出孪生；动了图签名还要两边一起 bump `GRAPH_VERSION`。`dist/` 不入库，按 `rl-vX` wheel 的先例走 Release 分发。
 
 ## 开发
 

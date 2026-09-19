@@ -29,8 +29,8 @@ from stgtrain.registry import FEATURIZERS, MODELS, load_builtins
 ROWS_B, ROWS_E = 16, 8
 
 
-def _cfg():
-    return small_cfg(featurize={"name": "danger_topk_v2", "k_bullets": 8, "k_enemies": 4})
+def _cfg(name="danger_topk_v3"):
+    return small_cfg(featurize={"name": name, "k_bullets": 8, "k_enemies": 4})
 
 
 _PLAYER = [(0.0, 384.0), (-60.0, 300.0)]
@@ -42,9 +42,10 @@ _BULLETS = [
      (0.0, 383.0, 0.0, 0.0, 2.0)],
     [(-60.0, 260.0, 0.0, 3.0, 5.0), (-100.0, 340.0, 2.0, -1.0, 2.5), (150.0, 440.0, 0.0, -1.0, 6.0)],
 ]
+# 敌行带速度（v3 的全部新意）：一只横移的 boss、一只朝自机俯冲的小怪
 _ENEMIES = [
-    [(20.0, 80.0, 16.0, 1.0), (-120.0, 40.0, 12.0, 0.0)],
-    [(-40.0, 120.0, 24.0, 1.0)],
+    [(20.0, 80.0, 16.0, 1.0, 2.5, 0.0), (-120.0, 40.0, 12.0, 0.0, 1.5, 3.0)],
+    [(-40.0, 120.0, 24.0, 1.0, -1.0, 2.0)],
 ]
 
 
@@ -78,18 +79,30 @@ def _wrapper_logits(cfg, model, obs, n):
     return torch.stack(out)
 
 
-def test_export_featurizer_spec_matches_training_one():
+FEATS = ["danger_topk_v2", "danger_topk_v3"]
+
+
+@pytest.mark.parametrize("name", FEATS)
+def test_export_featurizer_spec_matches_training_one(name):
     """导出用的特征化器只改 _topk 的哨兵写法，spec 必须逐项相同 —— 否则模型形状都对不上。"""
-    cfg = _cfg()
+    cfg = _cfg(name)
     load_builtins()
-    train_spec = FEATURIZERS.get("danger_topk_v2")(cfg).spec()
-    from stgtrain.export_onnx import DangerTopKV2Export
+    train_spec = FEATURIZERS.get(name)(cfg).spec()
+    from stgtrain.export_onnx import export_featurizer
 
-    assert DangerTopKV2Export(cfg).spec() == train_spec
+    assert export_featurizer(cfg).spec() == train_spec
 
 
-def test_deploy_wrapper_matches_training_path():
-    cfg, obs = _cfg(), _obs()
+def test_unknown_featurizer_is_refused():
+    from stgtrain.export_onnx import export_featurizer
+
+    with pytest.raises(ValueError, match="只支持"):
+        export_featurizer(_cfg("danger_topk_v1"))
+
+
+@pytest.mark.parametrize("name", FEATS)
+def test_deploy_wrapper_matches_training_path(name):
+    cfg, obs = _cfg(name), _obs()
     model, ref = _reference(cfg, obs)
     got = _wrapper_logits(cfg, model, obs, n=2)
     assert torch.allclose(got, ref, atol=1e-5), (got - ref).abs().max()
@@ -107,6 +120,33 @@ def test_prev_action_changes_logits():
         args[INPUT_NAMES.index("prev_action")] = torch.tensor([7], dtype=torch.int64)
         b = wrap(*args)
     assert not torch.allclose(a, b, atol=1e-6), "换了上一步动作 logits 却没变 —— one-hot 那一路没接上"
+
+
+def _logits_with_enemy_velocity_zeroed(name):
+    cfg = _cfg(name)
+    obs = _obs(n=1)
+    model, _ = _reference(cfg, obs)
+    wrap = DeployWrapper(cfg, model, bullets_rows=ROWS_B, enemies_rows=ROWS_E).eval()
+    args = list(deploy_inputs(obs, 0, bullets_rows=ROWS_B, enemies_rows=ROWS_E))
+    with torch.no_grad():
+        a = wrap(*args)
+        e = args[INPUT_NAMES.index("enemies")].clone()
+        e[:, 4:6] = 0.0
+        args[INPUT_NAMES.index("enemies")] = e
+        b = wrap(*args)
+    return a, b
+
+
+def test_enemy_velocity_changes_logits_v3():
+    """变异守卫：敌人速度是 v3 的全部新意；`deploy_inputs` 或 wrapper 把那两列丢了，本测试必须红。"""
+    a, b = _logits_with_enemy_velocity_zeroed("danger_topk_v3")
+    assert not torch.allclose(a, b, atol=1e-6), "敌人速度清零 logits 却没变 —— vx/vy 那两列没接上"
+
+
+def test_enemy_velocity_is_ignored_by_v2():
+    """v2 的图也按六列签名导出（同一个 DLL 换着装），但那两列进了图不能有人读。"""
+    a, b = _logits_with_enemy_velocity_zeroed("danger_topk_v2")
+    assert torch.equal(a, b)
 
 
 def test_masked_rows_cannot_influence_logits():
@@ -188,7 +228,7 @@ def test_build_deploy_loads_checkpoint_weights(tmp_path):
     with torch.no_grad():
         assert torch.allclose(wrap(*args), DeployWrapper(cfg, model, bullets_rows=ROWS_B,
                                                          enemies_rows=ROWS_E).eval()(*args), atol=1e-6)
-    assert meta["update"] == 7 and meta["featurizer_name"] == "danger_topk_v2"
+    assert meta["update"] == 7 and meta["featurizer_name"] == "danger_topk_v3"
 
 
 def test_manifest_records_provenance(tmp_path):
