@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 无人值守串行跑一批实验（默认 G0 → H → I，各约 2.5h，共约 7.5h）。
+# 无人值守串行跑一批实验（队列见下面的 EXPS；单条 2000 轮约 2h、3500 轮约 3h40）。
 #
 #   tmux new -s night
 #   bash scripts/run-night.sh                        # 自动选线程（未知机器先 bench 一次，三条复用）
@@ -21,10 +21,9 @@
 set -uo pipefail
 cd "$(dirname "$0")/.."
 
+# 当前队列（跑完一批就换成下一批；G0/H/I 已于 2026-09-19 跑完，见 docs/experiments.md）
 EXPS=(
-  "g0 configs/exp-g0-newpool.toml"
-  "h  configs/exp-h-curriculum.toml"
-  "i  configs/exp-i-freemix.toml"
+  "i2 configs/exp-i2-stack.toml"
 )
 THREADS=""; RETRIES=2; ONLY=""; SMOKE=0; CHECK=strict
 while [[ $# -gt 0 ]]; do
@@ -71,7 +70,7 @@ if [[ "$CHECK" == off ]]; then
   say "跳过 gpucheck（--no-check）"
 else
   say "gpucheck（真跑一次前向/反向 + 编译 + CUDA 图）……"
-  GC_ARGS=(configs/exp-g0-newpool.toml)
+  GC_ARGS=("${EXPS[0]#* }")
   [[ "$CHECK" == loose ]] && GC_ARGS+=(--warn-only)
   uv run --frozen python -m stgtrain.gpucheck "${GC_ARGS[@]}" || { say "gpucheck 没过，停（确认是浮点噪声就加 --loose-check）"; exit 1; }
 fi
@@ -85,7 +84,7 @@ if [[ -z "$THREADS" ]]; then
     say "识别到 $CPU × $(nproc) 逻辑核 → threads = 32（实测最快）"
   else
     say "未知机器（$CPU × $(nproc) 逻辑核），bench 选线程（约 5 分钟，只做这一次）……"
-    uv run --frozen python -m stgtrain.train configs/exp-g0-newpool.toml bench-night --bench
+    uv run --frozen python -m stgtrain.train "${EXPS[0]#* }" bench-night --bench
     BENCH="$(ls -td runs/*bench-night*/ | head -1)"
     THREADS="$(uv run --frozen python -c "import json,sys;print(json.load(open(sys.argv[1]))['recommended']['threads'])" "$BENCH/bench.json")"
     say "bench 推荐 threads = $THREADS"

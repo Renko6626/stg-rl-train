@@ -104,14 +104,18 @@ def run_group(cfg: dict, ppo, featurizer, image, card: str, rank: int, episodes:
 
 
 def evaluate(cfg: dict, ppo, featurizer, images: dict, specs: list[EvalSpec], device, hysteresis: float = 0.0) -> dict:
-    result: dict = {"cards": {}, "overall": {}}
+    result: dict = {"cards": {}, "overall": {}, "by_rank": {}}
     everything: list[dict] = []
+    by_rank: dict[int, list[dict]] = {}
     for spec in specs:
         per: dict[str, dict] = {}
         for rank in spec.ranks:
             recs = run_group(cfg, ppo, featurizer, images[spec.card], spec.card, rank, spec.episodes, device, hysteresis)
             per[f"r{rank}"] = summarize_eval(recs)
             everything.extend(recs)
+            by_rank.setdefault(rank, []).extend(recs)
         result["cards"][spec.card] = per
     result["overall"] = summarize_eval(everything)
+    # 分档聚合：评测集加档之后 `overall` 换了口径，`by_rank.r2` 保持与历史实验同口径可比。
+    result["by_rank"] = {f"r{r}": summarize_eval(recs) for r, recs in sorted(by_rank.items())}
     return result

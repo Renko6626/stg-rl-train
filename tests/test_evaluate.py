@@ -82,3 +82,21 @@ def test_eval_intent_is_pinned_and_does_not_mutate_the_training_cfg():
     assert cfg["intent"]["name"] == "mixed_v1", "不得就地改调用方的配置"
     same = {"intent": {"name": "lower_half_uniform_v1"}, "eval": {"intent": ""}}
     assert eval_cfg(same) is same, "空串 = 跟训练一致，直接返回原配置"
+
+
+def test_by_rank_keeps_each_difficulty_separately_comparable():
+    """评测集加档后 `overall` 换了口径；`by_rank.rN` 必须能把各档单独拎出来
+    （历史实验只测 rank 2，回看时对的是 by_rank.r2，不是 overall）。"""
+    from stgtrain.cards import EvalSpec
+    cfg = small_cfg()
+    device = torch.device("cpu")
+    images = compile_cards(discover(FIXTURES / "cards"))
+    feat = FEATURIZERS.get("danger_topk_v1")(cfg)
+    ppo = PPO(cfg, lambda: MODELS.get("set_attn_v1")(cfg, feat.spec()), device)
+    ppo.act = lambda feats, greedy: torch.full((feats["player"].shape[0],), 10, dtype=torch.int64)
+    res = evaluate(cfg, ppo, feat, images, [EvalSpec(card="example_calm", ranks=(1, 2), episodes=2)], device)
+    assert set(res["by_rank"]) == {"r1", "r2"}
+    assert res["by_rank"]["r1"]["episodes"] == 2 and res["by_rank"]["r2"]["episodes"] == 2
+    assert res["overall"]["episodes"] == 4
+    # 分档聚合必须与分卡那份一致（同一批局的两种切法）
+    assert res["by_rank"]["r2"]["survival"] == res["cards"]["example_calm"]["r2"]["survival"]

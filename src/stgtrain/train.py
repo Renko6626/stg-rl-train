@@ -193,7 +193,8 @@ def train(cfg: dict, run_dir: Path, resume: dict | None = None, pack_result: boo
                 res = evaluate(cfg, ppo, featurizer, images, specs, device)
                 (run_dir / "eval" / f"{update}.json").write_text(json.dumps(res, indent=2, ensure_ascii=False),
                                                                encoding="utf-8")
-                logger.log(update, env_steps, {f"eval/{k}": v for k, v in res["overall"].items()})
+                logger.log(update, env_steps, {f"eval/{k}": v for k, v in res["overall"].items()}
+                           | {f"eval/{rk}/{k}": v for rk, d in res.get("by_rank", {}).items() for k, v in d.items()})
                 sc = score(res["overall"])
                 is_best = best is None or sc > best
                 if is_best:

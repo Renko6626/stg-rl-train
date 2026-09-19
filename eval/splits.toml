@@ -8,54 +8,61 @@
 #   3. 每关都有道中与 boss（含符卡）；标签覆盖 aimed/stream/ring/curve/spiral/random/fast/mixed。
 #   4. 训练侧每个标签至少保留一张。
 #
-# ⚠ 与 2026-09-17 的实验 A–F 的撑过率不可直接比（那批评测集含 2 张无弹卡，且没有密档）。
+# 2026-09-19 第三版：**每张卡加 rank 3**（10 张全都有 3 档）。理由是 rank 2 已经在见顶——
+# G0/H/I 三条里 s1_w04 / s2_w08 三家都是 1.00，s3_b5 / s3_mb3 / s3_b7 也有两家顶格，
+# 十张里有效区分度基本只剩 s1_b4（0.72–0.94）与 s2_b6（0.78–0.94）两张。rank 3 的弹量跳得很凶
+# （s1_b4 187→360、s2_b6 385→639、s3_w02 495→768），能把天花板顶开。
+# 训练用的是 rank 2（E/N 专属卡钳到 1），所以 rank 3 测的是**对未见难度的泛化**。
+#
+# ⚠ 可比性：`overall` 现在是 r2+r3 混合，与 A–I 不可直接比；**`by_rank.r2` 那一组与历史同口径**
+# （训练日志里对应 eval/r2/*）。与 2026-09-17 的实验 A–F 更是不可比（那批含 2 张无弹卡且没有密档）。
 
 [[eval]]
 card = "th06_s1_w04"     # 第 1 关 道中 · 稀 · 峰值 96 / 场上均值 56
-ranks = [2]
+ranks = [2, 3]
 episodes = 32
 
 [[eval]]
 card = "th06_s1_b4"     # 第 1 关 符卡 · 中（与 probe/splits 相同，便于回溯） · 峰值 187 / 场上均值 113
-ranks = [2]
+ranks = [2, 3]
 episodes = 32
 
 [[eval]]
 card = "th06_s2_w08"     # 第 2 关 道中 · 中 · 峰值 205 / 场上均值 75
-ranks = [2]
+ranks = [2, 3]
 episodes = 32
 
 [[eval]]
 card = "th06_s2_mb1"     # 第 2 关 中 boss 非符 · 中（spiral） · 峰值 214 / 场上均值 72
-ranks = [2]
+ranks = [2, 3]
 episodes = 32
 
 [[eval]]
 card = "th06_s2_b6"     # 第 2 关 符卡 · 密（random dense） · 峰值 385 / 场上均值 241
-ranks = [2]
+ranks = [2, 3]
 episodes = 32
 
 [[eval]]
 card = "th06_s3_w02"     # 第 3 关 道中 · 中（fast） · 峰值 495 / 场上均值 154
-ranks = [2]
+ranks = [2, 3]
 episodes = 32
 
 [[eval]]
 card = "th06_s3_w12"     # 第 3 关 道中 · 密（640 弹池等效截止那张） · 峰值 700 / 场上均值 223
-ranks = [2]
+ranks = [2, 3]
 episodes = 32
 
 [[eval]]
 card = "th06_s3_b5"     # 第 3 关 boss 非符 · 中 · 峰值 433 / 场上均值 176
-ranks = [2]
+ranks = [2, 3]
 episodes = 32
 
 [[eval]]
 card = "th06_s3_mb3"     # 第 3 关 中 boss 符卡 · 密（spiral，全池第二密） · 峰值 602 / 场上均值 396
-ranks = [2]
+ranks = [2, 3]
 episodes = 32
 
 [[eval]]
 card = "th06_s3_b7"     # 第 3 关 boss 符卡 · 中（mixed） · 峰值 308 / 场上均值 178
-ranks = [2]
+ranks = [2, 3]
 episodes = 32
