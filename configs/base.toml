@@ -58,6 +58,7 @@ trunk = 256
 [reward]
 hold_radius = 24.0
 edge_margin = 16.0
+quick_frames = 3       # 连击判据：上一个方向保持 ≤ 这么多步就又换 = 振荡（60Hz 下 3 步 = 50ms）
 
 [reward.terms]
 death = 10.0
@@ -65,6 +66,7 @@ follow_shaping = 1.0
 hold = 0.01
 segment_survived = 0.0
 key_press = 0.0
+quick_change = 0.0
 shift_toggle = 0.0
 edge_hug = 0.0
 

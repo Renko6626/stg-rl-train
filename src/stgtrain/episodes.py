@@ -12,9 +12,11 @@ from .envwrap import RawObs, StepInfo
 
 _COLS = ("return", "steps", "in_r", "edge", "shift", "dirchg", "reach_sum", "reach_cnt",
          "keys", "dir_in", "dir_out", "steps_in", "steps_out", "graze", "close4", "close12",
-         "quick", "dir_near", "steps_near")
+         "quick", "quick3", "dir_near", "steps_near")
 CLOSE_PX = (4.0, 12.0)  # 神穿指标：自机判定边缘到最近弹边缘的距离阈值
-QUICK_STEPS = 2   # 上一次变向到这一次 ≤ 2 步 = 连击（60Hz 下 ≤33ms，人做不到）
+# 连击两档都记：≤2 与历史实验（F/G0/H/I）同口径，≤3 对应 reward.quick_frames 的默认判据。
+# 指标口径固定，不跟着 reward 阈值走——否则换个惩罚参数，历史数字就全废了。
+QUICK_STEPS, QUICK_STEPS3 = 2, 3
 DANGER_PX = 24.0  # 最近弹边缘在这个距离内算「弹到脸上」，用来分「临危抖」与「平时抖」
 NEVER = 1 << 20   # hold 的初值：开局第一次变向不算连击
 
@@ -29,7 +31,7 @@ class EpisodeTracker:
         self.acc = torch.zeros(self.n, len(_COLS) + len(self.term_names), device=device)
         self.since = torch.zeros(self.n, device=device)
         # 距上次变向多少步。全局平均看不出「平时不动、弹来了猛抽」——这个计数器让连击现形。
-        self.hold = torch.full((self.n,), NEVER, dtype=torch.int64, device=device)
+        self.hold = torch.full((self.n,), NEVER, dtype=torch.int64, device=device)   # info.dir_hold 缺席时的兜底
         self.reached = torch.zeros(self.n, dtype=torch.bool, device=device)
         self._pending: list[tuple[Tensor, Tensor, Tensor, Tensor]] = []
 
@@ -51,9 +53,14 @@ class EpisodeTracker:
         near = edge_d.masked_fill(~cur.bullets_mask, float("inf")).min(dim=1).values if cur.bullets.shape[1] else \
             torch.full_like(d, float("inf"))
 
-        self.hold = self.hold + 1
-        quick = dir_chg & (self.hold <= QUICK_STEPS) & alive
-        self.hold = torch.where(dir_chg, torch.zeros_like(self.hold), self.hold)
+        if info.dir_hold is not None:
+            hold = info.dir_hold          # envwrap 算好的那一份（reward 也吃它）
+        else:
+            self.hold = self.hold + 1
+            hold = self.hold
+            self.hold = torch.where(dir_chg, torch.zeros_like(self.hold), self.hold)
+        quick = dir_chg & (hold <= QUICK_STEPS) & alive
+        quick3 = dir_chg & (hold <= QUICK_STEPS3) & alive
         danger = (near < DANGER_PX) & alive
 
         self.since = self.since + 1
@@ -71,7 +78,7 @@ class EpisodeTracker:
                 pressed.float(), (dir_chg & at_r).float(), (dir_chg & at_out).float(), at_r.float(), at_out.float(),
                 info.events[:, 1].to(torch.float32), ((near < CLOSE_PX[0]) & alive).float(),
                 ((near < CLOSE_PX[1]) & alive).float(),
-                quick.float(), (dir_chg & danger).float(), danger.float()]
+                quick.float(), quick3.float(), (dir_chg & danger).float(), danger.float()]
         cols += [raw_terms[name].to(torch.float32) for name in self.term_names]
         self.acc = self.acc + torch.stack(cols, dim=-1)
 
@@ -116,10 +123,11 @@ class EpisodeTracker:
                 "graze_per_s": a[13] / secs,
                 "close4_frac": a[14] / max(a[11] + a[12], 1.0), "close12_frac": a[15] / max(a[11] + a[12], 1.0),
                 # 抖动的**形状**：连击占比 + 临危/平时分开的变向率（后两个按总时长合并，见 summarize）
-                "quick_frac": a[16] / max(a[5], 1.0),
-                "dir_changes_near": int(a[17]), "dir_changes_far": int(a[5] - a[17]),
-                "secs_near": a[18] * self.frame_skip / 60.0,
-                "secs_far": max(a[1] - a[18], 0.0) * self.frame_skip / 60.0,
+                "quick_frac": a[16] / max(a[5], 1.0), "quick3_frac": a[17] / max(a[5], 1.0),
+                "quick3_per_s": a[17] / secs,
+                "dir_changes_near": int(a[18]), "dir_changes_far": int(a[5] - a[18]),
+                "secs_near": a[19] * self.frame_skip / 60.0,
+                "secs_far": max(a[1] - a[19], 0.0) * self.frame_skip / 60.0,
             }
             for k, name in enumerate(self.term_names):
                 rec[f"term/{name}"] = a[len(_COLS) + k]

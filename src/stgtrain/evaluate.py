@@ -37,7 +37,8 @@ def summarize_eval(records: list[dict]) -> dict[str, float]:
         "dir_changes_in_r_per_s": pooled_rate(records, "dir_changes_in_r", "secs_in_r"),
         "dir_changes_near_per_s": pooled_rate(records, "dir_changes_near", "secs_near"),
         "dir_changes_far_per_s": pooled_rate(records, "dir_changes_far", "secs_far"),
-        "quick_frac": mean("quick_frac"),
+        "quick_frac": mean("quick_frac"), "quick3_frac": mean("quick3_frac"),
+        "quick3_per_s": mean("quick3_per_s"),
         "dir_changes_out_r_per_s": pooled_rate(records, "dir_changes_out_r", "secs_out_r"),
     }
 

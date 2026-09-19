@@ -90,7 +90,8 @@ from stgagent import consts as C
 from stgtrain.envwrap import StepInfo
 
 
-def step_info(n=2, done=None, refreshed=None, buttons=None, prev_buttons=None, ep_frames=100) -> StepInfo:
+def step_info(n=2, done=None, refreshed=None, buttons=None, prev_buttons=None, ep_frames=100,
+              dir_hold=None) -> StepInfo:
     def i64(v, default):
         return torch.tensor(v, dtype=torch.int64) if v is not None else torch.full((n,), default, dtype=torch.int64)
 
@@ -101,4 +102,5 @@ def step_info(n=2, done=None, refreshed=None, buttons=None, prev_buttons=None, e
         refreshed=torch.tensor(refreshed, dtype=torch.bool) if refreshed is not None else torch.zeros(n, dtype=torch.bool),
         buttons=i64(buttons, C.BTN_SHOT),
         prev_buttons=i64(prev_buttons, C.BTN_SHOT),
+        dir_hold=i64(dir_hold, 1 << 20),
     )

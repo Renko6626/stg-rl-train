@@ -10,7 +10,7 @@ load_builtins()
 
 
 def ctx(prev, cur, info, gamma=1.0):
-    return RewardContext(prev, cur, info, gamma=gamma, hold_radius=24.0, edge_margin=16.0)
+    return RewardContext(prev, cur, info, gamma=gamma, hold_radius=24.0, quick_frames=3, edge_margin=16.0)
 
 
 def term(name, *a, **k):
@@ -110,3 +110,17 @@ def test_rollout_features_and_rewards_are_deterministic():
         for k in a:
             assert torch.equal(a[k], b[k]), k
     assert all(torch.equal(x, y) for x, y in zip(ra, rb))
+
+
+def test_quick_change_only_punishes_sub_human_reversals():
+    """只罚「上一个方向没保持够 quick_frames 步就又换」，正常移动一分不扣。"""
+    o = raw_obs(n=4)
+    info = step_info(n=4,
+                     prev_buttons=[C.BTN_LEFT] * 4,
+                     buttons=[C.BTN_RIGHT, C.BTN_RIGHT, C.BTN_LEFT, C.BTN_RIGHT],
+                     dir_hold=[2, 9, 1, 3])   # 第 3 个没换方向；第 4 个恰好等于阈值 3
+    assert term("quick_change", o, o, info).tolist() == [1.0, 0.0, 0.0, 1.0]
+    # 老数据（没有 dir_hold）不许炸，静默记 0
+    bare = step_info(n=4, prev_buttons=[C.BTN_LEFT] * 4, buttons=[C.BTN_RIGHT] * 4)
+    bare.dir_hold = None
+    assert term("quick_change", o, o, bare).tolist() == [0.0] * 4

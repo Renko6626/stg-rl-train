@@ -23,6 +23,7 @@ class RewardContext:
     info: StepInfo
     gamma: float
     hold_radius: float
+    quick_frames: int
     edge_margin: float
 
     @property
@@ -65,6 +66,20 @@ def key_press(ctx: RewardContext) -> Tensor:
     return actions.key_changes(ctx.info.prev_buttons, ctx.info.buttons)[0].to(torch.float32)
 
 
+@REWARD_TERMS.register("quick_change")
+def quick_change(ctx: RewardContext) -> Tensor:
+    """**只罚「上一个方向没保持够 N 步就又换」**，不碰正常移动。
+
+    `key_press` 是无差别惩罚，压水平不挑形状：D→E→F 一路加码，边际在变差，而且会把有用的
+    移动一起压掉。实测（评测集）F 的方向变化里有 43% 发生在上一次变向后 ≤2 步——60Hz 下
+    ≤33ms，那不是反应，是振荡。本项专打这一段，`quick_frames` 之外的变向一分不扣。
+    """
+    if ctx.info.dir_hold is None:
+        return torch.zeros_like(ctx.alive)
+    changed = actions.direction_changed(ctx.info.prev_buttons, ctx.info.buttons)
+    return (changed & (ctx.info.dir_hold <= ctx.quick_frames)).to(torch.float32)
+
+
 @REWARD_TERMS.register("shift_toggle")
 def shift_toggle(ctx: RewardContext) -> Tensor:
     return actions.key_changes(ctx.info.prev_buttons, ctx.info.buttons)[1].to(torch.float32)
@@ -89,10 +104,11 @@ class RewardFn:
         self.terms = terms
         self.gamma = float(cfg["ppo"]["gamma"])
         self.hold_radius = float(cfg["reward"]["hold_radius"])
+        self.quick_frames = int(cfg["reward"]["quick_frames"])
         self.edge_margin = float(cfg["reward"]["edge_margin"])
 
     def __call__(self, prev: RawObs, cur: RawObs, info: StepInfo) -> tuple[Tensor, dict[str, Tensor]]:
-        ctx = RewardContext(prev, cur, info, self.gamma, self.hold_radius, self.edge_margin)
+        ctx = RewardContext(prev, cur, info, self.gamma, self.hold_radius, self.quick_frames, self.edge_margin)
         raw = {name: fn(ctx) for name, fn in self.fns.items()}
         total = torch.zeros_like(info.done, dtype=torch.float32)
         for name, value in raw.items():

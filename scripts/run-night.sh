@@ -9,6 +9,8 @@
 #   bash scripts/run-night.sh --smoke                # 30 秒 CPU 冒烟：先确认脚本本身没问题再放它跑整夜
 #   bash scripts/run-night.sh --loose-check          # gpucheck 不通过也继续（只打印 WARN）
 #   bash scripts/run-night.sh --no-check             # 完全跳过 gpucheck
+#   bash scripts/run-night.sh --parallel 2           # 同机并行 2 条（受限于显存，见下）
+#   bash scripts/run-night.sh --parallel 2           # 同机并行 2 条（显存够就行，见下）
 #
 # 设计要点（都是为了睡觉时别白跑）：
 #   · **开跑前先体检**：GPU 可见 + gpucheck（真做一次前向/反向，编译与 CUDA 图都走一遍）+ 磁盘余量。
@@ -18,14 +20,25 @@
 #   · **一条挂了继续下一条**：所以不开 `set -e`。H 和 I 都只跟 G0 比，G0 没跑成也不必整夜停摆。
 #   · **线程只 bench 一次**：run-exp.sh 是单条脚本，每条都会 bench（约 5 分钟）；这里测一次三条复用。
 #   · 日志：runs/<名>.console.log（单条）与 runs/night-<时间>.log（总）。
+#   · **并行**：单条实测占显存 10.1G、GPU 利用率中位 37%、128 逻辑核只用掉约 6.7 个
+#     （env 线程 32 个，但 env_step 只占一轮的 24%）。所以同机并行卡在**显存**而不是算力：
+#     24G 的卡塞得下 2 条（20.2G），3 条不行。两条合计吞吐约 1.4 倍（那 40% 的 update 阶段会串行化），
+#     两条实验从串行 7h20 缩到约 5h15。要线性加速就另租一台，别硬塞第三条。
+#   · **并行**：单条实测占 GPU 显存 10.1G、GPU 利用率中位 37%、128 逻辑核里只用掉约 6.7 个
+#     （env 线程 32 个，但 env_step 只占一轮的 24%）。所以同机并行受限于**显存**而非算力：
+#     24G 卡能塞 2 条（20.2G），3 条不行。两条并行的合计吞吐约 1.4 倍（GPU 那 40% 的更新阶段会串行化），
+#     即两条实验从串行 7h20 缩到约 5h15。要线性加速就另租一台，别硬塞第三条。
 set -uo pipefail
 cd "$(dirname "$0")/.."
 
 # 当前队列（跑完一批就换成下一批；G0/H/I 已于 2026-09-19 跑完，见 docs/experiments.md）
 EXPS=(
   "i2 configs/exp-i2-stack.toml"
+  "j  configs/exp-j-quickchange.toml"
 )
-THREADS=""; RETRIES=2; ONLY=""; SMOKE=0; CHECK=strict
+THREADS=""; RETRIES=2; ONLY=""; SMOKE=0; CHECK=strict; PAR=1
+VRAM_PER_RUN_MB=11000     # 单条实测峰值 10.1G，留一点余量; PAR=1
+VRAM_PER_RUN_MB=11000     # 单条实测峰值 10.1G，留一点余量
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --threads) THREADS="$2"; shift 2 ;;
@@ -34,6 +47,8 @@ while [[ $# -gt 0 ]]; do
     --smoke)   SMOKE=1;      shift 1 ;;
     --loose-check) CHECK=loose; shift 1 ;;
     --no-check)    CHECK=off;   shift 1 ;;
+    --parallel)    PAR="$2";    shift 2 ;;
+    --parallel)    PAR="$2";    shift 2 ;;
     *) echo "未知参数 $1" >&2; exit 2 ;;
   esac
 done
@@ -76,7 +91,21 @@ else
 fi
 fi
 
-# ── 线程：只测一次，三条复用 ────────────────────────────────────────────────
+# ── 并行前的资源闸 ──────────────────────────────────────────────────────────
+if [[ "$PAR" -gt 1 && $SMOKE -eq 0 ]]; then
+  FREE_MB=$(nvidia-smi --query-gpu=memory.free --format=csv,noheader,nounits | head -1)
+  NEED=$((PAR * VRAM_PER_RUN_MB))
+  say "并行 $PAR 条：需显存约 ${NEED}MB，当前空闲 ${FREE_MB}MB"
+  if [[ "$FREE_MB" -lt "$NEED" ]]; then
+    say "✘ 显存不够（单条实测峰值 10.1G）。降并行度，或把 env.num_envs 调小——"
+    say "  但 num_envs 是实验变量，改了就不能和既有实验直接比。"
+    exit 1
+  fi
+  # 显存碎片：两条同卡时 expandable_segments 能少踩一次 OOM
+  export PYTORCH_CUDA_ALLOC_CONF="${PYTORCH_CUDA_ALLOC_CONF:-expandable_segments:True}"
+fi
+
+# ── 线程：只测一次，整个队列复用 ────────────────────────────────────────────
 if [[ -z "$THREADS" ]]; then
   CPU="$(lscpu | sed -n 's/^Model name:[[:space:]]*//p' | head -1)"
   if [[ "$CPU" == *"EPYC 7742"* && "$(nproc)" -ge 255 ]]; then
@@ -116,11 +145,21 @@ run_one() {           # $1 = 名字, $2 = 配置
   return $rc
 }
 
+if [[ "$PAR" -gt 1 ]]; then
+  CORES=$(nproc)
+  (( PAR * THREADS > CORES )) && say "⚠ 并行 $PAR × threads $THREADS = $((PAR*THREADS)) 超过 $CORES 逻辑核，env 会互相抢"
+fi
 for e in "${EXPS[@]}"; do
   read -r name cfg <<<"$e"
   [[ -n "$ONLY" && "$ONLY" != *",$name,"* ]] && { say "跳过 $name"; continue; }
-  run_one "$name" "$cfg"
+  if [[ "$PAR" -gt 1 ]]; then
+    run_one "$name" "$cfg" &
+    while [[ "$(jobs -rp | wc -l)" -ge "$PAR" ]]; do sleep 20; done
+  else
+    run_one "$name" "$cfg"
+  fi
 done
+wait
 
 # ── 汇总：每条的末次评测 ────────────────────────────────────────────────────
 say "════════ 汇总 ════════"
