@@ -20,6 +20,9 @@ eval_every = 200
 num_envs = 4096
 threads = 63           # scripts/run-exp.sh 会按机器改写（EPYC 7742 → 32）
 
+[curriculum]
+enabled = false        # G0 是「均匀采样」的基线（课程已于 H 之后转默认，这里显式关掉）
+
 [reward.terms]
 death = 10.0
 follow_shaping = 1.0

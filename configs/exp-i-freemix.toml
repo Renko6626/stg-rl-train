@@ -18,6 +18,11 @@ eval_every = 200
 num_envs = 4096
 threads = 63
 
+[curriculum]
+enabled = false        # I 是在课程转默认**之前**启动的，实际跑的是 G0 + 混合意图；
+                       # 写死以保持「与 G0 只差 intent.name」的单变量归因。
+                       # 课程 + 混合的叠加留给后续（I2 = H + mix）。
+
 [intent]
 name = "mixed_v1"
 

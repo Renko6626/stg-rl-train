@@ -32,7 +32,7 @@ free = 0.1
 
 # 起点难度采样（课程学习）：按每起点死亡率 EMA 调权重，不会的多练。口径见 curriculum.py。
 [curriculum]
-enabled = false
+enabled = true         # 实验 H 实测 +3.8pp（0.912 → 0.950），转默认；关掉它就是 G0 那条基线
 interval = 20          # 每多少次更新重算一次权重（下一次 reset 生效）
 ema_decay = 0.98
 alpha = 1.0

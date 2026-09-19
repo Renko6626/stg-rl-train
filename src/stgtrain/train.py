@@ -118,7 +118,9 @@ def train(cfg: dict, run_dir: Path, resume: dict | None = None, pack_result: boo
         best = tuple(best_extra["best"]) if best_extra.get("best") is not None else None
     if not (run_dir / "env.json").exists():
         _update_env_json(run_dir, stg_rl=stg_rl.build_info(), train_repo_sha=git_sha(),
-                         action_table_version=ACTION_TABLE_VERSION, machine=machine_info())
+                         action_table_version=ACTION_TABLE_VERSION, machine=machine_info(),
+                         # 起点顺序 = 课程权重向量的列序（curriculum.jsonl 按它回看）
+                         starts=[f"{s.image}:{s.mark}:{s.rank}" for s in starts])
 
     envw = EnvWrapper(cfg, images, starts, device, seed=int(cfg["run"]["seed"]) + start - 1)  # Ruling 7
     curriculum = Curriculum(len(starts), cfg["curriculum"])
@@ -163,7 +165,14 @@ def train(cfg: dict, run_dir: Path, resume: dict | None = None, pack_result: boo
             if curriculum.enabled:
                 curriculum.observe(finished)
                 if curriculum.due(update):
-                    envw.set_start_weights(curriculum.weights())
+                    w = curriculum.weights()
+                    envw.set_start_weights(w)
+                    # 逐起点留档：聚合的 w_max/w_min 看不出「到底哪几张卡最难」，
+                    # 事后要按卡回看就得有这份。列名在 env.json 的 starts 里。
+                    with (run_dir / "curriculum.jsonl").open("a", encoding="utf-8") as f:
+                        f.write(json.dumps({"update": update, "w": [round(x, 4) for x in w],
+                                            "fail": [round(x, 4) for x in curriculum.fail.tolist()],
+                                            "seen": curriculum.seen.tolist()}) + "\n")
                 scalars.update(curriculum.stats())
             scalars["perf/sps"] = steps_per_iter / (time.perf_counter() - t0)
             row = timer.pop_iteration()

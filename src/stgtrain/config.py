@@ -14,7 +14,7 @@ DEFAULTS: dict = {
             "mirror": True},
     "intent": {"name": "lower_half_uniform_v1", "margin": 16.0, "interval": [120, 300],
                "mix": {"follow": 0.6, "anchor": 0.3, "free": 0.1}},
-    "curriculum": {"enabled": False, "interval": 20, "ema_decay": 0.98, "alpha": 1.0, "fail_floor": 0.05,
+    "curriculum": {"enabled": True, "interval": 20, "ema_decay": 0.98, "alpha": 1.0, "fail_floor": 0.05,
                    "fail_ceil": 0.95, "w_lo": 0.25, "w_hi": 4.0, "min_episodes": 30},
     "featurize": {"name": "danger_topk_v3", "k_bullets": 64, "k_enemies": 8, "horizon": 60, "d_max": 128.0},
     "model": {"name": "set_attn_v1", "d": 64, "heads": 4, "trunk": 256},
