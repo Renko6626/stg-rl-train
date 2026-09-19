@@ -10,7 +10,6 @@
 #   bash scripts/run-night.sh --loose-check          # gpucheck 不通过也继续（只打印 WARN）
 #   bash scripts/run-night.sh --no-check             # 完全跳过 gpucheck
 #   bash scripts/run-night.sh --parallel 2           # 同机并行 2 条（受限于显存，见下）
-#   bash scripts/run-night.sh --parallel 2           # 同机并行 2 条（显存够就行，见下）
 #
 # 设计要点（都是为了睡觉时别白跑）：
 #   · **开跑前先体检**：GPU 可见 + gpucheck（真做一次前向/反向，编译与 CUDA 图都走一遍）+ 磁盘余量。
@@ -23,11 +22,8 @@
 #   · **并行**：单条实测占显存 10.1G、GPU 利用率中位 37%、128 逻辑核只用掉约 6.7 个
 #     （env 线程 32 个，但 env_step 只占一轮的 24%）。所以同机并行卡在**显存**而不是算力：
 #     24G 的卡塞得下 2 条（20.2G），3 条不行。两条合计吞吐约 1.4 倍（那 40% 的 update 阶段会串行化），
-#     两条实验从串行 7h20 缩到约 5h15。要线性加速就另租一台，别硬塞第三条。
-#   · **并行**：单条实测占 GPU 显存 10.1G、GPU 利用率中位 37%、128 逻辑核里只用掉约 6.7 个
-#     （env 线程 32 个，但 env_step 只占一轮的 24%）。所以同机并行受限于**显存**而非算力：
-#     24G 卡能塞 2 条（20.2G），3 条不行。两条并行的合计吞吐约 1.4 倍（GPU 那 40% 的更新阶段会串行化），
-#     即两条实验从串行 7h20 缩到约 5h15。要线性加速就另租一台，别硬塞第三条。
+#     **2026-09-19 实测**（I2 + J 并行 3500 轮）：单条 47.8k / 47.1k 帧/s，合计 94.9k
+#     = 单跑 70k 的 1.36 倍；每条 5.33h / 5.41h（单跑约 3h40）。要线性加速就另租一台，别硬塞第三条。
 set -uo pipefail
 cd "$(dirname "$0")/.."
 
@@ -37,7 +33,6 @@ EXPS=(
   "j  configs/exp-j-quickchange.toml"
 )
 THREADS=""; RETRIES=2; ONLY=""; SMOKE=0; CHECK=strict; PAR=1
-VRAM_PER_RUN_MB=11000     # 单条实测峰值 10.1G，留一点余量; PAR=1
 VRAM_PER_RUN_MB=11000     # 单条实测峰值 10.1G，留一点余量
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -47,7 +42,6 @@ while [[ $# -gt 0 ]]; do
     --smoke)   SMOKE=1;      shift 1 ;;
     --loose-check) CHECK=loose; shift 1 ;;
     --no-check)    CHECK=off;   shift 1 ;;
-    --parallel)    PAR="$2";    shift 2 ;;
     --parallel)    PAR="$2";    shift 2 ;;
     *) echo "未知参数 $1" >&2; exit 2 ;;
   esac
@@ -149,12 +143,14 @@ if [[ "$PAR" -gt 1 ]]; then
   CORES=$(nproc)
   (( PAR * THREADS > CORES )) && say "⚠ 并行 $PAR × threads $THREADS = $((PAR*THREADS)) 超过 $CORES 逻辑核，env 会互相抢"
 fi
+running=0
 for e in "${EXPS[@]}"; do
   read -r name cfg <<<"$e"
   [[ -n "$ONLY" && "$ONLY" != *",$name,"* ]] && { say "跳过 $name"; continue; }
   if [[ "$PAR" -gt 1 ]]; then
+    (( running >= PAR )) && { wait -n; running=$((running - 1)); }   # 任一条结束立刻补位，不轮询
     run_one "$name" "$cfg" &
-    while [[ "$(jobs -rp | wc -l)" -ge "$PAR" ]]; do sleep 20; done
+    running=$((running + 1))
   else
     run_one "$name" "$cfg"
   fi
