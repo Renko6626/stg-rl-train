@@ -194,6 +194,9 @@ def test_counter_draw_is_order_independent_and_matches_golden():
     zero = torch.zeros(1, dtype=torch.int64)
     assert counter_draw(12345, zero, 0, 12, 0, 2, 6)[:, 0].tolist() == [2, 3, 4, 6, 4, 2, 6, 5, 6, 6, 4, 6]
     assert counter_draw(12345, zero, 0, 12, 1, 0, 2)[:, 0].tolist() == [2, 1, 2, 2, 0, 0, 0, 2, 2, 1, 2, 0]
+    # 低速位那两路（stream 2 / 3），同样与 C 侧共用
+    assert counter_draw(12345, zero, 0, 12, 2, 2, 6)[:, 0].tolist() == [6, 5, 6, 5, 5, 5, 3, 2, 4, 5, 4, 5]
+    assert counter_draw(12345, zero, 0, 12, 3, 0, 2)[:, 0].tolist() == [1, 1, 2, 1, 2, 0, 1, 0, 2, 0, 1, 0]
 
 
 def test_env_ids_make_batched_layer_reproduce_separate_layers():

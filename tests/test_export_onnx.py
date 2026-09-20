@@ -53,6 +53,7 @@ _ENEMIES = [
 def _obs_held(n=2):
     o = _obs(n)
     o.dir_held = torch.tensor(_HELD[:n], dtype=torch.int64)
+    o.slow_held = torch.tensor(_SLOW_HELD[:n], dtype=torch.int64)
     return o
 
 
@@ -67,6 +68,7 @@ def _obs(n=2):
 
 
 _HELD = [3, 1 << 20]      # 一个刚换完方向不久、一个「新局 = 很大」（图里要封顶）
+_SLOW_HELD = [7, 2]       # 与 _HELD 取不同的值：两个输入接反了的话等价性测试会红
 
 
 def _reference(cfg, obs):
@@ -89,7 +91,7 @@ def _wrapper_logits(cfg, model, obs, n):
     return torch.stack(out)
 
 
-FEATS = ["danger_topk_v2", "danger_topk_v3", "danger_topk_v4"]
+FEATS = ["danger_topk_v2", "danger_topk_v3", "danger_topk_v4", "danger_topk_v5"]
 
 
 @pytest.mark.parametrize("name", FEATS)
@@ -179,6 +181,24 @@ def test_dir_held_changes_logits_v4_and_is_capped():
     assert torch.equal(c, d), "封顶 16：再大也一样"
 
 
+def test_slow_held_changes_logits_v5_and_is_not_confused_with_dir_held():
+    """变异守卫：slow_held 是 v5 的全部新意；也押「两个 held 输入没接反」。"""
+    cfg = _cfg("danger_topk_v5")
+    obs = _obs_held(n=1)
+    model, _ = _reference(cfg, obs)
+    wrap = DeployWrapper(cfg, model, bullets_rows=ROWS_B, enemies_rows=ROWS_E).eval()
+    args = list(deploy_inputs(obs, 0, bullets_rows=ROWS_B, enemies_rows=ROWS_E, with_held=2))
+    assert len(args) == len(INPUT_NAMES) + 2 and int(args[-2]) == _HELD[0] and int(args[-1]) == _SLOW_HELD[0]
+    with torch.no_grad():
+        a = wrap(*args)
+        swapped = args[:-2] + [args[-1], args[-2]]
+        b = wrap(*swapped)
+        args[-1] = torch.tensor([12], dtype=torch.int64)
+        c = wrap(*args)
+    assert not torch.allclose(a, c, atol=1e-6), "换了 slow_held logits 却没变 —— 那一维没接上"
+    assert not torch.allclose(a, b, atol=1e-6), "dir_held 与 slow_held 对调 logits 却没变 —— 两个输入等价了？"
+
+
 def test_masked_rows_cannot_influence_logits():
     """mask 关掉的行填垃圾也不能改结果 —— 押运哨兵（1e30）与 sel 两处。"""
     cfg = _cfg()
@@ -198,7 +218,7 @@ def test_masked_rows_cannot_influence_logits():
     assert torch.allclose(clean, dirty, atol=1e-6), "无效行影响了 logits"
 
 
-@pytest.mark.parametrize("name", ["danger_topk_v3", "danger_topk_v4"])
+@pytest.mark.parametrize("name", ["danger_topk_v3", "danger_topk_v4", "danger_topk_v5"])
 def test_onnx_matches_torch(tmp_path, name):
     """v3 = 七输入（图版本 2）；v4 多一个 dir_held（图版本 3）—— 输入没被导出器剪掉是这里押的。"""
     ort = pytest.importorskip("onnxruntime")
@@ -211,12 +231,12 @@ def test_onnx_matches_torch(tmp_path, name):
     example = deploy_inputs(obs, 0, bullets_rows=ROWS_B, enemies_rows=ROWS_E, with_held=held)
     export_graph(wrap, example, path)
 
-    names = list(INPUT_NAMES) + (["dir_held"] if held else [])
+    names = list(INPUT_NAMES) + ["dir_held", "slow_held"][:held]
     sess = ort.InferenceSession(str(path), providers=["CPUExecutionProvider"])
     assert [i.name for i in sess.get_inputs()] == names
     assert [tuple(i.shape) for i in sess.get_inputs()] == [
         (ROWS_B, BULLET_COLS), (ROWS_B,), (ROWS_E, ENEMY_COLS), (ROWS_E,), (5,), (2,), (1,)
-    ] + ([(1,)] if held else [])
+    ] + [(1,)] * held
     for i in range(2):
         args = deploy_inputs(obs, i, bullets_rows=ROWS_B, enemies_rows=ROWS_E, with_held=held)
         feed = {n: a.numpy() for n, a in zip(names, args)}
