@@ -100,6 +100,7 @@ greedy = true
 seed = 12345
 intent = "lower_half_uniform_v1"   # 评测意图钉死，与训练意图解耦（空串 = 跟训练一致）
 motor = "train"                    # 评测沿用 [motor]（主判据）；"off" = 评测时关掉运动层
+batched = true                     # 局数相同的评测组并成一批同步推进（约快一个数量级）；false = 逐组单跑
 
 [log]
 tensorboard = true

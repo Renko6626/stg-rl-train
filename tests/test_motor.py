@@ -174,3 +174,36 @@ def test_no_executed_movement_segment_is_shorter_than_hold_lo():
         overridden += int(info.overridden.sum())
     assert shortest >= 2, f"出现了 {shortest} 帧的段"
     assert overridden > 600, "乱按的策略应当大部分时候被运动层否决"
+
+
+# ---------------- 基于计数器的随机数 ----------------
+
+def test_counter_draw_is_order_independent_and_matches_golden():
+    """值只由 (seed, env, step, stream) 决定：分块怎么切、先算哪块都一样。黄金值与契约仓 c/tests/test_motor.c 共用 ——
+    两边各写各的实现，押同一组数，C 与 Python 才算逐位同源。"""
+    from stgtrain.envwrap import counter_draw
+
+    ids = torch.arange(4)
+    whole = counter_draw(12345, ids, 0, 16, 0, 2, 6)
+    parts = torch.cat([counter_draw(12345, ids, 8, 8, 0, 2, 6), counter_draw(12345, ids, 0, 8, 0, 2, 6)])
+    assert torch.equal(whole, torch.cat([parts[8:], parts[:8]]))
+    assert whole.min() >= 2 and whole.max() <= 6
+    assert not torch.equal(whole, counter_draw(12345, ids, 0, 16, 1, 2, 6)), "两路（hold / delay）不能同值"
+    assert not torch.equal(whole[:, 0], whole[:, 1]), "不同 env 不能同值"
+    assert torch.equal(counter_draw(1, ids, 0, 4, 0, 5, 5), torch.full((4, 4), 5))
+    zero = torch.zeros(1, dtype=torch.int64)
+    assert counter_draw(12345, zero, 0, 12, 0, 2, 6)[:, 0].tolist() == [2, 3, 4, 6, 4, 2, 6, 5, 6, 6, 4, 6]
+    assert counter_draw(12345, zero, 0, 12, 1, 0, 2)[:, 0].tolist() == [2, 1, 2, 2, 0, 0, 0, 2, 2, 1, 2, 0]
+
+
+def test_env_ids_make_batched_layer_reproduce_separate_layers():
+    """批量评测的前提：把两组各 8 个 env 并成一批（env 编号各自 0..7），与两组分开跑逐位相同。"""
+    cfg = small_cfg(motor={"enabled": True, "hold": [2, 6], "delay": [0, 2]})
+    a, b = MotorLayer(cfg, 8, CPU, seed=5), MotorLayer(cfg, 8, CPU, seed=5)
+    both = MotorLayer(cfg, 16, CPU, seed=5, env_ids=torch.arange(16) % 8)
+    ha, hb, hboth = Hand(a), Hand(b), Hand(both)
+    g = torch.Generator().manual_seed(3)
+    for _ in range(150):
+        wa, wb = (torch.randint(0, actions.NUM_ACTIONS, (8,), generator=g) for _ in range(2))
+        out = torch.cat([ha.step(wa), hb.step(wb)])
+        assert torch.equal(hboth.step(torch.cat([wa, wb])), out)

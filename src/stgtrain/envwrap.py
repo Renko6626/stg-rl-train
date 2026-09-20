@@ -102,6 +102,36 @@ def enemy_velocity(prev_ids: Tensor, prev_xy: Tensor, cur_ids: Tensor, cur_xy: T
     return torch.where(keep.unsqueeze(-1), v, torch.zeros_like(v))
 
 
+_M32 = 0xFFFFFFFF
+_RNG_C_ENV, _RNG_C_STEP, _RNG_C_STREAM = 0x9E3779B1, 0x85EBCA6B, 0xC2B2AE35
+
+
+def _mix32(x: Tensor) -> Tensor:
+    """lowbias32（Chris Wellons）：32 位整数的雪崩混合。int64 张量里算，每次乘完掩回 32 位 ——
+    int64 乘法溢出是按 2^64 回绕的，低 32 位不受影响，所以与 C 的 uint32 运算逐位相同。"""
+    x = x ^ (x >> 16)
+    x = (x * 0x7FEB352D) & _M32
+    x = x ^ (x >> 15)
+    x = (x * 0x846CA68B) & _M32
+    return x ^ (x >> 16)
+
+
+def counter_draw(seed: int, env_ids: Tensor, step0: int, steps: int, stream: int, lo: int, hi: int) -> Tensor:
+    """**基于计数器的随机数**：第 `t` 步、第 `e` 个 env、第 `stream` 路的抽样值只由 (seed, e, t, stream) 决定。
+    返回 `[steps, n]`，取值 U{lo..hi}。
+
+    为什么不用 `torch.Generator`：① 有状态的发生器，抽样值取决于**此前调过多少次**，于是「20 组评测串行跑」与
+    「20 组并成一批跑」没法逐位一致；计数器式的与调用顺序无关，给定 env 编号就能复现。② 同一个公式用 C 写出来
+    逐位相同（契约仓 `sa_motor.c`），DLL 侧的运动层因此可以和训练侧对拍。③ 一次算一整块（`[steps, n]`），
+    每步只取一行视图，不再每步发射随机数核。取模偏差 < 3e-8，可忽略。
+    """
+    if hi <= lo:
+        return torch.full((steps, env_ids.shape[0]), lo, dtype=torch.int64, device=env_ids.device)
+    t = torch.arange(step0, step0 + steps, dtype=torch.int64, device=env_ids.device)
+    x = (int(seed) & _M32) + env_ids[None, :] * _RNG_C_ENV + t[:, None] * _RNG_C_STEP + int(stream) * _RNG_C_STREAM
+    return lo + _mix32(x & _M32) % (hi - lo + 1)
+
+
 class MotorLayer:
     """手部运动层（实验 N）：把人手的限制写进环境 —— 策略只说「想按哪个方向」，实际按出去的由这里决定。
 
@@ -112,21 +142,29 @@ class MotorLayer:
     - `delay = [lo, hi]`：想换方向时，抽一个延迟 d ~ U{lo..hi}，d 帧后才生效；期间改主意就按新意图重抽，
       改回当前方向则撤销。
 
+    随机数是基于计数器的（见 `counter_draw`），不用 `torch.Generator`。
+
     确定性的「至少 N 帧」不行：那只是把时间轴量化成 N 帧一格，模型照样能在粗格子上精确操作。
     只锁方向，低速键直通（已知漏洞：高低速交替能拼细位移，盯 shift_toggles_per_s）。
     作用在智能体坐标系的动作 id 上（镜像之前），只做相等与计数，天然左右对称。
     """
 
-    def __init__(self, cfg: dict, n: int, device: torch.device, seed: int):
+    BLOCK = 64     # 一次预抽多少步
+    STREAM_HOLD, STREAM_DELAY = 0, 1
+
+    def __init__(self, cfg: dict, n: int, device: torch.device, seed: int, env_ids: Tensor | None = None):
         m = cfg["motor"]
         self.n, self.device = int(n), device
         self.hold_lo, self.hold_hi = int(m["hold"][0]), int(m["hold"][1])
         self.delay_lo, self.delay_hi = int(m["delay"][0]), int(m["delay"][1])
-        self.gen = torch.Generator(device=device)
-        self.gen.manual_seed((int(seed) * 40503 + 7919) % (2**63))
+        self.seed = (int(seed) * 40503 + 7919) & _M32
+        # env 编号进随机数的键。批量评测把多组并成一批时，每组各传自己的 0..k-1，结果就与逐组单跑逐位相同。
+        self.env_ids = (torch.arange(self.n, device=device) if env_ids is None else env_ids.to(device)).to(torch.int64)
         self.reset_all()
 
     def reset_all(self) -> None:
+        self.t = 0                       # 已走过的步数 = 随机数的计数器；reset_all 归零 ⇒ 同种子的评测可复现
+        self._block0 = -1
         self.need = torch.zeros(self.n, dtype=torch.int64, device=self.device)   # 本段最短长度 L；新局 0 = 第一下不受限
         self.pend = torch.full((self.n,), -1, dtype=torch.int64, device=self.device)
         self.wait = torch.zeros(self.n, dtype=torch.int64, device=self.device)
@@ -136,24 +174,126 @@ class MotorLayer:
         self.pend = torch.where(mask, torch.full_like(self.pend, -1), self.pend)
         self.wait = torch.where(mask, torch.zeros_like(self.wait), self.wait)
 
-    def _draw(self, lo: int, hi: int) -> Tensor:
-        if lo == hi:
-            return torch.full((self.n,), lo, dtype=torch.int64, device=self.device)
-        return torch.randint(lo, hi + 1, (self.n,), generator=self.gen, device=self.device)
+    def _draws(self) -> tuple[Tensor, Tensor]:
+        """本步的 (hold, delay) 抽样。整块预抽，每步只取一行视图。"""
+        b0 = self.t - self.t % self.BLOCK
+        if b0 != self._block0:
+            self._hold = counter_draw(self.seed, self.env_ids, b0, self.BLOCK, self.STREAM_HOLD, self.hold_lo, self.hold_hi)
+            self._delay = counter_draw(self.seed, self.env_ids, b0, self.BLOCK, self.STREAM_DELAY, self.delay_lo, self.delay_hi)
+            self._block0 = b0
+        k = self.t - b0
+        return self._hold[k], self._delay[k]
 
     def apply(self, want: Tensor, prev_exec: Tensor, held: Tensor) -> Tensor:
         """`want` = 策略选的动作 id；`prev_exec` = 上一步实际执行的；`held` = 当前方向已执行帧数。返回本步实际执行的动作 id。"""
         want = want.to(torch.int64)
+        hold_draw, delay_draw = self._draws()
+        self.t += 1
         want_dir, slow, cur = want // 2, want % 2, prev_exec // 2
         diff = want_dir != cur
         new_req = diff & (want_dir != self.pend)                 # 新意图（或改了主意）→ 重抽延迟
-        self.wait = torch.where(new_req, self._draw(self.delay_lo, self.delay_hi), self.wait)
+        self.wait = torch.where(new_req, delay_draw, self.wait)
         self.pend = torch.where(diff, want_dir, torch.full_like(self.pend, -1))   # 想回当前方向 = 撤销
         go = diff & (self.wait <= 0) & (held >= self.need)
         self.wait = torch.where(diff & ~go, (self.wait - 1).clamp_min(0), self.wait)
-        self.need = torch.where(go, self._draw(self.hold_lo, self.hold_hi), self.need)
+        self.need = torch.where(go, hold_draw, self.need)
         self.pend = torch.where(go, torch.full_like(self.pend, -1), self.pend)
         return torch.where(go, want_dir, cur) * 2 + slow
+
+
+class MultiVecEnv:
+    """把 G 个小 `VecEnv`（各 k 个 env、各自一个起点）并成一个大的给 `EnvWrapper` 用 —— **批量评测**的底座。
+
+    为什么不是一个 640-env 的 VecEnv：引擎的起点是按权重**随机**抽的，没法把第 i 个 env 钉在第 j 张卡上；
+    而评测要的正是「每张卡每个难度恰好 k 局」。所以保留 G 个独立的小 VecEnv（种子、env 数都与逐组单跑时相同，
+    于是每一局的弹幕与逐组单跑逐位相同），只把它们的输出缓冲拼起来，让解码 / 特征化 / 策略前向 / 统计在 G×k 的
+    大批量上各做**一次**。逐组单跑时 GPU 每步只推理 32 条、20 组串行，几乎全在空转（一次评测 6–7 分钟，
+    占整条训练墙钟的两成）。
+    """
+
+    def __init__(self, cfg: dict, groups: list[tuple[dict, "stg_rl.Start"]], k: int, seed: int, threads: int):
+        e = cfg["env"]
+        self.k, self.g = int(k), len(groups)
+        self.cap = int(e["bullets_cap"])
+        self.bufs = [stg_rl.alloc_buffers(self.k, self.cap, backend="torch", pin=False) for _ in groups]
+        self.envs = [
+            stg_rl.VecEnv(self.k, max(1, min(int(threads), self.k)), images, [start], frame_skip=int(e["frame_skip"]),
+                          max_frames=int(e["max_frames"]), warmup_max=int(e["warmup_max"]), bullets_cap=self.cap,
+                          seed=int(seed), buffers=buf)
+            for (images, start), buf in zip(groups, self.bufs)
+        ]
+        self.buf: dict[str, Tensor] = {}
+
+    def _gather(self) -> None:
+        bs = self.bufs
+        out = {key: torch.cat([b[key] for b in bs]) for key in ("done", "events", "ep_frames", "player", "enemies",
+                                                                "enemies_count")}
+        counts = [int(b["bullets_offsets"][self.k]) for b in bs]
+        out["bullets"] = torch.cat([b["bullets"][:m] for b, m in zip(bs, counts)])
+        base, offs = 0, []
+        for b, m in zip(bs, counts):
+            offs.append(b["bullets_offsets"][:self.k] + base)
+            base += m
+        offs.append(torch.tensor([base], dtype=bs[0]["bullets_offsets"].dtype))
+        out["bullets_offsets"] = torch.cat(offs)
+        # start_index：各组自己的都是 0，这里改记「第几组」，逐局统计按它归组
+        out["start_index"] = torch.arange(self.g, dtype=bs[0]["start_index"].dtype).repeat_interleave(self.k)
+        self.buf.clear()
+        self.buf.update(out)
+
+    def reset(self) -> None:
+        for env in self.envs:
+            env.reset()
+        self._gather()
+
+    def step(self, buttons: Tensor) -> None:
+        for i, env in enumerate(self.envs):
+            env.step(buttons[i * self.k:(i + 1) * self.k].contiguous())
+        self._gather()
+
+    def set_start_weights(self, w: list[float]) -> None:
+        raise RuntimeError("批量评测的每组只有一个起点，没有权重可调")
+
+
+class StackedIntent:
+    """G 个同种子、各 k 个 env 的意图生成器并排放。逐组单跑时每组各有一个这样的实例；并成一批后仍然各用各的，
+    随机数的消耗与逐组单跑逐步相同，于是目标点序列逐位相同。"""
+
+    def __init__(self, make, g: int, k: int):
+        self.parts = [make() for _ in range(g)]
+        self.k = int(k)
+
+    def _cat(self, name: str) -> Tensor:
+        return torch.cat([getattr(p, name) for p in self.parts])
+
+    @property
+    def target(self) -> Tensor:
+        return self._cat("target")
+
+    def __getattr__(self, name: str):
+        # mode / track / track_world 只有部分意图有：有就转发，没有就照常 AttributeError（envwrap 用 hasattr / getattr 探测）
+        parts = self.__dict__.get("parts")
+        if not parts or not hasattr(parts[0], name):
+            raise AttributeError(name)
+        if name == "mode":
+            return self._cat("mode")
+        if name in ("track", "track_world"):
+            def call(*args):
+                for i, p in enumerate(parts):
+                    getattr(p, name)(*(a[i * self.k:(i + 1) * self.k] for a in args))
+            return call
+        raise AttributeError(name)
+
+    def reset_all(self) -> None:
+        for p in self.parts:
+            p.reset_all()
+
+    def reset(self, mask: Tensor) -> None:
+        for i, p in enumerate(self.parts):
+            p.reset(mask[i * self.k:(i + 1) * self.k])
+
+    def advance(self, frames: int, active: Tensor) -> Tensor:
+        return torch.cat([p.advance(frames, active[i * self.k:(i + 1) * self.k]) for i, p in enumerate(self.parts)])
 
 
 def _phase(timer, name: str):
@@ -162,19 +302,30 @@ def _phase(timer, name: str):
 
 class EnvWrapper:
     def __init__(self, cfg: dict, images: dict, starts: list, device: torch.device, seed: int,
-                 num_envs: int | None = None, mirror: bool | None = None):
+                 num_envs: int | None = None, mirror: bool | None = None,
+                 groups: list[tuple[dict, "stg_rl.Start"]] | None = None):
+        """`groups` 非空 = 批量评测：每个 (images, start) 一组、每组 `num_envs` 个 env，并成一批（见 `MultiVecEnv`）。
+        此时 `images` / `starts` 不用；意图与运动层的随机数按组各自为政，与逐组单跑逐位相同。"""
         e = cfg["env"]
-        self.n = int(num_envs if num_envs is not None else e["num_envs"])
+        k = int(num_envs if num_envs is not None else e["num_envs"])
+        self.n = k * len(groups) if groups else k
         self.cap = int(e["bullets_cap"])
         self.frame_skip = int(e["frame_skip"])
         self.device = device
-        threads = max(1, min(int(e["threads"]) or (os.cpu_count() or 1), self.n))
-        self.buf = stg_rl.alloc_buffers(self.n, self.cap, backend="torch", pin=device.type == "cuda")
-        self.env = stg_rl.VecEnv(
-            self.n, threads, images, starts, frame_skip=self.frame_skip, max_frames=int(e["max_frames"]),
-            warmup_max=int(e["warmup_max"]), bullets_cap=self.cap, seed=int(seed), buffers=self.buf,
-        )
-        self.intent = INTENTS.get(cfg["intent"]["name"])(cfg, self.n, device, seed)
+        threads = max(1, min(int(e["threads"]) or (os.cpu_count() or 1), k))
+        make_intent = lambda: INTENTS.get(cfg["intent"]["name"])(cfg, k, device, seed)   # noqa: E731
+        if groups:
+            self.env = MultiVecEnv(cfg, groups, k, seed, threads=min(threads, 8))
+            self.buf = self.env.buf
+            self.intent = StackedIntent(make_intent, len(groups), k)
+        else:
+            self.buf = stg_rl.alloc_buffers(self.n, self.cap, backend="torch", pin=device.type == "cuda")
+            self.env = stg_rl.VecEnv(
+                self.n, threads, images, starts, frame_skip=self.frame_skip, max_frames=int(e["max_frames"]),
+                warmup_max=int(e["warmup_max"]), bullets_cap=self.cap, seed=int(seed), buffers=self.buf,
+            )
+            self.intent = make_intent()
+        self._group_k = k if groups else None
         self.mirror_enabled = bool(e["mirror"] if mirror is None else mirror)
         self._mirror_gen = torch.Generator(device=device)
         self._mirror_gen.manual_seed((int(seed) * 2654435761 + 97) % (2**63))
@@ -190,7 +341,8 @@ class EnvWrapper:
         self._prev_enemy_xy = torch.zeros(self.n, stg_rl.ENEMIES_CAP, 2, device=device)
         self._enemy_prev_valid = torch.zeros(self.n, dtype=torch.bool, device=device)
         self.dir_hold = torch.full((self.n,), DIR_HOLD_NEVER, dtype=torch.int64, device=device)
-        self.motor = MotorLayer(cfg, self.n, device, seed) if cfg["motor"]["enabled"] else None
+        env_ids = torch.arange(self.n, device=device) % self._group_k if self._group_k else None
+        self.motor = MotorLayer(cfg, self.n, device, seed, env_ids=env_ids) if cfg["motor"]["enabled"] else None
 
     def _dev(self, t: Tensor) -> Tensor:
         # CUDA：从 pinned 缓冲异步拷贝。安全性来自下一次 step 之前 `buttons.to("cpu")` 的阻塞同步——

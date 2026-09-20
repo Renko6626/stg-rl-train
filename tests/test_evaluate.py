@@ -101,3 +101,32 @@ def test_by_rank_keeps_each_difficulty_separately_comparable():
     assert res["overall"]["episodes"] == 4
     # 分档聚合必须与分卡那份一致（同一批局的两种切法）
     assert res["by_rank"]["r2"]["survival"] == res["cards"]["example_calm"]["r2"]["survival"]
+
+
+def test_batched_evaluation_matches_group_by_group():
+    """批量评测的全部价值建立在「与逐组单跑是同一把尺子」上：每组同种子同规模 ⇒ 每一局逐条相同。
+
+    故意选最容易分叉的配置：混合意图（每组自己的随机目标点 / 模式）+ 手部运动层（每组自己的抽样）+ 未训练的
+    真网络贪心（不是固定动作）。三组里两组是同一张卡的不同难度，第三组是另一张卡。"""
+    from stgtrain.cards import EvalSpec
+
+    device = torch.device("cpu")
+    images = compile_cards(discover(FIXTURES / "cards"))
+    specs = [EvalSpec("example_ring", (1, 2), 6), EvalSpec("example_calm", (2,), 6)]
+    out = {}
+    for batched in (False, True):
+        cfg = small_cfg(featurize={"name": "danger_topk_v4", "k_bullets": 8, "k_enemies": 4},
+                        intent={"name": "mixed_v1"}, motor={"enabled": True, "hold": [2, 6], "delay": [0, 2]},
+                        eval={"batched": batched, "intent": ""})
+        feat = FEATURIZERS.get("danger_topk_v4")(cfg)
+        torch.manual_seed(0)
+        ppo = PPO(cfg, lambda: MODELS.get("set_attn_v1")(cfg, feat.spec()), device)
+        out[batched] = evaluate(cfg, ppo, feat, images, specs, device)
+    a, b = out[False], out[True]
+    assert a["overall"]["episodes"] == b["overall"]["episodes"] == 18
+    for card in a["cards"]:
+        for rank, want in a["cards"][card].items():
+            got = b["cards"][card][rank]
+            for key, v in want.items():
+                assert got[key] == pytest.approx(v, rel=1e-6, abs=1e-9), f"{card} {rank} {key}"
+    assert a["overall"]["motor_override_frac"] > 0, "运动层得真的起过作用，否则这条等价性是空的"

@@ -30,7 +30,9 @@ DEFAULTS: dict = {
     # eval.intent 把**评测用的意图钉死**，与训练意图解耦：实验 I 用 mixed_v1 训练，评测仍走规范的
     # 跟点档，撑过率才跟 G0/H 同口径可比（锚点 / 自由档的数字用 eval_ckpt --intent 单独跑）。
     # eval.motor："train" = 评测沿用 [motor]（主判据，与训练同分布）；"off" = 评测关掉运动层。
-    "eval": {"episodes": 32, "greedy": True, "seed": 12345, "intent": "lower_half_uniform_v1", "motor": "train"},
+    "eval": {"episodes": 32, "greedy": True, "seed": 12345, "intent": "lower_half_uniform_v1", "motor": "train",
+             # batched：把局数相同的评测组并成一批同步推进（一次前向），墙钟从各组之和变成最慢一组；false = 逐组单跑
+             "batched": True},
     "log": {"tensorboard": True, "perf_sync_every": 20, "sample_hz": 1.0},
     "bench": {"seconds": 10.0, "num_envs": [512, 1024, 2048, 4096]},
 }

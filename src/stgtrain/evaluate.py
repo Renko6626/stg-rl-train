@@ -80,11 +80,31 @@ def eval_cfg(cfg: dict) -> dict:
 
 def run_group(cfg: dict, ppo, featurizer, image, card: str, rank: int, episodes: int, device,
               hysteresis: float = 0.0) -> list[dict]:
+    """逐组单跑：一张卡一个难度，`episodes` 个 env。`[eval].batched = false` 时走这条；也是批量路径的对照基准。"""
+    return run_groups(cfg, ppo, featurizer, [(image, card, rank)], episodes, device, hysteresis)[0]
+
+
+def run_groups(cfg: dict, ppo, featurizer, groups: list[tuple], episodes: int, device,
+               hysteresis: float = 0.0) -> list[list[dict]]:
+    """把若干 (image, card, rank) 组并成一批同步推进，返回每组的逐局记录（各 `episodes` 条，按 env 序）。
+
+    每组的 VecEnv / 意图 / 运动层都与逐组单跑时同种子同规模（见 `envwrap.MultiVecEnv`），所以每一局的弹幕、
+    目标点序列、运动层抽样都逐位相同；只有策略前向的批量从 32 变成了 G×32 —— 浮点归约顺序可能差出 1e-6，
+    贪心 argmax 在近平局上偶尔翻一下，与「CPU 补测 vs GPU 评测」同一量级（±1–2pp 以内，通常为 0）。
+    墙钟从「各组帧数之和」变成「最慢那组的帧数」。
+    """
     cfg = eval_cfg(cfg)
-    envw = EnvWrapper(cfg, {card: image}, [stg_rl.Start(card, 0, rank)], device,
-                      seed=int(cfg["eval"]["seed"]), num_envs=episodes, mirror=False)
+    n_groups = len(groups)
+    if n_groups == 1:
+        image, card, rank = groups[0]
+        envw = EnvWrapper(cfg, {card: image}, [stg_rl.Start(card, 0, rank)], device,
+                          seed=int(cfg["eval"]["seed"]), num_envs=episodes, mirror=False)
+    else:
+        envw = EnvWrapper(cfg, {}, [], device, seed=int(cfg["eval"]["seed"]), num_envs=episodes, mirror=False,
+                          groups=[({card: image}, stg_rl.Start(card, 0, rank)) for image, card, rank in groups])
+    n_total = episodes * n_groups
     reward_fn = RewardFn(cfg)
-    tracker = EpisodeTracker(episodes, device, list(reward_fn.terms), cfg["reward"]["hold_radius"],
+    tracker = EpisodeTracker(n_total, device, list(reward_fn.terms), cfg["reward"]["hold_radius"],
                              cfg["reward"]["edge_margin"], envw.frame_skip, cfg["intent"]["interval"][1])
     greedy = bool(cfg["eval"]["greedy"])
     first: dict[int, dict] = {}
@@ -104,23 +124,41 @@ def run_group(cfg: dict, ppo, featurizer, image, card: str, rank: int, episodes:
         if (step + 1) % 64 == 0:
             for r in tracker.pop_finished():
                 first.setdefault(r["env"], r)
-            if len(first) == episodes:
+            if len(first) == n_total:
                 break
     for r in tracker.pop_finished():
         first.setdefault(r["env"], r)
-    if len(first) != episodes:
-        raise RuntimeError(f"评测组 {card} r{rank} 只收到 {len(first)}/{episodes} 局")
-    return [first[i] for i in sorted(first)]
+    if len(first) != n_total:
+        names = "、".join(f"{card} r{rank}" for _, card, rank in groups[:3])
+        raise RuntimeError(f"评测（{names}{' …' if n_groups > 3 else ''}）只收到 {len(first)}/{n_total} 局")
+    out = []
+    for g in range(n_groups):          # env 编号改回组内编号，与逐组单跑的记录同形
+        out.append([{**first[g * episodes + i], "env": i} for i in range(episodes)])
+    return out
 
 
 def evaluate(cfg: dict, ppo, featurizer, images: dict, specs: list[EvalSpec], device, hysteresis: float = 0.0) -> dict:
     result: dict = {"cards": {}, "overall": {}, "by_rank": {}}
     everything: list[dict] = []
     by_rank: dict[int, list[dict]] = {}
+    # 局数相同的组并成一批同步推进（现在的评测集全是 32 局 ⇒ 一批 20 组）；`[eval].batched = false` 退回逐组单跑
+    batched = bool(cfg["eval"].get("batched", True))
+    todo: dict[int, list[tuple]] = {}
+    for spec in specs:
+        for rank in spec.ranks:
+            key = spec.episodes if batched else len(todo)
+            todo.setdefault(key, []).append((spec, rank))
+    records: dict[tuple[str, int], list[dict]] = {}
+    for items in todo.values():
+        episodes = items[0][0].episodes
+        got = run_groups(cfg, ppo, featurizer, [(images[sp.card], sp.card, rk) for sp, rk in items],
+                         episodes, device, hysteresis)
+        for (sp, rk), recs in zip(items, got):
+            records[(sp.card, rk)] = recs
     for spec in specs:
         per: dict[str, dict] = {}
         for rank in spec.ranks:
-            recs = run_group(cfg, ppo, featurizer, images[spec.card], spec.card, rank, spec.episodes, device, hysteresis)
+            recs = records[(spec.card, rank)]
             per[f"r{rank}"] = summarize_eval(recs)
             everything.extend(recs)
             by_rank.setdefault(rank, []).extend(recs)
