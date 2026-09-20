@@ -22,6 +22,7 @@ from stgtrain.export_onnx import (
     build_deploy,
     deploy_inputs,
     export_graph,
+    uses_held,
     write_manifest,
 )
 from stgtrain.registry import FEATURIZERS, MODELS, load_builtins
@@ -49,6 +50,12 @@ _ENEMIES = [
 ]
 
 
+def _obs_held(n=2):
+    o = _obs(n)
+    o.dir_held = torch.tensor(_HELD[:n], dtype=torch.int64)
+    return o
+
+
 def _obs(n=2):
     """`n` 个 env，几何各不相同；每一路特征都有非零值，且都含被 d_max 滤掉的远弹与关掉的脏行。"""
     return raw_obs(
@@ -57,6 +64,9 @@ def _obs(n=2):
         speed=4.5, hit_r=2.5, focus=True,
         bullets=_BULLETS[:n], enemies=_ENEMIES[:n],
     )
+
+
+_HELD = [3, 1 << 20]      # 一个刚换完方向不久、一个「新局 = 很大」（图里要封顶）
 
 
 def _reference(cfg, obs):
@@ -75,11 +85,11 @@ def _wrapper_logits(cfg, model, obs, n):
     out = []
     with torch.no_grad():
         for i in range(n):
-            out.append(wrap(*deploy_inputs(obs, i, bullets_rows=ROWS_B, enemies_rows=ROWS_E)))
+            out.append(wrap(*deploy_inputs(obs, i, bullets_rows=ROWS_B, enemies_rows=ROWS_E, with_held=uses_held(cfg))))
     return torch.stack(out)
 
 
-FEATS = ["danger_topk_v2", "danger_topk_v3"]
+FEATS = ["danger_topk_v2", "danger_topk_v3", "danger_topk_v4"]
 
 
 @pytest.mark.parametrize("name", FEATS)
@@ -102,7 +112,7 @@ def test_unknown_featurizer_is_refused():
 
 @pytest.mark.parametrize("name", FEATS)
 def test_deploy_wrapper_matches_training_path(name):
-    cfg, obs = _cfg(name), _obs()
+    cfg, obs = _cfg(name), _obs_held()
     model, ref = _reference(cfg, obs)
     got = _wrapper_logits(cfg, model, obs, n=2)
     assert torch.allclose(got, ref, atol=1e-5), (got - ref).abs().max()
@@ -149,6 +159,26 @@ def test_enemy_velocity_is_ignored_by_v2():
     assert torch.equal(a, b)
 
 
+def test_dir_held_changes_logits_v4_and_is_capped():
+    """变异守卫：dir_held 是 v4 的全部新意；wrapper 丢了它本测试必须红。封顶 16 ⇒ 16 与「很大」等价。"""
+    cfg = _cfg("danger_topk_v4")
+    obs = _obs_held(n=1)
+    model, _ = _reference(cfg, obs)
+    wrap = DeployWrapper(cfg, model, bullets_rows=ROWS_B, enemies_rows=ROWS_E).eval()
+    args = list(deploy_inputs(obs, 0, bullets_rows=ROWS_B, enemies_rows=ROWS_E, with_held=True))
+    assert len(args) == len(INPUT_NAMES) + 1
+    with torch.no_grad():
+        a = wrap(*args)
+        args[-1] = torch.tensor([9], dtype=torch.int64)
+        b = wrap(*args)
+        args[-1] = torch.tensor([16], dtype=torch.int64)
+        c = wrap(*args)
+        args[-1] = torch.tensor([1 << 20], dtype=torch.int64)
+        d = wrap(*args)
+    assert not torch.allclose(a, b, atol=1e-6), "换了 dir_held logits 却没变 —— 那一维没接上"
+    assert torch.equal(c, d), "封顶 16：再大也一样"
+
+
 def test_masked_rows_cannot_influence_logits():
     """mask 关掉的行填垃圾也不能改结果 —— 押运哨兵（1e30）与 sel 两处。"""
     cfg = _cfg()
@@ -168,24 +198,28 @@ def test_masked_rows_cannot_influence_logits():
     assert torch.allclose(clean, dirty, atol=1e-6), "无效行影响了 logits"
 
 
-def test_onnx_matches_torch(tmp_path):
+@pytest.mark.parametrize("name", ["danger_topk_v3", "danger_topk_v4"])
+def test_onnx_matches_torch(tmp_path, name):
+    """v3 = 七输入（图版本 2）；v4 多一个 dir_held（图版本 3）—— 输入没被导出器剪掉是这里押的。"""
     ort = pytest.importorskip("onnxruntime")
-    cfg = _cfg()
-    obs = _obs(n=2)
+    cfg = _cfg(name)
+    held = uses_held(cfg)
+    obs = _obs_held(n=2)
     model, _ = _reference(cfg, obs)
     wrap = DeployWrapper(cfg, model, bullets_rows=ROWS_B, enemies_rows=ROWS_E).eval()
     path = tmp_path / "m.onnx"
-    example = deploy_inputs(obs, 0, bullets_rows=ROWS_B, enemies_rows=ROWS_E)
+    example = deploy_inputs(obs, 0, bullets_rows=ROWS_B, enemies_rows=ROWS_E, with_held=held)
     export_graph(wrap, example, path)
 
+    names = list(INPUT_NAMES) + (["dir_held"] if held else [])
     sess = ort.InferenceSession(str(path), providers=["CPUExecutionProvider"])
-    assert [i.name for i in sess.get_inputs()] == list(INPUT_NAMES)
+    assert [i.name for i in sess.get_inputs()] == names
     assert [tuple(i.shape) for i in sess.get_inputs()] == [
         (ROWS_B, BULLET_COLS), (ROWS_B,), (ROWS_E, ENEMY_COLS), (ROWS_E,), (5,), (2,), (1,)
-    ]
+    ] + ([(1,)] if held else [])
     for i in range(2):
-        args = deploy_inputs(obs, i, bullets_rows=ROWS_B, enemies_rows=ROWS_E)
-        feed = {n: a.numpy() for n, a in zip(INPUT_NAMES, args)}
+        args = deploy_inputs(obs, i, bullets_rows=ROWS_B, enemies_rows=ROWS_E, with_held=held)
+        feed = {n: a.numpy() for n, a in zip(names, args)}
         got = torch.from_numpy(sess.run(["logits"], feed)[0])
         with torch.no_grad():
             ref = wrap(*args)

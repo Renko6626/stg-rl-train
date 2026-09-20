@@ -21,6 +21,14 @@ env 不导出这两个量，训练侧由 `envwrap.enemy_velocity` 按 id 差分�
 v2 的 checkpoint 也按六列签名导出（那两列进了图没人读），所以同一个 DLL 能换着装 F 与 J 的图；
 版本 1 的旧图（四列）新 DLL 会在建会话时拒掉。
 
+**图版本 3（2026-09-20）**：`danger_topk_v4`（实验 N，手部运动层）多一个输入
+
+    dir_held     i64[1]      当前方向已经**实际执行**了多少帧（新局 = 很大；图里封顶 16 再归一化）
+
+只有 v4 的 checkpoint 才导出成八输入；v2 / v3 仍是七输入的版本 2（整个输入没人读的话导出器会把它剪掉，
+所以没法像敌人速度那样「同一套签名、旧图不读」）。C 侧 `sa_onnx` 两种都收，并据此知道这张图是不是
+在运动层下练出来的。`prev_action` 在 v4 下的含义是上一步**实际执行**的动作（运动层之后的），不是策略想按的。
+
 用法：
 
     uv run --frozen python -m stgtrain.export_onnx runs/<run>/checkpoints/best.pt --out dist
@@ -42,9 +50,11 @@ from .envwrap import RawObs
 from .featurize.danger_topk_v1 import _gather, closest_approach
 from .featurize.danger_topk_v2 import DangerTopKV2
 from .featurize.danger_topk_v3 import DangerTopKV3
+from .featurize.danger_topk_v4 import DangerTopKV4
 from .registry import FEATURIZERS, MODELS, load_builtins
 
-GRAPH_VERSION = 2
+GRAPH_VERSION = 2          # 七输入（v2 / v3）
+GRAPH_VERSION_HELD = 3     # 八输入：多一个 dir_held（v4）
 BULLET_COLS = 5
 ENEMY_COLS = 6
 PLAYER_COLS = 5
@@ -53,6 +63,7 @@ PLAYER_COLS = 5
 #: 失败后它静默留在 18。没有理由跟降级器较劲 —— ORT 支持 18 已久，直接钉 18。
 OPSET = 18
 INPUT_NAMES = ("bullets", "bullets_mask", "enemies", "enemies_mask", "player", "target", "prev_action")
+HELD_INPUT = "dir_held"
 OUTPUT_NAMES = ("logits",)
 
 #: `float("inf")` 的可导出替身。ONNX 能表达 inf，但 `torch.isfinite` 的导出不稳，
@@ -96,8 +107,23 @@ class DangerTopKV3Export(_ExportTopK, DangerTopKV3):
     """v3 的敌人行再走一遍 `_topk`（带相对速度），同样落在 mixin 重写的那一份上。"""
 
 
+class DangerTopKV4Export(_ExportTopK, DangerTopKV4):
+    """v4 只在 player 向量后面多拼一维 dir_held，`_topk` 同样落在 mixin 上。"""
+
+
 #: checkpoint 的特征化器名 → 可导出孪生。不在表里的一律拒绝导出。
-EXPORT_FEATURIZERS = {"danger_topk_v2": DangerTopKV2Export, "danger_topk_v3": DangerTopKV3Export}
+EXPORT_FEATURIZERS = {"danger_topk_v2": DangerTopKV2Export, "danger_topk_v3": DangerTopKV3Export,
+                      "danger_topk_v4": DangerTopKV4Export}
+#: 这些特征化器要 `dir_held` 输入（图版本 3）
+HELD_FEATURIZERS = frozenset({"danger_topk_v4"})
+
+
+def uses_held(cfg: dict) -> bool:
+    return cfg["featurize"]["name"] in HELD_FEATURIZERS
+
+
+def input_names(cfg: dict) -> tuple[str, ...]:
+    return INPUT_NAMES + ((HELD_INPUT,) if uses_held(cfg) else ())
 
 
 def export_featurizer(cfg: dict):
@@ -114,6 +140,7 @@ class DeployWrapper(nn.Module):
     def __init__(self, cfg: dict, model: nn.Module, *, bullets_rows: int, enemies_rows: int):
         super().__init__()
         self.feat = export_featurizer(cfg)
+        self.with_held = uses_held(cfg)
         self.model = model
         self.bullets_rows = int(bullets_rows)
         self.enemies_rows = int(enemies_rows)
@@ -123,7 +150,7 @@ class DeployWrapper(nn.Module):
             raise ValueError(f"enemies_rows({enemies_rows}) < k_enemies({cfg['featurize']['k_enemies']})")
 
     def forward(self, bullets: Tensor, bullets_mask: Tensor, enemies: Tensor, enemies_mask: Tensor,
-                player: Tensor, target: Tensor, prev_action: Tensor) -> Tensor:
+                player: Tensor, target: Tensor, prev_action: Tensor, dir_held: Tensor | None = None) -> Tensor:
         obs = RawObs(
             player_xy=player[0:2].reshape(1, 2),
             player_hit_r=player[2:3],
@@ -136,12 +163,14 @@ class DeployWrapper(nn.Module):
             enemies_mask=enemies_mask.unsqueeze(0),
             target_xy=target.reshape(1, 2),
             prev_action=prev_action,
+            dir_held=dir_held if self.with_held else None,
         )
         logits, _ = self.model(self.feat(obs))
         return logits.reshape(NUM_ACTIONS)
 
 
-def deploy_inputs(obs: RawObs, env: int, *, bullets_rows: int, enemies_rows: int) -> tuple[Tensor, ...]:
+def deploy_inputs(obs: RawObs, env: int, *, bullets_rows: int, enemies_rows: int,
+                  with_held: bool = False) -> tuple[Tensor, ...]:
     """从训练侧 `RawObs` 取第 `env` 个 env，摊成图的七个输入。行数不足补零行 + 假掩码，超出则截断。
 
     `enemies` 六列全取（后两列是 `envwrap.enemy_velocity` 差分出来的速度）。摊出来的形状与 dtype 就是 `INPUT_NAMES` 的契约，
@@ -161,6 +190,8 @@ def deploy_inputs(obs: RawObs, env: int, *, bullets_rows: int, enemies_rows: int
 
     prev = obs.prev_action
     prev_id = 0 if prev is None else int(prev[env])
+    held = () if not with_held else (
+        torch.tensor([int(obs.dir_held[env]) if obs.dir_held is not None else 1 << 20], dtype=torch.int64),)
     return (
         fit(obs.bullets[env], bullets_rows, BULLET_COLS),
         fit_mask(obs.bullets_mask[env], bullets_rows),
@@ -171,7 +202,7 @@ def deploy_inputs(obs: RawObs, env: int, *, bullets_rows: int, enemies_rows: int
                       float(obs.player_focus[env])], dtype=torch.float32),
         obs.target_xy[env].to(torch.float32).clone(),
         torch.tensor([prev_id], dtype=torch.int64),
-    )
+    ) + held
 
 
 def build_deploy(ckpt_path, *, bullets_rows: int = DEPLOY_BULLETS_ROWS,
@@ -197,6 +228,7 @@ def build_deploy(ckpt_path, *, bullets_rows: int = DEPLOY_BULLETS_ROWS,
         "action_table_version": int(ck["action_table_version"]),
         "featurize": dict(cfg["featurize"]), "model": dict(cfg["model"]),
         "hold_radius": float(cfg["reward"]["hold_radius"]),
+        "motor": dict(cfg["motor"]), "with_held": uses_held(cfg),
         "extra": ck.get("extra", {}),
     }
     return wrap, meta
@@ -237,7 +269,8 @@ def export_graph(wrap: DeployWrapper, example: tuple[Tensor, ...], out_path) -> 
     """导出定形图，权重内联成单文件。dynamo 导出器优先，失败退回 TorchScript 路径。"""
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    kw = dict(input_names=list(INPUT_NAMES), output_names=list(OUTPUT_NAMES), opset_version=OPSET)
+    names = INPUT_NAMES + ((HELD_INPUT,) if len(example) > len(INPUT_NAMES) else ())
+    kw = dict(input_names=list(names), output_names=list(OUTPUT_NAMES), opset_version=OPSET)
     try:
         torch.onnx.export(wrap, example, str(out_path), dynamo=True, **kw)
     except Exception as exc:  # noqa: BLE001 —— 退回路径本身就是为了兜住任意导出器内部错误
@@ -255,7 +288,7 @@ def _sha256(path) -> str:
     return h.hexdigest()
 
 
-def graph_signature(bullets_rows: int, enemies_rows: int) -> list[dict]:
+def graph_signature(bullets_rows: int, enemies_rows: int, with_held: bool = False) -> list[dict]:
     shapes = {
         "bullets": ([bullets_rows, BULLET_COLS], "float32"),
         "bullets_mask": ([bullets_rows], "bool"),
@@ -264,15 +297,18 @@ def graph_signature(bullets_rows: int, enemies_rows: int) -> list[dict]:
         "player": ([PLAYER_COLS], "float32"),
         "target": ([2], "float32"),
         "prev_action": ([1], "int64"),
+        HELD_INPUT: ([1], "int64"),
     }
-    return [{"name": n, "dtype": shapes[n][1], "shape": shapes[n][0]} for n in INPUT_NAMES]
+    names = INPUT_NAMES + ((HELD_INPUT,) if with_held else ())
+    return [{"name": n, "dtype": shapes[n][1], "shape": shapes[n][0]} for n in names]
 
 
 def write_manifest(path, *, checkpoint, onnx, meta: dict, bullets_rows: int, enemies_rows: int) -> Path:
     """出处清单：部署侧靠它确认「装的是哪一版模型」，对拍脚本靠它核签名。"""
     path = Path(path)
+    with_held = bool(meta.get("with_held", False))
     payload = {
-        "graph_version": GRAPH_VERSION,
+        "graph_version": GRAPH_VERSION_HELD if with_held else GRAPH_VERSION,
         "opset": OPSET,
         "num_actions": NUM_ACTIONS,
         "action_table_version": meta.get("action_table_version", ACTION_TABLE_VERSION),
@@ -285,8 +321,10 @@ def write_manifest(path, *, checkpoint, onnx, meta: dict, bullets_rows: int, ene
         "featurize": meta.get("featurize"),
         "model": meta.get("model"),
         "hold_radius": meta.get("hold_radius"),
+        # 这张图是在什么运动层下练出来的 —— 部署侧 DLL 要照这组参数跑同一个运动层
+        "motor": meta.get("motor"),
         "eval": meta.get("extra", {}).get("eval"),
-        "inputs": graph_signature(bullets_rows, enemies_rows),
+        "inputs": graph_signature(bullets_rows, enemies_rows, with_held),
         "outputs": [{"name": "logits", "dtype": "float32", "shape": [NUM_ACTIONS]}],
         "sha256": {"checkpoint": _sha256(checkpoint), "onnx": _sha256(onnx)},
     }
@@ -295,7 +333,7 @@ def write_manifest(path, *, checkpoint, onnx, meta: dict, bullets_rows: int, ene
     return path
 
 
-def _example_inputs(bullets_rows: int, enemies_rows: int) -> tuple[Tensor, ...]:
+def _example_inputs(bullets_rows: int, enemies_rows: int, with_held: bool = False) -> tuple[Tensor, ...]:
     """导出用的样例输入：一颗迎面弹 + 一只敌，够让每一路都有非零值。"""
     bullets = torch.zeros(bullets_rows, BULLET_COLS)
     bullets[0] = torch.tensor([8.0, 320.0, 0.0, 3.0, 4.0])
@@ -307,7 +345,8 @@ def _example_inputs(bullets_rows: int, enemies_rows: int) -> tuple[Tensor, ...]:
     emask[0] = True
     player = torch.tensor([0.0, 384.0, 2.5, 4.5, 0.0])
     target = torch.tensor([0.0, 384.0])
-    return bullets, bmask, enemies, emask, player, target, torch.zeros(1, dtype=torch.int64)
+    base = (bullets, bmask, enemies, emask, player, target, torch.zeros(1, dtype=torch.int64))
+    return base + ((torch.tensor([3], dtype=torch.int64),) if with_held else ())
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -322,7 +361,7 @@ def main(argv: list[str] | None = None) -> int:
     wrap, meta = build_deploy(a.checkpoint, bullets_rows=a.bullets_rows, enemies_rows=a.enemies_rows)
     out_dir = Path(a.out)
     onnx_path = out_dir / f"{a.name}.onnx"
-    example = _example_inputs(a.bullets_rows, a.enemies_rows)
+    example = _example_inputs(a.bullets_rows, a.enemies_rows, with_held=bool(meta["with_held"]))
     export_graph(wrap, example, onnx_path)
     man = write_manifest(out_dir / f"{a.name}.manifest.json", checkpoint=a.checkpoint, onnx=onnx_path, meta=meta,
                          bullets_rows=a.bullets_rows, enemies_rows=a.enemies_rows)
@@ -335,7 +374,8 @@ def main(argv: list[str] | None = None) -> int:
         print("[export] 没装 onnxruntime，跳过导出后自检（CI 与本地 pytest 会跑）")
     else:
         sess = ort.InferenceSession(str(onnx_path), providers=["CPUExecutionProvider"])
-        got = torch.from_numpy(sess.run(["logits"], {n: t.numpy() for n, t in zip(INPUT_NAMES, example)})[0])
+        names = INPUT_NAMES + ((HELD_INPUT,) if meta["with_held"] else ())
+        got = torch.from_numpy(sess.run(["logits"], {n: t.numpy() for n, t in zip(names, example)})[0])
         dev = (got - ref).abs().max().item()
         if dev > 1e-5 or got.argmax().item() != ref.argmax().item():
             raise SystemExit(f"导出后自检失败：logits 最大偏差 {dev:.3g}，argmax {got.argmax()} vs {ref.argmax()}")
