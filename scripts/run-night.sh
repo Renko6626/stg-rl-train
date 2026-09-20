@@ -11,6 +11,7 @@
 #   bash scripts/run-night.sh --no-check             # 完全跳过 gpucheck
 #   bash scripts/run-night.sh --parallel 2           # 同机并行 2 条（受限于显存，见下）
 #   bash scripts/run-night.sh --no-preflight         # 跳过「每条配置真跑 2 轮」的试车
+#   bash scripts/run-night.sh --only n3 --share 2    # 分两个终端各开一条时：告诉脚本这台机器同时要跑 2 条（用来分 CPU 配额）
 #
 # 设计要点（都是为了睡觉时别白跑）：
 #   · **开跑前先体检**：GPU 可见 + gpucheck（真做一次前向/反向，编译与 CUDA 图都走一遍）+ 磁盘余量。
@@ -20,6 +21,10 @@
 #   · **一条挂了继续下一条**：所以不开 `set -e`。H 和 I 都只跟 G0 比，G0 没跑成也不必整夜停摆。
 #   · **线程只 bench 一次**：run-exp.sh 是单条脚本，每条都会 bench（约 5 分钟）；这里测一次三条复用。
 #   · 日志：runs/<名>.console.log（单条）与 runs/night-<时间>.log（总）。
+#   · **CPU 配额**（2026-09-21）：租来的容器看得见宿主机全部 255 个逻辑核（nproc 不骗人地报 255），但 cgroup 只给
+#     租下的那些核的**时间配额**（CFS bandwidth，如 24 核）。env 线程总数超过配额时，整个容器在每个 100 ms 周期里
+#     被掐停 —— 表现为 env_step 双峰（1.0–1.5 s ↔ 2.5–4 s）、单条进程时快时慢、两条并行尤其严重
+#     （N1 / N2 / M 都中了，J / I2 / N3 碰巧两条的 rollout 错开）。所以线程数按「配额 ÷ 同时跑几条」来定，不按 nproc。
 #   · **并行**：单条实测占显存 10.1G、GPU 利用率中位 37%、128 逻辑核只用掉约 6.7 个
 #     （env 线程 32 个，但 env_step 只占一轮的 24%）。所以同机并行卡在**显存**而不是算力：
 #     24G 的卡塞得下 2 条（20.2G），3 条不行。两条合计吞吐约 1.4 倍（那 40% 的 update 阶段会串行化），
@@ -29,12 +34,13 @@ set -uo pipefail
 cd "$(dirname "$0")/.."
 
 # 当前队列（跑完一批就换成下一批；G0/H/I、I2/J 已于 2026-09-19 跑完，见 docs/experiments.md）
-# N3（低速键也过运动层）‖ M（N3 + edge_hug），两条同机并行：  bash scripts/run-night.sh --parallel 2
+# L（M + rank 3 进训练）‖ O（M + 熵系数 0.003），两条同机并行：  bash scripts/run-night.sh --parallel 2
+# 分两个终端各开一条：  bash scripts/run-night.sh --only l --share 2   /   --only o --share 2 --no-check
 EXPS=(
-  "n3 configs/exp-n3-motor-slow.toml"
-  "m  configs/exp-m-edgehug.toml"
+  "l configs/exp-l-rank3.toml"
+  "o configs/exp-o-entropy.toml"
 )
-THREADS=""; RETRIES=2; ONLY=""; SMOKE=0; CHECK=strict; PAR=1; PREFLIGHT=1
+THREADS=""; RETRIES=2; ONLY=""; SMOKE=0; CHECK=strict; PAR=1; PREFLIGHT=1; SHARE=""
 VRAM_PER_RUN_MB=11000     # 单条实测峰值 10.1G，留一点余量
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -46,6 +52,7 @@ while [[ $# -gt 0 ]]; do
     --no-check)    CHECK=off;   shift 1 ;;
     --parallel)    PAR="$2";    shift 2 ;;
     --no-preflight) PREFLIGHT=0; shift 1 ;;
+    --share)       SHARE="$2";  shift 2 ;;
     *) echo "未知参数 $1" >&2; exit 2 ;;
   esac
 done
@@ -102,7 +109,35 @@ if [[ "$PAR" -gt 1 && $SMOKE -eq 0 ]]; then
   export PYTORCH_CUDA_ALLOC_CONF="${PYTORCH_CUDA_ALLOC_CONF:-expandable_segments:True}"
 fi
 
+# ── CPU 配额：容器真正能用多少个核（不是 nproc）────────────────────────────
+cgroup_cores() {      # 有配额输出核数（向上取整），没有配额 / 读不到输出空
+  local q p
+  if [[ -r /sys/fs/cgroup/cpu.max ]]; then                       # cgroup v2
+    read -r q p < /sys/fs/cgroup/cpu.max
+    [[ "$q" != max && "$p" -gt 0 ]] && echo $(( (q + p - 1) / p ))
+  elif [[ -r /sys/fs/cgroup/cpu/cpu.cfs_quota_us ]]; then        # cgroup v1
+    q=$(< /sys/fs/cgroup/cpu/cpu.cfs_quota_us); p=$(< /sys/fs/cgroup/cpu/cpu.cfs_period_us)
+    [[ "$q" -gt 0 && "$p" -gt 0 ]] && echo $(( (q + p - 1) / p ))
+  fi
+  return 0
+}
+throttle_stat() {     # 容器至今被掐停了多少次 / 多久：开跑前后各打一次，差值就是这批实验吃到的节流
+  grep -hE "^(nr_periods|nr_throttled|throttled_usec|throttled_time)" \
+    /sys/fs/cgroup/cpu.stat /sys/fs/cgroup/cpu/cpu.stat 2>/dev/null | tr '\n' ' '
+}
+QUOTA="$(cgroup_cores)"
+say "CPU：nproc=$(nproc) · cgroup 配额=${QUOTA:-无} 核 · 节流计数 $(throttle_stat)"
+
 # ── 线程：只测一次，整个队列复用 ────────────────────────────────────────────
+if [[ -z "$THREADS" && -n "$QUOTA" && $SMOKE -eq 0 ]]; then
+  # 每条留 2 个核给 Python 主线程与 torch；env 线程 = 配额 ÷ 同时跑的条数 − 2，钳进 [4, 32]。
+  # 单跑时 bench 实测 8 线程仍有 32 线程的 86% 吞吐（docs/perf-baseline.md），少开线程的代价远小于被节流。
+  N_SHARE="${SHARE:-$PAR}"
+  THREADS=$(( QUOTA / N_SHARE - 2 ))
+  (( THREADS < 4 )) && THREADS=4
+  (( THREADS > 32 )) && THREADS=32
+  say "按 CPU 配额定线程：$QUOTA 核 ÷ $N_SHARE 条 − 2 → threads = $THREADS"
+fi
 if [[ -z "$THREADS" ]]; then
   CPU="$(lscpu | sed -n 's/^Model name:[[:space:]]*//p' | head -1)"
   if [[ "$CPU" == *"EPYC 7742"* && "$(nproc)" -ge 255 ]]; then
@@ -202,4 +237,5 @@ for name, upd, o in rows[-12:]:
           f"{o.get('seg_le2_frac', 0):9.1%}{o.get('shift_toggles_per_s', 0):9.2f}"
           f"{o.get('close12_frac', 0):8.1%}{o.get('motor_override_frac', 0):8.1%}")
 PY
+say "节流计数（收尾）$(throttle_stat)"
 say "打包在 runs/*.tar.gz；总日志 $NIGHT_LOG"

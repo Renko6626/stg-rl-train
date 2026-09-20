@@ -1,0 +1,47 @@
+# 实验 L（2026-09-21）：M + **rank 3 进训练**
+#
+# 问题：套上人手之后，对未见难度的泛化差了一大截 —— r2 → r3 的落差 J 4.8pp、N2 17.5pp、**M 21.8pp**
+# （跟点档 0.807 → 0.589；部署用的自由档 0.925 → 0.753）。M 的短板几乎全在 r3：s2_mb1 0.23、s3_b5 0.08、s3_b7 0.34。
+# 09-20 第一次提 L 时落差只有 5pp，现在是已知最大的一块差距。
+#
+# 与 M 只差 env.ranks = [2, 3]：每张卡的 rank 2 与 rank 3 各是一个训练起点（只有 E/N 档的卡照旧钳到 1），
+# 起点数约翻倍，采样交给课程（死亡率 EMA 加权）。留出卡仍不进训练池 ⇒ r3 评测量的仍是**对未见卡**的泛化，尺子不变；
+# 变的是「rank 3 这个难度训练时见没见过」。
+#
+# 判读（立项时定，详见 docs/experiments.md「下一批：L ‖ O」；撑过率一律按末 4 次评测均值比）：
+#   ① r3 跟点档 ≥ 0.69（M 0.589，+10pp）、自由档 r3 ≥ 0.85（M 0.753）；
+#   ② r2 不低于 M 超过 2pp（0.807 / 自由档 0.925）—— 算力分给 rank 3 之后 rank 2 不能塌；
+#   ③ 三张老短板（s2_mb1 / s3_b5 / s3_b7 的 r3）有没有动；
+#   ④ 课程：w_max 是否长期贴 4.0、rank 3 的密集卡（s5_b9 一屏 731 颗、s5_b1 峰 872）有没有把采样吸干。
+# 例行探针：--motor off、--motor "hold=3,7;delay=0,4;slow=1"、--intent fixed_point_v1 / follow_player_v1。
+[run]
+total_updates = 3500
+ckpt_every = 100
+eval_every = 250
+
+[env]
+num_envs = 4096
+threads = 63
+ranks = [2, 3]
+
+[intent]
+name = "mixed_v1"
+
+[featurize]
+name = "danger_topk_v5"
+
+[motor]
+enabled = true
+hold = [2, 6]
+delay = [0, 2]
+slow = true
+
+[reward.terms]
+death = 10.0
+follow_shaping = 1.0
+hold = 0.01
+segment_survived = 0.0
+key_press = -0.003
+quick_change = -0.01
+shift_toggle = 0.0
+edge_hug = -0.02

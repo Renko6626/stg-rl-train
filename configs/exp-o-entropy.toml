@@ -1,0 +1,50 @@
+# 实验 O（2026-09-21）：M + **熵系数 0.01 → 0.003**
+#
+# 问题：N 系列的评测曲线从 u1250 起横盘两千多轮，而训练时的行为策略很差 —— 训练死亡率 M 43%（J 9.5%）、
+# 运动层否决了 62% 的帧、策略熵 1.66（J 0.82）。
+# 假设（未验证）：**探索噪声被运动层放大了**。以前采样出的错动作只执行 1 帧、下一帧就能纠正；现在锁一松开，恰好采到的
+# 那个随机方向会被锁住执行 2–6 帧（9–27 px）。模型又不知道哪一帧会松锁，每一帧都得果断，熵奖励却一直往反方向拉。
+# 若成立，收益应当遍及三种意图、两个 rank，与只抬 r3 的 L 互补。
+#
+# 与 M 只差 ppo.ent_coef = 0.003。（字母：E 早被「观测加上一步动作」用了，K 取消、L 留给 rank 3，所以是 O。）
+# 风险：探索不足 → 早期学得更慢或卡在「躲边上」的局部最优（M 有 edge_hug，这条路本来就被罚着）。
+#
+# 判读（立项时定，详见 docs/experiments.md「下一批：L ‖ O」；撑过率一律按末 4 次评测均值比）：
+#   ① 训练侧：末期熵明显低于 M 的 1.66、训练死亡率低于 43%、运动层否决的帧低于 62% —— 先看机制有没有发生；
+#   ② 评测：r2 / r3 跟点档相对 M（0.807 / 0.589）≥ +3pp 才算有效应（单种子噪声约 ±2pp，别读 1–2pp）；
+#   ③ 早期曲线（u500–1000）别比 M 慢太多；慢很多 = 探索不足，下一步改成退火（前期 0.01、后期 0.003）而不是固定值；
+#   ④ 横盘有没有被打破：u1250–3000 这一段是否仍然是平的。
+# 例行探针：--motor off、--motor "hold=3,7;delay=0,4;slow=1"、--intent fixed_point_v1 / follow_player_v1。
+[run]
+total_updates = 3500
+ckpt_every = 100
+eval_every = 250
+
+[env]
+num_envs = 4096
+threads = 63
+
+[intent]
+name = "mixed_v1"
+
+[featurize]
+name = "danger_topk_v5"
+
+[motor]
+enabled = true
+hold = [2, 6]
+delay = [0, 2]
+slow = true
+
+[reward.terms]
+death = 10.0
+follow_shaping = 1.0
+hold = 0.01
+segment_survived = 0.0
+key_press = -0.003
+quick_change = -0.01
+shift_toggle = 0.0
+edge_hug = -0.02
+
+[ppo]
+ent_coef = 0.003
