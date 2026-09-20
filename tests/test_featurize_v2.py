@@ -55,3 +55,18 @@ def test_v4_appends_normalised_dir_held():
     assert torch.allclose(out4["player"][:, -1], torch.tensor([1 / HELD_CAP, 8 / HELD_CAP, 1.0]))
     obs.dir_held = None
     assert torch.equal(v4(obs)["player"][:, -1], torch.ones(3))
+
+
+def test_v5_appends_normalised_slow_held():
+    from stgtrain.featurize.danger_topk_v4 import HELD_CAP
+
+    cfg = small_cfg(featurize={"name": "danger_topk_v5", "k_bullets": 8, "k_enemies": 4})
+    v4, v5 = FEATURIZERS.get("danger_topk_v4")(cfg), FEATURIZERS.get("danger_topk_v5")(cfg)
+    assert v5.spec()["player"] == (v4.spec()["player"][0] + 1,)
+    obs = raw_obs(n=3)
+    obs.dir_held = torch.tensor([2, 5, 9])
+    obs.slow_held = torch.tensor([1, 8, 1 << 20])
+    assert torch.equal(v5(obs)["player"][:, :-1], v4(obs)["player"]), "前 14 维与 v4 逐位相同"
+    assert torch.allclose(v5(obs)["player"][:, -1], torch.tensor([1 / HELD_CAP, 8 / HELD_CAP, 1.0]))
+    obs.slow_held = None
+    assert torch.equal(v5(obs)["player"][:, -1], torch.ones(3))

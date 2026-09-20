@@ -5,6 +5,7 @@
 
     python -m stgtrain.eval_ckpt <ckpt> --motor off                                 # 探针：关掉手部运动层
     python -m stgtrain.eval_ckpt <ckpt> --motor "hold=3,7;delay=0,4"                # 探针：换一套运动层参数（旧模型也能测）
+    python -m stgtrain.eval_ckpt <ckpt> --motor "hold=2,6;delay=0,2;slow=1"         # 同上，低速键也过运动层（N3 的层）
 
 模型、特征化、reward、frame_skip 一律取 checkpoint 里的配置；只覆盖设备、卡池目录、局数、意图、运动层。
 """
@@ -27,7 +28,8 @@ from .train import build_components, pick_device
 
 
 def parse_motor(spec: str) -> dict:
-    """`--motor` → 配置覆盖。`train` = 不动；`off` = 关；`hold=a,b[;delay=c,d]` = 开并换参数（没写的那项取 0,0）。
+    """`--motor` → 配置覆盖。`train` = 不动；`off` = 关；`hold=a,b[;delay=c,d][;slow=0|1]` = 开并换参数
+    （没写的区间取 0,0，没写 slow 取 0）。
 
     旧 checkpoint 的配置里没有 [motor]（from_dict 补的默认是关），所以给 J 补对照线也走这里。
     """
@@ -35,12 +37,15 @@ def parse_motor(spec: str) -> dict:
         return {}
     if spec == "off":
         return {"motor": {"enabled": False}, "eval": {"motor": "train"}}
-    got = {"hold": [0, 0], "delay": [0, 0]}
+    got = {"hold": [0, 0], "delay": [0, 0], "slow": False}
     for part in spec.split(";"):
         key, _, val = part.partition("=")
         key = key.strip()
+        if key == "slow":
+            got["slow"] = val.strip() not in ("0", "false", "")
+            continue
         if key not in got:
-            raise SystemExit(f"--motor 不认识 {key!r}：要 train / off / hold=a,b[;delay=c,d]")
+            raise SystemExit(f"--motor 不认识 {key!r}：要 train / off / hold=a,b[;delay=c,d][;slow=0|1]")
         try:
             lo, hi = (int(v) for v in val.split(","))
         except ValueError:
@@ -61,7 +66,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--intent", default=None,
                     help="覆盖意图生成器（如 follow_player_v1 = 目标点锁自机的自由躲弹诊断）")
     ap.add_argument("--motor", default="train",
-                    help="手部运动层探针：train（默认，沿用 checkpoint 配置）/ off / hold=a,b[;delay=c,d]")
+                    help="手部运动层探针：train（默认，沿用 checkpoint 配置）/ off / hold=a,b[;delay=c,d][;slow=0|1]")
     ap.add_argument("--hysteresis", type=float, default=0.0,
                     help="诊断用：最优动作 logit 比上一步高出超过 τ 才换（0 = 纯 argmax）")
     ap.add_argument("--out", default=None, help="结果 json（默认 checkpoint 同目录 eval-<名>-<时间>.json）")

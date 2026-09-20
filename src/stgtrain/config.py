@@ -18,7 +18,7 @@ DEFAULTS: dict = {
                    "fail_ceil": 0.95, "w_lo": 0.25, "w_hi": 4.0, "min_episodes": 30},
     # 手部运动层（实验 N）：策略只说「想按哪个方向」，实际按出去的由 envwrap.MotorLayer 决定。
     # hold = 每段方向最短保持帧数的抽样区间（闭区间，换段时抽，对模型不可见）；delay = 变向生效延迟的抽样区间。
-    "motor": {"enabled": False, "hold": [2, 6], "delay": [0, 0]},
+    "motor": {"enabled": False, "hold": [2, 6], "delay": [0, 0], "slow": False},   # slow：低速键也过运动层（N3）
     "featurize": {"name": "danger_topk_v3", "k_bullets": 64, "k_enemies": 8, "horizon": 60, "d_max": 128.0},
     "model": {"name": "set_attn_v1", "d": 64, "heads": 4, "trunk": 256},
     "reward": {"hold_radius": 24.0, "edge_margin": 16.0, "quick_frames": 3,

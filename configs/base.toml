@@ -48,6 +48,7 @@ min_episodes = 30      # 样本不足的起点权重保持 1
 enabled = false
 hold = [2, 6]          # 每段方向的最短保持帧数 ~ U{lo..hi}（60Hz：33–100 ms），换段时抽
 delay = [0, 0]         # 变向生效延迟 ~ U{lo..hi} 帧；[0, 0] = 没有时机散布
+slow = false           # true = 低速键也过运动层（另一路状态机，与方向互不牵连；N3）。false 时低速键直通（N1 / N2）
 
 [featurize]
 name = "danger_topk_v3"

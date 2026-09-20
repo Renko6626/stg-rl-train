@@ -207,3 +207,87 @@ def test_env_ids_make_batched_layer_reproduce_separate_layers():
         wa, wb = (torch.randint(0, actions.NUM_ACTIONS, (8,), generator=g) for _ in range(2))
         out = torch.cat([ha.step(wa), hb.step(wb)])
         assert torch.equal(hboth.step(torch.cat([wa, wb])), out)
+
+
+# ---------------- N3：低速键也过运动层 ----------------
+
+class Hand2(Hand):
+    """带低速位记账的替身（envwrap 里的 slow_held）。"""
+
+    def __init__(self, m):
+        super().__init__(m)
+        self.slow_held = torch.full((self.n,), DIR_HOLD_NEVER, dtype=torch.int64)
+
+    def step(self, want):
+        want = torch.as_tensor(want, dtype=torch.int64).expand(self.n).clone()
+        out = self.m.apply(want, self.prev, self.held, self.slow_held)
+        self.held = torch.where((out // 2) != (self.prev // 2), torch.ones_like(self.held), self.held + 1)
+        self.slow_held = torch.where((out % 2) != (self.prev % 2), torch.ones_like(self.slow_held), self.slow_held + 1)
+        self.prev = out
+        return out
+
+
+def slow_layer(hold=(3, 3), delay=(0, 0), n=1, seed=1):
+    cfg = small_cfg(motor={"enabled": True, "hold": list(hold), "delay": list(delay), "slow": True})
+    return MotorLayer(cfg, n, CPU, seed)
+
+
+def test_slow_key_is_locked_like_a_direction():
+    h = Hand2(slow_layer(hold=(3, 3)))
+    # 方向一直是 3；低速：按下（第一下放行）→ 想松被锁两帧 → 第 4 帧放行
+    got = [int(h.step(a)[0]) for a in (7, 6, 6, 6, 6)]
+    assert got == [7, 7, 7, 6, 6]
+
+
+def test_slow_and_direction_channels_are_independent():
+    """按 shift 的手指和按方向的手指是两根：一路被锁不耽误另一路。"""
+    h = Hand2(slow_layer(hold=(4, 4)))
+    assert int(h.step(3 * 2 + 1)[0]) == 7            # 方向 3 + 低速，两路都是新局第一下
+    assert int(h.step(7 * 2 + 0)[0]) == 7            # 两路都想换，两路都被锁
+    h2 = Hand2(slow_layer(hold=(4, 4)))
+    h2.step(3 * 2)                                   # 只换方向；低速位没动过 → 它那一路仍是「第一下不受限」
+    assert int(h2.step(3 * 2 + 1)[0]) == 7, "方向刚换、被锁着，不妨碍低速键立刻按下"
+    assert int(h2.step(7 * 2 + 1)[0]) == 7, "反过来：低速刚按下，方向还在自己的锁里"
+
+
+def test_slow_delay_and_withdraw():
+    h = Hand2(slow_layer(hold=(0, 0), delay=(2, 2)))
+    assert [int(h.step(a)[0]) % 2 for a in (1, 1, 1, 1)] == [0, 0, 1, 1]
+    h = Hand2(slow_layer(hold=(0, 0), delay=(2, 2)))
+    assert [int(h.step(a)[0]) % 2 for a in (1, 0, 1, 1, 1)] == [0, 0, 0, 0, 1], "撤回之后要重新等"
+
+
+def test_slow_off_is_bit_identical_to_n2_on_the_direction_channel():
+    """四路抽样各用各的 stream ⇒ 开不开低速那一路，方向这一路的行为逐位不变（N3 关掉 slow 就退回 N2）。"""
+    cfg = lambda slow: small_cfg(motor={"enabled": True, "hold": [2, 6], "delay": [0, 2], "slow": slow})  # noqa: E731
+    a, b = Hand(MotorLayer(cfg(False), 64, CPU, 5)), Hand2(MotorLayer(cfg(True), 64, CPU, 5))
+    g = torch.Generator().manual_seed(0)
+    slow_blocked = 0
+    for _ in range(300):
+        want = torch.randint(0, actions.NUM_ACTIONS, (64,), generator=g)
+        oa, ob = a.step(want), b.step(want)
+        assert torch.equal(oa // 2, ob // 2)
+        assert torch.equal(oa % 2, want % 2), "slow = false：低速位直通"
+        slow_blocked += int(((ob % 2) != (want % 2)).sum())
+    assert slow_blocked > 1000, "slow = true：乱按的低速位大部分时候应被挡住"
+
+
+def test_slow_segments_never_shorter_than_hold_lo_end_to_end():
+    w = ring(motor={"enabled": True, "hold": [2, 6], "delay": [0, 2], "slow": True}, seed=9)
+    obs = w.reset()
+    assert (obs.slow_held > 1000).all()
+    g = torch.Generator().manual_seed(1)
+    prev = torch.zeros(w.n, dtype=torch.int64)
+    run = torch.full((w.n,), 99, dtype=torch.int64)
+    shortest = 99
+    for _ in range(600):
+        obs, info = w.step(torch.randint(0, actions.NUM_ACTIONS, (w.n,), generator=g))
+        cur, ended = obs.prev_action % 2, info.done != 0
+        changed = (cur != prev) & ~ended
+        if changed.any():
+            shortest = min(shortest, int(run[changed].min()))
+        # 包装层记的 slow_held 要和这里自己数的一致
+        run = torch.where(ended, torch.full_like(run, 99), torch.where(changed, torch.ones_like(run), run + 1))
+        assert torch.equal(obs.slow_held[~ended & (run < 99)], run[~ended & (run < 99)])
+        prev = torch.where(ended, torch.zeros_like(cur), cur)
+    assert shortest >= 2, f"出现了 {shortest} 帧的低速段"

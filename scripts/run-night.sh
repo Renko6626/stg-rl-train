@@ -29,10 +29,10 @@ set -uo pipefail
 cd "$(dirname "$0")/.."
 
 # 当前队列（跑完一批就换成下一批；G0/H/I、I2/J 已于 2026-09-19 跑完，见 docs/experiments.md）
-# N1 / N2 = 手部运动层，两条同机并行：  bash scripts/run-night.sh --parallel 2
+# N3（低速键也过运动层）‖ M（N3 + edge_hug），两条同机并行：  bash scripts/run-night.sh --parallel 2
 EXPS=(
-  "n1 configs/exp-n1-motor-hold.toml"
-  "n2 configs/exp-n2-motor-delay.toml"
+  "n3 configs/exp-n3-motor-slow.toml"
+  "m  configs/exp-m-edgehug.toml"
 )
 THREADS=""; RETRIES=2; ONLY=""; SMOKE=0; CHECK=strict; PAR=1; PREFLIGHT=1
 VRAM_PER_RUN_MB=11000     # 单条实测峰值 10.1G，留一点余量

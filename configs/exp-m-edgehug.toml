@@ -1,0 +1,44 @@
+# 实验 M（2026-09-20）：N3 + **`edge_hug` 贴边惩罚**
+#
+# 问题：N2 自由档（无目标点 = th06nc mod 的 BYPASS）撑过 0.944 / 0.853，但有 **56–59% 的时间贴着边**
+# （J 的祖父 I 约 27%）—— 活得好好的，观感很「缩」，不像人。J 的死亡诊断里贴边每帧风险是平时的 47 倍（N1 降到 8 倍）。
+#
+# 与 N3 只差 reward.terms.edge_hug = -0.02（判定：离边 16 px 内；项本来就有、系数一直是 0）。
+# 量级：跟点档贴边 4–7% 的时间 ⇒ 约 −0.05/s 可忽略；自由档 56% ⇒ 约 −0.7/s，与 hold 的收入（+0.6/s）同量级。
+# **父实验是同批的 N3（用户 09-20 定），不是 N2**：两条同时开跑，M 与 N3 单变量可比；N3 若翻车 M 跟着作废，接受。
+#
+# 判读（立项时定，详见 docs/experiments.md「下一批：N3 ‖ M」）：
+#   ① 自由档贴边率从 56–59% 降到 ≤ 20%，**且看死亡位置分布** —— 防「贴着惩罚带外沿死」被读成成功；
+#   ② 自由档与跟点档的撑过不低于同批 N3；
+#   ③ 跟点档贴边本来只有 4–7%，那里的代价应可忽略。
+# 例行探针：--motor off、--motor "hold=3,7;delay=0,4;slow=1"、--intent fixed_point_v1 / follow_player_v1。
+[run]
+total_updates = 3500
+ckpt_every = 100
+eval_every = 250
+
+[env]
+num_envs = 4096
+threads = 63
+
+[intent]
+name = "mixed_v1"
+
+[featurize]
+name = "danger_topk_v5"
+
+[motor]
+enabled = true
+hold = [2, 6]
+delay = [0, 2]
+slow = true
+
+[reward.terms]
+death = 10.0
+follow_shaping = 1.0
+hold = 0.01
+segment_survived = 0.0
+key_press = -0.003
+quick_change = -0.01
+shift_toggle = 0.0
+edge_hug = -0.02

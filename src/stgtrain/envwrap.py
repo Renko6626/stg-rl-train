@@ -35,6 +35,7 @@ class RawObs:
     target_xy: Tensor
     prev_action: Tensor | None = None  # 上一步**实际执行**的动作 id（智能体坐标系、镜像前），新局首步为 0（不动）；v2 特征化用
     dir_held: Tensor | None = None     # 当前方向已经执行了多少帧（新局 = 很大）；v4 特征化用
+    slow_held: Tensor | None = None    # 当前低速位（按着 / 松着）已经执行了多少帧（新局 = 很大）；v5 特征化用
 
 
 @dataclass
@@ -145,18 +146,22 @@ class MotorLayer:
     随机数是基于计数器的（见 `counter_draw`），不用 `torch.Generator`。
 
     确定性的「至少 N 帧」不行：那只是把时间轴量化成 N 帧一格，模型照样能在粗格子上精确操作。
-    只锁方向，低速键直通（已知漏洞：高低速交替能拼细位移，盯 shift_toggles_per_s）。
+    `slow = false`（N1 / N2）：只锁方向，低速键直通。这是个被实测用上的漏洞 —— 方向被锁住时，高速 4.5 / 低速 2 px
+    来回切是模型手里唯一还能立即生效的调节手段，N1 / N2 的 shift 切换因此是 J 的 4 倍。
+    `slow = true`（N3）：低速键走**同一套规则的另一路状态机**（各自的锁、待生效请求、随机抽样），与方向互不牵连 ——
+    人按 shift 的手指和按方向的手指是两根。按住低速微调本来就是人的打法，这里禁的只是「切得太快、太精确」。
     作用在智能体坐标系的动作 id 上（镜像之前），只做相等与计数，天然左右对称。
     """
 
     BLOCK = 64     # 一次预抽多少步
-    STREAM_HOLD, STREAM_DELAY = 0, 1
+    STREAM_HOLD, STREAM_DELAY, STREAM_SLOW_HOLD, STREAM_SLOW_DELAY = 0, 1, 2, 3
 
     def __init__(self, cfg: dict, n: int, device: torch.device, seed: int, env_ids: Tensor | None = None):
         m = cfg["motor"]
         self.n, self.device = int(n), device
         self.hold_lo, self.hold_hi = int(m["hold"][0]), int(m["hold"][1])
         self.delay_lo, self.delay_hi = int(m["delay"][0]), int(m["delay"][1])
+        self.slow = bool(m.get("slow", False))
         self.seed = (int(seed) * 40503 + 7919) & _M32
         # env 编号进随机数的键。批量评测把多组并成一批时，每组各传自己的 0..k-1，结果就与逐组单跑逐位相同。
         self.env_ids = (torch.arange(self.n, device=device) if env_ids is None else env_ids.to(device)).to(torch.int64)
@@ -165,40 +170,61 @@ class MotorLayer:
     def reset_all(self) -> None:
         self.t = 0                       # 已走过的步数 = 随机数的计数器；reset_all 归零 ⇒ 同种子的评测可复现
         self._block0 = -1
-        self.need = torch.zeros(self.n, dtype=torch.int64, device=self.device)   # 本段最短长度 L；新局 0 = 第一下不受限
-        self.pend = torch.full((self.n,), -1, dtype=torch.int64, device=self.device)
-        self.wait = torch.zeros(self.n, dtype=torch.int64, device=self.device)
+        # 每路通道一份 [need, pend, wait]：need = 本段最短长度（新局 0 = 第一下不受限）、pend = 待生效的取值（−1 = 无）
+        zeros = lambda: torch.zeros(self.n, dtype=torch.int64, device=self.device)   # noqa: E731
+        self.dir_state = [zeros(), zeros() - 1, zeros()]
+        self.slow_state = [zeros(), zeros() - 1, zeros()]
+
+    # 旧名字留着：测试与诊断脚本读的是方向那一路
+    need = property(lambda self: self.dir_state[0])
+    pend = property(lambda self: self.dir_state[1])
+    wait = property(lambda self: self.dir_state[2])
 
     def reset(self, mask: Tensor) -> None:
-        self.need = torch.where(mask, torch.zeros_like(self.need), self.need)
-        self.pend = torch.where(mask, torch.full_like(self.pend, -1), self.pend)
-        self.wait = torch.where(mask, torch.zeros_like(self.wait), self.wait)
+        for st in (self.dir_state, self.slow_state):
+            st[0] = torch.where(mask, torch.zeros_like(st[0]), st[0])
+            st[1] = torch.where(mask, torch.full_like(st[1], -1), st[1])
+            st[2] = torch.where(mask, torch.zeros_like(st[2]), st[2])
 
-    def _draws(self) -> tuple[Tensor, Tensor]:
-        """本步的 (hold, delay) 抽样。整块预抽，每步只取一行视图。"""
+    def _draws(self) -> tuple[Tensor, ...]:
+        """本步的 (hold, delay, slow_hold, slow_delay) 抽样。整块预抽，每步只取一行视图。
+        四路各用各的 stream ⇒ 开不开低速那一路，方向这一路抽到的值都不变（N3 关掉 slow 就逐位退回 N2）。"""
         b0 = self.t - self.t % self.BLOCK
         if b0 != self._block0:
-            self._hold = counter_draw(self.seed, self.env_ids, b0, self.BLOCK, self.STREAM_HOLD, self.hold_lo, self.hold_hi)
-            self._delay = counter_draw(self.seed, self.env_ids, b0, self.BLOCK, self.STREAM_DELAY, self.delay_lo, self.delay_hi)
+            d = lambda stream, lo, hi: counter_draw(self.seed, self.env_ids, b0, self.BLOCK, stream, lo, hi)  # noqa: E731
+            self._tab = [d(self.STREAM_HOLD, self.hold_lo, self.hold_hi), d(self.STREAM_DELAY, self.delay_lo, self.delay_hi)]
+            if self.slow:
+                self._tab += [d(self.STREAM_SLOW_HOLD, self.hold_lo, self.hold_hi),
+                              d(self.STREAM_SLOW_DELAY, self.delay_lo, self.delay_hi)]
             self._block0 = b0
         k = self.t - b0
-        return self._hold[k], self._delay[k]
+        return tuple(t[k] for t in self._tab)
 
-    def apply(self, want: Tensor, prev_exec: Tensor, held: Tensor) -> Tensor:
-        """`want` = 策略选的动作 id；`prev_exec` = 上一步实际执行的；`held` = 当前方向已执行帧数。返回本步实际执行的动作 id。"""
+    @staticmethod
+    def _channel(st: list, want: Tensor, cur: Tensor, held: Tensor, hold_draw: Tensor, delay_draw: Tensor) -> Tensor:
+        """一路通道走一帧：想要 `want`、正在执行 `cur`（已执行 `held` 帧）。返回本帧实际执行的取值，就地更新 `st`。"""
+        need, pend, wait = st
+        diff = want != cur
+        wait = torch.where(diff & (want != pend), delay_draw, wait)      # 新意图（或改了主意）→ 重抽延迟
+        go = diff & (wait <= 0) & (held >= need)
+        st[2] = torch.where(diff & ~go, (wait - 1).clamp_min(0), wait)
+        st[0] = torch.where(go, hold_draw, need)
+        st[1] = torch.where(diff & ~go, want, torch.full_like(pend, -1))  # 想回当前取值 = 撤销；放行了也清掉
+        return torch.where(go, want, cur)
+
+    def apply(self, want: Tensor, prev_exec: Tensor, held: Tensor, slow_held: Tensor | None = None) -> Tensor:
+        """`want` = 策略选的动作 id；`prev_exec` = 上一步实际执行的；`held` / `slow_held` = 当前方向 / 低速位已执行帧数。
+        返回本步实际执行的动作 id。"""
         want = want.to(torch.int64)
-        hold_draw, delay_draw = self._draws()
+        draws = self._draws()
         self.t += 1
-        want_dir, slow, cur = want // 2, want % 2, prev_exec // 2
-        diff = want_dir != cur
-        new_req = diff & (want_dir != self.pend)                 # 新意图（或改了主意）→ 重抽延迟
-        self.wait = torch.where(new_req, delay_draw, self.wait)
-        self.pend = torch.where(diff, want_dir, torch.full_like(self.pend, -1))   # 想回当前方向 = 撤销
-        go = diff & (self.wait <= 0) & (held >= self.need)
-        self.wait = torch.where(diff & ~go, (self.wait - 1).clamp_min(0), self.wait)
-        self.need = torch.where(go, hold_draw, self.need)
-        self.pend = torch.where(go, torch.full_like(self.pend, -1), self.pend)
-        return torch.where(go, want_dir, cur) * 2 + slow
+        exec_dir = self._channel(self.dir_state, want // 2, prev_exec // 2, held, draws[0], draws[1])
+        slow = want % 2
+        if self.slow:
+            if slow_held is None:
+                raise ValueError("motor.slow = true 需要 slow_held")
+            slow = self._channel(self.slow_state, slow, prev_exec % 2, slow_held, draws[2], draws[3])
+        return exec_dir * 2 + slow
 
 
 class MultiVecEnv:
@@ -341,6 +367,7 @@ class EnvWrapper:
         self._prev_enemy_xy = torch.zeros(self.n, stg_rl.ENEMIES_CAP, 2, device=device)
         self._enemy_prev_valid = torch.zeros(self.n, dtype=torch.bool, device=device)
         self.dir_hold = torch.full((self.n,), DIR_HOLD_NEVER, dtype=torch.int64, device=device)
+        self.slow_held = torch.full((self.n,), DIR_HOLD_NEVER, dtype=torch.int64, device=device)
         env_ids = torch.arange(self.n, device=device) % self._group_k if self._group_k else None
         self.motor = MotorLayer(cfg, self.n, device, seed, env_ids=env_ids) if cfg["motor"]["enabled"] else None
 
@@ -366,6 +393,7 @@ class EnvWrapper:
         self.prev_buttons = torch.zeros(self.n, dtype=torch.int64, device=self.device)
         self.prev_action = torch.zeros(self.n, dtype=torch.int64, device=self.device)
         self.dir_hold = torch.full((self.n,), DIR_HOLD_NEVER, dtype=torch.int64, device=self.device)
+        self.slow_held = torch.full((self.n,), DIR_HOLD_NEVER, dtype=torch.int64, device=self.device)
         self._enemy_prev_valid = torch.zeros(self.n, dtype=torch.bool, device=self.device)
         if self.motor is not None:
             self.motor.reset_all()
@@ -376,8 +404,12 @@ class EnvWrapper:
         # dir_hold 在变向那步清零、之后每步 +1，所以「当前方向已执行帧数」= dir_hold + 1。
         want = action_ids
         if self.motor is not None:
-            action_ids = self.motor.apply(want, self.prev_action, self.dir_hold + 1).to(want.dtype)
-        overridden = (action_ids // 2) != (want // 2)
+            action_ids = self.motor.apply(want, self.prev_action, self.dir_hold + 1, self.slow_held).to(want.dtype)
+        overridden = action_ids != want          # 方向或低速位，任一路被运动层否决都算
+        # 低速位已执行帧数：换了 → 1，否则 +1（与 dir_held = dir_hold + 1 同口径）；不管开没开运动层都记
+        slow_chg = (action_ids % 2) != (self.prev_action % 2)
+        self.slow_held = torch.where(slow_chg, torch.ones_like(self.slow_held),
+                                     (self.slow_held + 1).clamp_max(DIR_HOLD_NEVER))
         ids = torch.where(self.mirrored, self._mirror[action_ids], action_ids)
         buttons = self._buttons[ids]
         with _phase(timer, "env_step"):
@@ -408,6 +440,7 @@ class EnvWrapper:
                             intent_mode=mode)
             self.prev_buttons = torch.where(ended, torch.zeros_like(buttons), buttons)
             self.dir_hold = torch.where(ended, torch.full_like(self.dir_hold, DIR_HOLD_NEVER), self.dir_hold)
+            self.slow_held = torch.where(ended, torch.full_like(self.slow_held, DIR_HOLD_NEVER), self.slow_held)
             # 智能体坐标系的动作 id：镜像只在新局重抽，而新局这里清零，所以不会与镜像标志错位
             self.prev_action = torch.where(ended, torch.zeros_like(action_ids), action_ids.to(torch.int64))
             self._enemy_prev_valid = self._enemy_prev_valid & ~ended
@@ -470,4 +503,5 @@ class EnvWrapper:
             player_xy=torch.stack([px, py], dim=-1), player_hit_r=hit_r, player_speed=speed, player_focus=focus,
             bullets=bullets, bullets_mask=bmask, enemies=enemies, enemies_mask=emask, target_xy=target,
             prev_action=self.prev_action.clone(), dir_held=(self.dir_hold + 1).clone(),
+            slow_held=self.slow_held.clone(),
         )
