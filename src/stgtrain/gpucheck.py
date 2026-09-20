@@ -10,6 +10,14 @@ backward，从而把反向路径也纳入被捕获的图；再比较策略 entro
 纯相对误差会把数值噪声放大成巨大百分比，故加 1e-6 绝对下限。
 盲区：每次调用都用同一批输入，无法识别「图重放忽略新输入」这类错误。
 
+**比对在全精度 FP32 下做（2026-09-20）**：训练开着 TF32（`ppo.py` 的 `set_float32_matmul_precision("high")`），
+而 TF32 的矩阵乘内部只有约 10 位尾数，**单次 matmul 的相对误差本来就在 1e-3 量级**；eager 与编译后走的是
+不同的 GEMM 核与融合方式，两边各带各的 TF32 噪声。于是 1e-3 的容差正好压在噪声地板上 —— 这个检查因此
+三次误报（策略输出 → 梯度范数 → 09-20 的 value 逐元素最大差：7.72e-4 对阈值 7.69e-4，超 0.3%，
+同一次里四个损失吻合到 1e-6）。本检查要验的是「编译 + CUDA 图重放算的是不是同一个东西」，与 TF32 无关，
+所以在这里把 TF32 关掉再比：真错误（图重放吃错输入、反向漏算）的差异是数量级的，FP32 下照样现形，
+而噪声降到 1e-6，容差重新有了意义。**训练本身不受影响**，仍走 TF32。
+
 用法：uv run --frozen python -m stgtrain.gpucheck configs/base.toml [--warn-only]
 """
 from __future__ import annotations
@@ -55,6 +63,10 @@ def main(argv: list[str] | None = None) -> int:
         print("gpucheck 需要 CUDA")
         return 2
     device = torch.device("cuda")
+    # 关 TF32 再比，理由见模块注释。必须在建模型 / 编译之前设（ppo.py 在 import 时设成了 "high"）。
+    torch.set_float32_matmul_precision("highest")
+    torch.backends.cuda.matmul.allow_tf32 = False
+    torch.backends.cudnn.allow_tf32 = False
     base = load_config(args.config, {"run": {"device": "cuda"}, "env": {"num_envs": 256},
                                      "ppo": {"update_epochs": 1, "num_minibatches": 1,
                                              "learning_rate": 0.0, "anneal_lr": False}})
