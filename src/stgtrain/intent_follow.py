@@ -88,3 +88,56 @@ class UnderBoss:
 
     def advance(self, frames: int, active: Tensor) -> Tensor:
         return torch.zeros(self.n, dtype=torch.bool, device=self.device)
+
+
+@INTENTS.register("boss_or_free_v1")
+class BossOrFree(UnderBoss):
+    """平时跟 boss 正下方，**弹幕压力大就临时改成无目标点**（目标点锁自机），压力降下来再切回。
+
+    起因（docs/experiments.md 2026-09-21）：用户实机上手动这么切（AUTO 跟 boss 正下方，目测压力大就切 BYPASS），
+    M 几乎能收所有符卡 —— 它只用到模型最强的两档（锚点 / 自由），而「不催它去哪」正是高压下帮助最大的一个指令。
+    这个意图把那个手动判断写成一条规则，先在仿真里扫阈值，再决定要不要让 mod 自动做。
+
+    压力 = 自机周围 `pressure_radius` px（边缘距离）内有判定的弹数。施密特触发：≥ `pressure_on` 进自由档，
+    ≤ `pressure_off`（默认 on 的一半）**且**已在自由档待满 `pressure_hold` 帧才切回 —— 不加滞回会在阈值附近来回翻，
+    每翻一次就是一次重新定位，而重新定位正是粗手最怕的事。`pressure_on = 0` 恒自由，很大则恒跟 boss。
+    部署侧（th06nc mod）要能用同一口径复现，所以只用「位置 + 半径 + 是否有判定」这些 DLL 里现成的量。
+    """
+
+    def __init__(self, cfg: dict, num_envs: int, device: torch.device, seed: int):
+        super().__init__(cfg, num_envs, device, seed)
+        c = cfg["intent"]
+        self.radius = float(c.get("pressure_radius", 96.0))
+        self.on = int(c.get("pressure_on", 16))
+        self.off = int(c.get("pressure_off", self.on // 2))
+        self.hold = int(c.get("pressure_hold", 60))
+        self.free = torch.zeros(self.n, dtype=torch.bool, device=device)
+        self.since = torch.zeros(self.n, dtype=torch.int64, device=device)
+        self.boss_target = self.target.clone()
+        self.player = self.target.clone()
+        self.free_frames = 0          # 统计用：自由档的帧数 / 总帧数 / 切换次数
+        self.total_frames = 0
+        self.switches = 0
+
+    def track_bullets(self, player_xy: Tensor, bullets: Tensor, mask: Tensor) -> None:
+        d = (bullets[..., 0:2] - player_xy[:, None, :]).norm(dim=-1) - bullets[..., 4]
+        count = ((d <= self.radius) & mask).sum(dim=1)
+        self.since = self.since + 1
+        enter = ~self.free & (count >= self.on)
+        leave = self.free & (count <= self.off) & (self.since >= self.hold)
+        flip = enter | leave
+        self.free = torch.where(flip, enter, self.free)
+        self.since = torch.where(flip, torch.zeros_like(self.since), self.since)
+        self.player = player_xy.detach().clone()
+        self.free_frames += int(self.free.sum())
+        self.total_frames += self.n
+        self.switches += int(flip.sum())
+
+    def track_world(self, player_xy: Tensor, enemy_xy: Tensor, is_boss: Tensor, mask: Tensor) -> None:
+        super().track_world(player_xy, enemy_xy, is_boss, mask)       # 写 self.target = boss 正下方
+        self.boss_target = self.target
+        self.target = torch.where(self.free[:, None], self.player, self.boss_target)
+
+    def reset(self, mask: Tensor) -> None:
+        self.free = self.free & ~mask
+        self.since = torch.where(mask, torch.zeros_like(self.since), self.since)

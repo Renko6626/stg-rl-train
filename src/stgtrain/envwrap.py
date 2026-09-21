@@ -303,7 +303,7 @@ class StackedIntent:
             raise AttributeError(name)
         if name == "mode":
             return self._cat("mode")
-        if name in ("track", "track_world"):
+        if name in ("track", "track_world", "track_bullets"):
             def call(*args):
                 for i, p in enumerate(parts):
                     getattr(p, name)(*(a[i * self.k:(i + 1) * self.k] for a in args))
@@ -488,6 +488,8 @@ class EnvWrapper:
 
         if hasattr(self.intent, "track"):   # 自由躲弹诊断：目标点锁自机（未镜像坐标）
             self.intent.track(torch.stack([px, py], dim=-1))
+        if hasattr(self.intent, "track_bullets"):   # 按弹幕压力切换指令的意图（未镜像坐标；只算有判定的弹）
+            self.intent.track_bullets(torch.stack([px, py], dim=-1), bullets, bmask)
         if hasattr(self.intent, "track_world"):   # 跟随场上实体的意图（如 boss 正下方），同样用未镜像坐标
             self.intent.track_world(torch.stack([px, py], dim=-1), enemies[..., 0:2],
                                     enemies[..., 3] != 0, emask)
