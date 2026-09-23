@@ -30,12 +30,27 @@ magnus job submit \
 
 Job 完成后先用 `magnus job status <ID>` 取得 Result 中的 File Custody secret，再用 `magnus receive <SECRET> --output <本地结果包.tar.gz>` 取回。secret 有效期 240 分钟。最初的训练 Job 用 CLI 输出 secret 到日志；当前脚本改用已验证的 SDK Result 协议。
 
+短验证通过后，正式单次训练入口是 `bash magnus/train.sh`；配置、运行名和训练参数原样传给现有训练器：
+
+```bash
+magnus job submit \
+  --task-name stg-rl-train-exp-name \
+  --namespace Renko6626 --repo-name stg-rl-train \
+  --branch feat/magnus-training --commit-sha <已推送的完整 SHA> \
+  --gpu-type a100 --gpu-count 1 --cpu-count 16 --memory-demand 32G \
+  --ephemeral-storage 20G --job-type A2 \
+  --container-image docker://pytorch/pytorch:2.5.1-cuda12.4-cudnn9-devel \
+  --entry-command 'bash magnus/train.sh configs/base.toml exp-name'
+```
+
+也可以传 `--total-updates N`、`--runs-dir PATH` 或 `--resume RUN_DIR`。`--resume` 指向的 run 目录必须在 Job 启动前已放进 Job 可见的持久挂载路径；目前尚未确认本站给该账号提供的挂载点。单次训练完成后，`train.sh` 会把打包结果交给 File Custody。
+
 `magnus/wheels/` 有两个项目自有依赖：`stg_rl` 取自 `stg-engine` 的 `rl-v0.1.0` Release；`stgagent` 从 `stg-agent-proto` 的 `v0.1.0`（commit `6b61fa052640377d640e5a7ecee9641b6ac3df96`）构建。`SHA256SUMS` 固定了本次验证的字节内容，更新依赖时必须一起更新 wheel 与校验和。放在仓库内是为了避免 Job 容器直连 GitHub 的不稳定性，合计约 804 KB。
 
 ## 正式训练前还需完成
 
 1. 给 Magnus 路径做独立锁定，不改变 Vast.ai 当前的 `uv.lock`；运行时必须记录实际的 Python、PyTorch、CUDA、TensorDict 与 wheel SHA。
-2. 确认站点可用的持久存储，将 `--runs-dir` 指向持久路径。Magnus 会清理 Job 工作区，File Custody 只有短期有效，不能作为正式续训的唯一存储。
+2. 确认站点可用的持久存储，将 `--runs-dir` 指向持久路径。Magnus 会清理 Job 工作区，File Custody 只有短期有效，不能作为正式续训的唯一存储。尚未收到本站持久挂载路径。
 3. 用实际训练卡池跑 `--bench`，按获得的 CPU 配额选 `env.threads`，不要沿用 `base.toml` 的 `threads=0`。
 4. 若每个 Job 安装小依赖仍过慢，再按 Magnus 的镜像指南用同一锁文件 `uv sync --frozen` 预热缓存，发布专用镜像；目前先复用已缓存镜像。
 
