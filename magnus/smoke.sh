@@ -15,8 +15,12 @@ PY
 # 两个项目自有的小 wheel 固定在仓库里，避免 Job 容器直连 GitHub 的超时。
 python -m pip install --no-deps magnus/wheels/*.whl
 python -m pip install 'tensordict==0.6.2' matplotlib psutil nvidia-ml-py tensorboard 'magnus-sdk==0.8.2'
-python -m pip check
-python -m pip freeze
+python -m pip check || echo '镜像预装包的 pip check 报告如上；继续验证训练路径'
+python - <<'PY'
+import importlib.metadata as meta
+for name in ("torch", "tensordict", "numpy", "stg-rl", "stgagent", "magnus-sdk"):
+    print(f"{name}=={meta.version(name)}", flush=True)
+PY
 
 # 此次只验证兼容性，不使用主仓为 Vast.ai 锁定的 torch 2.14/CUDA 13 环境。
 export PYTHONPATH="$PWD/src"
