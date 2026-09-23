@@ -11,6 +11,7 @@ if torch.__version__ != "2.5.1+cu124" or not torch.cuda.is_available():
     raise SystemExit("需要已验证的 PyTorch 2.5.1+cu124 GPU 镜像")
 print(torch.cuda.get_device_name(0), flush=True)
 PY
+command -v cc >/dev/null || { echo 'torch.compile 需要 C 编译器；请用 CUDA 12.4 devel 镜像' >&2; exit 1; }
 
 # 两个项目自有的小 wheel 固定在仓库里，避免 Job 容器直连 GitHub 的超时。
 python -m pip install --no-deps magnus/wheels/*.whl
@@ -29,4 +30,14 @@ python -m stgtrain.train configs/base.toml magnus-cu124-smoke --total-updates 2
 
 bundle=$(find runs -maxdepth 1 -name '*magnus-cu124-smoke.tar.gz' -print -quit)
 test -n "$bundle"
-magnus custody "$bundle" --expire-minutes 240 | tee "$MAGNUS_RESULT"
+python - "$bundle" <<'PY'
+import os
+import sys
+from pathlib import Path
+
+import magnus
+
+secret = magnus.custody_file(sys.argv[1], expire_minutes=240)
+Path(os.environ["MAGNUS_RESULT"]).write_text(secret + "\n", encoding="utf-8")
+print("结果包已交给 Magnus File Custody；secret 见 Job Result", flush=True)
+PY

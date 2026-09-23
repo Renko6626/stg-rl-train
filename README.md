@@ -1,6 +1,7 @@
 # stg-rl-train
 
 stg-engine 躲弹小模型的训练仓。设计见 `docs/2026-09-15-stg-rl-train-design.md`。
+Magnus A100 的短 Job 验证与迁移限制见 [`docs/magnus-migration.md`](docs/magnus-migration.md)。
 
 ## 一条命令跑训练（任意有 GPU 的 Linux）
 
