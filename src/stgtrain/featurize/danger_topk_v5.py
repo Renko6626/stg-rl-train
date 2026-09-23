@@ -12,6 +12,7 @@ import torch
 from torch import Tensor
 
 from ..envwrap import RawObs
+from ..perf import maybe_phase
 from ..registry import FEATURIZERS
 from .danger_topk_v4 import HELD_CAP, DangerTopKV4
 
@@ -20,11 +21,12 @@ from .danger_topk_v4 import HELD_CAP, DangerTopKV4
 class DangerTopKV5(DangerTopKV4):
     F_PLAYER = DangerTopKV4.F_PLAYER + 1
 
-    def __call__(self, obs: RawObs) -> dict[str, Tensor]:
-        out = super().__call__(obs)
-        if obs.slow_held is None:
-            held = torch.full_like(obs.player_xy[:, 0], HELD_CAP)
-        else:
-            held = obs.slow_held.to(obs.player_xy.device, torch.float32).clamp(0.0, HELD_CAP)
-        out["player"] = torch.cat([out["player"], (held / HELD_CAP).unsqueeze(-1)], dim=-1)
+    def __call__(self, obs: RawObs, timer=None) -> dict[str, Tensor]:
+        out = super().__call__(obs, timer=timer)
+        with maybe_phase(timer, "feat_slow_held"):
+            if obs.slow_held is None:
+                held = torch.full_like(obs.player_xy[:, 0], HELD_CAP)
+            else:
+                held = obs.slow_held.to(obs.player_xy.device, torch.float32).clamp(0.0, HELD_CAP)
+            out["player"] = torch.cat([out["player"], (held / HELD_CAP).unsqueeze(-1)], dim=-1)
         return out

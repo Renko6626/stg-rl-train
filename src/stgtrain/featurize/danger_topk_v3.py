@@ -13,6 +13,7 @@ import torch
 from torch import Tensor
 
 from ..envwrap import RawObs
+from ..perf import maybe_phase
 from ..registry import FEATURIZERS
 from .danger_topk_v1 import _gather
 from .danger_topk_v2 import DangerTopKV2
@@ -22,16 +23,17 @@ from .danger_topk_v2 import DangerTopKV2
 class DangerTopKV3(DangerTopKV2):
     F_ENEMY = DangerTopKV2.F_ENEMY + 2
 
-    def __call__(self, obs: RawObs) -> dict[str, Tensor]:
-        out = super().__call__(obs)
-        pos = obs.player_xy[:, None, :]
-        pe = obs.enemies[..., 0:2] - pos
-        ve = obs.enemies[..., 4:6] - self.player_velocity(obs)[:, None, :]
-        idx, sel, ed, et = self._topk(pe, ve, obs.enemies[..., 2], obs.enemies_mask, obs.player_hit_r, self.ke)
-        enemies = torch.cat([
-            _gather(pe, idx) / 192.0, _gather(obs.enemies[..., 2:3], idx) / 32.0,
-            ed.unsqueeze(-1), et.unsqueeze(-1), _gather(obs.enemies[..., 3:4], idx),
-            _gather(obs.enemies[..., 4:6], idx) / 8.0,
-        ], dim=-1) * sel.unsqueeze(-1)
-        out["enemies"], out["enemies_mask"] = enemies, sel
+    def __call__(self, obs: RawObs, timer=None) -> dict[str, Tensor]:
+        out = super().__call__(obs, timer=timer)
+        with maybe_phase(timer, "feat_enemies_motion"):
+            pos = obs.player_xy[:, None, :]
+            pe = obs.enemies[..., 0:2] - pos
+            ve = obs.enemies[..., 4:6] - self.player_velocity(obs)[:, None, :]
+            idx, sel, ed, et = self._topk(pe, ve, obs.enemies[..., 2], obs.enemies_mask, obs.player_hit_r, self.ke)
+            enemies = torch.cat([
+                _gather(pe, idx) / 192.0, _gather(obs.enemies[..., 2:3], idx) / 32.0,
+                ed.unsqueeze(-1), et.unsqueeze(-1), _gather(obs.enemies[..., 3:4], idx),
+                _gather(obs.enemies[..., 4:6], idx) / 8.0,
+            ], dim=-1) * sel.unsqueeze(-1)
+            out["enemies"], out["enemies_mask"] = enemies, sel
         return out

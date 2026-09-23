@@ -7,6 +7,7 @@ from stgtrain.cards import compile_cards, discover
 from stgtrain.envwrap import EnvWrapper
 from stgtrain.episodes import EpisodeTracker
 from stgtrain.ppo import PPO, gae
+from stgtrain.perf import PhaseTimer
 from stgtrain.registry import FEATURIZERS, MODELS, load_builtins
 from stgtrain.reward import RewardFn
 
@@ -77,6 +78,15 @@ def test_rollout_and_train_step_on_cpu():
     # agent_inference 与 agent 共享数据
     for a, b in zip(ppo.agent.parameters(), ppo.agent_inference.parameters()):
         assert torch.equal(a.data, b.data)
+
+
+def test_rollout_reports_reward_and_episode_stat_costs_separately():
+    cfg, envw, feat, ppo, rf, tr = setup(num_steps=2)
+    timer = PhaseTimer(sync_every=1, device=CPU)
+    timer.start_iteration(1)
+    ppo.rollout(envw, feat, rf, tr, timer, envw.reset())
+    phases = timer.pop_iteration()
+    assert {"reward_s", "reward_terms_s", "episode_tracker_s", "feat_density_s"} <= phases.keys()
 
 
 def test_act_greedy_and_lr_anneal():

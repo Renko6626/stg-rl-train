@@ -13,6 +13,7 @@ from torch import Tensor
 
 from ..actions import NUM_ACTIONS
 from ..envwrap import RawObs
+from ..perf import maybe_phase
 from ..registry import FEATURIZERS
 from .danger_topk_v1 import DangerTopKV1
 
@@ -23,13 +24,14 @@ N_DIRS = NUM_ACTIONS // 2
 class DangerTopKV2(DangerTopKV1):
     F_PLAYER = DangerTopKV1.F_PLAYER + N_DIRS + 1
 
-    def __call__(self, obs: RawObs) -> dict[str, Tensor]:
-        out = super().__call__(obs)
-        n = obs.player_xy.shape[0]
-        prev = obs.prev_action if obs.prev_action is not None else torch.zeros(n, dtype=torch.int64,
-                                                                                device=obs.player_xy.device)
-        prev = prev.to(obs.player_xy.device, torch.int64)
-        onehot = torch.nn.functional.one_hot(prev // 2, N_DIRS).to(torch.float32)
-        slow = (prev % 2).to(torch.float32).unsqueeze(-1)
-        out["player"] = torch.cat([out["player"], onehot, slow], dim=-1)
+    def __call__(self, obs: RawObs, timer=None) -> dict[str, Tensor]:
+        out = super().__call__(obs, timer=timer)
+        with maybe_phase(timer, "feat_prev_action"):
+            n = obs.player_xy.shape[0]
+            prev = obs.prev_action if obs.prev_action is not None else torch.zeros(n, dtype=torch.int64,
+                                                                                    device=obs.player_xy.device)
+            prev = prev.to(obs.player_xy.device, torch.int64)
+            onehot = torch.nn.functional.one_hot(prev // 2, N_DIRS).to(torch.float32)
+            slow = (prev % 2).to(torch.float32).unsqueeze(-1)
+            out["player"] = torch.cat([out["player"], onehot, slow], dim=-1)
         return out

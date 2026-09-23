@@ -13,6 +13,7 @@ import torch
 from torch import Tensor
 
 from ..envwrap import RawObs
+from ..perf import maybe_phase
 from ..registry import FEATURIZERS
 from .danger_topk_v3 import DangerTopKV3
 
@@ -23,11 +24,12 @@ HELD_CAP = 16.0   # 运动层的最短保持上限远小于它；再长就没有
 class DangerTopKV4(DangerTopKV3):
     F_PLAYER = DangerTopKV3.F_PLAYER + 1
 
-    def __call__(self, obs: RawObs) -> dict[str, Tensor]:
-        out = super().__call__(obs)
-        if obs.dir_held is None:
-            held = torch.full_like(obs.player_xy[:, 0], HELD_CAP)
-        else:
-            held = obs.dir_held.to(obs.player_xy.device, torch.float32).clamp(0.0, HELD_CAP)
-        out["player"] = torch.cat([out["player"], (held / HELD_CAP).unsqueeze(-1)], dim=-1)
+    def __call__(self, obs: RawObs, timer=None) -> dict[str, Tensor]:
+        out = super().__call__(obs, timer=timer)
+        with maybe_phase(timer, "feat_dir_held"):
+            if obs.dir_held is None:
+                held = torch.full_like(obs.player_xy[:, 0], HELD_CAP)
+            else:
+                held = obs.dir_held.to(obs.player_xy.device, torch.float32).clamp(0.0, HELD_CAP)
+            out["player"] = torch.cat([out["player"], (held / HELD_CAP).unsqueeze(-1)], dim=-1)
         return out

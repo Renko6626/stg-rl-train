@@ -12,6 +12,7 @@ import torch
 from torch import Tensor
 
 from ..envwrap import RawObs
+from ..perf import maybe_phase
 from ..registry import FEATURIZERS
 
 GRID_H, GRID_W, CELL = 14, 12, 32.0
@@ -64,55 +65,60 @@ class DangerTopKV1:
         d_norm = kval.clamp(-self.d_max, self.d_max) / self.d_max
         return idx, sel, d_norm, _gather(t, idx) / self.horizon
 
-    def __call__(self, obs: RawObs) -> dict[str, Tensor]:
-        n = obs.player_xy.shape[0]
-        dev = obs.player_xy.device
-        pos = obs.player_xy[:, None, :]
-        vp = self.player_velocity(obs)
+    def __call__(self, obs: RawObs, timer=None) -> dict[str, Tensor]:
+        with maybe_phase(timer, "feat_common"):
+            n = obs.player_xy.shape[0]
+            dev = obs.player_xy.device
+            pos = obs.player_xy[:, None, :]
+            vp = self.player_velocity(obs)
 
-        pb = obs.bullets[..., 0:2] - pos
-        vb = obs.bullets[..., 2:4] - vp[:, None, :]
-        idx, bsel, bd, bt = self._topk(pb, vb, obs.bullets[..., 4], obs.bullets_mask, obs.player_hit_r, self.kb)
-        bullets = torch.cat([
-            _gather(pb, idx) / 192.0, _gather(vb, idx) / 8.0, _gather(obs.bullets[..., 4:5], idx) / 8.0,
-            bd.unsqueeze(-1), bt.unsqueeze(-1),
-        ], dim=-1) * bsel.unsqueeze(-1)
+        with maybe_phase(timer, "feat_bullets"):
+            pb = obs.bullets[..., 0:2] - pos
+            vb = obs.bullets[..., 2:4] - vp[:, None, :]
+            idx, bsel, bd, bt = self._topk(pb, vb, obs.bullets[..., 4], obs.bullets_mask, obs.player_hit_r, self.kb)
+            bullets = torch.cat([
+                _gather(pb, idx) / 192.0, _gather(vb, idx) / 8.0, _gather(obs.bullets[..., 4:5], idx) / 8.0,
+                bd.unsqueeze(-1), bt.unsqueeze(-1),
+            ], dim=-1) * bsel.unsqueeze(-1)
 
-        pe = obs.enemies[..., 0:2] - pos
-        ve = (-vp)[:, None, :].expand_as(pe)
-        eidx, esel, ed, et = self._topk(pe, ve, obs.enemies[..., 2], obs.enemies_mask, obs.player_hit_r, self.ke)
-        enemies = torch.cat([
-            _gather(pe, eidx) / 192.0, _gather(obs.enemies[..., 2:3], eidx) / 32.0,
-            ed.unsqueeze(-1), et.unsqueeze(-1), _gather(obs.enemies[..., 3:4], eidx),
-        ], dim=-1) * esel.unsqueeze(-1)
+        with maybe_phase(timer, "feat_enemies_static"):
+            pe = obs.enemies[..., 0:2] - pos
+            ve = (-vp)[:, None, :].expand_as(pe)
+            eidx, esel, ed, et = self._topk(pe, ve, obs.enemies[..., 2], obs.enemies_mask, obs.player_hit_r, self.ke)
+            enemies = torch.cat([
+                _gather(pe, eidx) / 192.0, _gather(obs.enemies[..., 2:3], eidx) / 32.0,
+                ed.unsqueeze(-1), et.unsqueeze(-1), _gather(obs.enemies[..., 3:4], eidx),
+            ], dim=-1) * esel.unsqueeze(-1)
 
-        valid = obs.bullets_mask.to(torch.float32)
-        u = (obs.bullets[..., 0] + 192.0) / CELL
-        col = u.floor().clamp(0, GRID_W - 1).long()
-        row = (obs.bullets[..., 1] / CELL).floor().clamp(0, GRID_H - 1).long()
-        # 内部格线上左右各半，保证 density(mirror(obs)) == density(obs).flip(-1)。
-        edge = (u == u.floor()) & (u > 0.0) & (u < float(GRID_W))
-        w_right = torch.where(edge, 0.5, 1.0)
-        w_left = torch.where(edge, 0.5, 0.0)
-        col_left = (col - 1).clamp_min(0)
-        cells = GRID_H * GRID_W
-        base = torch.arange(n, device=dev)[:, None] * cells + row * GRID_W
-        flat_right = (base + col).reshape(-1)
-        flat_left = (base + col_left).reshape(-1)
-        unit = pb / pb.norm(dim=-1, keepdim=True).clamp_min(1e-6)
-        approach = (-(unit * obs.bullets[..., 2:4]).sum(-1)).clamp_min(0.0) / 8.0
-        count = torch.zeros(n * cells, device=dev).scatter_add_(
-            0, flat_right, (valid * w_right).reshape(-1)
-        ).scatter_add_(0, flat_left, (valid * w_left).reshape(-1))
-        appr = torch.zeros(n * cells, device=dev).scatter_add_(
-            0, flat_right, (approach * valid * w_right).reshape(-1)
-        ).scatter_add_(0, flat_left, (approach * valid * w_left).reshape(-1))
-        density = torch.stack([count.view(n, GRID_H, GRID_W), appr.view(n, GRID_H, GRID_W)], dim=1)
+        with maybe_phase(timer, "feat_density"):
+            valid = obs.bullets_mask.to(torch.float32)
+            u = (obs.bullets[..., 0] + 192.0) / CELL
+            col = u.floor().clamp(0, GRID_W - 1).long()
+            row = (obs.bullets[..., 1] / CELL).floor().clamp(0, GRID_H - 1).long()
+            # 内部格线上左右各半，保证 density(mirror(obs)) == density(obs).flip(-1)。
+            edge = (u == u.floor()) & (u > 0.0) & (u < float(GRID_W))
+            w_right = torch.where(edge, 0.5, 1.0)
+            w_left = torch.where(edge, 0.5, 0.0)
+            col_left = (col - 1).clamp_min(0)
+            cells = GRID_H * GRID_W
+            base = torch.arange(n, device=dev)[:, None] * cells + row * GRID_W
+            flat_right = (base + col).reshape(-1)
+            flat_left = (base + col_left).reshape(-1)
+            unit = pb / pb.norm(dim=-1, keepdim=True).clamp_min(1e-6)
+            approach = (-(unit * obs.bullets[..., 2:4]).sum(-1)).clamp_min(0.0) / 8.0
+            count = torch.zeros(n * cells, device=dev).scatter_add_(
+                0, flat_right, (valid * w_right).reshape(-1)
+            ).scatter_add_(0, flat_left, (valid * w_left).reshape(-1))
+            appr = torch.zeros(n * cells, device=dev).scatter_add_(
+                0, flat_right, (approach * valid * w_right).reshape(-1)
+            ).scatter_add_(0, flat_left, (approach * valid * w_left).reshape(-1))
+            density = torch.stack([count.view(n, GRID_H, GRID_W), appr.view(n, GRID_H, GRID_W)], dim=1)
 
-        player = torch.stack([obs.player_xy[:, 0] / 192.0, obs.player_xy[:, 1] / 192.0,
-                              obs.player_focus.to(torch.float32)], dim=-1)
-        d = obs.target_xy - obs.player_xy
-        dn = d.norm(dim=-1)
-        cond = torch.stack([d[:, 0] / 192.0, d[:, 1] / 192.0, dn / 448.0, (dn < self.hold_r).to(torch.float32)], dim=-1)
+        with maybe_phase(timer, "feat_player_cond"):
+            player = torch.stack([obs.player_xy[:, 0] / 192.0, obs.player_xy[:, 1] / 192.0,
+                                  obs.player_focus.to(torch.float32)], dim=-1)
+            d = obs.target_xy - obs.player_xy
+            dn = d.norm(dim=-1)
+            cond = torch.stack([d[:, 0] / 192.0, d[:, 1] / 192.0, dn / 448.0, (dn < self.hold_r).to(torch.float32)], dim=-1)
         return {"bullets": bullets, "bullets_mask": bsel, "enemies": enemies, "enemies_mask": esel,
                 "density": density, "player": player, "cond": cond}

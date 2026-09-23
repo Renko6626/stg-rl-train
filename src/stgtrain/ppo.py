@@ -183,14 +183,16 @@ class PPO:
         ts = []
         for _ in range(self.num_steps):
             with maybe_phase(timer, "featurize"):
-                feats = TensorDict(featurizer(obs), batch_size=[n])
+                feats = TensorDict(featurizer(obs, timer=timer), batch_size=[n])
             with maybe_phase(timer, "policy"):
                 torch.compiler.cudagraph_mark_step_begin()
                 action, logprob, _, value = self.policy(feats)
             next_obs, info = envw.step(action, timer)
             with maybe_phase(timer, "reward"):
-                reward, raw = reward_fn(obs, next_obs, info)
-                tracker.update(obs, next_obs, info, reward, raw)
+                with maybe_phase(timer, "reward_terms"):
+                    reward, raw = reward_fn(obs, next_obs, info)
+                with maybe_phase(timer, "episode_tracker"):
+                    tracker.update(obs, next_obs, info, reward, raw)
             ts.append(TensorDict._new_unsafe(
                 feats=feats, vals=value.flatten(), actions=action, logprobs=logprob, rewards=reward,
                 dones=info.done, batch_size=(n,),
@@ -198,7 +200,7 @@ class PPO:
             obs = next_obs
         container = torch.stack(ts, 0)
         with maybe_phase(timer, "featurize"):
-            next_feats = TensorDict(featurizer(obs), batch_size=[n])
+            next_feats = TensorDict(featurizer(obs, timer=timer), batch_size=[n])
         with torch.no_grad():
             next_value = self.agent_inference.get_value(next_feats)
         return obs, container, next_value
