@@ -14,9 +14,10 @@ PY
 command -v cc >/dev/null || { echo 'torch.compile 需要 C 编译器；请用 CUDA 12.4 devel 镜像' >&2; exit 1; }
 
 # 两个项目自有的小 wheel 固定在仓库里，避免 Job 容器直连 GitHub 的超时。
+(cd magnus/wheels && sha256sum -c SHA256SUMS)
 python -m pip install --no-deps magnus/wheels/*.whl
-python -m pip install 'tensordict==0.6.2' matplotlib psutil nvidia-ml-py tensorboard 'magnus-sdk==0.8.2'
-python -m pip check || echo '镜像预装包的 pip check 报告如上；继续验证训练路径'
+python -m pip install 'tensordict==0.6.2' 'matplotlib==3.11.2' 'psutil==6.1.0' \
+    'nvidia-ml-py==13.610.43' 'tensorboard==2.21.0' 'magnus-sdk==0.8.2'
 python - <<'PY'
 import importlib.metadata as meta
 for name in ("torch", "tensordict", "numpy", "stg-rl", "stgagent", "magnus-sdk"):
