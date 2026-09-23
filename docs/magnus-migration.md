@@ -11,6 +11,9 @@
 - `2.5.1-cuda12.4-cudnn9-runtime` 缺少 C 编译器，`torch.compile` 失败。换成站点已缓存的同版本 `devel` 镜像后，Job `1c1be6b6ac0da812` 的 `gpucheck` 所有数值对拍通过，并完成两次 PPO 更新、640 局评测、checkpoint、出图与打包，Job 状态为 Success。结果包已取回到本地 `runs/20260923-190104-magnus-cu124-smoke.tar.gz`（约 8 MB）。
 - 可复用训练入口 `magnus/train.sh` 也经 Job `bd399f020e27bb86` 完整验证：两次更新、评测、checkpoint、打包、Result secret 和本机下载均通过。结果包在 `runs/20260923-203522-magnus-wrapper-smoke.tar.gz`（约 8 MB）。
 - File Custody 的 SDK 结果协议另用 CPU Job `46285c4e0fd0a54e` 验证：上传小文件、写 `$MAGNUS_RESULT`、从 `magnus job status` 读 secret、本机 `magnus receive` 下载，全部通过。
+- A100 性能扫描 Job `69aca4cf66a70501` 已扫 28 个 `threads × num_envs` 组合，原始结果保存在 `runs/bench-a100-cpu16-20260923.json`，结论与局限见 `docs/perf-baseline.md`。
+
+复测吞吐时，沿用下文的镜像与资源参数，将 Job 入口改为 `bash magnus/bench.sh configs/base.toml a100-cpu16`；Job Result 会返回 `bench.json` 的 File Custody secret。
 
 ## 当前验证路径
 
@@ -52,7 +55,7 @@ magnus job submit \
 
 1. 给 Magnus 路径做独立锁定，不改变 Vast.ai 当前的 `uv.lock`；运行时必须记录实际的 Python、PyTorch、CUDA、TensorDict 与 wheel SHA。
 2. 确认站点可用的持久存储，将 `--runs-dir` 指向持久路径。Magnus 会清理 Job 工作区，File Custody 只有短期有效，不能作为正式续训的唯一存储。尚未收到本站持久挂载路径。
-3. 用实际训练卡池跑 `--bench`，按获得的 CPU 配额选 `env.threads`，不要沿用 `base.toml` 的 `threads=0`。
+3. 按 `docs/perf-baseline.md` 的扫描结果选择 `env.threads` 和 `num_envs`，明确训练目标是固定环境帧数还是固定更新次数；长期任务不要沿用 `base.toml` 的 `threads=0`。
 4. 若每个 Job 安装小依赖仍过慢，再按 Magnus 的镜像指南用同一锁文件 `uv sync --frozen` 预热缓存，发布专用镜像；目前先复用已缓存镜像。
 
 Magnus 参考：`/data/sunyunbo/magnus-docs/official/docs/internals/job-runtime.zh-CN.md` 与 `.../uv-image.zh-CN.md`。
