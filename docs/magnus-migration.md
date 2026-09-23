@@ -12,6 +12,7 @@
 - 可复用训练入口 `magnus/train.sh` 也经 Job `bd399f020e27bb86` 完整验证：两次更新、评测、checkpoint、打包、Result secret 和本机下载均通过。结果包在 `runs/20260923-203522-magnus-wrapper-smoke.tar.gz`（约 8 MB）。
 - File Custody 的 SDK 结果协议另用 CPU Job `46285c4e0fd0a54e` 验证：上传小文件、写 `$MAGNUS_RESULT`、从 `magnus job status` 读 secret、本机 `magnus receive` 下载，全部通过。
 - A100 性能扫描 Job `69aca4cf66a70501` 已扫 28 个 `threads × num_envs` 组合，原始结果保存在 `runs/bench-a100-cpu16-20260923.json`，结论与局限见 `docs/perf-baseline.md`。
+- 同卡双实验 Job `032ea8f38643e7dd` 成功完成受控单跑/并跑对比与分阶段计时；两条并跑的稳态总吞吐比单跑高约 39%，CPU 亲和性与阶段结果见 `docs/perf-baseline.md`。
 
 复测吞吐时，沿用下文的镜像与资源参数，将 Job 入口改为 `bash magnus/bench.sh configs/base.toml a100-cpu16`；Job Result 会返回 `bench.json` 的 File Custody secret。
 
