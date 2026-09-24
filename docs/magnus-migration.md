@@ -53,7 +53,7 @@ magnus job submit \
 
 也可以传 `--total-updates N`、`--runs-dir PATH` 或 `--resume RUN_DIR`。`--resume` 指向的 run 目录必须在 Job 启动前已放进 Job 可见的持久挂载路径；目前尚未确认本站给该账号提供的挂载点。单次训练完成后，`train.sh` 会把打包结果交给 File Custody。
 
-`magnus/wheels/` 有两个项目自有依赖：`stg_rl` 取自 `stg-engine` 的 `rl-v0.1.0` Release；`stgagent` 从 `stg-agent-proto` 的 `v0.1.0`（commit `6b61fa052640377d640e5a7ecee9641b6ac3df96`）构建。`SHA256SUMS` 固定了本次验证的字节内容，更新依赖时必须一起更新 wheel 与校验和。放在仓库内是为了避免 Job 容器直连 GitHub 的不稳定性，合计约 804 KB。
+`magnus/wheels/` 有两个项目自有依赖：`stg_rl` 取自 `stg-engine` 的 `rl-v0.1.1` Release（2026-09-24 从 `rl-v0.1.0` 升级：VecEnv 分块修复 + `tick_steps` 遇 END 即停，观测输出不变）；`stgagent` 从 `stg-agent-proto` 的 `v0.1.0`（commit `6b61fa052640377d640e5a7ecee9641b6ac3df96`）构建。`SHA256SUMS` 固定了本次验证的字节内容，更新依赖时必须一起更新 wheel 与校验和。放在仓库内是为了避免 Job 容器直连 GitHub 的不稳定性，合计约 804 KB。
 
 ## 正式训练前还需完成
 

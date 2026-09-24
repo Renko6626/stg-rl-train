@@ -79,6 +79,15 @@ def _u32(rows: Tensor, off: int) -> Tensor:
     return v
 
 
+def usable_cpus() -> int:
+    """本进程能用的 CPU 数（亲和性），`env.threads = 0` 取它。不用 `os.cpu_count()`：容器里它报的是
+    宿主机总核数——Magnus Job 申请 32 核，cpu_count 却是 112，rayon 就会开 112 个线程挤 32 个 CPU。"""
+    try:
+        return max(1, len(os.sched_getaffinity(0)))
+    except AttributeError:   # 非 Linux
+        return os.cpu_count() or 1
+
+
 TELEPORT_PX = 16.0   # 单帧位移超过它 = 瞬移（不是运动），速度记 0
 DIR_HOLD_NEVER = 1 << 20   # dir_hold 的初值 / 新局值：开局第一次变向不算连击
 
@@ -347,7 +356,7 @@ class EnvWrapper:
         self.cap = int(e["bullets_cap"])
         self.frame_skip = int(e["frame_skip"])
         self.device = device
-        threads = max(1, min(int(e["threads"]) or (os.cpu_count() or 1), k))
+        threads = max(1, min(int(e["threads"]) or usable_cpus(), k))
         make_intent = lambda: INTENTS.get(cfg["intent"]["name"])(cfg, k, device, seed)   # noqa: E731
         if groups:
             self.env = MultiVecEnv(cfg, groups, k, seed, threads=min(threads, 8))

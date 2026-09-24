@@ -322,3 +322,14 @@ def test_step_records_dropped_bullets():
     w.step(still(w.n), timer)
     row = timer.pop_iteration()
     assert {"bullets_dropped_max", "bullets_drop_envs_max"} <= row.keys()
+
+
+def test_threads_zero_means_cpus_this_process_may_use(monkeypatch):
+    """threads = 0 取进程亲和性里的 CPU 数，不是宿主机总核数（Magnus：cpu_count 112、实际只给 32）。"""
+    import os
+
+    from stgtrain.envwrap import usable_cpus
+
+    monkeypatch.setattr(os, "cpu_count", lambda: 112)
+    monkeypatch.setattr(os, "sched_getaffinity", lambda pid: set(range(32)), raising=False)
+    assert usable_cpus() == 32

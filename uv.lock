@@ -752,13 +752,13 @@ wheels = [
 
 [[package]]
 name = "stg-rl"
-version = "0.1.0"
-source = { url = "https://github.com/Renko6626/stg-engine/releases/download/rl-v0.1.0/stg_rl-0.1.0-cp310-abi3-manylinux_2_28_x86_64.whl" }
+version = "0.1.1"
+source = { url = "https://github.com/Renko6626/stg-engine/releases/download/rl-v0.1.1/stg_rl-0.1.1-cp310-abi3-manylinux_2_28_x86_64.whl" }
 dependencies = [
     { name = "numpy" },
 ]
 wheels = [
-    { url = "https://github.com/Renko6626/stg-engine/releases/download/rl-v0.1.0/stg_rl-0.1.0-cp310-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:3b33c77a0dfe9c0daf6c287babaadc6c45827bac508a3b6246818f97d70d1ef4" },
+    { url = "https://github.com/Renko6626/stg-engine/releases/download/rl-v0.1.1/stg_rl-0.1.1-cp310-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:55bf45e8df351e9923b874e35b4b3208370cffb3027bc5c07cb0f91955a24e01" },
 ]
 
 [package.metadata]
@@ -807,7 +807,7 @@ requires-dist = [
     { name = "numpy" },
     { name = "nvidia-ml-py" },
     { name = "psutil" },
-    { name = "stg-rl", url = "https://github.com/Renko6626/stg-engine/releases/download/rl-v0.1.0/stg_rl-0.1.0-cp310-abi3-manylinux_2_28_x86_64.whl" },
+    { name = "stg-rl", url = "https://github.com/Renko6626/stg-engine/releases/download/rl-v0.1.1/stg_rl-0.1.1-cp310-abi3-manylinux_2_28_x86_64.whl" },
     { name = "stgagent", git = "https://github.com/Renko6626/stg-agent-proto?rev=v0.1.0" },
     { name = "tensorboard" },
     { name = "tensordict", specifier = "==0.14.2" },

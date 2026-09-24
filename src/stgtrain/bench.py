@@ -11,7 +11,6 @@
 from __future__ import annotations
 
 import json
-import os
 import time
 from pathlib import Path
 
@@ -20,7 +19,7 @@ import torch
 from tensordict import TensorDict
 
 from .config import deep_merge
-from .envwrap import EnvWrapper
+from .envwrap import EnvWrapper, usable_cpus
 from .perf import machine_info
 from .ppo import PPO
 from .train import build_components, pick_device
@@ -76,7 +75,7 @@ def run_bench(cfg: dict, out_dir: Path) -> dict:
     device = pick_device(cfg["run"]["device"])
     images, starts, _, featurizer, factory = build_components(cfg, device)
     model = factory().to(device).eval()
-    cpu = os.cpu_count() or 1
+    cpu = usable_cpus()
     # 线程网格：大机器上线程数远超实际并行度反而崩（255 核机实测 255 线程只有 63 线程的 1/8），
     # 所以从小往大都要试，别只试 cpu/4 以上。
     grid = sorted({t for t in (8, 16, 32, cpu // 8, cpu // 4, cpu // 2, cpu) if t >= 1})

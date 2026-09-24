@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "stg-engine 躲弹小模型训练仓（PPO，LeanRL 底本）"
 requires-python = ">=3.12,<3.13"
 dependencies = [
-  "stg-rl @ https://github.com/Renko6626/stg-engine/releases/download/rl-v0.1.0/stg_rl-0.1.0-cp310-abi3-manylinux_2_28_x86_64.whl",
+  "stg-rl @ https://github.com/Renko6626/stg-engine/releases/download/rl-v0.1.1/stg_rl-0.1.1-cp310-abi3-manylinux_2_28_x86_64.whl",
   "stgagent @ git+https://github.com/Renko6626/stg-agent-proto@v0.1.0",
   "torch==2.14.0",
   "tensordict==0.14.2",
