@@ -157,7 +157,7 @@ def train(cfg: dict, run_dir: Path, resume: dict | None = None, pack_result: boo
             t0 = time.perf_counter()
             obs, container, next_value = ppo.rollout(envw, featurizer, reward_fn, tracker, timer, obs)
             with timer.phase("update"):
-                stats = ppo.train_step(container, next_value, update, total)
+                stats = ppo.train_step(container, next_value, update, total, timer=timer)
             env_steps += steps_per_iter
             scalars = {f"ppo/{k}": v for k, v in stats.items()}
             finished = tracker.pop_finished()

@@ -3,6 +3,11 @@
 set -euo pipefail
 source "$(dirname "$0")/bootstrap.sh"
 
+# GPUCHECK=1：先跑 gpucheck（录图 / 编译与 eager 的数值对拍），不过就不测
+if [[ ${GPUCHECK:-0} == 1 ]]; then
+    python -m stgtrain.gpucheck configs/base.toml
+fi
+
 probe_dir="runs/a100-phase-probe-${MAGNUS_JOB_ID:-local}"
 mkdir -p "$probe_dir"
 # 位置参数 = 依次要测的 env 线程数（默认只测 28）；同一 Job 内比较，避开跨 Job 的节点波动

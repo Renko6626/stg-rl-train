@@ -62,6 +62,22 @@ def _maxdiff(a, b) -> tuple[float, float]:
     return max(a.abs().max().item(), b.abs().max().item(), 0.0), (a - b).abs().max().item()
 
 
+def check_gae_graph(ppo: PPO, container, next_value, calls: int = 6) -> tuple:
+    """录图的 GAE（`ppo._gae`）每次喂**不同**的奖励，与 eager `gae` 比；过了 warmup 走的是重放。"""
+    from .ppo import gae
+
+    p = ppo.p
+    g = torch.Generator(device=next_value.device).manual_seed(0)
+    scale = worst = 0.0
+    for _ in range(calls):
+        r = torch.randn(container["rewards"].shape, generator=g, device=next_value.device)
+        args = (r, container["vals"], container["dones"], next_value, float(p["gamma"]), float(p["gae_lambda"]))
+        for a, b in zip(ppo._gae(*args), gae(*args)):
+            s_, d_ = _maxdiff(a, b)
+            scale, worst = max(scale, s_), max(worst, d_)
+    return ("gae_graph", scale, scale, worst, worst <= ROLLOUT_REL * scale + 1e-6)
+
+
 def check_rollout_graphs(cfg: dict, images, starts, featurizer, ppo: PPO, device) -> list[tuple]:
     envw = EnvWrapper(cfg, images, starts, device, seed=0)
     rf = RewardFn(cfg)
@@ -170,6 +186,7 @@ def main(argv: list[str] | None = None) -> int:
 
     # rollout 图：两列都是两边输出的最大绝对值（量级参考），比较看 abs diff
     checks += check_rollout_graphs(base, images, starts, featurizer, off, device)
+    checks.append(check_gae_graph(on, container, next_value))
 
     print(f"{'key':>22} {'off':>14} {'on':>14} {'abs diff':>12}  ok")
     for k, a, b, diff, good in checks:

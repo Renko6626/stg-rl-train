@@ -145,6 +145,8 @@ class PPO:
             policy = CudaGraphModule(policy, warmup=20)
             update = CudaGraphModule(update, warmup=20)
         self.policy, self.update = policy, update
+        # GAE 是 num_steps 步的 Python 循环（约 600 个小核）；录成一张图，与 eager 同一批核、结果相同
+        self._gae = CudaGraphModule(gae, warmup=2) if self.cudagraphs else gae
 
     def _update(self, feats, actions, logprobs, advantages, returns, vals):
         p = self.p
@@ -213,29 +215,40 @@ class PPO:
             next_value = self.agent_inference.get_value(next_feats)
         return obs, container, next_value
 
-    def train_step(self, container, next_value, iteration: int, num_iterations: int) -> dict[str, float]:
+    def train_step(self, container, next_value, iteration: int, num_iterations: int, timer=None) -> dict[str, float]:
         p = self.p
         if p["anneal_lr"]:
             frac = 1.0 - (iteration - 1.0) / num_iterations
             self.optimizer.param_groups[0]["lr"].copy_(frac * float(p["learning_rate"]))
-        adv, ret = gae(container["rewards"], container["vals"], container["dones"], next_value,
-                       float(p["gamma"]), float(p["gae_lambda"]))
-        container["advantages"] = adv
-        container["returns"] = ret
+        with maybe_phase(timer, "update_gae"):
+            adv, ret = self._gae(container["rewards"], container["vals"], container["dones"], next_value,
+                                 float(p["gamma"]), float(p["gae_lambda"]))
+            container["advantages"] = adv
+            container["returns"] = ret
         flat = container.view(-1)
-        mb = flat.shape[0] // int(p["num_minibatches"])
+        n = flat.shape[0]
+        mb = n // int(p["num_minibatches"])
         outs = []
         for _ in range(int(p["update_epochs"])):
-            for b in torch.randperm(flat.shape[0], device=self.device).split(mb):
-                torch.compiler.cudagraph_mark_step_begin()
-                outs.append(self.update(flat[b], tensordict_out=TensorDict()))
-        stats = {k: torch.stack([o[k] for o in outs]).float().mean().item() for k in outs[0].keys()}
-        var_y = ret.var()
-        stats["explained_variance"] = (
-            (1.0 - (ret - container["vals"]).var() / var_y).item() if var_y.item() > 0 else float("nan")
-        )
-        stats["lr"] = float(self.optimizer.param_groups[0]["lr"])
-        stats["done3_frac"] = (container["dones"] == 3).float().mean().item()
+            # 每个 epoch 整表按随机排列 gather 一次，minibatch 取连续切片：与逐 minibatch 按
+            # perm[i*mb:(i+1)*mb] 各 gather 一次逐位相同，但每个键只 gather 一次而不是 num_minibatches 次
+            with maybe_phase(timer, "update_shuffle"):
+                shuffled = flat[torch.randperm(n, device=self.device)]
+            with maybe_phase(timer, "update_minibatches"):
+                for start in range(0, n, mb):
+                    torch.compiler.cudagraph_mark_step_begin()
+                    outs.append(self.update(shuffled[start:start + mb], tensordict_out=TensorDict()))
+        with maybe_phase(timer, "update_stats"):
+            # 全部统计量先在设备上算好、拼成一个张量，只同步一次（原来是十来次 .item()）
+            keys = list(outs[0].keys())
+            means = [torch.stack([o[k] for o in outs]).float().mean() for k in keys]
+            var_y = ret.var()
+            ev = torch.where(var_y > 0, 1.0 - (ret - container["vals"]).var() / var_y,
+                             torch.full_like(var_y, float("nan")))
+            done3 = (container["dones"] == 3).float().mean()
+            lr = self.optimizer.param_groups[0]["lr"]
+            values = torch.stack([*means, ev.float(), done3, torch.as_tensor(lr, device=ev.device).float()]).tolist()
+        stats = dict(zip([*keys, "explained_variance", "done3_frac", "lr"], values))
         return stats
 
     @torch.no_grad()

@@ -7,6 +7,7 @@ from stgtrain.cards import compile_cards, discover
 from stgtrain.envwrap import EnvWrapper
 from stgtrain.episodes import EpisodeTracker
 from stgtrain.ppo import PPO, gae
+from tensordict import TensorDict
 from stgtrain.perf import PhaseTimer
 from stgtrain.registry import FEATURIZERS, MODELS, load_builtins
 from stgtrain.reward import RewardFn
@@ -48,8 +49,8 @@ def test_gae_done_codes():
     assert torch.allclose(ret, adv + v)
 
 
-def setup(num_steps=16, **sections):
-    cfg = small_cfg(ppo={"num_steps": num_steps}, **sections)
+def setup(num_steps=16, ppo=None, **sections):
+    cfg = small_cfg(ppo={"num_steps": num_steps, **(ppo or {})}, **sections)
     images = compile_cards(discover(FIXTURES / "cards"))
     envw = EnvWrapper(cfg, images, [stg_rl.Start("example_ring", 0, 2)], CPU, seed=4)
     feat = FEATURIZERS.get("danger_topk_v1")(cfg)
@@ -164,3 +165,80 @@ def test_rollout_graphs_use_only_tensordict_062_api(monkeypatch):
     cfg, envw, feat, ppo, rf, tr = setup(num_steps=2)
     ppo.rollout_graphs = True
     ppo.rollout(envw, feat, rf, tr, None, envw.reset())
+
+
+def _reference_train_step(ppo, container, next_value, iteration, num_iterations):
+    """改动前的 train_step（每个 minibatch 各按随机下标 gather 一次）——等价性对照。"""
+    p = ppo.p
+    if p["anneal_lr"]:
+        frac = 1.0 - (iteration - 1.0) / num_iterations
+        ppo.optimizer.param_groups[0]["lr"].copy_(frac * float(p["learning_rate"]))
+    adv, ret = gae(container["rewards"], container["vals"], container["dones"], next_value,
+                   float(p["gamma"]), float(p["gae_lambda"]))
+    container["advantages"] = adv
+    container["returns"] = ret
+    flat = container.view(-1)
+    mb = flat.shape[0] // int(p["num_minibatches"])
+    outs = []
+    for _ in range(int(p["update_epochs"])):
+        for b in torch.randperm(flat.shape[0], device=ppo.device).split(mb):
+            outs.append(ppo.update(flat[b], tensordict_out=TensorDict()))
+    stats = {k: torch.stack([o[k] for o in outs]).float().mean().item() for k in outs[0].keys()}
+    var_y = ret.var()
+    stats["explained_variance"] = (
+        (1.0 - (ret - container["vals"]).var() / var_y).item() if var_y.item() > 0 else float("nan")
+    )
+    stats["lr"] = float(ppo.optimizer.param_groups[0]["lr"])
+    stats["done3_frac"] = (container["dones"] == 3).float().mean().item()
+    return stats
+
+
+def test_train_step_matches_per_minibatch_gather_reference():
+    """每个 epoch 整表打乱一次、minibatch 取连续切片：与逐 minibatch 按随机下标 gather 逐位相同（同一个 randperm）。"""
+    from tensordict import TensorDict  # noqa: F401  (reference 用)
+
+    torch.manual_seed(0)
+    cfg, envw, feat, ppo, rf, tr = setup(num_steps=8, ppo={"update_epochs": 2, "num_minibatches": 4})
+    _, container, nv = ppo.rollout(envw, feat, rf, tr, None, envw.reset())
+    torch.manual_seed(0)
+    cfg2, envw2, feat2, ref, rf2, tr2 = setup(num_steps=8, ppo={"update_epochs": 2, "num_minibatches": 4})
+    ref.agent.load_state_dict(ppo.agent.state_dict())
+
+    torch.manual_seed(7)
+    got = ppo.train_step(container.clone(), nv.clone(), 1, 10)
+    torch.manual_seed(7)
+    want = _reference_train_step(ref, container.clone(), nv.clone(), 1, 10)
+    assert got.keys() == want.keys()
+    for k in want:
+        assert got[k] == want[k] or (want[k] != want[k] and got[k] != got[k]), k
+    for a, b in zip(ppo.agent.parameters(), ref.agent.parameters()):
+        assert torch.equal(a, b)
+
+
+def test_train_step_reports_update_subphases():
+    cfg, envw, feat, ppo, rf, tr = setup(num_steps=4)
+    _, container, nv = ppo.rollout(envw, feat, rf, tr, None, envw.reset())
+    timer = PhaseTimer(sync_every=1, device=CPU)
+    timer.start_iteration(1)
+    ppo.train_step(container, nv, 1, 10, timer=timer)
+    row = timer.pop_iteration()
+    assert {"update_gae_s", "update_shuffle_s", "update_minibatches_s", "update_stats_s"} <= row.keys()
+
+
+def test_explained_variance_nan_when_returns_constant():
+    cfg, envw, feat, ppo, rf, tr = setup(num_steps=4)
+    _, container, nv = ppo.rollout(envw, feat, rf, tr, None, envw.reset())
+    container["rewards"].zero_()
+    container["vals"].zero_()
+    container["dones"].zero_()
+    stats = ppo.train_step(container, torch.zeros_like(nv), 1, 10)
+    assert stats["explained_variance"] != stats["explained_variance"], "回报恒定时为 NaN"
+
+
+def test_gpucheck_gae_graph_check_runs_on_cpu():
+    from stgtrain.gpucheck import check_gae_graph
+
+    cfg, envw, feat, ppo, rf, tr = setup(num_steps=4)
+    _, container, nv = ppo.rollout(envw, feat, rf, tr, None, envw.reset())
+    name, *_, good = check_gae_graph(ppo, container, nv)
+    assert name == "gae_graph" and good
