@@ -37,7 +37,12 @@ Magnus（北大站点）上用 A100 跑训练，替代在 Vast.ai 租卡。本�
 **结果一定交回**：`train.sh` / `train-multi.sh` / `parallel_probe.sh` 都装了 `trap EXIT`，正常结束、训练失败、
 Magnus 发 SIGTERM（终止 / 超时）三种情形都会把已有的 run 目录（含 checkpoint）打包交给 File Custody；
 收到 SIGTERM 时先停训练、写好 Result 再以 0 退出，Job 记为 Success。任一条训练失败时以非零码退出。
-共用函数在 `magnus/lib.sh`。（2026-09-25 本机 CPU 用 smoke 配置验过三种情形，上传换成桩。）
+共用函数在 `magnus/lib.sh`。
+
+**⚠ 手动 kill 救不回来**（2026-09-25，M0 Job `f58d88682d4b428d` 被用户终止）：Magnus 终止时**先清掉工作区**，训练进程还活着，
+接着写 tensorboard 报 `FileNotFoundError` 退出；退出 trap 去打包时 run 目录已不存在，什么都没上传。兜底只对「训练自己失败」
+与「超时 SIGTERM 且工作区还在」有效。要在终止前留住结果，得先让训练自己停（例如 `run.max_minutes`），或以后加「中途定期上传」。
+评测数字仍在 Job 日志里（`magnus job logs`），可以解析出来。另：Job 实际跑在 zhustation 本机（tfevents 文件名里的主机名）。（2026-09-25 本机 CPU 用 smoke 配置验过三种情形，上传换成桩。）
 
 ## 提交与取回
 
