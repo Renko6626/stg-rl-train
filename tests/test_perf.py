@@ -64,3 +64,25 @@ def test_machine_info_and_summarize():
     assert s["cpu_waits_gpu"] == pytest.approx(0.5)
     assert s["load/cpu_percent"] == 40.0
     assert summarize([], {}, 10) == {"phase_frac": {}}
+
+
+def test_phase_timer_records_counts_only_on_sync_iterations():
+    """按步记录的计数（每步弹行数、敌人数上限）：采样迭代上汇总成 均值 / 最大值，其余迭代不记。"""
+    t = PhaseTimer(sync_every=2, device=torch.device("cpu"))
+    t.start_iteration(0)
+    for v in (3, 5, 10):
+        t.record("enemies_max", v)
+    row = t.pop_iteration()
+    assert row["enemies_max_mean"] == 6.0 and row["enemies_max_max"] == 10
+    t.start_iteration(1)
+    t.record("enemies_max", 99)
+    assert t.pop_iteration() is None
+    t.start_iteration(2)
+    row = t.pop_iteration()
+    assert "enemies_max_mean" not in row, "上一个采样迭代的计数不能串到下一个"
+
+
+def test_record_accepts_none_timer():
+    from stgtrain.perf import maybe_record
+
+    maybe_record(None, "x", 1)

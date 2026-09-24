@@ -19,6 +19,11 @@ def maybe_phase(timer, name: str):
     return timer.phase(name) if timer is not None else contextlib.nullcontext()
 
 
+def maybe_record(timer, name: str, value: float) -> None:
+    if timer is not None:
+        timer.record(name, value)
+
+
 class PerfWriter:
     def __init__(self, path: Path):
         self.path = Path(path)
@@ -41,6 +46,7 @@ class PhaseTimer:
         self.cuda = device.type == "cuda"
         self._sync = False
         self._acc: dict[str, float] = {}
+        self._counts: dict[str, list[float]] = {}
         self._t0 = 0.0
 
     def _synchronize(self) -> None:
@@ -50,6 +56,7 @@ class PhaseTimer:
     def start_iteration(self, iteration: int) -> None:
         self._sync = iteration % self.sync_every == 0
         self._acc = {}
+        self._counts = {}
         if self._sync:
             self._synchronize()
         self._t0 = time.perf_counter()
@@ -67,11 +74,20 @@ class PhaseTimer:
             self._synchronize()
             self._acc[name] = self._acc.get(name, 0.0) + time.perf_counter() - t
 
+    def record(self, name: str, value: float) -> None:
+        """按步记一个计数（如每步弹行数）；只在采样迭代上留，pop 时汇总成 `{name}_mean` / `{name}_max`。
+        值须是 CPU 上已有的数，别为它去读 GPU 张量——那会插进一次同步。"""
+        if self._sync:
+            self._counts.setdefault(name, []).append(float(value))
+
     def pop_iteration(self) -> dict[str, float] | None:
         if not self._sync:
             return None
         self._synchronize()
         row = {f"{k}_s": v for k, v in self._acc.items()}
+        for k, vals in self._counts.items():
+            row[f"{k}_mean"] = sum(vals) / len(vals)
+            row[f"{k}_max"] = max(vals)
         row["total_s"] = time.perf_counter() - self._t0
         self._sync = False
         return row

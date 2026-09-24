@@ -199,3 +199,37 @@ def test_reported_intent_mode_is_the_finished_episode_not_the_next_one():
             # 结束的那些 env：报的必须是翻面**之前**的值，而不是 intent 当前持有的新值
             assert torch.equal(info.intent_mode[ended], 1 - w.intent.mode[ended])
     assert seen_ended, "没等到任何一局结束，测试没押到东西"
+
+
+H2D_SUBPHASES = {"h2d_copy_s", "h2d_state_s", "h2d_bullets_s", "h2d_enemies_s", "h2d_enemy_velocity_s", "h2d_finish_s"}
+
+
+def test_step_reports_h2d_subphases_and_counts():
+    from stgtrain.perf import PhaseTimer
+
+    w = ring()
+    w.reset()
+    timer = PhaseTimer(sync_every=1, device=CPU)
+    timer.start_iteration(1)
+    w.step(still(w.n), timer)
+    row = timer.pop_iteration()
+    assert H2D_SUBPHASES <= row.keys()
+    assert {"bullet_rows_mean", "bullet_rows_max", "bullets_env_max_max", "enemies_max_mean", "enemies_max_max"} <= row.keys()
+    assert row["enemies_max_max"] <= stg_rl.ENEMIES_CAP
+
+
+def test_step_outputs_identical_with_and_without_timer():
+    """计时只加了同步边界、把设备拷贝挪到了最前面；观测必须逐位不变。"""
+    from stgtrain.perf import PhaseTimer
+
+    a, b = ring(seed=3, mirror=True), ring(seed=3, mirror=True)
+    a.reset(), b.reset()
+    timer = PhaseTimer(sync_every=1, device=CPU)
+    for _ in range(20):
+        timer.start_iteration(1)
+        oa, ia = a.step(still(a.n))
+        ob, ib = b.step(still(b.n), timer)
+        timer.pop_iteration()
+        for f in ("player_xy", "bullets", "bullets_mask", "enemies", "enemies_mask", "target_xy", "dir_held"):
+            assert torch.equal(getattr(oa, f), getattr(ob, f)), f
+        assert torch.equal(ia.done, ib.done) and torch.equal(ia.refreshed, ib.refreshed)

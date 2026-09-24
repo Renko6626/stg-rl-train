@@ -8,6 +8,10 @@ mkdir -p "$probe_dir"
 sed -E -e 's/^threads = 0[[:space:]].*$/threads = 28/' \
        -e 's/^perf_sync_every = 20$/perf_sync_every = 5/' \
        configs/base.toml > "$probe_dir/config.toml"
+# sed 没匹配上不会报错；配置写法一变，数据就会贴错标签，所以逐项确认
+for want in '^threads = 28$' '^perf_sync_every = 5$'; do
+    grep -Eq "$want" "$probe_dir/config.toml" || { echo "配置替换失败：$want" >&2; exit 1; }
+done
 python -u -m stgtrain.train "$probe_dir/config.toml" phase-28 \
     --runs-dir "$probe_dir" --total-updates 20 --no-pack \
     2>&1 | tee "$probe_dir/console.log"
@@ -26,8 +30,11 @@ if len(runs) != 1:
 rows = [json.loads(line) for line in (runs[0] / "perf.jsonl").read_text().splitlines() if line]
 phases = [row for row in rows if row.get("kind") == "phase"]
 keys = sorted({key for row in phases for key in row if key.endswith("_s")})
+counts = sorted({key for row in phases for key in row if key.endswith(("_mean", "_max"))})
 summary = {"phase_samples": len(phases), "sampled_updates": [row["update"] for row in phases],
-           "median_seconds": {key: median(row[key] for row in phases if key in row) for key in keys}}
+           "median_seconds": {key: median(row[key] for row in phases if key in row) for key in keys},
+           # 每步计数（弹行数、敌人数上限等）：先在一次更新的 64 步里取均值 / 最大，再对各采样更新取中位数
+           "median_counts": {key: median(row[key] for row in phases if key in row) for key in counts}}
 (root / "summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n")
 print(json.dumps(summary, ensure_ascii=False, indent=2), flush=True)
 PY

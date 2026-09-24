@@ -14,6 +14,7 @@ import torch
 from torch import Tensor
 
 from . import actions
+from .perf import maybe_record
 from .registry import INTENTS
 
 FX_SCALE = 1.0 / 65536.0
@@ -415,92 +416,117 @@ class EnvWrapper:
         with _phase(timer, "env_step"):
             self.env.step(buttons.to("cpu"))
         with _phase(timer, "h2d"):
-            done = self._dev(self.buf["done"]).to(torch.int64)
-            events = self._dev(self.buf["events"]).to(torch.int64)
-            ep_frames = self._dev(self.buf["ep_frames"]).to(torch.int64)
-            ended = done != 0
-            # **先拍下模式再 reset**：reset 会给结束的 env 抽新一局的模式，晚读就把刚结束那局
-            # 标成了下一局的档，三档统计等于随机切一刀（2026-09-19 实验 I 踩过）。
-            # start_index 没这个问题——它是 env 在自动 reset 之前写进缓冲的。
-            # 方向保持步数：本步决策相对上一步换没换方向；换了就读出上一段保持了多久，然后清零。
-            # reward 的 quick_change 与 episodes 的连击统计都吃这一份，避免两处各算一遍算岔。
-            dir_chg = actions.direction_changed(self.prev_buttons, buttons)
-            self.dir_hold = self.dir_hold + 1
-            hold_now = self.dir_hold.clone()
-            self.dir_hold = torch.where(dir_chg, torch.zeros_like(self.dir_hold), self.dir_hold)
-            mode = getattr(self.intent, "mode", None)
-            mode = mode.clone() if mode is not None else None
-            self.intent.reset(ended)
-            self._draw_mirror(ended)
-            refreshed = self.intent.advance(self.frame_skip, ~ended)
-            info = StepInfo(done=done, events=events, ep_frames=ep_frames, refreshed=refreshed,
-                            buttons=buttons, prev_buttons=self.prev_buttons,
-                            dir_hold=hold_now, overridden=overridden,
-                            start_index=self._dev(self.buf["start_index"]).to(torch.int64),
-                            intent_mode=mode)
-            self.prev_buttons = torch.where(ended, torch.zeros_like(buttons), buttons)
-            self.dir_hold = torch.where(ended, torch.full_like(self.dir_hold, DIR_HOLD_NEVER), self.dir_hold)
-            self.slow_held = torch.where(ended, torch.full_like(self.slow_held, DIR_HOLD_NEVER), self.slow_held)
-            # 智能体坐标系的动作 id：镜像只在新局重抽，而新局这里清零，所以不会与镜像标志错位
-            self.prev_action = torch.where(ended, torch.zeros_like(action_ids), action_ids.to(torch.int64))
-            self._enemy_prev_valid = self._enemy_prev_valid & ~ended
-            if self.motor is not None:
-                self.motor.reset(ended)
-            obs = self._decode()
+            # 子阶段计时（2026-09-24）：「h2d」名不副实，拷贝之外还有解码、敌人速度匹配与意图状态，分开量
+            with _phase(timer, "h2d_copy"):
+                raw = self._copy_in(timer)
+            with _phase(timer, "h2d_state"):
+                done = raw["done"].to(torch.int64)
+                events = raw["events"].to(torch.int64)
+                ep_frames = raw["ep_frames"].to(torch.int64)
+                ended = done != 0
+                # **先拍下模式再 reset**：reset 会给结束的 env 抽新一局的模式，晚读就把刚结束那局
+                # 标成了下一局的档，三档统计等于随机切一刀（2026-09-19 实验 I 踩过）。
+                # start_index 没这个问题——它是 env 在自动 reset 之前写进缓冲的。
+                # 方向保持步数：本步决策相对上一步换没换方向；换了就读出上一段保持了多久，然后清零。
+                # reward 的 quick_change 与 episodes 的连击统计都吃这一份，避免两处各算一遍算岔。
+                dir_chg = actions.direction_changed(self.prev_buttons, buttons)
+                self.dir_hold = self.dir_hold + 1
+                hold_now = self.dir_hold.clone()
+                self.dir_hold = torch.where(dir_chg, torch.zeros_like(self.dir_hold), self.dir_hold)
+                mode = getattr(self.intent, "mode", None)
+                mode = mode.clone() if mode is not None else None
+                self.intent.reset(ended)
+                self._draw_mirror(ended)
+                refreshed = self.intent.advance(self.frame_skip, ~ended)
+                info = StepInfo(done=done, events=events, ep_frames=ep_frames, refreshed=refreshed,
+                                buttons=buttons, prev_buttons=self.prev_buttons,
+                                dir_hold=hold_now, overridden=overridden,
+                                start_index=raw["start_index"].to(torch.int64),
+                                intent_mode=mode)
+                self.prev_buttons = torch.where(ended, torch.zeros_like(buttons), buttons)
+                self.dir_hold = torch.where(ended, torch.full_like(self.dir_hold, DIR_HOLD_NEVER), self.dir_hold)
+                self.slow_held = torch.where(ended, torch.full_like(self.slow_held, DIR_HOLD_NEVER), self.slow_held)
+                # 智能体坐标系的动作 id：镜像只在新局重抽，而新局这里清零，所以不会与镜像标志错位
+                self.prev_action = torch.where(ended, torch.zeros_like(action_ids), action_ids.to(torch.int64))
+                self._enemy_prev_valid = self._enemy_prev_valid & ~ended
+                if self.motor is not None:
+                    self.motor.reset(ended)
+            obs = self._decode(raw, timer)
         return obs, info
 
-    def _decode(self) -> RawObs:
-        b, n, cap, dev = self.buf, self.n, self.cap, self.device
-        player = self._dev(b["player"])
-        px, py = _fx(player, _off("player", "x")), _fx(player, _off("player", "y"))
-        hit_r = _fx(player, _off("player", "hit_radius"))
-        speed = _fx(player, _off("player", "speed"))
-        focus = player[:, _off("player", "focus")] != 0
-
+    def _copy_in(self, timer=None) -> dict[str, Tensor]:
+        """本步要用的缓冲一次性搬上设备。计数全取自 CPU 缓冲，不触发 GPU 同步。"""
+        b, n = self.buf, self.n
         m = int(b["bullets_offsets"][n])  # CPU 缓冲，读它不触发 GPU 同步
-        rows = self._dev(b["bullets"][:m])
-        offs = self._dev(b["bullets_offsets"]).to(torch.int64)
-        counts = offs[1:] - offs[:-1]
-        env_idx = torch.repeat_interleave(self._arange_n, counts, output_size=m)
-        slot = torch.arange(m, device=dev) - offs[:-1][env_idx]
-        feats = torch.stack([_fx(rows, _off("bullets", f)) for f in ("x", "y", "vx", "vy", "radius")], dim=-1)
-        collidable = (rows[:, _off("bullets", "flags")] & BULLET_FLAG_COLLIDABLE) != 0
-        bullets = torch.zeros(n, cap, 5, device=dev)
-        bmask = torch.zeros(n, cap, dtype=torch.bool, device=dev)
-        bullets[env_idx, slot] = feats
-        bmask[env_idx, slot] = collidable
+        if timer is not None:
+            per_env = b["bullets_offsets"][1:] - b["bullets_offsets"][:-1]
+            maybe_record(timer, "bullet_rows", m)
+            maybe_record(timer, "bullets_env_max", int(per_env.max()))
+            maybe_record(timer, "enemies_max", int(b["enemies_count"].max()))
+        raw = {k: self._dev(b[k]) for k in ("done", "events", "ep_frames", "start_index", "player", "enemies",
+                                             "enemies_count")}
+        raw["bullets"] = self._dev(b["bullets"][:m])
+        raw["bullets_offsets"] = self._dev(b["bullets_offsets"])
+        raw["m"] = m
+        return raw
 
-        en = self._dev(b["enemies"])
-        ecount = self._dev(b["enemies_count"]).to(torch.int64)
-        eflags = _u16(en, _off("enemies", "flags"))
-        emask = (self._arange_e[None, :] < ecount[:, None]) & ((eflags & ENEMY_FLAG_COLLIDABLE) != 0)
-        ex, ey = _fx(en, _off("enemies", "x")), _fx(en, _off("enemies", "y"))
-        eids = _u32(en, _off("enemies", "id"))
-        exy = torch.stack([ex, ey], dim=-1)
-        evel = enemy_velocity(self._prev_enemy_ids, self._prev_enemy_xy, eids, exy,
-                              self.frame_skip, self._enemy_prev_valid)
-        self._prev_enemy_ids, self._prev_enemy_xy = eids, exy
-        self._enemy_prev_valid = torch.ones_like(self._enemy_prev_valid)
-        enemies = torch.stack([
-            ex, ey, _fx(en, _off("enemies", "hit_w")),
-            ((eflags & ENEMY_FLAG_BOSS) != 0).to(torch.float32), evel[..., 0], evel[..., 1],
-        ], dim=-1)
+    def _decode(self, raw: dict | None = None, timer=None) -> RawObs:
+        raw = self._copy_in() if raw is None else raw
+        n, cap, dev = self.n, self.cap, self.device
+        with _phase(timer, "h2d_bullets"):
+            player = raw["player"]
+            px, py = _fx(player, _off("player", "x")), _fx(player, _off("player", "y"))
+            hit_r = _fx(player, _off("player", "hit_radius"))
+            speed = _fx(player, _off("player", "speed"))
+            focus = player[:, _off("player", "focus")] != 0
 
-        if hasattr(self.intent, "track"):   # 自由躲弹诊断：目标点锁自机（未镜像坐标）
-            self.intent.track(torch.stack([px, py], dim=-1))
-        if hasattr(self.intent, "track_bullets"):   # 按弹幕压力切换指令的意图（未镜像坐标；只算有判定的弹）
-            self.intent.track_bullets(torch.stack([px, py], dim=-1), bullets, bmask)
-        if hasattr(self.intent, "track_world"):   # 跟随场上实体的意图（如 boss 正下方），同样用未镜像坐标
-            self.intent.track_world(torch.stack([px, py], dim=-1), enemies[..., 0:2],
-                                    enemies[..., 3] != 0, emask)
-        target = self.intent.target.clone()
-        sign = torch.where(self.mirrored, -1.0, 1.0)
-        px = px * sign
-        bullets[..., 0] *= sign[:, None]
-        bullets[..., 2] *= sign[:, None]
-        enemies[..., 0] *= sign[:, None]
-        enemies[..., 4] *= sign[:, None]   # 敌人速度 x 分量随镜像取反
-        target[:, 0] *= sign
+            m = raw["m"]
+            rows = raw["bullets"]
+            offs = raw["bullets_offsets"].to(torch.int64)
+            counts = offs[1:] - offs[:-1]
+            env_idx = torch.repeat_interleave(self._arange_n, counts, output_size=m)
+            slot = torch.arange(m, device=dev) - offs[:-1][env_idx]
+            feats = torch.stack([_fx(rows, _off("bullets", f)) for f in ("x", "y", "vx", "vy", "radius")], dim=-1)
+            collidable = (rows[:, _off("bullets", "flags")] & BULLET_FLAG_COLLIDABLE) != 0
+            bullets = torch.zeros(n, cap, 5, device=dev)
+            bmask = torch.zeros(n, cap, dtype=torch.bool, device=dev)
+            bullets[env_idx, slot] = feats
+            bmask[env_idx, slot] = collidable
+
+        with _phase(timer, "h2d_enemies"):
+            en = raw["enemies"]
+            ecount = raw["enemies_count"].to(torch.int64)
+            eflags = _u16(en, _off("enemies", "flags"))
+            emask = (self._arange_e[None, :] < ecount[:, None]) & ((eflags & ENEMY_FLAG_COLLIDABLE) != 0)
+            ex, ey = _fx(en, _off("enemies", "x")), _fx(en, _off("enemies", "y"))
+            eids = _u32(en, _off("enemies", "id"))
+            exy = torch.stack([ex, ey], dim=-1)
+        with _phase(timer, "h2d_enemy_velocity"):
+            evel = enemy_velocity(self._prev_enemy_ids, self._prev_enemy_xy, eids, exy,
+                                  self.frame_skip, self._enemy_prev_valid)
+        with _phase(timer, "h2d_finish"):
+            self._prev_enemy_ids, self._prev_enemy_xy = eids, exy
+            self._enemy_prev_valid = torch.ones_like(self._enemy_prev_valid)
+            enemies = torch.stack([
+                ex, ey, _fx(en, _off("enemies", "hit_w")),
+                ((eflags & ENEMY_FLAG_BOSS) != 0).to(torch.float32), evel[..., 0], evel[..., 1],
+            ], dim=-1)
+
+            if hasattr(self.intent, "track"):   # 自由躲弹诊断：目标点锁自机（未镜像坐标）
+                self.intent.track(torch.stack([px, py], dim=-1))
+            if hasattr(self.intent, "track_bullets"):   # 按弹幕压力切换指令的意图（未镜像坐标；只算有判定的弹）
+                self.intent.track_bullets(torch.stack([px, py], dim=-1), bullets, bmask)
+            if hasattr(self.intent, "track_world"):   # 跟随场上实体的意图（如 boss 正下方），同样用未镜像坐标
+                self.intent.track_world(torch.stack([px, py], dim=-1), enemies[..., 0:2],
+                                        enemies[..., 3] != 0, emask)
+            target = self.intent.target.clone()
+            sign = torch.where(self.mirrored, -1.0, 1.0)
+            px = px * sign
+            bullets[..., 0] *= sign[:, None]
+            bullets[..., 2] *= sign[:, None]
+            enemies[..., 0] *= sign[:, None]
+            enemies[..., 4] *= sign[:, None]   # 敌人速度 x 分量随镜像取反
+            target[:, 0] *= sign
         return RawObs(
             player_xy=torch.stack([px, py], dim=-1), player_hit_r=hit_r, player_speed=speed, player_focus=focus,
             bullets=bullets, bullets_mask=bmask, enemies=enemies, enemies_mask=emask, target_xy=target,
