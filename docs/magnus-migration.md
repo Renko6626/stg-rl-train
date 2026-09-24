@@ -1,4 +1,6 @@
-# Magnus 训练迁移记录（2026-09-23）
+# Magnus 训练迁移记录（2026-09-23 起）
+
+Magnus（北大站点）上用 A100 跑训练，替代在 Vast.ai 租卡。本文记录环境事实、Job 入口与正式训练前的待办；吞吐数据在 `docs/perf-baseline.md`。
 
 ## 已验证的环境
 
@@ -11,55 +13,59 @@
 - `2.5.1-cuda12.4-cudnn9-runtime` 缺少 C 编译器，`torch.compile` 失败。换成站点已缓存的同版本 `devel` 镜像后，Job `1c1be6b6ac0da812` 的 `gpucheck` 所有数值对拍通过，并完成两次 PPO 更新、640 局评测、checkpoint、出图与打包，Job 状态为 Success。结果包已取回到本地 `runs/20260923-190104-magnus-cu124-smoke.tar.gz`（约 8 MB）。
 - 可复用训练入口 `magnus/train.sh` 也经 Job `bd399f020e27bb86` 完整验证：两次更新、评测、checkpoint、打包、Result secret 和本机下载均通过。结果包在 `runs/20260923-203522-magnus-wrapper-smoke.tar.gz`（约 8 MB）。
 - File Custody 的 SDK 结果协议另用 CPU Job `46285c4e0fd0a54e` 验证：上传小文件、写 `$MAGNUS_RESULT`、从 `magnus job status` 读 secret、本机 `magnus receive` 下载，全部通过。
-- A100 性能扫描 Job `69aca4cf66a70501` 已扫 28 个 `threads × num_envs` 组合，原始结果保存在 `runs/bench-a100-cpu16-20260923.json`，结论与局限见 `docs/perf-baseline.md`。
-- 同卡双实验 Job `032ea8f38643e7dd` 成功完成受控单跑/并跑对比与分阶段计时；两条并跑的稳态总吞吐比单跑高约 39%，CPU 亲和性与阶段结果见 `docs/perf-baseline.md`。
-- 组件细分 Job `7a39b00b6d0846b2` 在 20 次更新里采了 4 次 CUDA 同步计时，区分弹 `top-k`、密度图、敌人处理、奖励项与逐局统计；实测和优化顺序见 `docs/perf-baseline.md`。
+- **CPU 可见性**：容器内 `os.cpu_count()` 返回宿主机的 112，进程亲和性只有申请到的 CPU（32 核 Job 为 `Cpus_allowed_list=2-17,58-73`，即单插槽 16 物理核加超线程），CFS quota 为 `-1`（Job `032ea8f38643e7dd`）。`env.threads = 0` 已改为取亲和性（`envwrap.usable_cpus`），不再开 112 个线程。
 
-rollout 图（`ppo.rollout_cudagraphs`，把每步的特征化、reward + 逐局统计各录成一张 CUDA 图）的验收与 A/B：入口改为 `bash magnus/graph_probe.sh`，申请 32 核。它先跑 `gpucheck`（含逐步对拍录图与 eager 的特征、奖励和 tracker 状态），再在同一 Job 里依次跑录图关 / 开各 20 次更新，`summary.json` 给出两边稳态帧率中位数与加速比。Job `d302175a23bd0b8f` 已验证：gpucheck PASS，稳态吞吐 +7.5%，详见 `docs/perf-baseline.md`。注意镜像里是 tensordict 0.6.2，`CudaGraphModule` 没有 `device` 参数（首个 Job `356819cb7a21700f` 因此失败）。
+## 与本地 / Vast 环境的差异（踩过的坑）
 
-复测吞吐时，沿用下文的镜像与资源参数，将 Job 入口改为 `bash magnus/bench.sh configs/base.toml a100-cpu16`；Job Result 会返回 `bench.json` 的 File Custody secret。
+- **版本栈不同**：Magnus 是 Python 3.11 + torch 2.5.1+cu124 + tensordict 0.6.2（`magnus/bootstrap.sh` 现装），本地与 Vast 是 Python 3.12 + torch 2.14 + tensordict 0.14。两边实验结果不能逐位对比。API 也有差：0.6.2 的 `CudaGraphModule` 没有 `device` 参数，首个 rollout 图 Job `356819cb7a21700f` 因此在 gpucheck 就失败了。**改到 torch / tensordict API 的代码，提交 Job 前先在同版本 CPU venv 里跑相关测试**（torch 2.5.1+cpu、tensordict 0.6.2、`PYTHONPATH=src`）。
+- **跨 Job 波动约 6%**：同一份代码在不同 Job 之间，稳态帧率实测相差约 6%（69.1k 对 73.4k）。比较改动时优先在同一 Job 内做 A/B（`graph_probe.sh`、`phase_probe.sh 28 32`），跨 Job 比较时主要看分阶段耗时。
 
-## 当前验证路径
+## Job 入口
 
-先复用站点缓存的 `docker://pytorch/pytorch:2.5.1-cuda12.4-cudnn9-devel` 镜像，运行 `bash magnus/smoke.sh`。它在 Job 中安装 TensorDict 0.6.2 和少量运行依赖，再执行 `gpucheck`、两次 PPO 更新和结果回传。它使用 `PYTHONPATH=src`，暂时绕开主仓 Python 3.12 / PyTorch 2.14 的安装约束；通过只能证明 CUDA 12.4 方案可行，**不能**视为正式训练环境已经锁定。
+所有入口先 `source magnus/bootstrap.sh`（校验镜像版本、安装 `magnus/wheels` 与小依赖、设置 `PYTHONPATH=src`），结束时把结果交给 File Custody，secret 写进 Job Result。
 
-提交时用已推送的固定 commit SHA：
+| 入口 | 用途 | 结果 |
+|---|---|---|
+| `bash magnus/smoke.sh` | 环境冒烟：`gpucheck` + 两次 PPO 更新 | 训练结果包 |
+| `bash magnus/train.sh <配置> <运行名> [训练器参数]` | 正式单次训练；参数原样传给 `stgtrain.train`（`--total-updates N`、`--runs-dir PATH`、`--resume RUN_DIR`） | 训练结果包 |
+| `bash magnus/bench.sh [配置] [名字]` | `threads × num_envs` 吞吐扫描（`stgtrain.train --bench`） | `bench.json` |
+| `[GPUCHECK=1] bash magnus/phase_probe.sh [线程数 …]` | 分阶段计时：每个线程数各跑 20 次更新，每 5 次采一次同步计时，汇总稳态帧率、各阶段中位秒数与每步计数；`GPUCHECK=1` 时先跑 gpucheck | `summary.json` + 各 run |
+| `bash magnus/graph_probe.sh` | rollout CUDA 图开 / 关 A/B（先跑 gpucheck） | `summary.json` + 各 run |
+| `bash magnus/parallel_probe.sh` | 单跑对比同卡两条并跑 | `summary.json` + 各 run |
 
-```bash
-magnus job submit \
-  --task-name stg-rl-train-cu124-smoke \
-  --namespace Renko6626 --repo-name stg-rl-train \
-  --branch feat/magnus-training --commit-sha <已推送的完整 SHA> \
-  --gpu-type a100 --gpu-count 1 --cpu-count 16 --memory-demand 32G \
-  --ephemeral-storage 10G --job-type A2 \
-  --container-image docker://pytorch/pytorch:2.5.1-cuda12.4-cudnn9-devel \
-  --entry-command 'bash magnus/smoke.sh'
-```
+## 提交与取回
 
-Job 完成后先用 `magnus job status <ID>` 取得 Result 中的 File Custody secret，再用 `magnus receive <SECRET> --output <本地结果包.tar.gz>` 取回。secret 有效期 240 分钟。最初的训练 Job 用 CLI 输出 secret 到日志；当前脚本改用已验证的 SDK Result 协议。
-
-短验证通过后，正式单次训练入口是 `bash magnus/train.sh`；配置、运行名和训练参数原样传给现有训练器：
+用已推送的固定 commit SHA，分支为 `main`。近期测量都申请 32 核、64 GB：
 
 ```bash
 magnus job submit \
-  --task-name stg-rl-train-exp-name \
+  --task-name stg-rl-train-<名字> \
   --namespace Renko6626 --repo-name stg-rl-train \
-  --branch feat/magnus-training --commit-sha <已推送的完整 SHA> \
-  --gpu-type a100 --gpu-count 1 --cpu-count 16 --memory-demand 32G \
+  --branch main --commit-sha <已推送的完整 SHA> \
+  --gpu-type a100 --gpu-count 1 --cpu-count 32 --memory-demand 64G \
   --ephemeral-storage 20G --job-type A2 \
   --container-image docker://pytorch/pytorch:2.5.1-cuda12.4-cudnn9-devel \
-  --entry-command 'bash magnus/train.sh configs/base.toml exp-name'
+  --entry-command 'bash magnus/train.sh configs/base.toml <运行名>'
 ```
 
-也可以传 `--total-updates N`、`--runs-dir PATH` 或 `--resume RUN_DIR`。`--resume` 指向的 run 目录必须在 Job 启动前已放进 Job 可见的持久挂载路径；目前尚未确认本站给该账号提供的挂载点。单次训练完成后，`train.sh` 会把打包结果交给 File Custody。
+Job 完成后先用 `magnus job status <ID>` 取得 Result 中的 File Custody secret，再用 `magnus receive <SECRET> --output <本地结果包.tar.gz>` 取回。secret 有效期 240 分钟。
 
-`magnus/wheels/` 有两个项目自有依赖：`stg_rl` 取自 `stg-engine` 的 `rl-v0.1.1` Release（2026-09-24 从 `rl-v0.1.0` 升级：VecEnv 分块修复 + `tick_steps` 遇 END 即停，观测输出不变）；`stgagent` 从 `stg-agent-proto` 的 `v0.1.0`（commit `6b61fa052640377d640e5a7ecee9641b6ac3df96`）构建。`SHA256SUMS` 固定了本次验证的字节内容，更新依赖时必须一起更新 wheel 与校验和。放在仓库内是为了避免 Job 容器直连 GitHub 的不稳定性，合计约 804 KB。
+`--resume` 指向的 run 目录必须在 Job 启动前已放进 Job 可见的持久挂载路径；目前尚未确认本站给该账号提供的挂载点。
+
+## 项目自有 wheel
+
+`magnus/wheels/` 放两个项目自有依赖，避免 Job 容器直连 GitHub 的不稳定性：
+- `stg_rl` 取自 `stg-engine` 的 `rl-v0.1.1` Release。2026-09-24 从 `rl-v0.1.0` 升级，内容是 VecEnv 分块修复加 `tick_steps` 遇 END 即停，观测输出不变。
+- `stgagent` 从 `stg-agent-proto` 的 `v0.1.0`（commit `6b61fa052640377d640e5a7ecee9641b6ac3df96`）构建。
+
+`SHA256SUMS` 固定了字节内容，更新依赖时必须一起更新 wheel 与校验和。`stg_rl` 升级时还要同步 `pyproject.toml` 与 `uv.lock`（Vast 用），两边哈希应当相同。
 
 ## 正式训练前还需完成
 
-1. 给 Magnus 路径做独立锁定，不改变 Vast.ai 当前的 `uv.lock`；运行时必须记录实际的 Python、PyTorch、CUDA、TensorDict 与 wheel SHA。
-2. 确认站点可用的持久存储，将 `--runs-dir` 指向持久路径。Magnus 会清理 Job 工作区，File Custody 只有短期有效，不能作为正式续训的唯一存储。尚未收到本站持久挂载路径。
-3. 按 `docs/perf-baseline.md` 的扫描结果选择 `env.threads` 和 `num_envs`，明确训练目标是固定环境帧数还是固定更新次数；长期任务不要沿用 `base.toml` 的 `threads=0`。
-4. 若每个 Job 安装小依赖仍过慢，再按 Magnus 的镜像指南用同一锁文件 `uv sync --frozen` 预热缓存，发布专用镜像；目前先复用已缓存镜像。
+1. **独立锁定 Magnus 路径**：现在由 `bootstrap.sh` 按固定版本号现装，没有锁文件。要做到不改变 Vast 的 `uv.lock`，并在运行时记录实际的 Python、PyTorch、CUDA、TensorDict 与 wheel SHA。
+2. **持久存储**：确认站点可用的持久挂载，把 `--runs-dir` 指向它。Magnus 会清理 Job 工作区，File Custody 只保留 240 分钟，不能作为正式续训的唯一存储。尚未收到本站的持久挂载路径。
+3. **失败也要交回结果**：`train.sh` 只在训练正常结束、找到结果包那一行后才上传。训练中途失败时 checkpoint 会随工作区一起丢失。应加 `trap … EXIT`，失败时把已有的 run 目录（checkpoint + metrics）打包上传，再以非零码退出。
+4. **定下 `num_envs` 与训练目标**：线程数已不必手选。`threads = 0` 取亲和性，32 核 Job 上 28 与 32 线程在噪声以内。还要明确训练目标是固定环境帧数还是固定更新次数；改 `num_envs` 会改变每次更新的样本数。
+5. 若每个 Job 安装小依赖仍过慢，再按 Magnus 的镜像指南用同一锁文件 `uv sync --frozen` 预热缓存，发布专用镜像；目前先复用已缓存镜像。
 
 Magnus 参考：`/data/sunyunbo/magnus-docs/official/docs/internals/job-runtime.zh-CN.md` 与 `.../uv-image.zh-CN.md`。
