@@ -1,6 +1,9 @@
 """模型 set_attn_v1（spec §4.1）：弹 / 敌各一个集合编码器 + 密度图小卷积 + 主干 MLP，策略头 18 路、价值头 1 路。
 
 全空掩码安全：池化与注意力对「一行都没有」输出 0，不出 NaN。形状全固定，ONNX 友好。
+
+`model.sa_layers`（默认 0，实验 R1a / R1b）：弹编码器在逐颗 MLP 之后、三路汇总之前插入 N 个 Pre-LN 自注意力 block，
+让每颗弹的 token 看得到其它弹（缝、通道这类局部结构）。0 = 原模型，模块、初始化顺序与前向逐位不变。敌人编码器不加。
 """
 from __future__ import annotations
 
@@ -22,8 +25,28 @@ def layer_init(layer, std=math.sqrt(2), bias_const=0.0):
     return layer
 
 
+class SelfAttnBlock(nn.Module):
+    """Pre-LN：x + MHA(LN(x))，再 x + FFN(LN(x))。注意力手写（加性掩码）：全空的行不出 NaN，ONNX 也好导。"""
+
+    def __init__(self, d: int, heads: int):
+        super().__init__()
+        self.heads, self.dk = heads, d // heads
+        self.ln1, self.ln2 = nn.LayerNorm(d), nn.LayerNorm(d)
+        self.qkv = layer_init(nn.Linear(d, 3 * d), std=1.0)
+        self.proj = layer_init(nn.Linear(d, d), std=1.0)
+        self.ffn = nn.Sequential(layer_init(nn.Linear(d, 2 * d)), nn.ReLU(), layer_init(nn.Linear(2 * d, d), std=1.0))
+
+    def forward(self, x: Tensor, mask: Tensor) -> Tensor:
+        n, k, d = x.shape
+        q, kk, v = self.qkv(self.ln1(x)).view(n, k, 3, self.heads, self.dk).permute(2, 0, 3, 1, 4)
+        scores = (q @ kk.transpose(-1, -2)) / math.sqrt(self.dk)
+        scores = scores.masked_fill(~mask[:, None, None, :], -1e4)
+        x = x + self.proj((scores.softmax(-1) @ v).transpose(1, 2).reshape(n, k, d))
+        return x + self.ffn(self.ln2(x))
+
+
 class SetEncoder(nn.Module):
-    def __init__(self, f_in: int, d: int, heads: int, ctx_dim: int):
+    def __init__(self, f_in: int, d: int, heads: int, ctx_dim: int, sa_layers: int = 0):
         super().__init__()
         self.phi = nn.Sequential(layer_init(nn.Linear(f_in, d)), nn.ReLU(), layer_init(nn.Linear(d, d)), nn.ReLU())
         self.heads, self.dk = heads, d // heads
@@ -31,10 +54,14 @@ class SetEncoder(nn.Module):
         self.k = layer_init(nn.Linear(d, d))
         self.v = layer_init(nn.Linear(d, d))
         self.out_dim = 3 * d
+        if sa_layers:   # 0 时不建这个子模块：state_dict 与初始化顺序和旧模型逐位相同
+            self.sa = nn.ModuleList(SelfAttnBlock(d, heads) for _ in range(sa_layers))
 
     def forward(self, x: Tensor, mask: Tensor, ctx: Tensor) -> Tensor:
         n, k, _ = x.shape
         h = self.phi(x)
+        for block in getattr(self, "sa", ()):
+            h = block(h, mask) * mask.unsqueeze(-1).to(h.dtype)   # padding 行归零，不带进下一层
         m = mask.unsqueeze(-1).to(h.dtype)
         cnt = m.sum(1)
         any_ = (cnt > 0).to(h.dtype)
@@ -57,12 +84,15 @@ class SetAttnV1(nn.Module):
         d, heads, trunk = int(m["d"]), int(m["heads"]), int(m["trunk"])
         if d % heads:
             raise ValueError(f"model.d({d}) 须能被 model.heads({heads}) 整除")
+        sa_layers = int(m.get("sa_layers", 0))
+        if sa_layers < 0:
+            raise ValueError(f"model.sa_layers 须 ≥ 0，得 {sa_layers}")
         self._spec = {k: tuple(spec[k]) for k in _KEYS}
         f_b, f_e = spec["bullets"][1], spec["enemies"][1]
         f_p, f_c = spec["player"][0], spec["cond"][0]
         c_d, h_d, w_d = spec["density"]
         self.ctx = nn.Sequential(layer_init(nn.Linear(f_p + f_c, d)), nn.ReLU())
-        self.bullets = SetEncoder(f_b, d, heads, d)
+        self.bullets = SetEncoder(f_b, d, heads, d, sa_layers)
         self.enemies = SetEncoder(f_e, d, heads, d)
         self.density = nn.Sequential(
             layer_init(nn.Conv2d(c_d, 16, 3, padding=1)), nn.ReLU(),

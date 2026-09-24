@@ -1,0 +1,44 @@
+# 实验 R1a（2026-09-25）：Q2 + **弹间自注意力 × 1 层**（model.sa_layers = 1）
+#
+# 问题：set_attn_v1 里每颗弹被**独立**编码，弹与弹之间的关系（缝、通道、两颗弹夹出的死角）只能靠池化后的主干 MLP 拼。
+# 在逐颗 MLP 之后插 1 个 Pre-LN 自注意力 block（4 头，FFN 64→128→64），敌人编码器不动。与 Q2 只差这一处。
+# R1a / R1b 只差层数：一次量出「再来一轮注意力」的边际收益（用户 09-25 问「要不要上原教旨 transformer」）。
+#
+# 判读：相对 Q2（末 4 次均值 r2 0.880 / r3 0.795）差 > 2σ 才算有效应（σ 的终点值还没有；中途种子差 5–8pp）；
+# R1b − R1a 在噪声内 ⇒ 固定一层。另看墙钟 / PPO 更新耗时涨了多少（部署前还要测 ONNX batch=1 延迟）。
+[run]
+total_updates = 3500
+ckpt_every = 100
+eval_every = 250
+
+[env]
+num_envs = 4096
+threads = 0
+
+[intent]
+name = "mixed_v1"
+
+[featurize]
+name = "danger_topk_v6"
+frame = "static"
+dt = false
+
+[motor]
+enabled = true
+hold = [2, 6]
+delay = [0, 2]
+slow = true
+
+[reward.terms]
+death = 10.0
+follow_shaping = 1.0
+hold = 0.01
+segment_survived = 0.0
+key_press = -0.003
+quick_change = -0.01
+shift_toggle = 0.0
+edge_hug = -0.02
+
+[model]
+name = "set_attn_v1"
+sa_layers = 1
