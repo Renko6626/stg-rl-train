@@ -10,6 +10,11 @@ backward，从而把反向路径也纳入被捕获的图；再比较策略 entro
 纯相对误差会把数值噪声放大成巨大百分比，故加 1e-6 绝对下限。
 盲区：每次调用都用同一批输入，无法识别「图重放忽略新输入」这类错误。
 
+**rollout 图（`rollout_graph.py`）另做一项**：同一条真实轨迹上逐步把同一份观测分别喂给 eager 与录图两套
+特征化 / reward + 逐局统计，比较每一步的输出与 tracker 状态。步数超过 warmup，后面走的都是重放，
+而且每步输入都在变——上面那个盲区在这一项里是覆盖到的。两边跑的是同一批核，只有密度图的原子加
+求和顺序不定，故用 ROLLOUT_REL 这个很紧的相对容差。
+
 **比对在全精度 FP32 下做（2026-09-20）**：训练开着 TF32（`ppo.py` 的 `set_float32_matmul_precision("high")`），
 而 TF32 的矩阵乘内部只有约 10 位尾数，**单次 matmul 的相对误差本来就在 1e-3 量级**；eager 与编译后走的是
 不同的 GEMM 核与融合方式，两边各带各的 TF32 噪声。于是 1e-3 的容差正好压在噪声地板上 —— 这个检查因此
@@ -32,6 +37,7 @@ from .episodes import EpisodeTracker
 from .ppo import PPO
 from .registry import MODELS
 from .reward import RewardFn
+from .rollout_graph import WARMUP, RolloutGraphs
 from .train import build_components
 
 TOLERANCE = 1e-4
@@ -46,6 +52,43 @@ MAXABS_REL = 1e-3
 # 差异只在这一个归约上。它的用途是梯度裁剪（max_grad_norm 0.5），0.025% 的差异对训练没有影响。
 GN_REL = 1e-3
 CALLS = 25
+ROLLOUT_REL = 1e-5
+ROLLOUT_STEPS = WARMUP + 16
+
+
+def _maxdiff(a, b) -> tuple[float, float]:
+    """(两边的最大绝对值, 逐元素最大绝对差)；bool / 整型按 float 比。"""
+    a, b = a.float(), b.float()
+    return max(a.abs().max().item(), b.abs().max().item(), 0.0), (a - b).abs().max().item()
+
+
+def check_rollout_graphs(cfg: dict, images, starts, featurizer, ppo: PPO, device) -> list[tuple]:
+    envw = EnvWrapper(cfg, images, starts, device, seed=0)
+    rf = RewardFn(cfg)
+
+    def tracker():
+        return EpisodeTracker(envw.n, device, list(rf.terms), cfg["reward"]["hold_radius"],
+                              cfg["reward"]["edge_margin"], envw.frame_skip, cfg["intent"]["interval"][1])
+
+    eager = RolloutGraphs(featurizer, rf, tracker(), graphs=False)
+    graphed = RolloutGraphs(featurizer, rf, tracker(), graphs=True, device=device)
+    worst = {"rollout_feats": (0.0, 0.0), "rollout_reward": (0.0, 0.0), "rollout_tracker": (0.0, 0.0)}
+
+    def note(key, a, b):
+        scale, diff = _maxdiff(a, b)
+        worst[key] = (max(worst[key][0], scale), max(worst[key][1], diff))
+
+    obs = envw.reset()
+    for _ in range(ROLLOUT_STEPS):
+        fe, fg = eager.featurize(obs), graphed.featurize(obs)
+        for k in fe:
+            note("rollout_feats", fe[k], fg[k])
+        nxt, info = envw.step(ppo.act(fe, greedy=False))
+        note("rollout_reward", eager.reward(obs, nxt, info), graphed.reward(obs, nxt, info))
+        for a, b in zip(eager.tracker.state(), graphed.tracker.state()):
+            note("rollout_tracker", a, b)
+        obs = nxt
+    return [(k, scale, scale, diff, diff <= ROLLOUT_REL * scale + 1e-6) for k, (scale, diff) in worst.items()]
 
 
 def close_enough(a: float, b: float, rel: float = TOLERANCE, abs_: float = 1e-6) -> bool:
@@ -125,6 +168,9 @@ def main(argv: list[str] | None = None) -> int:
     checks.append(("policy_value_maxabs", v_off.abs().max().item(), v_on.abs().max().item(),
                    v_maxabs, v_maxabs <= MAXABS_REL * v_scale))
 
+    # rollout 图：两列都是两边输出的最大绝对值（量级参考），比较看 abs diff
+    checks += check_rollout_graphs(base, images, starts, featurizer, off, device)
+
     print(f"{'key':>22} {'off':>14} {'on':>14} {'abs diff':>12}  ok")
     for k, a, b, diff, good in checks:
         print(f"{k:>22} {a:>14.8g} {b:>14.8g} {diff:>12.3g}  {good}")
@@ -134,7 +180,7 @@ def main(argv: list[str] | None = None) -> int:
     else:
         bad = "、".join(k for k, *_, good in checks if not good)
         print(f"{'WARN' if args.warn_only else 'FAIL'}（不合格项：{bad}；损失容差 {TOLERANCE}，"
-              f"梯度范数 {GN_REL}，策略输出 {POLICY_REL}，均为相对）")
+              f"梯度范数 {GN_REL}，策略输出 {POLICY_REL}，rollout 图 {ROLLOUT_REL}，均为相对）")
     return 0 if ok or args.warn_only else 1
 
 

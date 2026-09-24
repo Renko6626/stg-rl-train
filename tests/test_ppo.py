@@ -48,8 +48,8 @@ def test_gae_done_codes():
     assert torch.allclose(ret, adv + v)
 
 
-def setup(num_steps=16):
-    cfg = small_cfg(ppo={"num_steps": num_steps})
+def setup(num_steps=16, **sections):
+    cfg = small_cfg(ppo={"num_steps": num_steps}, **sections)
     images = compile_cards(discover(FIXTURES / "cards"))
     envw = EnvWrapper(cfg, images, [stg_rl.Start("example_ring", 0, 2)], CPU, seed=4)
     feat = FEATURIZERS.get("danger_topk_v1")(cfg)
@@ -98,3 +98,51 @@ def test_act_greedy_and_lr_anneal():
     obs, c, nv = ppo.rollout(envw, feat, rf, tr, None, envw.reset())
     stats = ppo.train_step(c, nv, iteration=6, num_iterations=10)
     assert stats["lr"] == pytest.approx(cfg["ppo"]["learning_rate"] * 0.5)
+
+
+def test_rollout_graphs_only_on_cuda():
+    cfg, envw, feat, ppo, rf, tr = setup(num_steps=2)
+    assert cfg["ppo"]["rollout_cudagraphs"] is True, "默认开"
+    assert ppo.rollout_graphs is False, "CPU 上不录图"
+
+
+def _rollout_twice(graphs: bool, timer=None):
+    torch.manual_seed(0)
+    cfg, envw, feat, ppo, rf, tr = setup(num_steps=12, env={"max_frames": 10})
+    ppo.rollout_graphs = graphs      # CPU 上强开：CudaGraphModule 在 CPU 上直接执行，验的是张量打包与状态传递
+    obs = envw.reset()
+    outs = []
+    for _ in range(2):
+        obs, container, next_value = ppo.rollout(envw, feat, rf, tr, timer, obs)
+        outs.append((container, next_value, tr.pop_finished()))
+    return outs
+
+
+def test_graphed_rollout_matches_eager_path():
+    eager, graphed = _rollout_twice(False), _rollout_twice(True)
+    for (c0, v0, r0), (c1, v1, r1) in zip(eager, graphed):
+        assert (c0 == c1).all(), "特征 / 奖励 / 动作逐位相同"
+        assert torch.equal(v0, v1)
+        assert r0 == r1, "逐局统计相同（跨 rollout 的 tracker 状态也接得上）"
+    assert sum(len(r) for _, _, r in eager) > 0, "夹具里要有结束的局，否则统计对拍是空的"
+
+
+def test_graphed_rollout_still_reports_parent_phases():
+    cfg, envw, feat, ppo, rf, tr = setup(num_steps=2)
+    ppo.rollout_graphs = True
+    timer = PhaseTimer(sync_every=1, device=CPU)
+    timer.start_iteration(1)
+    ppo.rollout(envw, feat, rf, tr, timer, envw.reset())
+    phases = timer.pop_iteration()
+    assert {"featurize_s", "reward_s"} <= phases.keys()
+
+
+def test_gpucheck_rollout_graph_check_runs_on_cpu():
+    """GPU 上才真正录图；这里只保证检查本身能跑、eager 对 eager 全部通过。"""
+    from stgtrain.gpucheck import check_rollout_graphs
+
+    cfg, envw, feat, ppo, rf, tr = setup(num_steps=2)
+    images = compile_cards(discover(FIXTURES / "cards"))
+    checks = check_rollout_graphs(cfg, images, [stg_rl.Start("example_ring", 0, 2)], feat, ppo, CPU)
+    assert [k for k, *_ in checks] == ["rollout_feats", "rollout_reward", "rollout_tracker"]
+    assert all(good for *_, good in checks)

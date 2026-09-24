@@ -94,6 +94,7 @@ anneal_lr = true
 norm_adv = true
 compile = true
 cudagraphs = true
+rollout_cudagraphs = true   # 特征化、reward + 逐局统计各录一张 CUDA 图（只在 CUDA 上生效）
 
 [eval]
 episodes = 32

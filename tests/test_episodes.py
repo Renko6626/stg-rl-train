@@ -123,3 +123,27 @@ def test_movement_segment_length_metrics():
     assert (rec["mv_segs"], rec["mv_le2"], rec["mv_le3"]) == (2, 1, 2)
     assert rec["seg_le2_frac"] == 0.5 and rec["seg_le3_frac"] == 1.0
     assert abs(rec["motor_override_frac"] - 1 / 6) < 1e-6
+
+
+def test_step_is_pure_and_matches_update():
+    """`step` 是 `update` 的纯函数内核（CUDA 图录它）：不改 tracker，返回的新状态与 update 后的状态逐位相同。"""
+    target = (0.0, 300.0)
+    prev = raw_obs(n=2, player=[(0.0, 400.0), (0.0, 305.0)], target=target)
+    cur = raw_obs(n=2, player=[(0.0, 305.0), (0.0, 305.0)], target=target)
+    info = step_info(n=2, done=[1, 0], ep_frames=8, refreshed=[False, True])
+    total = torch.tensor([1.0, 0.5])
+    raw = {"death": -(info.done == 1).float(), "hold": torch.zeros(2)}
+    pure, ref = tracker(), tracker()
+    feed(ref, prev, prev, step_info(n=2), [0.0, 0.0])     # 先走一步，让状态非零
+    feed(pure, prev, prev, step_info(n=2), [0.0, 0.0])
+    before = [s.clone() for s in pure.state()]
+
+    new_state, entry = pure.step(pure.state(), prev, cur, info, total, raw)
+    assert all(torch.equal(a, b) for a, b in zip(before, pure.state())), "step 不得改 tracker"
+
+    ref.update(prev, cur, info, total, raw)
+    assert all(torch.equal(a, b) for a, b in zip(new_state, ref.state()))
+    pure.load_state(new_state)
+    pure.push(entry)
+    ref_recs = ref.pop_finished()
+    assert pure.pop_finished() == ref_recs and len(ref_recs) == 1

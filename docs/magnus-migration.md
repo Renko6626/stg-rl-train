@@ -15,6 +15,8 @@
 - 同卡双实验 Job `032ea8f38643e7dd` 成功完成受控单跑/并跑对比与分阶段计时；两条并跑的稳态总吞吐比单跑高约 39%，CPU 亲和性与阶段结果见 `docs/perf-baseline.md`。
 - 组件细分 Job `7a39b00b6d0846b2` 在 20 次更新里采了 4 次 CUDA 同步计时，区分弹 `top-k`、密度图、敌人处理、奖励项与逐局统计；实测和优化顺序见 `docs/perf-baseline.md`。
 
+rollout 图（`ppo.rollout_cudagraphs`，把每步的特征化、reward + 逐局统计各录成一张 CUDA 图）的验收与 A/B：入口改为 `bash magnus/graph_probe.sh`，申请 32 核。它先跑 `gpucheck`（含逐步对拍录图与 eager 的特征、奖励和 tracker 状态），再在同一 Job 里依次跑录图关 / 开各 20 次更新，`summary.json` 给出两边稳态帧率中位数与加速比。尚未在 GPU 上跑过。
+
 复测吞吐时，沿用下文的镜像与资源参数，将 Job 入口改为 `bash magnus/bench.sh configs/base.toml a100-cpu16`；Job Result 会返回 `bench.json` 的 File Custody secret。
 
 ## 当前验证路径

@@ -42,6 +42,7 @@ from torch import Tensor  # noqa: E402
 from torch.distributions.categorical import Categorical, Distribution  # noqa: E402
 
 from .perf import maybe_phase  # noqa: E402
+from .rollout_graph import RolloutGraphs  # noqa: E402
 
 Distribution.set_default_validate_args(False)
 
@@ -123,6 +124,8 @@ class PPO:
         on_cuda = device.type == "cuda"
         self.compile = bool(self.p["compile"]) and on_cuda
         self.cudagraphs = bool(self.p["cudagraphs"]) and on_cuda
+        self.rollout_graphs = bool(self.p["rollout_cudagraphs"]) and on_cuda
+        self._rollout_fns: RolloutGraphs | None = None
         self.optimizer = optim.Adam(
             self.agent.parameters(), lr=torch.tensor(float(self.p["learning_rate"]), device=device), eps=1e-5,
             capturable=self.cudagraphs and not self.compile,
@@ -178,21 +181,26 @@ class PPO:
         self.optimizer.step()
         return approx_kl, v_loss.detach(), pg_loss.detach(), entropy_loss.detach(), old_approx_kl, clipfrac, gn
 
+    def _rollout_graphs(self, featurizer, reward_fn, tracker) -> RolloutGraphs:
+        # 图按这三个对象录：换了任何一个（如 gpucheck 另建 tracker）就重建，不复用旧图
+        fns = self._rollout_fns
+        if fns is None or not fns.matches(featurizer, reward_fn, tracker) or fns.graphs != self.rollout_graphs:
+            fns = self._rollout_fns = RolloutGraphs(featurizer, reward_fn, tracker, self.rollout_graphs, self.device)
+        return fns
+
     def rollout(self, envw, featurizer, reward_fn, tracker, timer, obs):
         n = envw.n
+        fns = self._rollout_graphs(featurizer, reward_fn, tracker)
         ts = []
         for _ in range(self.num_steps):
             with maybe_phase(timer, "featurize"):
-                feats = TensorDict(featurizer(obs, timer=timer), batch_size=[n])
+                feats = TensorDict(fns.featurize(obs, timer), batch_size=[n])
             with maybe_phase(timer, "policy"):
                 torch.compiler.cudagraph_mark_step_begin()
                 action, logprob, _, value = self.policy(feats)
             next_obs, info = envw.step(action, timer)
             with maybe_phase(timer, "reward"):
-                with maybe_phase(timer, "reward_terms"):
-                    reward, raw = reward_fn(obs, next_obs, info)
-                with maybe_phase(timer, "episode_tracker"):
-                    tracker.update(obs, next_obs, info, reward, raw)
+                reward = fns.reward(obs, next_obs, info, timer)
             ts.append(TensorDict._new_unsafe(
                 feats=feats, vals=value.flatten(), actions=action, logprobs=logprob, rewards=reward,
                 dones=info.done, batch_size=(n,),
@@ -200,7 +208,7 @@ class PPO:
             obs = next_obs
         container = torch.stack(ts, 0)
         with maybe_phase(timer, "featurize"):
-            next_feats = TensorDict(featurizer(obs, timer=timer), batch_size=[n])
+            next_feats = TensorDict(fns.featurize(obs, timer), batch_size=[n])
         with torch.no_grad():
             next_value = self.agent_inference.get_value(next_feats)
         return obs, container, next_value

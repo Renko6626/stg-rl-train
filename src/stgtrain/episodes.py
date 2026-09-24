@@ -35,7 +35,25 @@ class EpisodeTracker:
         self.reached = torch.zeros(self.n, dtype=torch.bool, device=device)
         self._pending: list[tuple[Tensor, Tensor, Tensor, Tensor]] = []
 
+    def state(self) -> tuple[Tensor, Tensor, Tensor, Tensor]:
+        return self.acc, self.since, self.hold, self.reached
+
+    def load_state(self, state: tuple[Tensor, Tensor, Tensor, Tensor]) -> None:
+        self.acc, self.since, self.hold, self.reached = state
+
+    def push(self, entry: tuple[Tensor, ...]) -> None:
+        self._pending.append(entry)
+
     def update(self, prev: RawObs, cur: RawObs, info: StepInfo, total: Tensor, raw_terms: dict[str, Tensor]) -> None:
+        state, entry = self.step(self.state(), prev, cur, info, total, raw_terms)
+        self.load_state(state)
+        self.push(entry)
+
+    def step(self, state: tuple[Tensor, Tensor, Tensor, Tensor], prev: RawObs, cur: RawObs, info: StepInfo,
+             total: Tensor, raw_terms: dict[str, Tensor]) -> tuple[tuple[Tensor, ...], tuple[Tensor, ...]]:
+        """`update` 的纯函数内核：不读写 self 上的状态，返回 (新状态, 待 pop 的一条记录)。
+        rollout 把它录进 CUDA 图（`rollout_graph.py`），状态靠图的输入 / 输出传递。"""
+        acc, since, hold_state, reached = state
         alive = info.done == 0
         d = (cur.player_xy - prev.target_xy).norm(dim=-1)
         in_r = (d < self.hold_radius) & alive
@@ -56,9 +74,8 @@ class EpisodeTracker:
         if info.dir_hold is not None:
             hold = info.dir_hold          # envwrap 算好的那一份（reward 也吃它）
         else:
-            self.hold = self.hold + 1
-            hold = self.hold
-            self.hold = torch.where(dir_chg, torch.zeros_like(self.hold), self.hold)
+            hold = hold_state + 1
+            hold_state = torch.where(dir_chg, torch.zeros_like(hold), hold)
         quick = dir_chg & (hold <= QUICK_STEPS) & alive
         quick3 = dir_chg & (hold <= QUICK_STEPS3) & alive
         danger = (near < DANGER_PX) & alive
@@ -67,13 +84,13 @@ class EpisodeTracker:
         mv_end = dir_chg & ((info.prev_buttons & actions.DIR_MASK) != 0) & alive
         override = (info.overridden & alive) if info.overridden is not None else torch.zeros_like(alive)
 
-        self.since = self.since + 1
-        newly = in_r & ~self.reached
-        reach_add = newly.float() * self.since * self.frame_skip
+        since = since + 1
+        newly = in_r & ~reached
+        reach_add = newly.float() * since * self.frame_skip
         reach_cnt = newly.float()
-        self.reached = self.reached | newly
+        reached = reached | newly
         seg_end = info.refreshed | ~alive
-        miss = seg_end & ~self.reached
+        miss = seg_end & ~reached
         reach_add = reach_add + miss.float() * self.reach_cap
         reach_cnt = reach_cnt + miss.float()
 
@@ -85,19 +102,20 @@ class EpisodeTracker:
                 quick.float(), quick3.float(), (dir_chg & danger).float(), danger.float(),
                 mv_end.float(), (mv_end & (hold <= 2)).float(), (mv_end & (hold <= 3)).float(), override.float()]
         cols += [raw_terms[name].to(torch.float32) for name in self.term_names]
-        self.acc = self.acc + torch.stack(cols, dim=-1)
+        acc = acc + torch.stack(cols, dim=-1)
 
         ended = ~alive
         zero = torch.zeros_like(info.done)
         # 起点下标与意图模式：env 在自动 reset 前写 start_index，所以 done≠0 这一步读到的正是
         # 刚结束那局的起点（课程采样按它归因）；意图模式只有混合意图才有。
-        self._pending.append((ended, self.acc.clone(), info.done, info.ep_frames,
-                              info.start_index if info.start_index is not None else zero,
-                              info.intent_mode if info.intent_mode is not None else zero))
-        self.acc = torch.where(ended[:, None], torch.zeros_like(self.acc), self.acc)
-        self.since = torch.where(seg_end, torch.zeros_like(self.since), self.since)
-        self.hold = torch.where(ended, torch.full_like(self.hold, NEVER), self.hold)
-        self.reached = self.reached & ~seg_end
+        entry = (ended, acc, info.done, info.ep_frames,
+                 info.start_index if info.start_index is not None else zero,
+                 info.intent_mode if info.intent_mode is not None else zero)
+        acc = torch.where(ended[:, None], torch.zeros_like(acc), acc)
+        since = torch.where(seg_end, torch.zeros_like(since), since)
+        hold_state = torch.where(ended, torch.full_like(hold_state, NEVER), hold_state)
+        reached = reached & ~seg_end
+        return (acc, since, hold_state, reached), entry
 
     def pop_finished(self) -> list[dict]:
         if not self._pending:

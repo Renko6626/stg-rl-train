@@ -26,7 +26,10 @@ DEFAULTS: dict = {
                          "key_press": 0.0, "quick_change": 0.0, "shift_toggle": 0.0, "edge_hug": 0.0}},
     "ppo": {"num_steps": 64, "gamma": 0.995, "gae_lambda": 0.95, "num_minibatches": 8, "update_epochs": 4,
             "clip_coef": 0.2, "clip_vloss": True, "ent_coef": 0.01, "vf_coef": 0.5, "max_grad_norm": 0.5,
-            "learning_rate": 3e-4, "anneal_lr": True, "norm_adv": True, "compile": True, "cudagraphs": True},
+            "learning_rate": 3e-4, "anneal_lr": True, "norm_adv": True, "compile": True, "cudagraphs": True,
+            # rollout_cudagraphs：把每步的特征化、reward + 逐局统计各录成一张 CUDA 图（rollout_graph.py），
+            # 省掉逐个小核的启动开销；只在 CUDA 上生效。开着时特征化的子阶段计时（feat_*）不再单独出现。
+            "rollout_cudagraphs": True},
     # eval.intent 把**评测用的意图钉死**，与训练意图解耦：实验 I 用 mixed_v1 训练，评测仍走规范的
     # 跟点档，撑过率才跟 G0/H 同口径可比（锚点 / 自由档的数字用 eval_ckpt --intent 单独跑）。
     # eval.motor："train" = 评测沿用 [motor]（主判据，与训练同分布）；"off" = 评测关掉运动层。
