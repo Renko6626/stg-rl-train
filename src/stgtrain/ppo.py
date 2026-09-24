@@ -185,7 +185,7 @@ class PPO:
         # 图按这三个对象录：换了任何一个（如 gpucheck 另建 tracker）就重建，不复用旧图
         fns = self._rollout_fns
         if fns is None or not fns.matches(featurizer, reward_fn, tracker) or fns.graphs != self.rollout_graphs:
-            fns = self._rollout_fns = RolloutGraphs(featurizer, reward_fn, tracker, self.rollout_graphs, self.device)
+            fns = self._rollout_fns = RolloutGraphs(featurizer, reward_fn, tracker, self.rollout_graphs)
         return fns
 
     def rollout(self, envw, featurizer, reward_fn, tracker, timer, obs):

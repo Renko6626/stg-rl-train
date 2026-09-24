@@ -71,7 +71,7 @@ def check_rollout_graphs(cfg: dict, images, starts, featurizer, ppo: PPO, device
                               cfg["reward"]["edge_margin"], envw.frame_skip, cfg["intent"]["interval"][1])
 
     eager = RolloutGraphs(featurizer, rf, tracker(), graphs=False)
-    graphed = RolloutGraphs(featurizer, rf, tracker(), graphs=True, device=device)
+    graphed = RolloutGraphs(featurizer, rf, tracker(), graphs=True)
     worst = {"rollout_feats": (0.0, 0.0), "rollout_reward": (0.0, 0.0), "rollout_tracker": (0.0, 0.0)}
 
     def note(key, a, b):

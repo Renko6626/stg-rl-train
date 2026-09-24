@@ -146,3 +146,21 @@ def test_gpucheck_rollout_graph_check_runs_on_cpu():
     checks = check_rollout_graphs(cfg, images, [stg_rl.Start("example_ring", 0, 2)], feat, ppo, CPU)
     assert [k for k, *_ in checks] == ["rollout_feats", "rollout_reward", "rollout_tracker"]
     assert all(good for *_, good in checks)
+
+
+def test_rollout_graphs_use_only_tensordict_062_api(monkeypatch):
+    """Magnus 镜像装的是 tensordict 0.6.2，它的 CudaGraphModule 只收 (module, warmup, in_keys, out_keys)，
+    没有 0.14 的 device 参数（Job 356819cb7a21700f 就栽在这）。用只认旧签名的替身锁住。"""
+    import stgtrain.rollout_graph as rg
+
+    class OldCudaGraphModule:
+        def __init__(self, module, warmup=2, in_keys=None, out_keys=None):
+            self.module = module
+
+        def __call__(self, *args, **kwargs):
+            return self.module(*args, **kwargs)
+
+    monkeypatch.setattr(rg, "CudaGraphModule", OldCudaGraphModule)
+    cfg, envw, feat, ppo, rf, tr = setup(num_steps=2)
+    ppo.rollout_graphs = True
+    ppo.rollout(envw, feat, rf, tr, None, envw.reset())

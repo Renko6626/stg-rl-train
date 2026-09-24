@@ -17,7 +17,6 @@ from __future__ import annotations
 
 import dataclasses
 
-import torch
 from tensordict.nn import CudaGraphModule
 from torch import Tensor
 
@@ -33,7 +32,7 @@ def _pack(x) -> dict[str, Tensor]:
 
 
 class RolloutGraphs:
-    def __init__(self, featurizer, reward_fn, tracker, graphs: bool, device: torch.device | None = None):
+    def __init__(self, featurizer, reward_fn, tracker, graphs: bool):
         self.featurizer, self.reward_fn, self.tracker = featurizer, reward_fn, tracker
         self.graphs = bool(graphs)
         if not self.graphs:
@@ -48,8 +47,9 @@ class RolloutGraphs:
             new_state, entry = tracker.step(state, p, c, i, total, raw)
             return total, new_state, entry
 
-        self._feat = CudaGraphModule(feat, warmup=WARMUP, device=device)
-        self._reward_track = CudaGraphModule(reward_track, warmup=WARMUP, device=device)
+        # 只用 tensordict 0.6.2（Magnus 镜像）与 0.14（Vast）共有的参数：0.6.2 没有 device，默认当前设备
+        self._feat = CudaGraphModule(feat, warmup=WARMUP)
+        self._reward_track = CudaGraphModule(reward_track, warmup=WARMUP)
 
     def matches(self, featurizer, reward_fn, tracker) -> bool:
         return self.featurizer is featurizer and self.reward_fn is reward_fn and self.tracker is tracker
