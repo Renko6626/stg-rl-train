@@ -1,0 +1,38 @@
+# 实验 M0（2026-09-25）：M 在**新观测语义**下重训（stg_rl 0.2.0：敌人速度由引擎给出，见 experiments.md
+# 「观测语义变化」）。旧语义下的数字不能与新语义直接比，后面的实验（动作危险度特征 v6 起）都以 M0 为父。
+#
+# 与 M（exp-m-edgehug.toml）只差 env.threads = 0（取亲和性；Magnus 多跑时 train-multi.sh 按 K 平分）。
+# 同一 Job 跑 seed 1 / seed 2 两条：第一次实测种子方差，替掉「单种子噪声约 ±2pp」这个推出来的数。
+#
+# 判读：① 与 M（末 4 次均值 r2 0.807 / r3 0.589）的差距 ≤ 3pp 算「语义变化无害」，否则查瞬移 / 非匀速帧；
+#       ② 两个种子末 4 次均值之差即为以后判据用的种子噪声。
+[run]
+total_updates = 3500
+ckpt_every = 100
+eval_every = 250
+
+[env]
+num_envs = 4096
+threads = 0
+
+[intent]
+name = "mixed_v1"
+
+[featurize]
+name = "danger_topk_v5"
+
+[motor]
+enabled = true
+hold = [2, 6]
+delay = [0, 2]
+slow = true
+
+[reward.terms]
+death = 10.0
+follow_shaping = 1.0
+hold = 0.01
+segment_survived = 0.0
+key_press = -0.003
+quick_change = -0.01
+shift_toggle = 0.0
+edge_hug = -0.02

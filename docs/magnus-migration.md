@@ -27,15 +27,21 @@ Magnus（北大站点）上用 A100 跑训练，替代在 Vast.ai 租卡。本�
 | 入口 | 用途 | 结果 |
 |---|---|---|
 | `bash magnus/smoke.sh` | 环境冒烟：`gpucheck` + 两次 PPO 更新 | 训练结果包 |
-| `bash magnus/train.sh <配置> <运行名> [训练器参数]` | 正式单次训练；参数原样传给 `stgtrain.train`（`--total-updates N`、`--runs-dir PATH`、`--resume RUN_DIR`） | 训练结果包 |
+| `bash magnus/train.sh <配置> <运行名> [训练器参数]` | 正式单次训练；参数原样传给 `stgtrain.train`（`--total-updates N`、`--resume RUN_DIR`；`--runs-dir` 由脚本固定为 `runs/job-<JobID>`） | `job-<JobID>.tar.gz` |
+| `bash magnus/train-multi.sh 配置:名字[:种子] … [-- 训练器参数]` | 同一张卡并跑 K 条训练；每条 env 线程 = (亲和性核数 − 2K) / K（`THREADS=` 可覆盖），配置副本写进结果目录 | `multi-<JobID>.tar.gz`（所有 run 一个包） |
 | `bash magnus/bench.sh [配置] [名字]` | `threads × num_envs` 吞吐扫描（`stgtrain.train --bench`） | `bench.json` |
 | `[GPUCHECK=1] bash magnus/phase_probe.sh [线程数 …]` | 分阶段计时：每个线程数各跑 20 次更新，每 5 次采一次同步计时，汇总稳态帧率、各阶段中位秒数与每步计数；`GPUCHECK=1` 时先跑 gpucheck | `summary.json` + 各 run |
 | `bash magnus/graph_probe.sh` | rollout CUDA 图开 / 关 A/B（先跑 gpucheck） | `summary.json` + 各 run |
-| `bash magnus/parallel_probe.sh` | 单跑对比同卡两条并跑 | `summary.json` + 各 run |
+| `[KS="1 2 3 4"] [CONFIG=…] [UPDATES=20] bash magnus/parallel_probe.sh` | 同卡并跑 K 条的吞吐扫描（线程按 `train-multi.sh` 的同一公式分），记每条 / 合计稳态帧率与显存峰值；默认配置 `exp-m0-rebase.toml` | `summary.json` + 各 run |
+
+**结果一定交回**：`train.sh` / `train-multi.sh` / `parallel_probe.sh` 都装了 `trap EXIT`，正常结束、训练失败、
+Magnus 发 SIGTERM（终止 / 超时）三种情形都会把已有的 run 目录（含 checkpoint）打包交给 File Custody；
+收到 SIGTERM 时先停训练、写好 Result 再以 0 退出，Job 记为 Success。任一条训练失败时以非零码退出。
+共用函数在 `magnus/lib.sh`。（2026-09-25 本机 CPU 用 smoke 配置验过三种情形，上传换成桩。）
 
 ## 提交与取回
 
-用已推送的固定 commit SHA，分支为 `main`。近期测量都申请 32 核、64 GB：
+用已推送的固定 commit SHA，分支为 `main`。**优先级一律 `B2`（站点默认；用户 09-25 定，共享集群不抢 A2）**。近期测量都申请 32 核、64 GB：
 
 ```bash
 magnus job submit \
@@ -43,7 +49,7 @@ magnus job submit \
   --namespace Renko6626 --repo-name stg-rl-train \
   --branch main --commit-sha <已推送的完整 SHA> \
   --gpu-type a100 --gpu-count 1 --cpu-count 32 --memory-demand 64G \
-  --ephemeral-storage 20G --job-type A2 \
+  --ephemeral-storage 20G --job-type B2 \
   --container-image docker://pytorch/pytorch:2.5.1-cuda12.4-cudnn9-devel \
   --entry-command 'bash magnus/train.sh configs/base.toml <运行名>'
 ```
@@ -64,7 +70,7 @@ Job 完成后先用 `magnus job status <ID>` 取得 Result 中的 File Custody s
 
 1. **独立锁定 Magnus 路径**：现在由 `bootstrap.sh` 按固定版本号现装，没有锁文件。要做到不改变 Vast 的 `uv.lock`，并在运行时记录实际的 Python、PyTorch、CUDA、TensorDict 与 wheel SHA。
 2. **持久存储**：确认站点可用的持久挂载，把 `--runs-dir` 指向它。Magnus 会清理 Job 工作区，File Custody 只保留 240 分钟，不能作为正式续训的唯一存储。尚未收到本站的持久挂载路径。
-3. **失败也要交回结果**：`train.sh` 只在训练正常结束、找到结果包那一行后才上传。训练中途失败时 checkpoint 会随工作区一起丢失。应加 `trap … EXIT`，失败时把已有的 run 目录（checkpoint + metrics）打包上传，再以非零码退出。
+3. ~~**失败也要交回结果**~~：2026-09-25 已做，见「Job 入口」下的说明。
 4. **定下 `num_envs` 与训练目标**：线程数已不必手选。`threads = 0` 取亲和性，32 核 Job 上 28 与 32 线程在噪声以内。还要明确训练目标是固定环境帧数还是固定更新次数；改 `num_envs` 会改变每次更新的样本数。
 5. 若每个 Job 安装小依赖仍过慢，再按 Magnus 的镜像指南用同一锁文件 `uv sync --frozen` 预热缓存，发布专用镜像；目前先复用已缓存镜像。
 

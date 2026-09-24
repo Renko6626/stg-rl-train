@@ -1,112 +1,94 @@
 #!/usr/bin/env bash
-# Compare one training process with two concurrent processes on one A100.
+# How many concurrent trainings fit one A100 best: run K = 1, 2, … copies of one config for a few
+# updates each, record per-run and total steady throughput plus the GPU memory peak.
+#
+#   [KS="1 2 3 4"] [CONFIG=configs/exp-m0-rebase.toml] [UPDATES=20] bash magnus/parallel_probe.sh
+#
+# Env threads per run follow train-multi.sh ((affinity CPUs − 2K) / K), so the result is what
+# train-multi would actually get. Steady = median perf/sps over updates 5..UPDATES-1.
 set -euo pipefail
 source "$(dirname "$0")/bootstrap.sh"
+source "$(dirname "$0")/lib.sh"
+
+KS=${KS:-1 2 3 4}
+CONFIG=${CONFIG:-configs/exp-m0-rebase.toml}
+UPDATES=${UPDATES:-20}
+probe_dir="runs/a100-kprobe-${MAGNUS_JOB_ID:-local}"
+mkdir -p "$probe_dir"
+MAGNUS_PIDS=()
 
 python - <<'PY'
 import os
 print(f"os.cpu_count={os.cpu_count()} affinity_cpus={len(os.sched_getaffinity(0))}", flush=True)
 PY
-for cgroup_file in /sys/fs/cgroup/cpu.max /sys/fs/cgroup/cpu/cpu.cfs_quota_us \
-                   /sys/fs/cgroup/cpu/cpu.cfs_period_us /sys/fs/cgroup/cpuset.cpus.effective; do
-    if [[ -r "$cgroup_file" ]]; then
-        printf '%s=' "$cgroup_file"
-        cat "$cgroup_file"
-    fi
+nvidia-smi --query-gpu=name,memory.total --format=csv,noheader || true
+
+on_exit() {
+    local rc=$?
+    set +e
+    trap - EXIT TERM INT
+    magnus_stop_runs
+    [[ -n ${smi_pid:-} ]] && kill "$smi_pid" 2>/dev/null
+    magnus_pack_upload "$probe_dir" || echo '结果包上传失败' >&2
+    exit "$rc"
+}
+trap on_exit EXIT
+trap 'echo "收到 SIGTERM，打包已有结果" >&2; exit 0' TERM INT
+
+# Denser phase sampling than a real run; everything else is the config under test.
+python - "$CONFIG" "$probe_dir/base.toml" <<'PY'
+import sys
+
+from stgtrain.config import dump_toml, load_config
+
+dump_toml(load_config(sys.argv[1], {"log": {"perf_sync_every": 5}}), sys.argv[2])
+PY
+
+MAGNUS_TRAIN_ARGS=(--total-updates "$UPDATES")
+for k in $KS; do
+    kdir="$probe_dir/k$k"
+    threads=$(magnus_threads_for "$k")
+    specs=()
+    for i in $(seq 1 "$k"); do specs+=("$probe_dir/base.toml:k$k-r$i:$i"); done
+    nvidia-smi --query-gpu=memory.used --format=csv,noheader,nounits -l 2 > "$kdir.gpumem" 2>/dev/null &
+    smi_pid=$!
+    start=$(date +%s)
+    magnus_launch_runs "$kdir" "$threads" "${specs[@]}"
+    failed=0
+    magnus_wait_runs || failed=$?
+    MAGNUS_PIDS=()
+    echo "k=$k threads=$threads wall=$(( $(date +%s) - start ))s failed=$failed" | tee -a "$probe_dir/walls.txt"
+    kill "$smi_pid" 2>/dev/null || true
+    smi_pid=
 done
-sed -n 's/^Cpus_allowed_list:[[:space:]]*/Cpus_allowed_list=/p' /proc/self/status
 
-probe_dir="runs/a100-parallel-probe-${MAGNUS_JOB_ID:-local}"
-mkdir -p "$probe_dir"
-sed -E -e 's/^threads = 0[[:space:]].*$/threads = 28/' \
-       -e 's/^perf_sync_every = 20$/perf_sync_every = 5/' \
-       configs/base.toml > "$probe_dir/single.toml"
-sed -E -e 's/^threads = 0[[:space:]].*$/threads = 14/' \
-       -e 's/^perf_sync_every = 20$/perf_sync_every = 5/' \
-       configs/base.toml > "$probe_dir/pair-a.toml"
-sed -E -e 's/^seed = 1$/seed = 2/' \
-       -e 's/^threads = 0[[:space:]].*$/threads = 14/' \
-       -e 's/^perf_sync_every = 20$/perf_sync_every = 5/' \
-       configs/base.toml > "$probe_dir/pair-b.toml"
-
-single_start=$(date +%s)
-python -u -m stgtrain.train "$probe_dir/single.toml" single-28 \
-    --runs-dir "$probe_dir" --total-updates 20 --no-pack \
-    2>&1 | tee "$probe_dir/single.console.log"
-single_wall=$(( $(date +%s) - single_start ))
-
-pair_start=$(date +%s)
-(
-    set -o pipefail
-    python -u -m stgtrain.train "$probe_dir/pair-a.toml" pair-a-14 \
-        --runs-dir "$probe_dir" --total-updates 20 --no-pack \
-        2>&1 | tee "$probe_dir/pair-a.console.log" | sed -u 's/^/[A] /'
-) &
-pair_a_pid=$!
-(
-    set -o pipefail
-    python -u -m stgtrain.train "$probe_dir/pair-b.toml" pair-b-14 \
-        --runs-dir "$probe_dir" --total-updates 20 --no-pack \
-        2>&1 | tee "$probe_dir/pair-b.console.log" | sed -u 's/^/[B] /'
-) &
-pair_b_pid=$!
-set +e
-wait "$pair_a_pid"; pair_a_rc=$?
-wait "$pair_b_pid"; pair_b_rc=$?
-set -e
-pair_wall=$(( $(date +%s) - pair_start ))
-
-export MAGNUS_PROBE_DIR="$probe_dir" MAGNUS_SINGLE_WALL="$single_wall" MAGNUS_PAIR_WALL="$pair_wall"
-export MAGNUS_PAIR_A_RC="$pair_a_rc" MAGNUS_PAIR_B_RC="$pair_b_rc"
-python - <<'PY'
+python - "$probe_dir" "$UPDATES" <<'PY'
 import json
-import os
+import sys
 from pathlib import Path
 from statistics import median
 
-root = Path(os.environ["MAGNUS_PROBE_DIR"])
-out = {"single_wall_s": int(os.environ["MAGNUS_SINGLE_WALL"]),
-       "pair_wall_s": int(os.environ["MAGNUS_PAIR_WALL"]),
-       "pair_exit_codes": [int(os.environ["MAGNUS_PAIR_A_RC"]), int(os.environ["MAGNUS_PAIR_B_RC"])],
-       "runs": {}}
-for label in ("single-28", "pair-a-14", "pair-b-14"):
-    matches = list(root.glob(f"*-{label}"))
-    if len(matches) != 1:
-        out["runs"][label] = {"error": f"expected one run directory; found {len(matches)}"}
-        continue
-    metrics = matches[0] / "metrics.jsonl"
-    if not metrics.exists():
-        out["runs"][label] = {"error": "metrics.jsonl missing"}
-        continue
-    rows = [json.loads(line) for line in metrics.read_text().splitlines() if line]
-    steady = [row["perf/sps"] for row in rows if 5 <= row.get("update", 0) <= 19 and "perf/sps" in row]
-    perf_path = matches[0] / "perf.jsonl"
-    phases = [json.loads(line) for line in perf_path.read_text().splitlines() if line] if perf_path.exists() else []
-    phases = [row for row in phases if row.get("kind") == "phase"]
-    phase_keys = sorted({key for row in phases for key in row if key.endswith("_s")})
-    out["runs"][label] = {"updates": max((r.get("update", 0) for r in rows), default=0),
-                          "steady_median_sps": median(steady) if steady else None,
-                          "steady_rows": len(steady),
-                          "phase_samples": len(phases),
-                          "phase_median_s": {key: median(row[key] for row in phases if key in row)
-                                             for key in phase_keys}}
+root, updates = Path(sys.argv[1]), int(sys.argv[2])
+out = {"walls": (root / "walls.txt").read_text().splitlines(), "k": {}}
+for kdir in sorted(p for p in root.glob("k*") if p.is_dir()):
+    runs = {}
+    for metrics in sorted(kdir.glob("*/metrics.jsonl")):
+        rows = [json.loads(line) for line in metrics.read_text().splitlines() if line]
+        steady = [r["perf/sps"] for r in rows if 5 <= r.get("update", 0) < updates and "perf/sps" in r]
+        perf = metrics.parent / "perf.jsonl"
+        phases = [json.loads(line) for line in perf.read_text().splitlines() if line] if perf.exists() else []
+        phases = [r for r in phases if r.get("kind") == "phase"]
+        keys = sorted({k for r in phases for k in r if k.endswith("_s")})
+        runs[metrics.parent.name] = {
+            "updates": max((r.get("update", 0) for r in rows), default=0),
+            "steady_median_sps": median(steady) if steady else None,
+            "phase_median_s": {k: median(r[k] for r in phases if k in r) for k in keys},
+        }
+    mem = kdir.with_suffix(".gpumem")
+    mem_mib = [int(x) for x in mem.read_text().split() if x.isdigit()] if mem.exists() else []
+    sps = [r["steady_median_sps"] for r in runs.values() if r["steady_median_sps"]]
+    out["k"][kdir.name] = {"runs": runs, "total_sps": sum(sps) if len(sps) == len(runs) else None,
+                           "gpu_mem_peak_mib": max(mem_mib, default=None)}
 print(json.dumps(out, ensure_ascii=False, indent=2), flush=True)
 (root / "summary.json").write_text(json.dumps(out, ensure_ascii=False, indent=2) + "\n")
 PY
-
-archive="$probe_dir.tar.gz"
-tar -czf "$archive" -C runs "$(basename "$probe_dir")"
-python - "$archive" <<'PY'
-import os
-import sys
-from pathlib import Path
-import magnus
-
-secret = magnus.custody_file(sys.argv[1], expire_minutes=240)
-Path(os.environ["MAGNUS_RESULT"]).write_text(secret + "\n", encoding="utf-8")
-print("并行探测结果包已上传；secret 见 Job Result", flush=True)
-PY
-
-if (( pair_a_rc != 0 || pair_b_rc != 0 )); then
-    exit 1
-fi
