@@ -106,10 +106,44 @@ def enemy_velocity(prev_ids: Tensor, prev_xy: Tensor, cur_ids: Tensor, cur_xy: T
     same = (cur_ids[:, :, None] == prev_ids[:, None, :]) & (cur_ids[:, :, None] != 0)
     hit, idx = same.max(dim=-1)
     matched = torch.gather(prev_xy, 1, idx.unsqueeze(-1).expand(-1, -1, 2))
-    step = cur_xy - matched
+    return _diff_velocity(cur_xy - matched, hit, frame_skip, valid, teleport_px)
+
+
+def _diff_velocity(step: Tensor, hit: Tensor, frame_skip: int, valid: Tensor, teleport_px: float) -> Tensor:
     v = step / max(1, int(frame_skip))
     keep = hit & valid[:, None] & (step.abs().amax(dim=-1) <= float(teleport_px) * max(1, int(frame_skip)))
     return torch.where(keep.unsqueeze(-1), v, torch.zeros_like(v))
+
+
+ENEMY_SLOT_MASK = 0xFFFF   # 引擎 pack_handle：id = (generation << 16) | 池槽号；敌人池容量 = ENEMIES_CAP
+
+
+def _enemy_slot(ids: Tensor) -> Tensor:
+    """id → 池槽号；空行（id 0）与越界槽号一律落到第 ENEMIES_CAP 列（垃圾位）。"""
+    slot = ids & ENEMY_SLOT_MASK
+    return torch.where((ids != 0) & (slot < stg_rl.ENEMIES_CAP), slot, torch.full_like(slot, stg_rl.ENEMIES_CAP))
+
+
+def enemy_slot_table(ids: Tensor, xy: Tensor) -> tuple[Tensor, Tensor]:
+    """把一帧的敌人按池槽号摆进 `[n, ENEMIES_CAP + 1]` 的表（id 与坐标），供下一帧直接寻址。
+    垃圾位的 id 固定为 0，而活着的 id 非零，所以永远对不上。"""
+    n = ids.shape[0]
+    slot = _enemy_slot(ids)
+    t_ids = torch.zeros(n, stg_rl.ENEMIES_CAP + 1, dtype=ids.dtype, device=ids.device).scatter_(1, slot, ids)
+    t_xy = torch.zeros(n, stg_rl.ENEMIES_CAP + 1, 2, dtype=xy.dtype, device=xy.device)
+    t_xy.scatter_(1, slot.unsqueeze(-1).expand(-1, -1, 2), xy)
+    t_ids[:, stg_rl.ENEMIES_CAP] = 0
+    return t_ids, t_xy
+
+
+def enemy_velocity_by_slot(table_ids: Tensor, table_xy: Tensor, cur_ids: Tensor, cur_xy: Tensor,
+                           frame_skip: int, valid: Tensor, teleport_px: float = TELEPORT_PX) -> Tensor:
+    """与 `enemy_velocity` 逐位相同，但 O(E)：id 里带着池槽号，上一帧同一只敌直接按槽号取，
+    id 全等（槽号与代数都对上）才算同一只。`enemy_velocity` 留作语义说明与测试参照。"""
+    slot = _enemy_slot(cur_ids)
+    hit = (torch.gather(table_ids, 1, slot) == cur_ids) & (cur_ids != 0)
+    matched = torch.gather(table_xy, 1, slot.unsqueeze(-1).expand(-1, -1, 2))
+    return _diff_velocity(cur_xy - matched, hit, frame_skip, valid, teleport_px)
 
 
 _M32 = 0xFFFFFFFF
@@ -372,8 +406,9 @@ class EnvWrapper:
         self._arange_n = torch.arange(self.n, device=device)
         self._arange_e = torch.arange(stg_rl.ENEMIES_CAP, device=device)
         # 敌人速度靠按 id 差分（env 不导出）；新局第一步 valid=False，避免跨局差分
-        self._prev_enemy_ids = torch.zeros(self.n, stg_rl.ENEMIES_CAP, dtype=torch.int64, device=device)
-        self._prev_enemy_xy = torch.zeros(self.n, stg_rl.ENEMIES_CAP, 2, device=device)
+        # 上一帧的敌人按池槽号摆的表（enemy_slot_table），速度按槽号直接寻址
+        self._prev_enemy_ids = torch.zeros(self.n, stg_rl.ENEMIES_CAP + 1, dtype=torch.int64, device=device)
+        self._prev_enemy_xy = torch.zeros(self.n, stg_rl.ENEMIES_CAP + 1, 2, device=device)
         self._enemy_prev_valid = torch.zeros(self.n, dtype=torch.bool, device=device)
         self.dir_hold = torch.full((self.n,), DIR_HOLD_NEVER, dtype=torch.int64, device=device)
         self.slow_held = torch.full((self.n,), DIR_HOLD_NEVER, dtype=torch.int64, device=device)
@@ -501,10 +536,10 @@ class EnvWrapper:
             eids = _u32(en, _off("enemies", "id")).masked_fill(~live, 0)
             exy = torch.stack([ex, ey], dim=-1)
         with _phase(timer, "h2d_enemy_velocity"):
-            evel = enemy_velocity(self._prev_enemy_ids, self._prev_enemy_xy, eids, exy,
-                                  self.frame_skip, self._enemy_prev_valid)
+            evel = enemy_velocity_by_slot(self._prev_enemy_ids, self._prev_enemy_xy, eids, exy,
+                                          self.frame_skip, self._enemy_prev_valid)
+            self._prev_enemy_ids, self._prev_enemy_xy = enemy_slot_table(eids, exy)
         with _phase(timer, "h2d_enemies"):
-            self._prev_enemy_ids, self._prev_enemy_xy = eids, exy
             self._enemy_prev_valid = torch.ones_like(self._enemy_prev_valid)
             rows = torch.stack([
                 ex, ey, _fx(en, _off("enemies", "hit_w")),
