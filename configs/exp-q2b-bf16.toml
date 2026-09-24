@@ -1,0 +1,41 @@
+# 实验 Q2b（2026-09-25）：Q2 + **bf16 autocast**（ppo.amp = "bf16"）—— 精度对照
+#
+# 问题：R1a / R1b 要靠 bf16 才跑得动（fp32 单条 4–8 h）。bf16 只改数值精度（rollout 与更新的模型前向走 bf16，
+# 参数 / Adam / 损失仍 fp32），但会不会伤学习没验过。与 Q2 只差这一个开关；R1a / R1b 与它同精度比较。
+#
+# 判读：相对 Q2（末 4 次均值 r2 0.880 / r3 0.795）差在噪声内（中途种子差 5–8pp）⇒ bf16 可当默认。
+[run]
+total_updates = 3500
+ckpt_every = 100
+eval_every = 250
+
+[env]
+num_envs = 4096
+threads = 0
+
+[intent]
+name = "mixed_v1"
+
+[featurize]
+name = "danger_topk_v6"
+frame = "static"
+dt = false
+
+[motor]
+enabled = true
+hold = [2, 6]
+delay = [0, 2]
+slow = true
+
+[reward.terms]
+death = 10.0
+follow_shaping = 1.0
+hold = 0.01
+segment_survived = 0.0
+key_press = -0.003
+quick_change = -0.01
+shift_toggle = 0.0
+edge_hug = -0.02
+
+[ppo]
+amp = "bf16"
