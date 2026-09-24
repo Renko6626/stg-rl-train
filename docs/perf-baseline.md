@@ -383,3 +383,27 @@ Job `838de9effa63ee54`（B2，1 × A100、22 核），`magnus/amp_probe.sh`：�
 - **bf16 的收益随模型变重而变大**：PPO 更新 Q2 −18%、R1a −41%、R1b −46%；帧率 +11% / +37% / +55%。
 - 每层自注意力给 PPO 更新加约 1.6 s（fp32）/ 0.7 s（bf16）；env、h2d、特征化不受影响。
 - 9.18 亿帧墙钟：Q2-bf16 约 2.25 h、R1a-bf16 约 3.1 h、R1b-bf16 约 3.7 h。bf16 对**学习**的影响尚未对照（需 Q2-bf16 vs Q2）。
+
+### PPO 更新的算子级 profile（2026-09-25）
+
+Job `debea8957cf49740`，`scripts/profile_update.py`：不跑环境，随机特征喂一个训练同形状的 minibatch（32768 样本），
+编译 + CUDA 图下计时（真实耗时），再关编译用 `torch.profiler` 按算子汇总（eager，只看占比）。结果包 `runs/a100-update-profile-20260925.tar.gz`。
+
+| 每 minibatch | Q2 | R1a（1 层） | R1b（2 层） |
+|---|---:|---:|---:|
+| fp32 编译 | 33.3 ms | 83.6 ms | 132.8 ms |
+| bf16 编译 | 26.6 ms | 49.9 ms | 72.5 ms |
+
+一次更新 = 4 epoch × 8 minibatch = 32 个，与训练里 `update_s` 对得上（Q2 fp32 33.3 × 32 = 1.07 s）。每层自注意力：fp32 +50 ms、bf16 +23 ms。
+
+R1a bf16 的 eager 算子占比（GPU 时间）：
+- **LayerNorm 反向 27%**，其中 `GammaBetaBackward`（γ / β 的梯度：对 32768 × 64 = 210 万行做规约）一个 kernel 就占 **21%**；LayerNorm 前向另占 9%。
+  宽度只有 64 的 LayerNorm 在两百万行上做规约，是出名的慢路径。
+- 高效注意力（SDPA mem-efficient）的反向约 10%，不是大头。
+- 密度图卷积的权重梯度在 **bf16 下反而更慢**（Q2：6.0 → 10.5 ms / minibatch，eager），`wgrad2d_shmem_tiling_kernel<bf16>` 占 5%。
+- Adam 在 eager 下占 13%，是逐张量发射开销；编译 + CUDA 图下不是问题。
+
+候选改法（都没做，R1a / R1b 正在跑，不在中途改结构）：
+1. **LayerNorm 去掉仿射参数**（`elementwise_affine=False`）：直接消掉 `GammaBetaBackward`；γ / β 的作用能被紧随其后的线性层吸收，表达能力几乎不变。
+2. 密度图卷积不进 autocast（留 fp32）。
+3. 编译模式下的算子分解没量（Inductor 会融合 LayerNorm，eager 的占比只作方向参考）；改之前用同一脚本在编译模式下复测。
