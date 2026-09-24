@@ -233,3 +233,92 @@ def test_step_outputs_identical_with_and_without_timer():
         for f in ("player_xy", "bullets", "bullets_mask", "enemies", "enemies_mask", "target_xy", "dir_held"):
             assert torch.equal(getattr(oa, f), getattr(ob, f)), f
         assert torch.equal(ia.done, ib.done) and torch.equal(ia.refreshed, ib.refreshed)
+
+
+# ---- 敌人表只处理到 emax 的分档宽度（2026-09-24）----
+
+def enemy_rows(n, rows_per_env):
+    """手搓 [n, ENEMIES_CAP, 38] 敌人字节表。rows_per_env[i] = [(id, x, y, hit_w, collidable), ...]。"""
+    t = torch.zeros(n, stg_rl.ENEMIES_CAP, 38, dtype=torch.uint8)
+    off = lambda f: stg_rl.OFFSETS["enemies"][f][0]   # noqa: E731
+
+    def put(i, j, o, v, width):
+        t[i, j, o:o + width] = torch.tensor(list(int(v).to_bytes(width, "little", signed=width == 4 and v < 0)),
+                                            dtype=torch.uint8)
+
+    for i, rows in enumerate(rows_per_env):
+        for j, (eid, x, y, r, coll) in enumerate(rows):
+            put(i, j, off("x"), int(x * 65536), 4)
+            put(i, j, off("y"), int(y * 65536), 4)
+            put(i, j, off("hit_w"), int(r * 65536), 4)
+            put(i, j, off("flags"), 0x10 if coll else 0, 2)
+            put(i, j, off("id"), eid, 4)
+    return t
+
+
+def test_enemy_width_buckets():
+    from stgtrain.envwrap import enemy_width
+
+    assert [enemy_width(e) for e in (0, 1, 16, 17, 54, 61, 64, 65, 200, 256)] == \
+        [16, 16, 16, 32, 64, 64, 64, 128, 256, 256]
+
+
+def test_stale_enemy_rows_never_match_and_are_zeroed():
+    """Rust 只覆写前 count 行，后面是以前的陈旧行（id 非零）。本步新出现的敌人不许匹配上上一步的陈旧行。"""
+    w = ring()
+    n = w.n
+    count = lambda c: torch.full((n,), c, dtype=torch.int32)   # noqa: E731
+    # 上一步：只有 A 活着（count=1），第 1 行是很久以前的 D（陈旧，(0,0)）
+    prev = enemy_rows(n, [[(11, 0.0, 0.0, 8.0, True), (44, 0.0, 0.0, 8.0, True)]] * n)
+    w._decode_enemies(prev, count(1), 1)
+    w._enemy_prev_valid = torch.ones(n, dtype=torch.bool)
+    # 这一步：D 真的出现在第 1 行 (5, 0)；第 2 行又是陈旧垃圾
+    cur = enemy_rows(n, [[(11, 1.0, 0.0, 8.0, True), (44, 5.0, 0.0, 8.0, True), (99, 7.0, 7.0, 8.0, True)]] * n)
+    enemies, emask = w._decode_enemies(cur, count(2), 2)
+    assert enemies.shape == (n, stg_rl.ENEMIES_CAP, 6) and emask.shape == (n, stg_rl.ENEMIES_CAP)
+    assert enemies[0, 0, 4].item() == pytest.approx(1.0), "A：(0,0)→(1,0)"
+    assert enemies[0, 1, 4:6].tolist() == [0.0, 0.0], "D 上一步不在（只有陈旧行），速度记 0"
+    assert emask[0, :2].all() and not emask[0, 2:].any()
+    assert enemies[:, 2:].abs().sum() == 0, "count 之后的陈旧行清零"
+
+
+def test_narrowed_enemy_decode_matches_full_width_reference():
+    """100 只敌人 ⇒ 宽度 128；结果与在全 256 列上（按 count 屏蔽陈旧 id）算的参考一致。"""
+    from stgtrain.envwrap import _fx, _off, _u32, enemy_velocity
+
+    w = ring()
+    n = w.n
+    g = torch.Generator().manual_seed(0)
+    ids = torch.randperm(1000, generator=g)[:120] + 1
+
+    def table(shift):
+        rows = [[(int(ids[(j + shift) % 120]), float(j), 2.0 * j + shift, 8.0, j % 3 != 0) for j in range(120)]] * n
+        return enemy_rows(n, rows)
+
+    a, b = table(0), table(1)
+    w._decode_enemies(a, torch.full((n,), 100, dtype=torch.int32), 100)
+    w._enemy_prev_valid = torch.ones(n, dtype=torch.bool)
+    enemies, emask = w._decode_enemies(b, torch.full((n,), 100, dtype=torch.int32), 100)
+
+    live = torch.arange(stg_rl.ENEMIES_CAP)[None, :] < 100
+    def full(t):
+        xy = torch.stack([_fx(t, _off("enemies", "x")), _fx(t, _off("enemies", "y"))], -1)
+        return torch.where(live, _u32(t, _off("enemies", "id")), 0), xy
+    (pid, pxy), (cid, cxy) = full(a), full(b)
+    ref_v = enemy_velocity(pid, pxy, cid, cxy, 1, torch.ones(n, dtype=torch.bool)) * live[..., None]
+    assert torch.equal(enemies[..., 4:6], ref_v)
+    assert torch.equal(enemies[..., 0:2], cxy * live[..., None])
+    assert torch.equal(emask[:, :100], torch.tensor([j % 3 != 0 for j in range(100)]).expand(n, -1))
+    assert not emask[:, 100:].any()
+
+
+def test_step_records_dropped_bullets():
+    from stgtrain.perf import PhaseTimer
+
+    w = ring()
+    w.reset()
+    timer = PhaseTimer(sync_every=1, device=CPU)
+    timer.start_iteration(1)
+    w.step(still(w.n), timer)
+    row = timer.pop_iteration()
+    assert {"bullets_dropped_max", "bullets_drop_envs_max"} <= row.keys()

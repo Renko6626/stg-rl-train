@@ -31,7 +31,10 @@ rows = [json.loads(line) for line in (runs[0] / "perf.jsonl").read_text().splitl
 phases = [row for row in rows if row.get("kind") == "phase"]
 keys = sorted({key for row in phases for key in row if key.endswith("_s")})
 counts = sorted({key for row in phases for key in row if key.endswith(("_mean", "_max"))})
-summary = {"phase_samples": len(phases), "sampled_updates": [row["update"] for row in phases],
+metrics = [json.loads(line) for line in (runs[0] / "metrics.jsonl").read_text().splitlines() if line]
+steady = [r["perf/sps"] for r in metrics if 5 <= r.get("update", 0) <= 19 and "perf/sps" in r]
+summary = {"steady_median_sps": median(steady), "steady_rows": len(steady),
+           "phase_samples": len(phases), "sampled_updates": [row["update"] for row in phases],
            "median_seconds": {key: median(row[key] for row in phases if key in row) for key in keys},
            # 每步计数（弹行数、敌人数上限等）：先在一次更新的 64 步里取均值 / 最大，再对各采样更新取中位数
            "median_counts": {key: median(row[key] for row in phases if key in row) for key in counts}}

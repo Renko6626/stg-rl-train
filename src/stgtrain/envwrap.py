@@ -83,6 +83,14 @@ TELEPORT_PX = 16.0   # 单帧位移超过它 = 瞬移（不是运动），速度
 DIR_HOLD_NEVER = 1 << 20   # dir_hold 的初值 / 新局值：开局第一次变向不算连击
 
 
+ENEMY_WIDTHS = (16, 32, 64, 128, stg_rl.ENEMIES_CAP)
+
+
+def enemy_width(emax: int) -> int:
+    """敌人表本步要处理的列数：盖住 emax 的最小档。分档是为了让形状只在少数几种之间变。"""
+    return next(w for w in ENEMY_WIDTHS if w >= emax)
+
+
 def enemy_velocity(prev_ids: Tensor, prev_xy: Tensor, cur_ids: Tensor, cur_xy: Tensor,
                    frame_skip: int, valid: Tensor, teleport_px: float = TELEPORT_PX) -> Tensor:
     """按 `enemies.id` 把当前帧的敌人对上上一帧，差分出每帧速度（env 只导出坐标，不导出敌人 vx/vy）。
@@ -458,17 +466,55 @@ class EnvWrapper:
         """本步要用的缓冲一次性搬上设备。计数全取自 CPU 缓冲，不触发 GPU 同步。"""
         b, n = self.buf, self.n
         m = int(b["bullets_offsets"][n])  # CPU 缓冲，读它不触发 GPU 同步
+        emax = int(b["enemies_count"].max())
         if timer is not None:
             per_env = b["bullets_offsets"][1:] - b["bullets_offsets"][:-1]
             maybe_record(timer, "bullet_rows", m)
             maybe_record(timer, "bullets_env_max", int(per_env.max()))
-            maybe_record(timer, "enemies_max", int(b["enemies_count"].max()))
+            maybe_record(timer, "enemies_max", emax)
+            if "bullets_dropped" in b:   # 本步超出 bullets_cap 被丢掉的弹（逐 env、逐步，不累计）
+                dropped = b["bullets_dropped"]
+                maybe_record(timer, "bullets_dropped", int(dropped.sum()))
+                maybe_record(timer, "bullets_drop_envs", int((dropped > 0).sum()))
         raw = {k: self._dev(b[k]) for k in ("done", "events", "ep_frames", "start_index", "player", "enemies",
                                              "enemies_count")}
         raw["bullets"] = self._dev(b["bullets"][:m])
         raw["bullets_offsets"] = self._dev(b["bullets_offsets"])
-        raw["m"] = m
+        raw["m"], raw["emax"] = m, emax
         return raw
+
+    def _decode_enemies(self, en: Tensor, ecount: Tensor, emax: int, timer=None) -> tuple[Tensor, Tensor]:
+        """敌人字节表 → (未镜像的 [n, ENEMIES_CAP, 6], 掩码)，并推进速度差分的上一帧状态。
+
+        只在前 `enemy_width(emax)` 列上算：实测所有 env 里最多也就五六十只敌人，而表按 256 列摆
+        （A100 上速度匹配占 h2d 的 23%，见 docs/perf-baseline.md）。输出仍是满宽，特征化的 CUDA 图不受影响。
+        Rust 只覆写前 count 行、后面是以前的**陈旧行**：它们的 id 清零（不参与匹配），行本身清零。
+        拷贝仍是整表——pinned 缓冲按列切出来不连续，搬上设备前会先在 CPU 上同步整理一遍，反而更慢。
+        """
+        with _phase(timer, "h2d_enemies"):
+            ew = enemy_width(emax)
+            en = en[:, :ew]
+            live = self._arange_e[None, :ew] < ecount.to(torch.int64)[:, None]
+            eflags = _u16(en, _off("enemies", "flags"))
+            emask_w = live & ((eflags & ENEMY_FLAG_COLLIDABLE) != 0)
+            ex, ey = _fx(en, _off("enemies", "x")), _fx(en, _off("enemies", "y"))
+            eids = _u32(en, _off("enemies", "id")).masked_fill(~live, 0)
+            exy = torch.stack([ex, ey], dim=-1)
+        with _phase(timer, "h2d_enemy_velocity"):
+            evel = enemy_velocity(self._prev_enemy_ids, self._prev_enemy_xy, eids, exy,
+                                  self.frame_skip, self._enemy_prev_valid)
+        with _phase(timer, "h2d_enemies"):
+            self._prev_enemy_ids, self._prev_enemy_xy = eids, exy
+            self._enemy_prev_valid = torch.ones_like(self._enemy_prev_valid)
+            rows = torch.stack([
+                ex, ey, _fx(en, _off("enemies", "hit_w")),
+                ((eflags & ENEMY_FLAG_BOSS) != 0).to(torch.float32), evel[..., 0], evel[..., 1],
+            ], dim=-1) * live.unsqueeze(-1)
+            enemies = torch.zeros(self.n, stg_rl.ENEMIES_CAP, 6, device=self.device)
+            emask = torch.zeros(self.n, stg_rl.ENEMIES_CAP, dtype=torch.bool, device=self.device)
+            enemies[:, :ew] = rows
+            emask[:, :ew] = emask_w
+        return enemies, emask
 
     def _decode(self, raw: dict | None = None, timer=None) -> RawObs:
         raw = self._copy_in() if raw is None else raw
@@ -493,25 +539,8 @@ class EnvWrapper:
             bullets[env_idx, slot] = feats
             bmask[env_idx, slot] = collidable
 
-        with _phase(timer, "h2d_enemies"):
-            en = raw["enemies"]
-            ecount = raw["enemies_count"].to(torch.int64)
-            eflags = _u16(en, _off("enemies", "flags"))
-            emask = (self._arange_e[None, :] < ecount[:, None]) & ((eflags & ENEMY_FLAG_COLLIDABLE) != 0)
-            ex, ey = _fx(en, _off("enemies", "x")), _fx(en, _off("enemies", "y"))
-            eids = _u32(en, _off("enemies", "id"))
-            exy = torch.stack([ex, ey], dim=-1)
-        with _phase(timer, "h2d_enemy_velocity"):
-            evel = enemy_velocity(self._prev_enemy_ids, self._prev_enemy_xy, eids, exy,
-                                  self.frame_skip, self._enemy_prev_valid)
+        enemies, emask = self._decode_enemies(raw["enemies"], raw["enemies_count"], raw["emax"], timer)
         with _phase(timer, "h2d_finish"):
-            self._prev_enemy_ids, self._prev_enemy_xy = eids, exy
-            self._enemy_prev_valid = torch.ones_like(self._enemy_prev_valid)
-            enemies = torch.stack([
-                ex, ey, _fx(en, _off("enemies", "hit_w")),
-                ((eflags & ENEMY_FLAG_BOSS) != 0).to(torch.float32), evel[..., 0], evel[..., 1],
-            ], dim=-1)
-
             if hasattr(self.intent, "track"):   # 自由躲弹诊断：目标点锁自机（未镜像坐标）
                 self.intent.track(torch.stack([px, py], dim=-1))
             if hasattr(self.intent, "track_bullets"):   # 按弹幕压力切换指令的意图（未镜像坐标；只算有判定的弹）
