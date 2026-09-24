@@ -55,7 +55,7 @@ Job 完成后先用 `magnus job status <ID>` 取得 Result 中的 File Custody s
 ## 项目自有 wheel
 
 `magnus/wheels/` 放两个项目自有依赖，避免 Job 容器直连 GitHub 的不稳定性：
-- `stg_rl` 取自 `stg-engine` 的 `rl-v0.1.1` Release。2026-09-24 从 `rl-v0.1.0` 升级，内容是 VecEnv 分块修复加 `tick_steps` 遇 END 即停，观测输出不变。
+- `stg_rl` 取自 `stg-engine` 的 `rl-v0.2.0` Release（2026-09-24）。相对 0.1.1：敌人行追加 `vx`/`vy`（步长 38 → 46，训练侧改读这两列、不再按 id 差分），外加引擎第二刀的三项模拟优化（`ENGINE_VER` 23）。之前的 `rl-v0.1.1` 是 VecEnv 分块修复加 `tick_steps` 遇 END 即停。
 - `stgagent` 从 `stg-agent-proto` 的 `v0.1.0`（commit `6b61fa052640377d640e5a7ecee9641b6ac3df96`）构建。
 
 `SHA256SUMS` 固定了字节内容，更新依赖时必须一起更新 wheel 与校验和。`stg_rl` 升级时还要同步 `pyproject.toml` 与 `uv.lock`（Vast 用），两边哈希应当相同。
