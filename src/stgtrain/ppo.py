@@ -75,15 +75,25 @@ torch.set_float32_matmul_precision("high")
 
 
 class Agent(nn.Module):
-    def __init__(self, model: nn.Module):
+    """`amp_device` 非 None 时，模型前向包进该设备的 bf16 autocast，输出转回 fp32（分布、损失都在 fp32 里算）。"""
+
+    def __init__(self, model: nn.Module, amp_device: str | None = None):
         super().__init__()
         self.model = model
+        self.amp_device = amp_device
+
+    def _forward(self, feats):
+        if self.amp_device is None:
+            return self.model(feats)
+        with torch.autocast(self.amp_device, dtype=torch.bfloat16):
+            logits, value = self.model(feats)
+        return logits.float(), value.float()
 
     def get_value(self, feats):
-        return self.model(feats)[1]
+        return self._forward(feats)[1]
 
     def get_action_and_value(self, feats, action=None):
-        logits, value = self.model(feats)
+        logits, value = self._forward(feats)
         probs = Categorical(logits=logits)
         if action is None:
             action = probs.sample()
@@ -113,11 +123,12 @@ class PPO:
         self.p = cfg["ppo"]
         self.device = device
         self.num_steps = int(self.p["num_steps"])
-        self.agent = Agent(model_factory()).to(device)
+        amp_device = device.type if self.p["amp"] == "bf16" else None
+        self.agent = Agent(model_factory(), amp_device).to(device)
         # 底本：推理用一份共享参数数据、但不带梯度的副本。tensordict 0.14 的 to_module 默认
         # preserve_module_state=True，会保留参数原有的 requires_grad=True，于是 rollout 的
         # vals/logprobs 会带上 rollout 图，第二次 minibatch backward 就报「图已释放」；显式关掉。
-        self.agent_inference = Agent(model_factory()).to(device)
+        self.agent_inference = Agent(model_factory(), amp_device).to(device)
         from_module(self.agent).data.to_module(self.agent_inference)
         self.agent_inference.requires_grad_(False)
 

@@ -29,7 +29,10 @@ DEFAULTS: dict = {
             "learning_rate": 3e-4, "anneal_lr": True, "norm_adv": True, "compile": True, "cudagraphs": True,
             # rollout_cudagraphs：把每步的特征化、reward + 逐局统计各录成一张 CUDA 图（rollout_graph.py），
             # 省掉逐个小核的启动开销；只在 CUDA 上生效。开着时特征化的子阶段计时（feat_*）不再单独出现。
-            "rollout_cudagraphs": True},
+            "rollout_cudagraphs": True,
+            # amp："off" = fp32（矩阵乘走 TF32）；"bf16" = rollout 与更新的模型前向都包 bf16 autocast，
+            # 参数、Adam 与损失仍是 fp32。评测直接调模型，照旧 fp32（与部署的 fp32 ONNX 一致）。
+            "amp": "off"},
     # eval.intent 把**评测用的意图钉死**，与训练意图解耦：实验 I 用 mixed_v1 训练，评测仍走规范的
     # 跟点档，撑过率才跟 G0/H 同口径可比（锚点 / 自由档的数字用 eval_ckpt --intent 单独跑）。
     # eval.motor："train" = 评测沿用 [motor]（主判据，与训练同分布）；"off" = 评测关掉运动层。
@@ -106,6 +109,8 @@ def validate(cfg: dict) -> None:
     for k in ("total_updates", "ckpt_every", "eval_every", "torch_threads"):
         if run[k] < 1:
             raise ValueError(f"run.{k} 须 ≥ 1")
+    if ppo["amp"] not in ("off", "bf16"):
+        raise ValueError(f"ppo.amp 须为 \"off\" / \"bf16\"，得 {ppo['amp']!r}")
     if run["max_minutes"] < 0:
         raise ValueError("run.max_minutes 须 ≥ 0（0 = 不限时）")
 

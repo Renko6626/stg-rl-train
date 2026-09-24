@@ -12,6 +12,7 @@ from typing import Mapping
 
 import torch
 from torch import Tensor, nn
+from torch.nn import functional as F
 
 from ..actions import NUM_ACTIONS
 from ..registry import MODELS
@@ -26,7 +27,7 @@ def layer_init(layer, std=math.sqrt(2), bias_const=0.0):
 
 
 class SelfAttnBlock(nn.Module):
-    """Pre-LN：x + MHA(LN(x))，再 x + FFN(LN(x))。注意力手写（加性掩码）：全空的行不出 NaN，ONNX 也好导。"""
+    """Pre-LN：x + MHA(LN(x))，再 x + FFN(LN(x))。注意力走 SDPA（加性掩码）：全空的行不出 NaN。"""
 
     def __init__(self, d: int, heads: int):
         super().__init__()
@@ -39,9 +40,11 @@ class SelfAttnBlock(nn.Module):
     def forward(self, x: Tensor, mask: Tensor) -> Tensor:
         n, k, d = x.shape
         q, kk, v = self.qkv(self.ln1(x)).view(n, k, 3, self.heads, self.dk).permute(2, 0, 3, 1, 4)
-        scores = (q @ kk.transpose(-1, -2)) / math.sqrt(self.dk)
-        scores = scores.masked_fill(~mask[:, None, None, :], -1e4)
-        x = x + self.proj((scores.softmax(-1) @ v).transpose(1, 2).reshape(n, k, d))
+        # SDPA 不显式存 [n, heads, k, k] 的注意力矩阵（每层省下 GB 级显存读写）；加性掩码 −1e4 而非 −inf，
+        # 全空的行因此是均匀分布而不是 NaN。掩码按 q 的 dtype 建，bf16 autocast 下也匹配。
+        bias = (~mask).to(q.dtype)[:, None, None, :] * -1e4
+        att = F.scaled_dot_product_attention(q, kk, v, attn_mask=bias)
+        x = x + self.proj(att.transpose(1, 2).reshape(n, k, d))
         return x + self.ffn(self.ln2(x))
 
 
