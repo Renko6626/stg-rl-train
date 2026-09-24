@@ -1,0 +1,40 @@
+# 实验 Q1（2026-09-25）：M0 + **自机不动假设**（特征化 danger_topk_v6，frame = "static"）
+#
+# 问题：v5 的弹 / 敌 token 按「假想自机朝目标点走」构造——速度列、d / t、按 d 选前 64 颗三样都由这个 vp 驱动，
+# 目标点一换一起跳（同帧入选集合 Jaccard 只有 0.44）。Q1 令 vp ≡ 0：速度列 = 绝对速度，d / t 按自机不动外推，
+# token 与目标点完全无关，目标点只从 cond 进来。与 M0 只差这一个开关。
+#
+# 判读（docs/2026-09-25-dt-ablation-design.md §6）：相对 M0 差 > 2σ（σ = M0 两种子之差）才算有效应；
+# 跟点档应比锚点 / 自由档受益更多；自由档本来 vp ≡ 0，理应与 M0 持平（同时是实现正确的旁证）。
+[run]
+total_updates = 3500
+ckpt_every = 100
+eval_every = 250
+
+[env]
+num_envs = 4096
+threads = 0
+
+[intent]
+name = "mixed_v1"
+
+[featurize]
+name = "danger_topk_v6"
+frame = "static"
+dt = true
+
+[motor]
+enabled = true
+hold = [2, 6]
+delay = [0, 2]
+slow = true
+
+[reward.terms]
+death = 10.0
+follow_shaping = 1.0
+hold = 0.01
+segment_survived = 0.0
+key_press = -0.003
+quick_change = -0.01
+shift_toggle = 0.0
+edge_hug = -0.02

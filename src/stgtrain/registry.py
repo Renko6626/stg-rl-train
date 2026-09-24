@@ -45,6 +45,7 @@ BUILTIN_MODULES: list[str] = [
     "stgtrain.featurize.danger_topk_v3",
     "stgtrain.featurize.danger_topk_v4",
     "stgtrain.featurize.danger_topk_v5",
+    "stgtrain.featurize.danger_topk_v6",
     "stgtrain.reward",
     "stgtrain.models.set_attn_v1",
 ]

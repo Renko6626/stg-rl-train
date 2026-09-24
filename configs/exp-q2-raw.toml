@@ -1,0 +1,39 @@
+# 实验 Q2（2026-09-25）：Q1 + **去掉 d / t**（danger_topk_v6，frame = "static"，dt = false）
+#
+# 问题：评测时把 d / t 清零，M 从 0.82 / 0.64 掉到 0.21 / 0.08——那只说明已训好的模型依赖它；「不给 d / t 从头训」从没做过。
+# Q2 删掉 d / t 两列（弹 7 → 5 维、敌 8 → 6 维），按当前边缘距离取最近 64 颗弹 / 8 个敌、不设距离上限。与 Q1 只差这一个开关。
+#
+# 判读：2σ 内追平 Q1 ⇒ 现有结构能从原始量学会这部分几何，动作 query 用纯原始 token；
+# 明显落后 ⇒ 分「慢」还是「学不会」（u3500 是否仍在涨、u1000–3500 斜率与 Q1 比）。
+[run]
+total_updates = 3500
+ckpt_every = 100
+eval_every = 250
+
+[env]
+num_envs = 4096
+threads = 0
+
+[intent]
+name = "mixed_v1"
+
+[featurize]
+name = "danger_topk_v6"
+frame = "static"
+dt = false
+
+[motor]
+enabled = true
+hold = [2, 6]
+delay = [0, 2]
+slow = true
+
+[reward.terms]
+death = 10.0
+follow_shaping = 1.0
+hold = 0.01
+segment_survived = 0.0
+key_press = -0.003
+quick_change = -0.01
+shift_toggle = 0.0
+edge_hug = -0.02
