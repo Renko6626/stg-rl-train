@@ -3,6 +3,15 @@
 > 数据来自探测模式的结果包（`runs/probe-*.tar.gz` 里的 `bench/bench.json`、`train/env.json`、`train/perf.jsonl`）。
 > 换机器、改特征化 / 模型 / 批量之后重跑 `--probe` 并在此续表。
 
+## 性能待办（2026-09-24 优化会话收尾）
+
+截至 `7a7940d`，A100 单实验稳态约 **89k 帧/秒**。本轮起点是 64.3k，累计提升约 +38%。一次更新 1.6 s 的构成：PPO 更新 35%、h2d 25%、`env_step` 18%、特征化 9%、reward 4%、策略前向 4%。
+
+1. **bf16 autocast 用于 PPO 更新。** 32 个 minibatch 占更新的 98%（0.536 s），已经编译并录图，瓶颈应是显存带宽：弹幕编码器的激活为 `[16384, 64, 64]` fp32。做法是只在 `_update` 的前向与反向上开 autocast，参数和 Adam 状态保持 fp32。**必须带训练效果对照**：同一种子分别用 fp32 和 bf16 完整训练，比较评测曲线，可以一卡两进程同一个 Job 完成。gpucheck 的容差也要相应放宽。
+2. **超参 / 结构层面压更新耗时**：`update_epochs`、`num_minibatches`（minibatch 大小）、`k_bullets`、编码器宽度 `model.d`。每一项都会改变学习行为，归实验设计，要在 `experiments.md` 里立项。
+3. （引擎侧，已排期到下一阶段）RL 专用观测缓冲，以及模拟热点的 §2–§6：详单在 stg-engine `docs/rl-perf-roadmap.md`（F26）。预计 h2d 从约 0.4 s 降到约 0.15 s（估算）。
+4. 一卡两进程的收益要重测：+39% 是 VecEnv 分块修复之前测的，现在 `env_step` 占比小了，收益可能下降。
+
 ## 机器
 
 | 日期 | 机器 | GPU | CPU | 内存 | 驱动 / torch |
