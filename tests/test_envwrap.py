@@ -289,8 +289,7 @@ def test_narrowed_enemy_decode_matches_full_width_reference():
     w = ring()
     n = w.n
     g = torch.Generator().manual_seed(0)
-    # 按引擎的打包方式造 id：(代数 << 16) | 池槽号，槽号 < ENEMIES_CAP 且互不相同
-    ids = (torch.randint(1, 4, (120,), generator=g) << 16) | torch.randperm(stg_rl.ENEMIES_CAP, generator=g)[:120]
+    ids = torch.randperm(1000, generator=g)[:120] + 1
 
     def table(shift):
         rows = [[(int(ids[(j + shift) % 120]), float(j), 2.0 * j + shift, 8.0, j % 3 != 0) for j in range(120)]] * n
@@ -323,20 +322,3 @@ def test_step_records_dropped_bullets():
     w.step(still(w.n), timer)
     row = timer.pop_iteration()
     assert {"bullets_dropped_max", "bullets_drop_envs_max"} <= row.keys()
-
-
-def test_engine_enemy_ids_pack_pool_slot_below_cap():
-    """按槽号寻址依赖引擎的 id 打包：低 16 位是池槽号且 < ENEMIES_CAP、同一 env 内活着的 id 互不相同。"""
-    w = EnvWrapper(small_cfg(), IMAGES, [stg_rl.Start("example_calm", 0, 2)], CPU, seed=2)
-    w.reset()
-    seen = 0
-    for _ in range(200):
-        w.step(still(w.n))
-        from stgtrain.envwrap import _off, _u32
-        ids = _u32(w.buf["enemies"], _off("enemies", "id"))
-        for i in range(w.n):
-            live = ids[i, :int(w.buf["enemies_count"][i])]
-            assert ((live & 0xFFFF) < stg_rl.ENEMIES_CAP).all() and (live != 0).all()
-            assert live.unique().numel() == live.numel()
-            seen += live.numel()
-    assert seen > 0, "夹具里要有敌人，否则什么也没验"

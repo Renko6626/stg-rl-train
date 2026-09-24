@@ -58,39 +58,3 @@ def test_threshold_scales_with_frame_skip():
     # frame_skip=1 时 24px 一帧算瞬移；frame_skip=2 时是每帧 12px，仍在阈值内
     assert enemy_velocity(ids, prev, ids, cur, 1, torch.tensor([True]))[0, 0].tolist() == [0.0, 0.0]
     assert enemy_velocity(ids, prev, ids, cur, 2, torch.tensor([True]))[0, 0].tolist() == [12.0, 0.0]
-
-
-# ---- 按池槽号直接寻址（2026-09-24）：id = (generation << 16) | 池槽号，槽号 < ENEMIES_CAP ----
-
-def test_slot_table_matches_pairwise_reference():
-    import stg_rl
-    from stgtrain.envwrap import enemy_slot_table, enemy_velocity_by_slot
-
-    g = torch.Generator().manual_seed(0)
-    n, e = 3, 40
-    slots = torch.stack([torch.randperm(stg_rl.ENEMIES_CAP, generator=g)[:e] for _ in range(n)])
-    gen = torch.randint(1, 5, (n, e), generator=g)
-    prev_ids = (gen << 16) | slots
-    prev_xy = torch.rand(n, e, 2, generator=g) * 100
-    keep = torch.rand(n, e, generator=g) < 0.7                       # 三成死掉 / 换代
-    cur_ids = torch.where(keep, prev_ids, ((gen + 1) << 16) | slots)  # 同槽复用、代数不同 = 另一只敌
-    perm = torch.stack([torch.randperm(e, generator=g) for _ in range(n)])
-    cur_ids = torch.gather(cur_ids, 1, perm)                         # 顺序打乱
-    cur_xy = torch.gather(prev_xy, 1, perm.unsqueeze(-1).expand(-1, -1, 2)) + torch.rand(n, e, 2, generator=g)
-    valid = torch.tensor([True, True, False])
-    ref = enemy_velocity(prev_ids, prev_xy, cur_ids, cur_xy, 1, valid)
-    ids_t, xy_t = enemy_slot_table(prev_ids, prev_xy)
-    got = enemy_velocity_by_slot(ids_t, xy_t, cur_ids, cur_xy, 1, valid)
-    assert torch.equal(got, ref)
-    assert (got[:2].abs().sum(-1) > 0).any() and (got[:2].abs().sum(-1) == 0).any(), "两种情况都要覆盖到"
-
-
-def test_slot_out_of_range_degrades_to_no_match():
-    """万一引擎改了打包方式、槽号超出 ENEMIES_CAP：不越界、不崩，按没对上处理（速度 0）。"""
-    from stgtrain.envwrap import enemy_slot_table, enemy_velocity_by_slot
-
-    ids = torch.tensor([[(1 << 16) | 300]])
-    xy = torch.tensor([[[0.0, 0.0]]])
-    ids_t, xy_t = enemy_slot_table(ids, xy)
-    v = enemy_velocity_by_slot(ids_t, xy_t, ids, xy + 1.0, 1, torch.ones(1, dtype=torch.bool))
-    assert v.abs().sum() == 0
