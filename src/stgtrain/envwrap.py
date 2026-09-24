@@ -17,6 +17,10 @@ from . import actions
 from .perf import maybe_record
 from .registry import INTENTS
 
+_STG_RL_MIN = (0, 2, 0)   # 敌人行带 vx/vy（引擎第二刀）
+if tuple(int(x) for x in stg_rl.build_info()["version"].split(".")[:3]) < _STG_RL_MIN:
+    raise ImportError(f"stg_rl >= 0.2.0 required (敌人速度字段), got {stg_rl.build_info()['version']}")
+
 FX_SCALE = 1.0 / 65536.0
 ENEMY_FLAG_BOSS = 0x01
 ENEMY_FLAG_COLLIDABLE = 0x10
@@ -88,7 +92,6 @@ def usable_cpus() -> int:
         return os.cpu_count() or 1
 
 
-TELEPORT_PX = 16.0   # 单帧位移超过它 = 瞬移（不是运动），速度记 0
 DIR_HOLD_NEVER = 1 << 20   # dir_hold 的初值 / 新局值：开局第一次变向不算连击
 
 
@@ -98,27 +101,6 @@ ENEMY_WIDTHS = (16, 32, 64, 128, stg_rl.ENEMIES_CAP)
 def enemy_width(emax: int) -> int:
     """敌人表本步要处理的列数：盖住 emax 的最小档。分档是为了让形状只在少数几种之间变。"""
     return next(w for w in ENEMY_WIDTHS if w >= emax)
-
-
-def enemy_velocity(prev_ids: Tensor, prev_xy: Tensor, cur_ids: Tensor, cur_xy: Tensor,
-                   frame_skip: int, valid: Tensor, teleport_px: float = TELEPORT_PX) -> Tensor:
-    """按 `enemies.id` 把当前帧的敌人对上上一帧，差分出每帧速度（env 只导出坐标，不导出敌人 vx/vy）。
-
-    对不上的（新出现的敌）与 `valid=False` 的 env（新局第一步）记 0——不能拿上一局的坐标差分。
-    id 是 u32 且同一只敌在池里换槽也不变，所以按 id 匹配比按槽位稳。
-
-    **瞬移守卫**：`move_to(0, …)` 会让敌人当帧跳过去（第 5 关咲夜那六张卡把时停窗口压平后，boss
-    每轮都要跳一次，最远一跳 112px）。差分把它读成上百 px/帧的速度，`/8` 归一化后是个十几倍的
-    离群值，还会让最近接近算出「这敌人瞬间飞走了」。单帧位移超过 `teleport_px` 的一律记 0——
-    敌人正常移动远达不到这个量级（原作 boss 游走 2.5 px/帧）。
-    """
-    same = (cur_ids[:, :, None] == prev_ids[:, None, :]) & (cur_ids[:, :, None] != 0)
-    hit, idx = same.max(dim=-1)
-    matched = torch.gather(prev_xy, 1, idx.unsqueeze(-1).expand(-1, -1, 2))
-    step = cur_xy - matched
-    v = step / max(1, int(frame_skip))
-    keep = hit & valid[:, None] & (step.abs().amax(dim=-1) <= float(teleport_px) * max(1, int(frame_skip)))
-    return torch.where(keep.unsqueeze(-1), v, torch.zeros_like(v))
 
 
 _M32 = 0xFFFFFFFF
@@ -380,10 +362,6 @@ class EnvWrapper:
         self._mirror = actions.mirror_table(device)
         self._arange_n = torch.arange(self.n, device=device)
         self._arange_e = torch.arange(stg_rl.ENEMIES_CAP, device=device)
-        # 敌人速度靠按 id 差分（env 不导出）；新局第一步 valid=False，避免跨局差分
-        self._prev_enemy_ids = torch.zeros(self.n, stg_rl.ENEMIES_CAP, dtype=torch.int64, device=device)
-        self._prev_enemy_xy = torch.zeros(self.n, stg_rl.ENEMIES_CAP, 2, device=device)
-        self._enemy_prev_valid = torch.zeros(self.n, dtype=torch.bool, device=device)
         self.dir_hold = torch.full((self.n,), DIR_HOLD_NEVER, dtype=torch.int64, device=device)
         self.slow_held = torch.full((self.n,), DIR_HOLD_NEVER, dtype=torch.int64, device=device)
         env_ids = torch.arange(self.n, device=device) % self._group_k if self._group_k else None
@@ -412,7 +390,6 @@ class EnvWrapper:
         self.prev_action = torch.zeros(self.n, dtype=torch.int64, device=self.device)
         self.dir_hold = torch.full((self.n,), DIR_HOLD_NEVER, dtype=torch.int64, device=self.device)
         self.slow_held = torch.full((self.n,), DIR_HOLD_NEVER, dtype=torch.int64, device=self.device)
-        self._enemy_prev_valid = torch.zeros(self.n, dtype=torch.bool, device=self.device)
         if self.motor is not None:
             self.motor.reset_all()
         return self._decode()
@@ -465,7 +442,6 @@ class EnvWrapper:
                 self.slow_held = torch.where(ended, torch.full_like(self.slow_held, DIR_HOLD_NEVER), self.slow_held)
                 # 智能体坐标系的动作 id：镜像只在新局重抽，而新局这里清零，所以不会与镜像标志错位
                 self.prev_action = torch.where(ended, torch.zeros_like(action_ids), action_ids.to(torch.int64))
-                self._enemy_prev_valid = self._enemy_prev_valid & ~ended
                 if self.motor is not None:
                     self.motor.reset(ended)
             obs = self._decode(raw, timer)
@@ -493,11 +469,12 @@ class EnvWrapper:
         return raw
 
     def _decode_enemies(self, en: Tensor, ecount: Tensor, emax: int, timer=None) -> tuple[Tensor, Tensor]:
-        """敌人字节表 → (未镜像的 [n, ENEMIES_CAP, 6], 掩码)，并推进速度差分的上一帧状态。
+        """敌人字节表 → (未镜像的 [n, ENEMIES_CAP, 6], 掩码)。
 
-        只在前 `enemy_width(emax)` 列上算：实测所有 env 里最多也就五六十只敌人，而表按 256 列摆
-        （A100 上速度匹配占 h2d 的 23%，见 docs/perf-baseline.md）。输出仍是满宽，特征化的 CUDA 图不受影响。
-        Rust 只覆写前 count 行、后面是以前的**陈旧行**：它们的 id 清零（不参与匹配），行本身清零。
+        速度由引擎给出（本帧实际位移，瞬移不计入）——直接读 Tier 0 的 `vx`/`vy` 字段，不再靠训练侧差分。
+        只在前 `enemy_width(emax)` 列上算：实测所有 env 里最多也就五六十只敌人，而表按 256 列摆。
+        输出仍是满宽，特征化的 CUDA 图不受影响。
+        Rust 只覆写前 count 行、后面是以前的**陈旧行**：行本身清零。
         拷贝仍是整表——pinned 缓冲按列切出来不连续，搬上设备前会先在 CPU 上同步整理一遍，反而更慢。
         """
         with _phase(timer, "h2d_enemies"):
@@ -507,17 +484,10 @@ class EnvWrapper:
             eflags = _u16(en, _off("enemies", "flags"))
             emask_w = live & ((eflags & ENEMY_FLAG_COLLIDABLE) != 0)
             ex, ey = _fx(en, _off("enemies", "x")), _fx(en, _off("enemies", "y"))
-            eids = _u32(en, _off("enemies", "id")).masked_fill(~live, 0)
-            exy = torch.stack([ex, ey], dim=-1)
-        with _phase(timer, "h2d_enemy_velocity"):
-            evel = enemy_velocity(self._prev_enemy_ids, self._prev_enemy_xy, eids, exy,
-                                  self.frame_skip, self._enemy_prev_valid)
-        with _phase(timer, "h2d_enemies"):
-            self._prev_enemy_ids, self._prev_enemy_xy = eids, exy
-            self._enemy_prev_valid = torch.ones_like(self._enemy_prev_valid)
+            evx, evy = _fx(en, _off("enemies", "vx")), _fx(en, _off("enemies", "vy"))
             rows = torch.stack([
                 ex, ey, _fx(en, _off("enemies", "hit_w")),
-                ((eflags & ENEMY_FLAG_BOSS) != 0).to(torch.float32), evel[..., 0], evel[..., 1],
+                ((eflags & ENEMY_FLAG_BOSS) != 0).to(torch.float32), evx, evy,
             ], dim=-1) * live.unsqueeze(-1)
             enemies = torch.zeros(self.n, stg_rl.ENEMIES_CAP, 6, device=self.device)
             emask = torch.zeros(self.n, stg_rl.ENEMIES_CAP, dtype=torch.bool, device=self.device)

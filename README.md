@@ -42,8 +42,9 @@ uv run --frozen python -m stgtrain.export_onnx runs/<run>/checkpoints/best.pt --
 
 导出后会自动拿 onnxruntime 与 torch 对一遍 logits（偏差 > 1e-5 或 argmax 不同就退非零码）。
 支持 `danger_topk_v2` / `danger_topk_v3`，两者导出的都是**图版本 2** 的同一套签名（`enemies` 六列，
-后两列是敌人速度；v2 的图不读它们），所以同一个 DLL 能换着装。敌人速度的差分**不在图里**，
-由 C 端 `sa_model_fill` 按 id 跨帧做（口径 = `envwrap.enemy_velocity`，含 16 px 瞬移守卫）。
+后两列是敌人速度；v2 的图不读它们），所以同一个 DLL 能换着装。敌人速度不在图里：训练侧自
+`stg_rl` 0.2.0 起直接读引擎 Tier 0 的 `vx`/`vy` 字段（本帧实际位移，瞬移不计入）；C 端 `sa_model_fill`
+仍按 id 跨帧差分自己填（含 16 px 瞬移守卫），两边口径暂不一致，图是无状态的、不要求逐位相同。
 再换特征化器要在 `EXPORT_FEATURIZERS` 加一个可导出孪生；动了图签名还要两边一起 bump `GRAPH_VERSION`。`dist/` 不入库，按 `rl-vX` wheel 的先例走 Release 分发。
 
 ## 开发

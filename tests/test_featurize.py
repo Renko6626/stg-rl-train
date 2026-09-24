@@ -87,6 +87,21 @@ def test_density_counts_and_mirror_consistency():
     assert torch.allclose(b["player"][:, 0], -a["player"][:, 0])
 
 
+def test_v3_uses_enemy_velocity_in_closest_approach():
+    """danger_topk_v3（实验 G）= v2 + 敌人速度：把敌人当移动而非静止算最近接近（速度由引擎给出）。"""
+    v1 = FEATURIZERS.get("danger_topk_v1")(small_cfg())
+    v3 = FEATURIZERS.get("danger_topk_v3")(small_cfg(featurize={"name": "danger_topk_v3"}))
+    assert v3.spec()["enemies"] == (v1.spec()["enemies"][0], v1.F_ENEMY + 2)
+    # 自机在 (0,380)；敌在正上方 (0,300)，以每帧 4 px 俯冲 ⇒ 20 帧后撞上
+    o = raw_obs(n=1, player=(0.0, 380.0), target=(0.0, 380.0),
+                enemies=[[(0.0, 300.0, 16.0, 0.0, 0.0, 4.0)]])
+    f1, f3 = v1(o), v3(o)
+    d1 = f1["enemies"][0, 0, 3].item()          # v1：把敌当静止，最近距离 = 当前距离
+    d3 = f3["enemies"][0, 0, 3].item()
+    assert d1 > 0.4 and d3 < 0.05, f"v1 看不出会撞上（{d1:.3f}），v3 应预测到贴近（{d3:.3f}）"
+    assert f3["enemies"][0, 0, 6:8].tolist() == pytest.approx([0.0, 0.5]), "末两列 = 速度 / 8"
+
+
 def test_density_mirror_exact_on_cell_edges():
     # x 落在内部格线上（32 的整数倍），旧实现整颗记到右侧格，镜像后不等于左右翻转。
     xs = [0.0, -160.0, 32.0, 192.0, -192.0]

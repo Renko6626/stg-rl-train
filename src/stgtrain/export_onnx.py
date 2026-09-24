@@ -16,8 +16,9 @@
     → logits     f32[18]
 
 **图版本 2（2026-09-20）**：`enemies` 从四列加到六列，多出来的 `vx, vy` 是 `danger_topk_v3` 要的敌人速度。
-env 不导出这两个量，训练侧由 `envwrap.enemy_velocity` 按 id 差分上一帧得到；部署侧 C 端
-（契约仓 `sa_model_fill` + `sa_model_track_t`）照同一口径差分后填进来 —— **差分不在图里**，图是无状态的。
+训练侧由引擎 Tier 0 的 `vx`/`vy` 字段直接给出（`stg_rl` 0.2.0 起，本帧实际位移、瞬移不计入；此前
+按 id 差分上一帧得到，见 2026-09-24 前的历史版本）；部署侧 C 端（契约仓 `sa_model_fill` +
+`sa_model_track_t`）仍照旧按 id 差分上一帧填进来 —— **差分不在图里**，图是无状态的，两边算法不必逐位相同。
 v2 的 checkpoint 也按六列签名导出（那两列进了图没人读），所以同一个 DLL 能换着装 F 与 J 的图；
 版本 1 的旧图（四列）新 DLL 会在建会话时拒掉。
 
@@ -191,7 +192,7 @@ def deploy_inputs(obs: RawObs, env: int, *, bullets_rows: int, enemies_rows: int
                   with_held: bool = False) -> tuple[Tensor, ...]:
     """从训练侧 `RawObs` 取第 `env` 个 env，摊成图的七个输入。行数不足补零行 + 假掩码，超出则截断。
 
-    `enemies` 六列全取（后两列是 `envwrap.enemy_velocity` 差分出来的速度）。摊出来的形状与 dtype 就是 `INPUT_NAMES` 的契约，
+    `enemies` 六列全取（后两列是引擎 Tier 0 给出的速度，`stg_rl` 0.2.0 起）。摊出来的形状与 dtype 就是 `INPUT_NAMES` 的契约，
     ONNX 会话的输入校验、C 侧 `sa_model_in` 填的数组，三者必须一致。
     """
     def fit(t: Tensor, rows: int, cols: int) -> Tensor:

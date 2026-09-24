@@ -201,7 +201,7 @@ def test_reported_intent_mode_is_the_finished_episode_not_the_next_one():
     assert seen_ended, "没等到任何一局结束，测试没押到东西"
 
 
-H2D_SUBPHASES = {"h2d_copy_s", "h2d_state_s", "h2d_bullets_s", "h2d_enemies_s", "h2d_enemy_velocity_s", "h2d_finish_s"}
+H2D_SUBPHASES = {"h2d_copy_s", "h2d_state_s", "h2d_bullets_s", "h2d_enemies_s", "h2d_finish_s"}
 
 
 def test_step_reports_h2d_subphases_and_counts():
@@ -238,8 +238,10 @@ def test_step_outputs_identical_with_and_without_timer():
 # ---- 敌人表只处理到 emax 的分档宽度（2026-09-24）----
 
 def enemy_rows(n, rows_per_env):
-    """手搓 [n, ENEMIES_CAP, 38] 敌人字节表。rows_per_env[i] = [(id, x, y, hit_w, collidable), ...]。"""
-    t = torch.zeros(n, stg_rl.ENEMIES_CAP, 38, dtype=torch.uint8)
+    """手搓 [n, ENEMIES_CAP, STRIDE] 敌人字节表。
+    rows_per_env[i] = [(id, x, y, hit_w, collidable[, vx, vy]), ...]（vx/vy 缺省为 0）。"""
+    stride = stg_rl.STRIDES["enemies"]
+    t = torch.zeros(n, stg_rl.ENEMIES_CAP, stride, dtype=torch.uint8)
     off = lambda f: stg_rl.OFFSETS["enemies"][f][0]   # noqa: E731
 
     def put(i, j, o, v, width):
@@ -247,13 +249,38 @@ def enemy_rows(n, rows_per_env):
                                             dtype=torch.uint8)
 
     for i, rows in enumerate(rows_per_env):
-        for j, (eid, x, y, r, coll) in enumerate(rows):
+        for j, row in enumerate(rows):
+            eid, x, y, r, coll = row[:5]
+            vx, vy = (row[5], row[6]) if len(row) > 5 else (0.0, 0.0)
             put(i, j, off("x"), int(x * 65536), 4)
             put(i, j, off("y"), int(y * 65536), 4)
             put(i, j, off("hit_w"), int(r * 65536), 4)
             put(i, j, off("flags"), 0x10 if coll else 0, 2)
             put(i, j, off("id"), eid, 4)
+            put(i, j, off("vx"), int(vx * 65536), 4)
+            put(i, j, off("vy"), int(vy * 65536), 4)
     return t
+
+
+def test_enemy_velocity_read_from_engine_fields_and_mirrored():
+    """敌人 vx/vy 直接取 Tier 0 字段（Q16.16），镜像 env 的 vx 取负、vy 不变（Review Focus 5）。"""
+    w = ring(mirror=False)
+    n = w.n
+    t = enemy_rows(n, [[(11, 10.0, 20.0, 8.0, True, 1.5, -0.25)]] * n)
+    enemies, emask = w._decode_enemies(t, torch.full((n,), 1, dtype=torch.int32), 1)
+    assert enemies[:, 0, 4:6].tolist() == [[1.5, -0.25]] * n
+    assert emask[:, 0].all()
+    # 镜像在 _decode 里做：直接走一次完整 step，看镜像 env 的符号
+    w2 = ring(mirror=False)
+    w2.reset()
+    w2.mirrored[:] = torch.arange(w2.n) % 2 == 1
+    raw = w2._copy_in()
+    raw["enemies"] = enemy_rows(w2.n, [[(11, 10.0, 20.0, 8.0, True, 1.5, -0.25)]] * w2.n)
+    raw["enemies_count"] = torch.full((w2.n,), 1, dtype=torch.int32)
+    raw["emax"] = 1
+    obs = w2._decode(raw)
+    assert obs.enemies[0, 0, 4:6].tolist() == [1.5, -0.25]
+    assert obs.enemies[1, 0, 4:6].tolist() == [-1.5, -0.25]
 
 
 def test_enemy_width_buckets():
@@ -264,50 +291,42 @@ def test_enemy_width_buckets():
 
 
 def test_stale_enemy_rows_never_match_and_are_zeroed():
-    """Rust 只覆写前 count 行，后面是以前的陈旧行（id 非零）。本步新出现的敌人不许匹配上上一步的陈旧行。"""
+    """Rust 只覆写前 count 行，后面是以前的陈旧行（id 非零，vx/vy 可能也非零）。速度直接读字段，
+    不再靠匹配上一帧；这里只验 count 之后的陈旧行（含速度）被清零、掩码只覆盖前 count 行。"""
     w = ring()
     n = w.n
     count = lambda c: torch.full((n,), c, dtype=torch.int32)   # noqa: E731
-    # 上一步：只有 A 活着（count=1），第 1 行是很久以前的 D（陈旧，(0,0)）
-    prev = enemy_rows(n, [[(11, 0.0, 0.0, 8.0, True), (44, 0.0, 0.0, 8.0, True)]] * n)
-    w._decode_enemies(prev, count(1), 1)
-    w._enemy_prev_valid = torch.ones(n, dtype=torch.bool)
-    # 这一步：D 真的出现在第 1 行 (5, 0)；第 2 行又是陈旧垃圾
-    cur = enemy_rows(n, [[(11, 1.0, 0.0, 8.0, True), (44, 5.0, 0.0, 8.0, True), (99, 7.0, 7.0, 8.0, True)]] * n)
-    enemies, emask = w._decode_enemies(cur, count(2), 2)
+    cur = enemy_rows(n, [[
+        (11, 1.0, 0.0, 8.0, True, 1.0, 0.0),
+        (44, 5.0, 0.0, 8.0, True, -2.0, 3.0),
+        (99, 7.0, 7.0, 8.0, True, 9.0, 9.0),   # 陈旧行：count=2 之外，速度非零也要被清零
+    ]] * n)
+    enemies, emask = w._decode_enemies(cur, count(2), 3)
     assert enemies.shape == (n, stg_rl.ENEMIES_CAP, 6) and emask.shape == (n, stg_rl.ENEMIES_CAP)
-    assert enemies[0, 0, 4].item() == pytest.approx(1.0), "A：(0,0)→(1,0)"
-    assert enemies[0, 1, 4:6].tolist() == [0.0, 0.0], "D 上一步不在（只有陈旧行），速度记 0"
+    assert enemies[0, 0, 4:6].tolist() == [1.0, 0.0]
+    assert enemies[0, 1, 4:6].tolist() == [-2.0, 3.0]
     assert emask[0, :2].all() and not emask[0, 2:].any()
-    assert enemies[:, 2:].abs().sum() == 0, "count 之后的陈旧行清零"
+    assert enemies[:, 2:].abs().sum() == 0, "count 之后的陈旧行（含速度）清零"
 
 
 def test_narrowed_enemy_decode_matches_full_width_reference():
-    """100 只敌人 ⇒ 宽度 128；结果与在全 256 列上（按 count 屏蔽陈旧 id）算的参考一致。"""
-    from stgtrain.envwrap import _fx, _off, _u32, enemy_velocity
+    """100 只敌人 ⇒ 宽度 128；结果与在全 256 列上直接解码 x/y/vx/vy（按 count 屏蔽陈旧行）算的参考一致。"""
+    from stgtrain.envwrap import _fx, _off
 
     w = ring()
     n = w.n
     g = torch.Generator().manual_seed(0)
     ids = torch.randperm(1000, generator=g)[:120] + 1
 
-    def table(shift):
-        rows = [[(int(ids[(j + shift) % 120]), float(j), 2.0 * j + shift, 8.0, j % 3 != 0) for j in range(120)]] * n
-        return enemy_rows(n, rows)
-
-    a, b = table(0), table(1)
-    w._decode_enemies(a, torch.full((n,), 100, dtype=torch.int32), 100)
-    w._enemy_prev_valid = torch.ones(n, dtype=torch.bool)
+    rows = [[(int(ids[j]), float(j), 2.0 * j, 8.0, j % 3 != 0, 0.1 * j, -0.2 * j) for j in range(120)]] * n
+    b = enemy_rows(n, rows)
     enemies, emask = w._decode_enemies(b, torch.full((n,), 100, dtype=torch.int32), 100)
 
     live = torch.arange(stg_rl.ENEMIES_CAP)[None, :] < 100
-    def full(t):
-        xy = torch.stack([_fx(t, _off("enemies", "x")), _fx(t, _off("enemies", "y"))], -1)
-        return torch.where(live, _u32(t, _off("enemies", "id")), 0), xy
-    (pid, pxy), (cid, cxy) = full(a), full(b)
-    ref_v = enemy_velocity(pid, pxy, cid, cxy, 1, torch.ones(n, dtype=torch.bool)) * live[..., None]
-    assert torch.equal(enemies[..., 4:6], ref_v)
-    assert torch.equal(enemies[..., 0:2], cxy * live[..., None])
+    ref_xy = torch.stack([_fx(b, _off("enemies", "x")), _fx(b, _off("enemies", "y"))], -1)
+    ref_v = torch.stack([_fx(b, _off("enemies", "vx")), _fx(b, _off("enemies", "vy"))], -1)
+    assert torch.equal(enemies[..., 4:6], ref_v * live[..., None])
+    assert torch.equal(enemies[..., 0:2], ref_xy * live[..., None])
     assert torch.equal(emask[:, :100], torch.tensor([j % 3 != 0 for j in range(100)]).expand(n, -1))
     assert not emask[:, 100:].any()
 
