@@ -407,3 +407,21 @@ R1a bf16 的 eager 算子占比（GPU 时间）：
 1. **LayerNorm 去掉仿射参数**（`elementwise_affine=False`）：直接消掉 `GammaBetaBackward`；γ / β 的作用能被紧随其后的线性层吸收，表达能力几乎不变。
 2. 密度图卷积不进 autocast（留 fp32）。
 3. 编译模式下的算子分解没量（Inductor 会融合 LayerNorm，eager 的占比只作方向参考）；改之前用同一脚本在编译模式下复测。
+
+### 两个开关的编译模式复测（2026-09-25）
+
+Job `64df95e17162a3e5`，R1a bf16，编译 + CUDA 图下每 minibatch（32768 样本）耗时；结果包 `runs/a100-update-profile-opt-20260925.tar.gz`：
+
+| 组合 | 编译 | 相对原样 | eager（仅参考） |
+|---|---:|---:|---:|
+| 原样 | 49.1 ms | — | 117.0 ms |
+| `ln_affine = false` | 48.0 ms | −2% | 94.4 ms |
+| `density_fp32 = true` | 45.2 ms | −8% | 114.0 ms |
+| 两个都开 | 44.2 ms | **−10%** | 91.4 ms |
+
+- **eager 的占比夸大了 LayerNorm**：eager 下去仿射省 20%，编译后只省 2% —— Inductor 已经把 LayerNorm 的前向 / 反向（含 γ / β 规约）融合得不错。
+  教训：**性能决策要看编译模式下的数**，eager profile 只能指方向。
+- 密度卷积留 fp32 是实打实的 −8%（与 eager 下 bf16 wgrad 变慢一致）。
+- 两个都开，每次更新省约 0.16 s（32 × 4.9 ms），端到端约 **−5%**。
+- 取舍：`density_fp32` 只提高精度、不改结构，风险最低 —— 采用；`ln_affine = false` 只值 2%，却改了结构（要一条学习对照才能用）—— 不值得，不采用。
+- R1a 比 Q2 每 minibatch 多出的 22.5 ms（bf16）在编译模式下花在哪，要用编译模式的 profile（Triton kernel 名）才看得清，未做。
