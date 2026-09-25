@@ -677,6 +677,9 @@ rank 16 下的修正量（`Enemy.hpp` 的 `BulletRank*Inner`，C 整数除法向
 - `f1 < 0`（保持原速）且一次开火里各层速度不同 → 按层拆成多个发射器 / 多个 xformdef。
 - `0x1` 与 `0x10` 叠加（如 `flags = 19`）：`0x10` 的计时也从出生算起，`@D` 写成 `@(D−16)` 接在冲刺之后：
   `add_speed(5.0fx); @16 set_accel(-0.3125fx); @(D-16) set_accel(f0); stop_fx();`（`D−16` 请算成数字）。
+- `0x1` 与 `0x20` 叠加（如 `flags = 37`）同理：`0x1` 与 `0x10/0x20` 在 `BulletManager.cpp:711-747` 是 `if … else if` 链，
+  **冲刺的 16 帧里 `0x20` 的逐帧加速 / 转向不生效**，冲刺结束才开始（计时仍从出生算，共 `i0` 帧）：
+  `add_speed(5.0fx); @16 set_accel(-0.3125fx); set_accel(f0); set_ang_vel(f1); @(i0-16) stop_fx();`（2026-09-25 抽检 s4_b8：卡在冲刺期就开始转，多转约 11°）。
 - 反弹后改速度、反弹 > 3 次：做不到，近似并在 report 写明。
 - **`f0` / `f1` 是运行期变量**（`%F0`、`%PLAYER_ANGLE`、循环累加量……）：TH06 在**建弹时**把值拷进每颗弹
   （`BulletManager.cpp:345-356`），所以**同一条 `bullet_*` 的弹共享一个值**。按下面的顺序选：
@@ -860,7 +863,7 @@ TH06 三种移动模式（`EclManager.cpp:933-977`）：
 | `move_position_time_*(t, x, y, _)` | `move_to(t, (x−192) fx, y fx, E);` |
 | `move_dir_time_*(t, a, s)` | 位移 `s·t/2` 沿 `a`：`move_to(t, $self_x + cos(a) * d, $self_y + sin(a) * d, E);`，`d = s * t / 2` |
 | `move_time_*(t)` | 用**当前** `ang`/`spd`，同上 |
-| `move_bounds_set(x0, y0, x1, y1)` | 记下边界（换算 x），供 `wander` 反射与夹紧目标点 |
+| `move_bounds_set(x0, y0, x1, y1)` | 记下边界（换算 x），供 `wander` 反射与夹紧目标点。**原作是每帧把位置夹进边界**（`Enemy::ClampPos`，`EnemyManager.cpp:469-490`，每帧 `:542/:571` 调用），不只是夹目标点：`move_to` 的目标点**必须**先夹进边界（到界即停的路径差是接受的近似，写进 report）；速度模式（`move_vel`）会越界时同样要处理（逐帧检查、到界停住），不能放任走出边界 |
 | `move_bounds_disable` | 不再夹紧 |
 
 缓动 `E`（`EclManager.cpp:949-966`）：`linear` → `0`；`decelerate` → `2`（QuadOut）；
