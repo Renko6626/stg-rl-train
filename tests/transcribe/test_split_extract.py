@@ -203,3 +203,13 @@ def test_write_unit(tmp_path, ecl, monkeypatch):
     assert json.loads((d / "unit.json").read_text())["id"] == "th06_s1_w01"
     ex = (d / "mapping-excerpt.md").read_text()
     assert "## §7 移动" in ex and "§0 口径" in ex
+
+
+def test_bullet_effects_floats_not_annotated_as_certain_angles():
+    """f0/f1 的量纲看 flags（mapping §5）：加速度 0.05 不能被标成角度；π/2 这种 BAM 整数仍提示（非确定）。"""
+    from stgtranscribe import extract as X
+    e = parse("sub Sub0()\n{\n    bullet_effects(40, 1, -1, -1, 0.05f, 1.5f, -1.0f, -1.0f);\n"
+              "    bullet_effects(40, 1, -1, -1, 1.5707964f, 1.5f, -1.0f, -1.0f);\n}\n")
+    accel, turn = (X.annotate(i) for i in e.subs["Sub0"].instrs)
+    assert "a4=" not in accel and "a5=" not in accel and "量纲看 flags" in accel
+    assert "a4=90°=16384bam" in turn

@@ -25,11 +25,13 @@ ANGLE_ARGS: dict[str, tuple[int, ...]] = {
     "move_velocity": (0,), "move_angular_velocity": (0,), "move_rand": (0, 1), "move_rand_in_bounds": (0, 1),
     "move_at_player": (0,), "move_dir_time_decelerate": (1,), "move_dir_time_decelerate_fast": (1,),
     "move_dir_time_accelerate": (1,), "move_dir_time_accelerate_fast": (1,), "shoot_offset_polar": (0,),
-    "bullet_effects": (4, 5),
 }
 MAYBE_ANGLE_ARGS: dict[str, tuple[int, ...]] = {
     "set_float": (1,), "math_float_add": (2,), "math_float_sub": (2,), "set_float_rand_bound": (1,),
     "set_float_rand_bound_min": (1, 2), "cmp_float": (1,), "call": (2,),
+    # f0 / f1 的量纲取决于后面 bullet_* 的 flags（mapping §5）：0x40/0x80/0x100 时 f0 是角、f1 是速度；
+    # 0x10 时 f0 是加速度、f1 是角；0x20 时 f0 是速度增量、f1 是角增量。所以只标「若为角度」，不当确定角度。
+    "bullet_effects": (4, 5),
 }
 X_ARGS: dict[str, tuple[int, ...]] = {
     "enemy_create": (1,), "enemy_create_mirror": (1,), "enemy_create_random": (1,), "enemy_create_mirror_random": (1,),
@@ -68,6 +70,8 @@ def annotate(i: Instr) -> str:
             v = U._float(i.args[idx]) if idx < len(i.args) else None
             if v is not None and (n := _angle_note(v, strict)):
                 notes.append(f"a{idx}={n}")
+    if i.name == "bullet_effects":
+        notes.append("f0/f1 量纲看 flags(§5)")
     if i.name in U.BULLET_OPS and i.args:
         sp = config.th06_config()["sprites"].get(i.args[0])
         if sp:
