@@ -4,6 +4,11 @@
 
 `model.sa_layers`（默认 0，实验 R1a / R1b）：弹编码器在逐颗 MLP 之后、三路汇总之前插入 N 个 Pre-LN 自注意力 block，
 让每颗弹的 token 看得到其它弹（缝、通道这类局部结构）。0 = 原模型，模块、初始化顺序与前向逐位不变。敌人编码器不加。
+
+两个性能开关（默认 = 旧行为，R1a 的 checkpoint 照常加载、数值照常复现；见 docs/perf-baseline.md「PPO 更新的算子级 profile」）：
+- `model.ln_affine = false`：自注意力 block 的 LayerNorm 不带 γ / β。γ / β 的梯度要对 210 万行（32768 样本 × 64 颗）规约，
+  是 PPO 更新里最贵的单个 kernel；其作用能被紧随其后的线性层吸收。
+- `model.density_fp32 = true`：密度图卷积在 autocast 之外用 fp32 跑（bf16 下卷积的权重梯度反而更慢）。
 """
 from __future__ import annotations
 
@@ -29,10 +34,11 @@ def layer_init(layer, std=math.sqrt(2), bias_const=0.0):
 class SelfAttnBlock(nn.Module):
     """Pre-LN：x + MHA(LN(x))，再 x + FFN(LN(x))。注意力走 SDPA（加性掩码）：全空的行不出 NaN。"""
 
-    def __init__(self, d: int, heads: int):
+    def __init__(self, d: int, heads: int, ln_affine: bool = True):
         super().__init__()
         self.heads, self.dk = heads, d // heads
-        self.ln1, self.ln2 = nn.LayerNorm(d), nn.LayerNorm(d)
+        self.ln1 = nn.LayerNorm(d, elementwise_affine=ln_affine)
+        self.ln2 = nn.LayerNorm(d, elementwise_affine=ln_affine)
         self.qkv = layer_init(nn.Linear(d, 3 * d), std=1.0)
         self.proj = layer_init(nn.Linear(d, d), std=1.0)
         self.ffn = nn.Sequential(layer_init(nn.Linear(d, 2 * d)), nn.ReLU(), layer_init(nn.Linear(2 * d, d), std=1.0))
@@ -49,7 +55,7 @@ class SelfAttnBlock(nn.Module):
 
 
 class SetEncoder(nn.Module):
-    def __init__(self, f_in: int, d: int, heads: int, ctx_dim: int, sa_layers: int = 0):
+    def __init__(self, f_in: int, d: int, heads: int, ctx_dim: int, sa_layers: int = 0, ln_affine: bool = True):
         super().__init__()
         self.phi = nn.Sequential(layer_init(nn.Linear(f_in, d)), nn.ReLU(), layer_init(nn.Linear(d, d)), nn.ReLU())
         self.heads, self.dk = heads, d // heads
@@ -58,7 +64,7 @@ class SetEncoder(nn.Module):
         self.v = layer_init(nn.Linear(d, d))
         self.out_dim = 3 * d
         if sa_layers:   # 0 时不建这个子模块：state_dict 与初始化顺序和旧模型逐位相同
-            self.sa = nn.ModuleList(SelfAttnBlock(d, heads) for _ in range(sa_layers))
+            self.sa = nn.ModuleList(SelfAttnBlock(d, heads, ln_affine) for _ in range(sa_layers))
 
     def forward(self, x: Tensor, mask: Tensor, ctx: Tensor) -> Tensor:
         n, k, _ = x.shape
@@ -95,7 +101,8 @@ class SetAttnV1(nn.Module):
         f_p, f_c = spec["player"][0], spec["cond"][0]
         c_d, h_d, w_d = spec["density"]
         self.ctx = nn.Sequential(layer_init(nn.Linear(f_p + f_c, d)), nn.ReLU())
-        self.bullets = SetEncoder(f_b, d, heads, d, sa_layers)
+        self.bullets = SetEncoder(f_b, d, heads, d, sa_layers, bool(m.get("ln_affine", True)))
+        self.density_fp32 = bool(m.get("density_fp32", False))
         self.enemies = SetEncoder(f_e, d, heads, d)
         self.density = nn.Sequential(
             layer_init(nn.Conv2d(c_d, 16, 3, padding=1)), nn.ReLU(),
@@ -116,6 +123,10 @@ class SetAttnV1(nn.Module):
         ctx = self.ctx(torch.cat([feats["player"], feats["cond"]], dim=-1))
         hb = self.bullets(feats["bullets"], feats["bullets_mask"], ctx)
         he = self.enemies(feats["enemies"], feats["enemies_mask"], ctx)
-        hd = self.dens_proj(self.density(feats["density"]))
+        if self.density_fp32:
+            with torch.autocast(feats["density"].device.type, enabled=False):
+                hd = self.dens_proj(self.density(feats["density"].float()))
+        else:
+            hd = self.dens_proj(self.density(feats["density"]))
         h = self.trunk(torch.cat([hb, he, hd, ctx], dim=-1))
         return self.actor(h), self.critic(h).squeeze(-1)

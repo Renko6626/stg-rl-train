@@ -6,6 +6,9 @@
   2. 关掉编译与 CUDA 图（否则整段是一次图重放、看不到算子），用 torch.profiler 按算子汇总 GPU 时间。
 
     python scripts/profile_update.py OUT_DIR configs/exp-q2-raw.toml configs/exp-r1a-sa1.toml …
+    python scripts/profile_update.py OUT_DIR "configs/exp-r1a-sa1.toml+model.ln_affine=false+model.density_fp32=true"
+
+每个参数可带 `+节.键=值`（值按 TOML 解析）覆盖配置，结果名里带上覆盖项。
 """
 from __future__ import annotations
 
@@ -13,6 +16,7 @@ import json
 import os
 import sys
 import time
+import tomllib
 from pathlib import Path
 
 import torch
@@ -50,8 +54,24 @@ def minibatch(cfg: dict, spec: dict, device) -> TensorDict:
                       returns=torch.randn(n, device=device), vals=torch.randn(n, device=device), batch_size=[n])
 
 
-def build(path: str, amp: str, fast: bool, device):
-    over = {"ppo": {"amp": amp, "compile": fast, "cudagraphs": fast}, "run": {"device": device.type}}
+def parse_spec(spec: str) -> tuple[str, dict, str]:
+    """`path+a.b=v+…` → (path, 覆盖字典, 结果名)。"""
+    path, *items = spec.split("+")
+    over: dict = {}
+    for item in items:
+        key, value = item.split("=", 1)
+        *parents, leaf = key.split(".")
+        node = over
+        for part in parents:
+            node = node.setdefault(part, {})
+        node[leaf] = tomllib.loads(f"v = {value}")["v"]
+    tag = "".join(f"+{i.split('.')[-1]}" for i in items)
+    return path, over, Path(path).stem + tag
+
+
+def build(spec: str, amp: str, fast: bool, device):
+    path, extra, _ = parse_spec(spec)
+    over = deep_merge(extra, {"ppo": {"amp": amp, "compile": fast, "cudagraphs": fast}, "run": {"device": device.type}})
     cfg = from_dict(deep_merge(load_config(path), over))
     feat = FEATURIZERS.get(cfg["featurize"]["name"])(cfg)
     ppo = PPO(cfg, lambda: MODELS.get(cfg["model"]["name"])(cfg, feat.spec()), device)
@@ -95,9 +115,10 @@ def main(argv: list[str]) -> int:
     load_builtins()
     device = DEVICE
     summary = {}
+    amps = os.environ.get("AMPS", "off bf16").split()
     for path in paths:
-        for amp in ("off", "bf16"):
-            name = f"{Path(path).stem}-{amp}"
+        for amp in amps:
+            name = f"{parse_spec(path)[2]}-{amp}"
             _, fast, mb = build(path, amp, True, device)
             ms = timed_ms(fast, mb)
             del fast

@@ -83,3 +83,40 @@ def test_gradients_reach_every_parameter(layers):
 def test_negative_layers_rejected():
     with pytest.raises(ValueError):
         build(-1)
+
+
+def build_opts(**model):
+    cfg = small_cfg(model={"sa_layers": 1, **model},
+                    featurize={"name": "danger_topk_v6", "frame": "static", "dt": False})
+    feat = FEATURIZERS.get("danger_topk_v6")(cfg)
+    torch.manual_seed(0)
+    return feat, MODELS.get("set_attn_v1")(cfg, feat.spec())
+
+
+def test_ln_affine_default_keeps_gamma_beta():
+    _, net = build_opts()
+    assert any(k.endswith("ln1.weight") for k in net.state_dict())
+
+
+def test_ln_affine_off_drops_gamma_beta_and_still_trains():
+    feat, net = build_opts(ln_affine=False)
+    assert not any(".ln1." in k or ".ln2." in k for k in net.state_dict())
+    logits, value = net(feat(busy_obs()))
+    (logits.sum() + value.sum()).backward()
+    assert [n for n, p in net.named_parameters() if p.grad is None] == []
+
+
+def test_density_fp32_runs_outside_autocast():
+    feat, net = build_opts(density_fp32=True)
+    f = feat(busy_obs())
+    seen = []
+    net.density.register_forward_hook(lambda m, i, o: seen.append(o.dtype))
+    with torch.autocast("cpu", dtype=torch.bfloat16):
+        logits, _ = net(f)
+    assert seen == [torch.float32] and torch.isfinite(logits).all()
+    feat, net = build_opts()
+    seen.clear()
+    net.density.register_forward_hook(lambda m, i, o: seen.append(o.dtype))
+    with torch.autocast("cpu", dtype=torch.bfloat16):
+        net(f)
+    assert seen == [torch.bfloat16], "默认仍随 autocast（R1a 的数值不变）"
