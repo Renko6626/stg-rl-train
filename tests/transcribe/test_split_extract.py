@@ -222,3 +222,11 @@ def test_bullet_effects_floats_not_annotated_as_certain_angles():
     accel, turn = (X.annotate(i) for i in e.subs["Sub0"].instrs)
     assert "a4=" not in accel and "a5=" not in accel and "量纲看 flags" in accel
     assert "a4=90°=16384bam" in turn
+
+
+def test_excerpt_with_bullet_ops_includes_section5():
+    """用到发弹指令就带上 §5：flags 低位（出生冲刺等）的语义在 §5（s4_w17 便笺）。"""
+    from stgtranscribe import config, mapping as M
+    text = (config.TH06_DIR / "mapping.md").read_text(encoding="utf-8")
+    ex = M.excerpt(text, {"bullet_fan_aimed"})
+    assert "## §5" in ex

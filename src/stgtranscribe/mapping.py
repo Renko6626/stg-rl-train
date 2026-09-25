@@ -62,6 +62,10 @@ def excerpt(text: str, names: set[str]) -> str:
     ]
     if unknown:
         parts.append("⚠️ 对照表里没有这些指令（report 里写 blocked）：" + ", ".join(f"`{u}`" for u in unknown) + "\n")
+    # bullet_* 的 flags 低位（出生冲刺 0x1 / 出生特效）和 0x10… 族的语义在 §5，不只在 §4：
+    # 用到发弹指令就一并带上 §5（2026-09-26 s4_w17 便笺：摘录缺 §5 但 flags 需要它）。
+    if "§4" in need:
+        need.add("§5")
     for sec in sorted(need, key=lambda s: int(s[1:])):
         if sec in secs:
             parts.append(secs[sec])
