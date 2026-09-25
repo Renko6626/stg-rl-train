@@ -9,6 +9,10 @@
 - `model.ln_affine = false`：自注意力 block 的 LayerNorm 不带 γ / β。γ / β 的梯度要对 210 万行（32768 样本 × 64 颗）规约，
   是 PPO 更新里最贵的单个 kernel；其作用能被紧随其后的线性层吸收。
 - `model.density_fp32 = true`：密度图卷积在 autocast 之外用 fp32 跑（bf16 下卷积的权重梯度反而更慢）。
+
+`model.action_query = true`（实验 R2）：策略头换成 18 路动作 query —— 每个动作一个 query（可学嵌入 + 该动作的物理量 +
+主干输出），对弹 token（自注意力之后、池化之前）做交叉注意力，再各自出一个 logit。价值头不变，仍从主干出。
+动作的物理量从 v5 / v6 的 `player` 向量里取（上一步执行的方向 one-hot、低速位、两个 held），所以只支持 15 维的 player。
 """
 from __future__ import annotations
 
@@ -20,6 +24,30 @@ from torch import Tensor, nn
 from torch.nn import functional as F
 
 from ..actions import NUM_ACTIONS
+
+# 动作表 v1（actions.py）：action = 方向 × 2 + 低速；方向 0 不动、1 上、2 右上、3 右 … 顺时针到 8 左上。屏幕 y 向下为正。
+_DIR_VEC = [(0.0, 0.0), (0.0, -1.0), (1.0, -1.0), (1.0, 0.0), (1.0, 1.0), (0.0, 1.0), (-1.0, 1.0), (-1.0, 0.0), (-1.0, -1.0)]
+PLAYER_V5_DIM = 15          # x, y, focus · 上一步方向 one-hot 9 · 上一步低速位 · dir_held · slow_held
+_P_DIR, _P_SLOW, _P_DIR_HELD, _P_SLOW_HELD = 3, 12, 13, 14
+AQ_PHYS = 7                 # dx, dy, 低速, 与当前方向相同, 与当前低速位相同, dir_held, slow_held
+
+
+def _action_tables(device=None) -> tuple[Tensor, Tensor, Tensor]:
+    vec = torch.tensor(_DIR_VEC)
+    vec = vec / vec.norm(dim=-1, keepdim=True).clamp_min(1.0)
+    idx = torch.arange(NUM_ACTIONS) // 2
+    return vec[idx].to(device), (torch.arange(NUM_ACTIONS) % 2).float().to(device), idx.to(device)
+
+
+def action_physics(player: Tensor, tables: tuple[Tensor, Tensor, Tensor] | None = None) -> Tensor:
+    """[n, 15] 的 player 向量 → [n, 18, 7] 每个动作的物理量。`tables` 由调用方以 buffer 形式传入（CUDA 图里不能现建常量）。"""
+    vec, slow, dir_idx = tables if tables is not None else _action_tables(player.device)
+    n = player.shape[0]
+    same_dir = player[:, _P_DIR:_P_DIR + 9].gather(1, dir_idx[None, :].expand(n, -1))
+    same_slow = 1.0 - (player[:, _P_SLOW:_P_SLOW + 1] - slow[None, :]).abs()
+    held = player[:, _P_DIR_HELD:_P_SLOW_HELD + 1][:, None, :].expand(n, NUM_ACTIONS, 2)
+    return torch.cat([vec[None].expand(n, -1, -1).to(player.dtype), slow[None, :, None].expand(n, -1, 1).to(player.dtype),
+                      same_dir.unsqueeze(-1), same_slow.unsqueeze(-1), held], dim=-1)
 from ..registry import MODELS
 
 _KEYS = ("bullets", "bullets_mask", "enemies", "enemies_mask", "density", "player", "cond")
@@ -66,11 +94,17 @@ class SetEncoder(nn.Module):
         if sa_layers:   # 0 时不建这个子模块：state_dict 与初始化顺序和旧模型逐位相同
             self.sa = nn.ModuleList(SelfAttnBlock(d, heads, ln_affine) for _ in range(sa_layers))
 
-    def forward(self, x: Tensor, mask: Tensor, ctx: Tensor) -> Tensor:
-        n, k, _ = x.shape
+    def tokens(self, x: Tensor, mask: Tensor) -> Tensor:
+        """逐颗 MLP（+ 自注意力）之后、池化之前的 token。"""
         h = self.phi(x)
         for block in getattr(self, "sa", ()):
             h = block(h, mask) * mask.unsqueeze(-1).to(h.dtype)   # padding 行归零，不带进下一层
+        return h
+
+    def forward(self, x: Tensor, mask: Tensor, ctx: Tensor, h: Tensor | None = None) -> Tensor:
+        n, k, _ = x.shape
+        if h is None:
+            h = self.tokens(x, mask)
         m = mask.unsqueeze(-1).to(h.dtype)
         cnt = m.sum(1)
         any_ = (cnt > 0).to(h.dtype)
@@ -83,6 +117,37 @@ class SetEncoder(nn.Module):
         scores = scores.masked_fill(~mask[:, None, None, :], -1e4)
         attn = (scores.softmax(-1) @ vv).reshape(n, -1) * any_
         return torch.cat([mean, mx, attn], dim=-1)
+
+
+class ActionQueryHead(nn.Module):
+    """18 路动作 query → 对弹 token 交叉注意力 → 每个动作一个 logit（实验 R2）。"""
+
+    def __init__(self, d: int, heads: int, trunk_dim: int):
+        super().__init__()
+        self.heads, self.dk = heads, d // heads
+        self.emb = nn.Parameter(torch.randn(NUM_ACTIONS, d) * 0.1)
+        self.phys = layer_init(nn.Linear(AQ_PHYS, d), std=1.0)
+        self.ctx = layer_init(nn.Linear(trunk_dim, d), std=1.0)
+        self.ln = nn.LayerNorm(d)
+        self.q = layer_init(nn.Linear(d, d), std=1.0)
+        self.kv = layer_init(nn.Linear(d, 2 * d), std=1.0)
+        self.o = layer_init(nn.Linear(d, d), std=1.0)
+        self.head = nn.Sequential(layer_init(nn.Linear(2 * d, d)), nn.ReLU(), layer_init(nn.Linear(d, 1), std=0.01))
+        vec, slow, idx = _action_tables()
+        self.register_buffer("dir_vec", vec, persistent=False)
+        self.register_buffer("slow_bit", slow, persistent=False)
+        self.register_buffer("dir_idx", idx, persistent=False)
+
+    def forward(self, tokens: Tensor, mask: Tensor, trunk_h: Tensor, player: Tensor) -> Tensor:
+        n, k, d = tokens.shape
+        phys = action_physics(player, (self.dir_vec, self.slow_bit, self.dir_idx))
+        q0 = self.ln(self.emb[None] + self.phys(phys) + self.ctx(trunk_h)[:, None, :])          # [n, 18, d]
+        q = self.q(q0).view(n, NUM_ACTIONS, self.heads, self.dk).transpose(1, 2)
+        kk, vv = self.kv(tokens).view(n, k, 2, self.heads, self.dk).permute(2, 0, 3, 1, 4)
+        bias = (~mask).to(q.dtype)[:, None, None, :] * -1e4
+        att = F.scaled_dot_product_attention(q, kk, vv, attn_mask=bias).transpose(1, 2).reshape(n, NUM_ACTIONS, d)
+        att = att * mask.any(dim=1).to(att.dtype)[:, None, None]      # 一颗弹都没有：别读 padding
+        return self.head(torch.cat([self.o(att), q0], dim=-1)).squeeze(-1)
 
 
 @MODELS.register("set_attn_v1")
@@ -113,15 +178,23 @@ class SetAttnV1(nn.Module):
         in_dim = self.bullets.out_dim + self.enemies.out_dim + 2 * d
         self.trunk = nn.Sequential(layer_init(nn.Linear(in_dim, trunk)), nn.ReLU(),
                                    layer_init(nn.Linear(trunk, trunk)), nn.ReLU())
-        self.actor = layer_init(nn.Linear(trunk, NUM_ACTIONS), std=0.01)
+        self.action_query = bool(m.get("action_query", False))
+        if self.action_query:
+            if f_p != PLAYER_V5_DIM:
+                raise ValueError(f"model.action_query 要 v5 / v6 那种 {PLAYER_V5_DIM} 维的 player 向量，得 {f_p} 维")
+        else:   # 开了动作 query 就不建旧的 actor（否则它的参数永远没有梯度）
+            self.actor = layer_init(nn.Linear(trunk, NUM_ACTIONS), std=0.01)
         self.critic = layer_init(nn.Linear(trunk, 1), std=1.0)
+        if self.action_query:
+            self.aq = ActionQueryHead(d, heads, trunk)
 
     def requires(self) -> dict[str, tuple[int, ...]]:
         return dict(self._spec)
 
     def forward(self, feats: Mapping[str, Tensor]) -> tuple[Tensor, Tensor]:
         ctx = self.ctx(torch.cat([feats["player"], feats["cond"]], dim=-1))
-        hb = self.bullets(feats["bullets"], feats["bullets_mask"], ctx)
+        tok = self.bullets.tokens(feats["bullets"], feats["bullets_mask"])
+        hb = self.bullets(feats["bullets"], feats["bullets_mask"], ctx, tok)
         he = self.enemies(feats["enemies"], feats["enemies_mask"], ctx)
         if self.density_fp32:
             with torch.autocast(feats["density"].device.type, enabled=False):
@@ -129,4 +202,8 @@ class SetAttnV1(nn.Module):
         else:
             hd = self.dens_proj(self.density(feats["density"]))
         h = self.trunk(torch.cat([hb, he, hd, ctx], dim=-1))
-        return self.actor(h), self.critic(h).squeeze(-1)
+        if self.action_query:
+            logits = self.aq(tok, feats["bullets_mask"], h, feats["player"])
+        else:
+            logits = self.actor(h)
+        return logits, self.critic(h).squeeze(-1)

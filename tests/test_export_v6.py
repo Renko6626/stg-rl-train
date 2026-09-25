@@ -22,9 +22,9 @@ from stgtrain.registry import FEATURIZERS, load_builtins
 VARIANTS = [("target", True), ("static", True), ("static", False)]
 
 
-def _cfg(frame, dt, sa_layers=0):
+def _cfg(frame, dt, sa_layers=0, action_query=False):
     return small_cfg(featurize={"name": "danger_topk_v6", "k_bullets": 8, "k_enemies": 4, "frame": frame, "dt": dt},
-                     model={"sa_layers": sa_layers})
+                     model={"sa_layers": sa_layers, "action_query": action_query})
 
 
 @pytest.mark.parametrize("frame,dt", VARIANTS)
@@ -79,3 +79,22 @@ def test_v6_onnx_matches_torch(tmp_path, frame, dt, sa_layers):
             ref = wrap(*args)
         assert torch.allclose(got, ref, atol=1e-5), (got - ref).abs().max()
         assert got.argmax().item() == ref.argmax().item()
+
+
+def test_action_query_deploy_and_onnx_match(tmp_path):
+    """R2：动作 query 策略头的常量表是 buffer，导出后与训练路径、ONNX 三者一致。"""
+    ort = pytest.importorskip("onnxruntime")
+    cfg, obs = _cfg("static", False, 1, True), _obs_held()
+    model, ref = _reference(cfg, obs)
+    got = _wrapper_logits(cfg, model, obs, n=2)
+    assert torch.allclose(got, ref, atol=1e-5), (got - ref).abs().max()
+    wrap = DeployWrapper(cfg, model, bullets_rows=ROWS_B, enemies_rows=ROWS_E).eval()
+    path = tmp_path / "aq.onnx"
+    export_graph(wrap, deploy_inputs(obs, 0, bullets_rows=ROWS_B, enemies_rows=ROWS_E, with_held=2), path)
+    names = list(INPUT_NAMES) + ["dir_held", "slow_held"]
+    sess = ort.InferenceSession(str(path), providers=["CPUExecutionProvider"])
+    for i in range(2):
+        args = deploy_inputs(obs, i, bullets_rows=ROWS_B, enemies_rows=ROWS_E, with_held=2)
+        out = torch.from_numpy(sess.run(["logits"], {n: a.numpy() for n, a in zip(names, args)})[0])
+        assert torch.allclose(out, ref[i], atol=1e-5), (out - ref[i]).abs().max()
+

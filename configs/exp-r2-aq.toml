@@ -1,0 +1,48 @@
+# 实验 R2（2026-09-25）：R1c + **18 路动作 query 策略头**（model.action_query = true）
+#
+# 问题：set_attn_v1 里「动作」只在最后一层 logit 才出现，前面对弹的汇总都与动作无关，逐动作的判断全靠主干 MLP 从汇总向量里解。
+# R2 让每个动作带着自己的物理量（方向、低速位、换不换、held）做 query，对弹 token（自注意力之后）做 4 头交叉注意力，各出一个 logit。
+# 价值头不变。「按动作 max 池化」那一路本轮不做（成对特征的激活 1–2 GB / minibatch）。与 R1c 只差这一处。
+#
+# 判读：相对 R1c 末 4 次均值差 > 3–5pp 算有效；另看前期学习速度、墙钟涨了多少。
+[run]
+total_updates = 3500
+ckpt_every = 100
+eval_every = 250
+
+[env]
+num_envs = 4096
+threads = 0
+
+[intent]
+name = "mixed_v1"
+
+[featurize]
+name = "danger_topk_v6"
+frame = "static"
+dt = false
+
+[motor]
+enabled = true
+hold = [2, 6]
+delay = [0, 2]
+slow = true
+
+[reward.terms]
+death = 10.0
+follow_shaping = 1.0
+hold = 0.01
+segment_survived = 0.0
+key_press = -0.003
+quick_change = -0.01
+shift_toggle = 0.0
+edge_hug = -0.02
+
+[model]
+name = "set_attn_v1"
+sa_layers = 1
+density_fp32 = true
+action_query = true
+
+[ppo]
+amp = "bf16"
