@@ -66,7 +66,9 @@ def states() -> dict[str, dict]:
         for line in p.read_text(encoding="utf-8").splitlines():
             if line.strip():
                 row = json.loads(line)
-                out[row["id"]] = row
+                # 用量行（_record_usage）与状态行同文件：worker 秒失败时它落在状态行之后，不能盖掉真实状态
+                if row.get("state") != "usage":
+                    out[row["id"]] = row
     return out
 
 

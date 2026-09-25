@@ -182,3 +182,11 @@ def test_select_sample_collect_status(work):
     assert not (config.CARDS_DIR / "th06_s1_w01" / "report.md").exists()
     table = pipeline.status_table(1)
     assert "collected 4" in table and "needs_human" in table
+
+
+def test_usage_rows_do_not_mask_unit_state(work):
+    """用量行（state="usage"）与单元状态同写 state.jsonl：worker 秒失败时用量行会落在状态行之后，
+    不能把真实状态盖掉（2026-09-25 余额耗尽时 37 个单元被显示成 usage）。"""
+    pipeline.record("th06_s7_w01", "pending")
+    pipeline.record("th06_s7_w01", "usage", kind="transcribe", steps=0)
+    assert pipeline.states()["th06_s7_w01"]["state"] == "pending"
