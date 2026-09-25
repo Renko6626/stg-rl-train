@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# dsh-flash 的替身：参数口径相同（--cwd --timeout --reasoning --log <prompt>），改用 Claude Code 无头模式跑一次性 worker。
+# 用法：STG_DSH_BIN=transcribe/tools/claude-worker uv run python -m stgtranscribe.pipeline …
+# 模型：STG_CLAUDE_MODEL（默认 sonnet）。最后一条回复打到 stdout（pipeline 落 .stdout），全过程另写 --log。
+set -u
+cwd=.; to=1800; log=/dev/null
+while [ $# -gt 1 ]; do
+  case "$1" in
+    --cwd) cwd=$2; shift 2;;
+    --timeout) to=$2; shift 2;;
+    --reasoning) shift 2;;          # dsh 专用，Claude 这里不用
+    --log) log=$2; shift 2;;
+    --model) shift 2;;
+    *) break;;
+  esac
+done
+prompt=$1
+cd "$cwd" || exit 2
+mkdir -p "$(dirname "$log")"
+timeout "$to" claude -p --model "${STG_CLAUDE_MODEL:-sonnet}" --dangerously-skip-permissions \
+  --output-format text "$prompt" 2> "$log" | tee -a "$log"
+exit "${PIPESTATUS[0]}"

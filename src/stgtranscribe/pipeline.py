@@ -118,7 +118,8 @@ def run_worker(cwd: Path, prompt: str, log: Path, kind: str = "transcribe") -> i
 
 # 供应商侧的致命错误：余额耗尽 / 因余额降并发。继续跑只会把一批单元误记成 validated / needs_human
 # （旧卡进审核、审核没产出 verdict），所以整批立即中止、不回写该单元状态（2026-09-25 两次踩坑）。
-PROVIDER_FATAL = ("QUOTA:", "RATE_LIMIT:", "Insufficient Balance")
+PROVIDER_FATAL = ("QUOTA:", "RATE_LIMIT:", "Insufficient Balance",  # DeepSeek（dsh）
+                  "usage limit reached", "rate_limit_error")      # Claude（transcribe/tools/claude-worker）
 
 
 def _abort_provider(msg: str) -> None:
