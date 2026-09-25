@@ -683,7 +683,8 @@ rank 16 下的修正量（`Enemy.hpp` 的 `BulletRank*Inner`，C 整数除法向
   `add_speed(5.0fx); @16 set_accel(-0.3125fx); @(D-16) set_accel(f0); stop_fx();`（`D−16` 请算成数字）。
 - `0x1` 与 `0x20` 叠加（如 `flags = 37`）同理：`0x1` 与 `0x10/0x20` 在 `BulletManager.cpp:711-747` 是 `if … else if` 链，
   **冲刺的 16 帧里 `0x20` 的逐帧加速 / 转向不生效**，冲刺结束才开始（计时仍从出生算，共 `i0` 帧）：
-  `add_speed(5.0fx); @16 set_accel(-0.3125fx); set_accel(f0); set_ang_vel(f1); @(i0-16) stop_fx();`（2026-09-25 抽检 s4_b8：卡在冲刺期就开始转，多转约 11°）。
+  `add_speed(5.0fx); @16 set_accel(-0.3125fx); set_accel(f0); @(i0-16) set_ang_vel(f1); stop_fx();`（2026-09-25 抽检 s4_b8：卡在冲刺期就开始转，多转约 11°）。
+  ⚠️ `@N` 是**后置延迟**（执行本 op 再等 N 帧），所以 `@(i0−16)` 挂在 `set_ang_vel` 上：帧 16 同时换加速度、开转，等 `i0−16` 帧后 `stop_fx`。挂在 `stop_fx` 上会在帧 16 就停，弹不转弯（范例见 th06_s4_b8 的 `CURVE_R`）。
 - 反弹后改速度、反弹 > 3 次：做不到，近似并在 report 写明。
 - **`f0` / `f1` 是运行期变量**（`%F0`、`%PLAYER_ANGLE`、循环累加量……）：TH06 在**建弹时**把值拷进每颗弹
   （`BulletManager.cpp:345-356`），所以**同一条 `bullet_*` 的弹共享一个值**。按下面的顺序选：
