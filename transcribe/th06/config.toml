@@ -8,16 +8,13 @@ decoded_dir = "/data/sunyunbo/www/renkolab/local/th06nc/decoded"
 engine_dir = "/data/sunyunbo/www/stg-engine"
 decomp_dir = "/data/sunyunbo/www/renkolab/local/vendor/th06-decomp/src"
 
-# 含这些指令的单元整体跳过（spec D3：引擎没有激光池）。
+# 含这些指令的单元整体跳过。激光九条 2026-09-25 起可转（引擎激光池，mapping §14），已移出。
 [skip]
-instructions = [
-  "laser_create", "laser_create_aimed", "laser_index", "laser_rotate", "laser_rotate_from_player",
-  "laser_offset", "laser_test", "laser_cancel", "laser_clear_all",
-]
+instructions = []
 # ex_ins_call / ex_ins_repeat 的这些编号需要遍历全场弹或激光，我方做不到 → 整单元跳过。
 # 编号语义见 mapping.md §10；17–19 是 NC 新增、decomp 里没有。
 # 2026-09-19：4 从跳过表里去掉——时停与大弹改向可用 wait_signal/pulse_signal + 弹挂任务表达（§10.1，原型实测过）。
-ex_ins_ids = [7, 8, 9, 11, 12, 14, 15, 17, 18, 19]   # 2026-09-19：0 也解禁（§10.2）
+ex_ins_ids = [7, 8, 9, 11, 15, 17, 18, 19]   # 2026-09-19：0 也解禁（§10.2）；2026-09-25：12、14 解禁（§14.4，激光读口）
 
 # TH06 弹型号（bullet_* 第 1 参）→ 我方图集行基址（bullets.ecl 的 const 值）与名字。
 # 判定半径由引擎表 SHAPE_RADIUS 决定，大玉/气泡偏小，见 mapping.md §3。

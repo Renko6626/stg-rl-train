@@ -107,6 +107,10 @@ $P usage [--stage N] [--since 2026-09-18]   # 步数 / 计费输入估算 / 推�
 - **弹峰值超 1024**：先看是不是 TH06 的 640 弹池在压画面（我方池 8192，屏内弹数照样超）。做法见设计 §13.4 第 2 条：
   离线复现 640 池（`work/units/th06_s3_w12/pool640/poolsim.py`，要临时放开 harness `AT_DUMP_LIMIT`）→ 拟合「某类弹 `$frame ≥ N` 的轮次不发」→
   返工派 dsh 实现 → 主会话用同一脚本复核曲线误差。不要随手抽稀颗数，也不要只收窄 ranks 了事。
+- **激光卡（2026-09-25 起可转）**：规则在 mapping §14，引擎侧口径在 stg-engine spec `2026-09-25-laser-pool-design.md` §9.1。
+  1–2 关早先按 `skip: "laser"` 切过的单元（s1_mb2、s1_b3、s2_b4）要重切：`split --stages 1,2 --force` 后 `extract`，
+  否则 `split_check` 会报「标了 skip 但机械检查没发现」。第 4 关（帕秋莉）从没切过。`ex_ins_12 / 14`（在激光上 / 沿激光发弹）用激光读口 `lz_x/lz_y/lz_angle/lz_near/lz_far` 转（mapping §14.4）。
+  **前提**：训练仓的 `stg-rl` wheel ≥ 0.3.0（rl-v0.2.0 的编译器不认 `laser()` / 激光读口），release harness 也要重编。
 - **一台机器只跑一个 `pipeline` 进程**：两个进程同秒起 dsh 会撞 `~/.dsh` 配置（`config file must be a top-level array`），并发靠 `--jobs`。
 - `validate` 要求**目录名 = 卡 id**，所以 pipeline 把 `out/` 拷到 `card/<id>/` 再验。
 - 别提交 `transcribe/work/`（含原文摘录，gitignore 已挡）。

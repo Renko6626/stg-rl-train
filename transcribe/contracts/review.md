@@ -23,6 +23,10 @@
    - 弹变换：`bullet_effects` + `flags` → xformdef 的每个数（§5）
    - 移动：目标点（x 减 192）、时长、缓动号、镜像
    - 随机范围
+   - **激光**（`laser_*`，mapping §14）：宽度 = 原作 / 2；`len` = 原作 end；有效 start = `max(st, en − sl, 0)`；飞棒有 `lz_speed(sp, sl)`；
+     三段时长原样；原点 = 敌 + 当时的 `shoot_offset`（`laser_offset` 则是敌 + 参数、不加 shoot_offset）；
+     自机狙必须是建完立刻 `lz_aim`（不是 `aim_player() + a`）；`laser_rotate` / `laser_offset` 逐帧照翻、次数与帧号对得上；
+     跨 sub 的句柄有没有作为参数传；`ex_ins_call(12/14)` 是否用读口 `lz_angle / lz_near / lz_far` 取当前几何（12 号出弹点是敌位置 + 64 px，14 号是激光原点起每 48 px）。锚点可以选激光：`--at` 的「活激光」表核 state、timer、角度
 3. 核外壳：`TIME_LIMIT`、`set_invuln(65535)`、段结束方式（非符 `phase_begin` / 符卡 `spell_begin`）、开场缓冲、小怪出界守卫。
 4. 核 `report.md` 的「近似」是否如实（卡里有近似但没写 = 发现）。
 5. **数值锚点（硬性，至少 3 轮）**：从原文**手算**某一轮弹在某帧的期望，用 harness 实测对照：

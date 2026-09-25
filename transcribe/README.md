@@ -43,7 +43,7 @@ uv run python -m stgtranscribe.pipeline collect    --stage 1               # 收
 ```
 pending → validated → reviewed → collected
    ↘ blocked   ↘ revise（回 transcribe）/ needs_human
-excluded（切分判定跳过：激光 / 不可转 ex_ins / 对话）
+excluded（切分判定跳过：不可转 ex_ins / 对话；激光 2026-09-25 起可转，见 mapping §14）
 ```
 
 ## 试玩

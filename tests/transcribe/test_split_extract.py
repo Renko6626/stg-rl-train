@@ -147,7 +147,8 @@ def test_boss_subs_and_structure_render(ecl):
     assert "**BOSS**" in md
     assert "テスト符「甲」" in md
     assert "间隙 400" in md
-    assert "**含 laser**" in md
+    assert "激光 ×1" in md                      # 信息标注：不论跳过名单都打
+    assert "**含 laser**" not in md             # 全局配置已不把激光当跳过原因（mapping §14）
     assert "timer_callback→Sub3[ENHL] 阈值 1200[ENHL]" in md
 
 

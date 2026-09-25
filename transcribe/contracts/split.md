@@ -28,7 +28,7 @@
 
 ## 步骤
 
-1. 读 `structure.md` 全文。timeline 表里 `**BOSS**` 是 boss 登场，`↓ 间隙 N 帧` 是出怪空档；sub 表列出每个 sub 的回调、符卡、激光。
+1. 读 `structure.md` 全文。timeline 表里 `**BOSS**` 是 boss 登场，`↓ 间隙 N 帧` 是出怪空档；sub 表列出每个 sub 的回调、符卡、激光（激光 2026-09-25 起可转，不再是跳过原因）。
 2. **切波次**：
    - 每条非 boss 的 `enemy_create*` **恰好属于一个波次**，波次之间不重叠；
    - 一个编队（同一批 sub、间隔规律的一串出怪）不要拆开；间隙 ≥ 100 帧通常是波次边界，但要看编队；
@@ -46,7 +46,7 @@
      - `kind`：闭包里有 `spellcard_start` 是 `spell`（写 `spell_key`，即第 3 参的字符串），否则 `nonspell`；
      - `hp_threshold`：进入下一段的血量阈值（仅记录，可省略）。
    - **符卡练习入口 sub**（形如 `call("Sub32"); … life_callback_threshold(0); … call("宣言"); call("模式")`，见 mapping §9）不是实战段，不单列；但它们调用的宣言 / 模式 sub 必须出现在某个实战段的闭包里。
-4. **标 skip**：`structure.md` 里标 `**含 laser**` / `**含 ex_ins_N**` / `**含 dialogue**` 的 sub 进了某个单元的闭包，该单元写 `"skip": "laser"`（或对应原因）。skip 的单元照样要列出来，只是不转写。
+4. **标 skip**：`structure.md` 里标 `**含 ex_ins_N**` / `**含 dialogue**` 的 sub 进了某个单元的闭包，该单元写对应原因（如 `"skip": "ex_ins_14"`）。含激光**不再**跳过。skip 的单元照样要列出来，只是不转写。
    **`note` 里不要替 `ex_ins_N` 下 skip 结论**——哪些编号能翻是 `mapping.md §10` 的事（例如 0 和 4 已改判 translate），切分只如实记「含 `ex_ins_call(4,1)`」这类事实；`skip` 字段由流水线按 `config.toml` 的 `ex_ins_ids` 判，不由你写。
 5. 写 `split.json`，然后**自检**直到通过：
 
@@ -70,7 +70,7 @@
       {"id": "th06_s1_mb1", "kind": "nonspell", "entry": "Sub9", "start_label": "+160", "ranks": [0, 3],
        "time_limit": 1440, "time_limit_origin": "timer", "hp_threshold": 500, "note": "超时跳 Sub8 退场"},
       {"id": "th06_s1_mb2", "kind": "spell", "entry": "Sub10", "ranks": [2, 3], "time_limit": 1320,
-       "time_limit_origin": "timer", "spell_key": "ST_ECLDATA1_SUB9_0", "skip": "laser"}
+       "time_limit_origin": "timer", "spell_key": "ST_ECLDATA1_SUB9_0", "note": "激光交叉扫射（mapping §14）"}
     ]}
   ]
 }

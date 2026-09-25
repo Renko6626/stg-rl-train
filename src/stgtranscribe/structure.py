@@ -69,6 +69,9 @@ def sub_section(ecl: EclFile, bosses: set[str], loc: dict) -> list[str]:
                 tags.append("耐久卡")
             elif i.name == "life_callback_threshold" and i.args[0] == "0":
                 tags.append("life_callback_threshold(0)")
+        n_laser = sum(1 for i in b.instrs if i.name.startswith("laser_create"))
+        if n_laser:  # 信息标注，不是跳过原因（激光 2026-09-25 起可转，mapping §14）
+            tags.append(f"激光 ×{n_laser}")
         reasons = U.skip_reasons(ecl, [name])
         if reasons:
             tags.append("**含 " + "/".join(reasons) + "**")

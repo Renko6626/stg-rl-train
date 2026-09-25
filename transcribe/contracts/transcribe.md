@@ -43,6 +43,10 @@
   > 目标污染。无敌把两层的职责边界焊进训练分布里。副作用是训练压力是**上界**（部署时真实
   > 压力更低），误差方向安全。代价是难度画像会高估道中卡、模型学不到「再撑 2 秒这波就没了」，
   > 已知且接受。**真实关卡（部署用的卡）另论** —— 那里小怪本来就该能打死。
+- **激光**（单元里有 `laser_*` 时）：通读 mapping §14。四条最容易错：宽度写**原作值 / 2**；`laser_rotate` / `laser_offset`
+  **逐帧照翻**成 `lz_rotate` / `lz_origin`（别自作主张改成 `lz_omega` / `lz_anchor`）；自机狙用 `laser(… 0bam …)` 后立刻 `lz_aim(lz, a)`；
+  原点 = 敌位置 + **当时生效的** `shoot_offset`。report 的「映射」表里每条激光单独一行，写清换算后的 `len / width / warn / active / fade`。
+  自检用 `--at` 看「活激光」表核 state / timer / 角度（仍计入 4 次上限）。
 - **开场缓冲**：卡开始后 120 帧内不能有致命弹到达自机出生点 `(0, 384)` 附近。波次卡导演先 `wait(120)`；boss 段原文开场有移动 / 宣言前奏的通常够，不够就在开头补等待，并写进 report。
 - `start_label` 有值时：entry sub 里该时间点之前的是登场设置，只取位置 / 出弹口 / 边界这类状态，攻击从该时间点开始。
 - 弹型名常量抄进卡里（§3 表）。文件头两行注释写单元 id、卡名、原文出处。
@@ -58,8 +62,8 @@ ranks = <unit.json 的 ranks>
 marks = [0]
 time_limit = <unit.json 的 time_limit>
 original_time_limit = <unit.json 的 original_time_limit>
-tags = [<从 aimed random ring spiral wall curve split stream dense fast mixed 里选>]
-laser_approx = false
+tags = [<从 aimed random ring spiral wall curve split stream dense fast mixed laser 里选；用了 laser() 必须带 laser>]
+laser_approx = false   # 真激光也写 false；只有「原作激光、这里用弹链近似」才是 true
 lower_half_blocked = <下半屏被长时间大面积封死就 true>
 notes = "<一句话：近似 / 特殊处理>"
 ```

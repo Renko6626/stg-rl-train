@@ -20,7 +20,7 @@ from pathlib import Path
 from . import config
 from . import units as U
 
-ALLOWED_TAGS = {"aimed", "random", "ring", "spiral", "wall", "curve", "split", "stream", "dense", "fast", "mixed"}
+ALLOWED_TAGS = {"aimed", "random", "ring", "spiral", "wall", "curve", "split", "stream", "dense", "fast", "mixed", "laser"}
 META_REQUIRED = {
     "title": str, "source": str, "origin": str, "source_ref": str, "ranks": list, "marks": list,
     "time_limit": int, "original_time_limit": int, "tags": list, "laser_approx": bool, "lower_half_blocked": bool,

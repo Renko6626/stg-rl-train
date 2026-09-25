@@ -7,7 +7,7 @@
 >
 > 本文每个 ```ecl 围栏都是完整程序，被训练仓 `tests/transcribe/test_mapping.py` 真编译。
 
-**读法**：先读 §0–§2（全局换算与执行模型，每个单元都用得到），再按 §索引 查本单元用到的指令所在节。
+**读法**：先读 §0–§2（全局换算与执行模型，每个单元都用得到），再按 §索引 查本单元用到的指令所在节。单元里有 `laser_*` 就通读 §14。
 处置三类：`translate` 翻译 · `drop` 丢弃（纯表现 / 由卡外壳接管 / 无敌下不可达）· `skip-unit` 整个单元不转。
 
 ## 索引
@@ -102,15 +102,15 @@
 | `bullet_cancel` | translate | §4 |
 | `bullet_sound` | drop | §11 |
 | `bullet_rank_influence` | translate | §4 |
-| `laser_create` | skip-unit | §12 |
-| `laser_create_aimed` | skip-unit | §12 |
-| `laser_index` | skip-unit | §12 |
-| `laser_rotate` | skip-unit | §12 |
-| `laser_rotate_from_player` | skip-unit | §12 |
-| `laser_offset` | skip-unit | §12 |
-| `laser_test` | skip-unit | §12 |
-| `laser_cancel` | skip-unit | §12 |
-| `laser_clear_all` | skip-unit | §12 |
+| `laser_create` | translate | §14 |
+| `laser_create_aimed` | translate | §14 |
+| `laser_index` | translate | §14 |
+| `laser_rotate` | translate | §14 |
+| `laser_rotate_from_player` | translate | §14 |
+| `laser_offset` | translate | §14 |
+| `laser_test` | translate | §14 |
+| `laser_cancel` | translate | §14 |
+| `laser_clear_all` | drop | §14 |
 | `spellcard_start` | drop | §9 |
 | `spellcard_end` | drop | §9 |
 | `spellcard_effect` | drop | §11 |
@@ -862,9 +862,9 @@ TH06 的段落靠回调串起来（`EnemyManager.cpp:340-447`）：
 | 9 | Stage6Func9：静止小弹按距离加速 | skip-unit | |
 | 10 | HandleBatTransformation：蝠翼 + bomb 期间隐身 | drop | |
 | 11 | Stage6Func11：静止小弹随机加速 | skip-unit | |
-| 12 | Stage4Func12：在激光上发弹 | skip-unit | |
+| 12 | Stage4Func12：在激光上发弹（`EnemyEclInstr.cpp:1069`） | **translate** | 见 §14.4（2026-09-25 由 skip-unit 改判）|
 | 13 | StageXFunc13：以场地中心为圆心、`$F3` 为半径的 N 个点每 6 帧开火（`EnemyEclInstr.cpp:1086`） | translate | 照源码算，中心 `(0, 224)` |
-| 14 | StageXFunc14：沿激光铺弹 | skip-unit | |
+| 14 | StageXFunc14：沿激光铺弹（`EnemyEclInstr.cpp:1110`） | **translate** | 见 §14.4（2026-09-25 引擎加激光读口后由 skip-unit 改判）|
 | 15 | StageXFunc15：大弹附近的静止小弹加速 | skip-unit | |
 | 16 | FlandreFinalContextUpdate：按剩余血量设 `$F2/$F3/$I5`（`EnemyEclInstr.cpp:1210`） | translate | 血量取满血常量（无敌）；计时 ≥ 7200 帧时按 0 血 |
 | 17–19 | NC 新增，decomp 无对应 | skip-unit | |
@@ -1080,7 +1080,7 @@ sub main() {
 
 ## §12 整单元跳过
 
-`laser_*` 九条（spec D3：引擎没有激光池）、§10 表中 skip-unit 的 `ex_ins` 编号、对话 `read_msg` / `wait_msg`。
+§10 表中 skip-unit 的 `ex_ins` 编号、对话 `read_msg` / `wait_msg`。（`laser_*` 九条 2026-09-25 起可转，见 §14。）
 切分器已按 `config.toml` 的 `[skip]` 机械判定；转写时发现漏判，`report.md` 写 `status: blocked` 并给原因。
 
 ## §13 卡外壳模板
@@ -1175,3 +1175,148 @@ sub main() {
 
 - boss 出生点：本段起始位置。原文段开头有移动的，出生在移动起点；不知道的，出生在 `(0, 96)`。
 - 前一段留下的变量状态（如 `$F0` 累加的相位）按原文初值重建，写进 report。
+
+## §14 激光（2026-09-25 起可转）
+
+引擎激光池见 stg-engine `docs/ecl-lang/9-lasers.md`（语法）与 spec `docs/superpowers/specs/2026-09-25-laser-pool-design.md` §2、§9.1、§12（原作机制与转写口径）。
+原作是**一种**直线激光：射线原点 + 角度 + 射线上 `[start, end]` 一段；每帧 `end += speed`、`start = max(start, end − startLength, 0)`；
+三态 预警（不判）→ 生效（判）→ 收缩（不判）；`start ≥ 640` 回收（`BulletManager.cpp:959-1100`）。角度和原点**只由 ECL 改**，结构体里没有角速度。
+
+### 14.1 逐条对照（`EclManager.cpp:456-530`）
+
+| 原作 | 我方 | 说明 |
+|---|---|---|
+| `laser_index(i)` | 局部变量 `lz_i` | 只是选「下一条 create 存进敌人指针表的第 i 格」。每个用到的 i 开一个 `var lz_i: int`；跨 sub 用到的句柄**作为参数传给被调 sub**（红魔乡只有 Extra Sub46 → Sub47 一处） |
+| `laser_create(sprite, color, a, sp, st, en, sl, w, T0, T1, T2, hb0, hb1, flags)` | `lz_i = laser(col, ox, oy, a, en, w/2, T0, T1, T2);` 再按 §14.2 补 `lz_start` / `lz_speed` | 原点 = 敌位置 + **当时生效的 `shoot_offset`**（`EclManager.cpp:460`） |
+| `laser_create_aimed(…)` | 同上，建完**立刻** `lz_aim(lz_i, a)`（角度位先填 `0bam`） | 原作从激光原点（= 敌 + `shoot_offset`）瞄准，`lz_aim` 同基点，精确一致。**别用 `aim_player() + a`**：它从敌自身瞄，`shoot_offset ≠ 0` 时差一个小角度 |
+| `laser_rotate(i, a)` | `lz_rotate(lz_i, a)` | 一次性加角度。**逐帧照翻**：红魔乡的 `laser_rotate` 全在逐帧循环里，照翻与原作逐位等价 |
+| `laser_rotate_from_player(i, a)` | `lz_aim(lz_i, a)` | 红魔乡未使用 |
+| `laser_offset(i, x, y, _)` | `lz_origin(lz_i, $self_x + x, $self_y + y)` | 原点 = 敌位置 + 参数（**不加** `shoot_offset`，`EclManager.cpp:506`）。**逐条照翻**，不要改成 `lz_anchor`：`lz_anchor` 在相位 5 读敌人移动后的位置，会领先原作一帧 |
+| `laser_test(i)` | `lz_alive(lz_i)` | 红魔乡未使用 |
+| `laser_cancel(i)` | `lz_cancel(lz_i)` | 提前进入收缩 |
+| `laser_clear_all` | 删掉 | 只清敌人指针表，激光照样活着；我方句柄本来就在局部变量里 |
+
+### 14.2 参数换算
+
+| 原作参数 | 换算 | 理由 |
+|---|---|---|
+| `w`（宽） | **`w / 2`** | 我方画多宽判多宽；原作判定半高是 `w/4`、画面是 `w`（spec 裁定 ④）。例：`32.0f` → `16.0fx` |
+| `a`（角度） | 同 §1：弧度 → `bam` | 可以是变量（`%F3`），照样用变量 |
+| `en`（end） | `laser()` 的 `len` | |
+| `st`（start）、`sl`（startLength） | `speed = 0` 时：有效 `start = max(st, en − sl, 0)`，非 0 才写 `lz_start(lz, start)` | 原作第一帧就按 `sl` 把 start 拽到位。例：第 4 关 `(64, 500, 500)` → `lz_start(lz, 64.0fx)`；Extra `(32, 420, 388)` → `lz_start(lz, 32.0fx)` |
+| `sp`（speed）≠ 0 | `laser(…, len = en, …)` 后 `lz_speed(lz, sp, sl)` | 飞棒：`lz_speed` 令 `end = start`，从近端长出去。红魔乡的飞棒都是 `st = en = 0`，与原作一致 |
+| `T0 / T1 / T2` | `warn / active / fade` 原样 | 原作 `startTime / duration / despawnDuration`。`T0 = 0` 出生即生效 |
+| `hb0 / hb1` | 丢弃 | CC0 在预警期 / 收缩期的判定窗；th06nc 只在生效态判定（renkolab `bullet/th06nc/01` §3.1） |
+| `sprite` | 丢弃 | 纯外观：`0` = 截面光条，`1` = 圆弹拉伸的梭形（帕秋莉、芙兰）。我方只画光条 |
+| `color` | `sprite = 0`：`[0, 2, 4, 6, 8, 10, 13, 15][color]`（8 色，同 32px 弹）；`sprite = 1`：原样（BALL 是 16 色） | 纯外观，别为它纠结 |
+| `flags` | 红魔乡全是 0，丢弃 | 位 0 只选收缩方式（变窄 / 淡出） |
+
+- **非整数 BAM 的逐帧转角**：`0.008267349f` = 86.23 bam，取整成 `86bam`，生效 120 帧累计差约 0.15°，可接受，写进 report。
+  累计误差超过 0.5° 时改用累积取整：第 k 帧转 `round(a × (k+1)) − round(a × k)`。
+- **镜像**：同弹，角度 `180deg − a`，`lz_rotate` 的增量取负，`lz_origin` 的 x 取负。
+- **难度前缀**：同 §2.2，粘滞前缀照常作用于 `laser` / `lz_*`。
+
+### 14.3 时序
+
+- 原作 ECL 在 `BulletManager` 更新之前执行，所以「本帧 create → 本帧推进」，与我方（相位 2 建、相位 5 推进）一致，不用补帧。
+- 原作生效恰好 `T1` 帧、预警恰好 `T0` 帧、收缩恰好 `T2` 帧，我方同口径（引擎有逐帧对拍测试）。
+- 符卡结束 / boss 死亡时原作全局清弹会把激光一起收掉；我方卡外壳的符卡结算走全屏清弹 field，激光同样被取消，不用额外写。
+
+### 14.4 `ex_ins_call(12)` / `ex_ins_call(14)`：在激光上 / 沿激光发弹
+
+两条都是「遍历该敌 `lasers[0..8]` 里还活着的激光，按激光几何放弹」，用**当前发射参数**（`bulletProps`）开火。
+我方用激光读口直接读当前几何：`lz_x(lz) / lz_y(lz)`（原点）、`lz_angle(lz)`（角度）、`lz_near(lz) / lz_far(lz)`（`start` / `end`），
+死活用 `lz_alive`。**别在脚本里另维护几何副本**，读口读到的就是引擎此刻的值。「活着」含收缩态（原作判的是 `inUse`），与 `lz_alive` 一致。
+
+- **12 号 Stage4Func12**（第 4 关，`EnemyEclInstr.cpp:1069`）：每条活激光开一次火，出弹点 = **敌位置** + 沿激光方向 64 px
+  （注意是敌位置，不是激光原点）。
+- **14 号 StageXFunc14**（Extra Sub47，`EnemyEclInstr.cpp:1110`）：每条活激光，从 `start` 起每 48 px 开一次火直到 `< end`，
+  出弹点 = **激光原点** + `d × (cos a, sin a)`。`end = 420`、`start = 32` 时是 d = 32, 80, …, 416 共 9 发。
+
+```text
+ex_ins_call(12, 0)   →   // 对本敌建过的每个 lz_i（i = 0..7，逐个展开）：
+                          if lz_alive(lz_i) == 1 {
+                              var a: angle = lz_angle(lz_i);
+                              sh_offset(k, 64.0fx * cos(a), 64.0fx * sin(a));   // 相对敌
+                              sh_fire(k);
+                          }
+                          sh_offset(k, ox, oy);                                 // 发完恢复原出弹口
+
+ex_ins_call(14, 0)   →   if lz_alive(lz_i) == 1 {
+                              var a: angle = lz_angle(lz_i);
+                              var d: fx = lz_near(lz_i);
+                              while d < lz_far(lz_i) {
+                                  // 出弹点是绝对坐标：用发射器的绝对偏移模式，或按 §4 的写法换算成相对敌的偏移
+                                  …开火于 (lz_x(lz_i) + d * cos(a), lz_y(lz_i) + d * sin(a))…
+                                  d = d + 48.0fx;
+                              }
+                          }
+```
+
+`sh_*` 的绝对偏移写法以 stg-engine `docs/ecl-lang/4-bullets.md` 的发射器节为准；完整可运行的「沿激光铺弹」例子见
+stg-engine `docs/ecl-lang/9-lasers.md`「读几何」节。
+
+### 14.5 已知差异（写进 report，不要去凑）
+
+1. 原作 `hb0 / hb1` 判定窗被丢弃：第 4 关有一条预警 90、`hb0 = 70`，CC0 在第 70–90 帧有一个缩在中点的小判定盒；th06nc 已删。
+2. 激光没有擦弹（stg-engine follow-ups D27 第 1 条）。
+3. 原作指针表是「敌人 × 格号 → 激光槽」，激光回收后槽被别人复用时，原作的 `laser_rotate` 会改到别人的激光；我方句柄带代际，只是 no-op。
+4. `sprite = 1` 的梭形外观画不出来（纯外观）。
+
+### 14.6 范例：第 1 关中 boss Sub12（两条交叉扫射）
+
+原文：两条 π/8、7π/8 的激光，宽 32，预警 30 / 生效 120 / 收缩 16；`+30` 起 120 帧每帧 `laser_rotate(0, +0.00827)` / `(1, −0.00827)`；
+`+60` 随机移动 120 帧后 `jump` 回开头。
+
+```ecl
+async sub midboss_sweep() {
+    set_invuln(65535);
+    loop {
+        // laser_index(0/1) + laser_create(0, 6, …)：色 6（sprite 0 → 8 色表 [6] = 13），宽 32 → 16
+        var lz_0: int = laser(13, $self_x, $self_y, 4096bam, 500.0fx, 16.0fx, 30, 120, 16);
+        var lz_1: int = laser(13, $self_x, $self_y, 28672bam, 500.0fx, 16.0fx, 30, 120, 16);
+        wait(30);
+        for k in 0..120 {          // set_int($I4, 120); +1 循环体; jump_dec → 帧 31..150 各转一次
+            wait(1);
+            lz_rotate(lz_0, 86bam);    // 0.008267349 rad = 86.23 bam，取整（§14.2）
+            lz_rotate(lz_1, -86bam);
+        }
+        wait(60);
+        wait(120);                  // move_rand_in_bounds + move_time_decelerate(120)：移动略
+    }
+}
+
+sub main() {
+    _ = spawn_enemy(0.0fx, 96.0fx, 1000, 0, 0, 0, midboss_sweep);
+    loop { wait(600); }
+}
+```
+
+### 14.7 范例：第 2 关 boss Sub27（三根飞棒自机狙）
+
+原文：`shoot_offset(0, 8, 0)` 后 `laser_create_aimed(0, 6|5, 0 / ±π/8, 4.0, 0, 0, 192, 6, 0, 9999, 30, …)`，三根一组，每 50 帧一组共 3 组。
+
+```ecl
+async sub boss_spears() {
+    set_invuln(65535);
+    for k in 0..3 {
+        // 原点 = 敌位置 + shoot_offset(0, 8)；aimed ⇒ 建完立刻 lz_aim（从激光原点瞄，同原作）
+        var l0: int = laser(13, $self_x, $self_y + 8.0fx, 0bam, 0.0fx, 3.0fx, 0, 9999, 30);
+        lz_aim(l0, 0bam);
+        lz_speed(l0, 4.0fx, 192.0fx);
+        var l1: int = laser(10, $self_x, $self_y + 8.0fx, 0bam, 0.0fx, 3.0fx, 0, 9999, 30);
+        lz_aim(l1, 4096bam);
+        lz_speed(l1, 4.0fx, 192.0fx);
+        var l2: int = laser(10, $self_x, $self_y + 8.0fx, 0bam, 0.0fx, 3.0fx, 0, 9999, 30);
+        lz_aim(l2, -4096bam);
+        lz_speed(l2, 4.0fx, 192.0fx);
+        wait(50);
+    }
+    loop { wait(1); }
+}
+
+sub main() {
+    _ = spawn_enemy(0.0fx, 96.0fx, 1000, 0, 0, 0, boss_spears);
+    loop { wait(600); }
+}
+```
