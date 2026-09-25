@@ -1,0 +1,12 @@
+title = "火水木金土符「賢者の石」"
+source = "th06"
+origin = "东方红魔乡 Stage 7(Extra) 中 boss 帕秋莉·诺蕾姬 符卡 火水木金土符「賢者の石」（ecldata7 Sub19/28/29/31–35），Extra 档"
+source_ref = "ecldata7.ecl.txt:497-518, 698-704, 706-728, 738-758, 760-777, 779-796, 798-816, 818-841, 730-736"
+ranks = [4, 4]
+marks = [0]
+time_limit = 2400
+original_time_limit = 2400
+tags = ["aimed", "random", "ring"]
+laser_approx = false
+lower_half_blocked = false
+notes = "Extra 中 boss 符卡；boss 无敌，按原作 2400 帧超时收段（SPELL_FAILED）。五只使魔各打一种鳞弹：整周随机环、自机狙扇、随机散射（带定角加速）、整周环（60 帧后定格自机角）、自机正前方随机散射（180 帧后各自随机转向）。flags 出生特效/冲刺按 §4.2/§5 处理。"

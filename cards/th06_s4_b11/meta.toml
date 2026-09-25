@@ -1,0 +1,12 @@
+title = "水符「プリンセスウンディネ」"
+source = "th06"
+origin = "东方红魔乡 Stage 4 boss 帕秋莉 符卡 水符「プリンセスウンディネ」（Sub51/Sub52/Sub53），E/N 两档（自机 shot1 版）"
+source_ref = "ecldata4.ecl.txt:1871-1877, 1879-1898, 1900-1941"
+ranks = [0, 1]
+marks = [0]
+time_limit = 2100
+original_time_limit = 2100
+tags = ["aimed", "laser", "spiral", "mixed"]
+laser_approx = false
+lower_half_blocked = false
+notes = "激光为 12 波 ×3 根自机狙飞棒；E/N 差异只在弹幕段的额外 BALL 扇与角度抖动。"

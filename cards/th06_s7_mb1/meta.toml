@@ -1,0 +1,12 @@
+title = "月符「サイレントセレナ」"
+source = "th06"
+origin = "东方红魔乡 Stage Extra 中 boss 帕秋莉·诺蕾姬 符卡 1 月符「サイレントセレナ」（ecldata7 Sub17/22/23/24），Extra 单档"
+source_ref = "ecldata7.ecl.txt:453-472, 543-549, 551-567, 569-598"
+ranks = [4, 4]
+marks = [0]
+time_limit = 2100
+original_time_limit = 2100
+tags = ["random", "stream", "dense"]
+laser_approx = false
+lower_half_blocked = false
+notes = "随机弹的随机切向加速度 [0.005,0.025) 用挂弹任务表达；0x8 出生特效不模拟，弹出生即全速有判定。"

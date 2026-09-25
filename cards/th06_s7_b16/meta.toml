@@ -1,0 +1,12 @@
+title = "禁弾「過去を刻む時計」"
+source = "th06"
+origin = "东方红魔乡 Extra（Stage 7）boss 芙兰朵露 符卡 禁弾「過去を刻む時計」（ecldata7 Sub77→Sub78→Sub79/Sub80，Sub76 的 timer/life 回调进入 Sub77），Extra 档"
+source_ref = "ecldata7.ecl.txt:2262-2268, 2270-2286, 2288-2362, 2364-2444"
+ranks = [4, 4]
+marks = [0]
+time_limit = 3000
+original_time_limit = 4200
+tags = ["laser", "aimed", "wall", "curve"]
+laser_approx = false
+lower_half_blocked = false
+notes = "四向旋转激光（宽 24→12、长 216、预警 60 / 生效 800 / 收缩 20，每帧 ±205bam）+ 32/17 发扇形弹；原 timer 4200 钳到 3000；小怪恒无敌由外壳保证。"

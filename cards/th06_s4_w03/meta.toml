@@ -1,0 +1,12 @@
+title = "Stage 4 道中 第 3 波"
+source = "th06"
+origin = "东方红魔乡 Stage 4 道中，timeline 帧 1150–1280（enemy_create/enemy_create_mirror 调 Sub3），E–L 四档"
+source_ref = "ecldata4.ecl.txt:3195-3222, 66-89"
+ranks = [0, 3]
+marks = [0]
+time_limit = 500
+original_time_limit = 500
+tags = ["aimed", "stream"]
+laser_approx = false
+lower_half_blocked = false
+notes = "小怪无敌（D8）；shoot_interval_delayed(50) 自动射击用写法 A，首发 = S+49−rand(50)，仅 k=0（1/50）晚 1 帧；出生特效 flags=4 不模拟。"

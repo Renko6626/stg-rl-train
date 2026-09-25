@@ -1,0 +1,12 @@
+title = "Stage 4 中 boss 小恶魔 非符"
+source = "th06"
+origin = "东方红魔乡 Stage 4 中 boss 小恶魔 非符（Sub21 从 +30 起 + Sub22 + Sub23 + Sub1）"
+source_ref = "ecldata4.ecl.txt:465-498, 500-513, 515-521, 18-41"
+ranks = [0, 3]
+marks = [0]
+time_limit = 2400
+original_time_limit = 2400
+tags = ["ring", "spiral", "random"]
+laser_approx = false
+lower_half_blocked = false
+notes = "Sub22 泡弹永久沿向加速 0.024 用 xformdef；子敌环弹颗数按难度 2/4/8/16。"

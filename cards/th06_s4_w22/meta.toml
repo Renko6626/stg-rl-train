@@ -1,0 +1,12 @@
+title = "Stage 4 道中 第 22 波"
+source = "th06"
+origin = "东方红魔乡 Stage 4 道中，timeline 帧 9260–9530（Sub9），E–L 四档"
+source_ref = "ecldata4.ecl.txt:3773-3820, 189-207"
+ranks = [0, 3]
+marks = [0]
+time_limit = 590
+original_time_limit = 590
+tags = ["aimed", "stream"]
+laser_approx = false
+lower_half_blocked = false
+notes = "E/N/H/L 分别 2/3/5/9 颗 ×2 层自机狙扇（同速层 s2=1.2），小怪无敌（D8），出界守卫退场。"

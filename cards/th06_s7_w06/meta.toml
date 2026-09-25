@@ -1,0 +1,12 @@
+title = "Stage 7 道中 第 6 波"
+source = "th06"
+origin = "东方红魔乡 Stage 7(Extra) 道中 第 6 波，timeline 帧 2920（Sub3 单只），Extra 档"
+source_ref = "ecldata7.ecl.txt:4419-4420, 100-139"
+ranks = [4, 4]
+marks = [0]
+time_limit = 720
+original_time_limit = 720
+tags = ["random", "ring", "dense"]
+laser_approx = false
+lower_half_blocked = false
+notes = "Extra 单档；小怪无敌（D8）；每轮 13 颗整周环 ×8 轮 ×2 内层 ×2 外层，基准角随机且逐轮偏转、速度逐轮 +0.18；flags 0x201 模拟 bit0 出生冲刺。"

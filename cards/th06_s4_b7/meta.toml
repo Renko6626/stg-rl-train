@@ -1,0 +1,12 @@
+title = "火＆土符「ラーヴァクロムレク」"
+source = "th06"
+origin = "东方红魔乡 Stage 4 boss 帕秋莉 符卡 火＆土符「ラーヴァクロムレク」（原文 Sub39→Sub81→Sub82/Sub83，自机固定灵梦 A，E/L 档）"
+source_ref = "ecldata4.ecl.txt:1588-1625, 2459-2466, 2468-2487, 2489-2524, 2526-2533, 2535-2554, 2556-2598, 2600-2607, 2609-2632, 2634-2669, 2671-2678, 2680-2699, 2701-2728, 2730-2737, 2739-2758, 2760-2790"
+ranks = [0, 3]
+marks = [0]
+time_limit = 2400
+original_time_limit = 2400
+tags = ["random", "ring", "dense"]
+laser_approx = false
+lower_half_blocked = false
+notes = "每 154 帧一轮：8 圈随机基角环 + 60 帧后 3 波随机半环；后者 flags 67 的 0x40 减速/随机转向用 xformdef+每弹任务复刻（0x1 被 0x40 覆盖，decomp 实证）。"

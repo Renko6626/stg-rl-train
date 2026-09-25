@@ -1,0 +1,12 @@
+title = "Stage 4 道中 第 7 波"
+source = "th06"
+origin = "东方红魔乡 Stage 4 道中 第 7 波（原文 ecldata4.ecl.txt timeline 帧 2304–2328，小怪 Sub11 / Sub13）"
+source_ref = "ecldata4.ecl.txt:3288-3293, 225-257, 266-295"
+ranks = [0, 3]
+marks = [0]
+time_limit = 444
+original_time_limit = 444
+tags = ["ring", "spiral", "dense"]
+laser_approx = false
+lower_half_blocked = false
+notes = "两对镜像小怪停住后各打 64 次旋转整周环；Sub11 四档弹数/层数/速度不同，Sub13 全档同一参数。"

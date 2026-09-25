@@ -1,0 +1,12 @@
+title = "火符「アグニレイディアンス」"
+source = "th06"
+origin = "东方红魔乡 Stage 4 boss 符卡 火符「アグニレイディアンス」（ecldata4 Sub48/Sub49/Sub50，自机 shot2 的 H/L 分支），H/L 两档"
+source_ref = "ecldata4.ecl.txt:1813-1819, 1821-1840, 1842-1869"
+ranks = [2, 3]
+marks = [0]
+time_limit = 1800
+original_time_limit = 1800
+tags = ["random", "ring", "curve"]
+laser_approx = false
+lower_half_blocked = false
+notes = "火弹环 0x20 曲线（前 128 帧每帧 ±256bam）用 xformdef 逐帧近似；随机气泡逐颗 fire。boss 无敌。"

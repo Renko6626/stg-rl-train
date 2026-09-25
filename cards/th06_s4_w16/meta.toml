@@ -1,0 +1,12 @@
+title = "Stage 4 道中 第 16 波"
+source = "th06"
+origin = "东方红魔乡 Stage 4 道中 第 16 波（ecldata4.ecl.txt timeline 6482–6870；Sub16 / Sub18 / Sub20 / Sub7）"
+source_ref = "ecldata4.ecl.txt:3508-3556, 358-382, 408-422, 449-463, 154-167"
+ranks = [0, 3]
+marks = [0]
+time_limit = 808
+original_time_limit = 808
+tags = ["aimed", "ring", "laser"]
+laser_approx = false
+lower_half_blocked = false
+notes = "真激光（90°下射，宽16/警90/生效120/收16）；Sub16 环形自机狙带出生冲刺；Sub7 不体碰、镜像只反水平速度。"

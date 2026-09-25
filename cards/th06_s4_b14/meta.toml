@@ -1,0 +1,12 @@
+title = "木符「シルフィホルン上級」"
+source = "th06"
+origin = "东方红魔乡 Stage 4 boss 符卡 木符「シルフィホルン上級」（Sub60/61/62），N/L 两档"
+source_ref = "ecldata4.ecl.txt:2081-2087, 2089-2108, 2110-2152"
+ranks = [1, 3]
+marks = [0]
+time_limit = 2100
+original_time_limit = 2100
+tags = ["random", "curve", "dense"]
+laser_approx = false
+lower_half_blocked = false
+notes = "SHARD 随机区域散射 + 每 6 轮放射（基准 15，H 追加 20 / L 追加 12 → 35/27，拆两个并行 emitter 同帧发）；i0 偶轮 6 帧 / 奇轮 4 帧；flags 19 的 0x1 冲刺 + 0x10 固定角加速用 xformdef 近似，0x2 出生特效不模拟。"

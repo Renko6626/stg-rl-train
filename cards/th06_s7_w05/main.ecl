@@ -1,0 +1,98 @@
+// th06_s7_w05 —— 东方红魔乡 Stage 7(Extra) 道中第 5 波
+// 原文：ecldata7 timeline 帧 2800（Sub2 单只）；Extra 档
+const TIME_LIMIT: int = 720;
+const BALL: int = 48;   // TH06 弹型 3 BALL 中玉
+
+// flags 0x201：位 0 = 出生冲刺（mapping §5）
+xformdef BURST { add_speed(5.0fx); @16 set_accel(-0.3125fx); stop_fx(); }
+
+// TH06 敌进过场地再出界即删（mapping §6.2）
+async sub oob_guard() {
+    var been_in: int = 0;
+    loop {
+        var inside: int = 0;
+        if $self_x > -208.0fx && $self_x < 208.0fx && $self_y > -16.0fx && $self_y < 464.0fx { inside = 1; }
+        if inside == 1 { been_in = 1; }
+        if been_in == 1 && inside == 0 { die(); }
+        wait(1);
+    }
+}
+
+// Sub2：从 y=-48 下落，+40 起减速（-1/15 px/帧²）、+70 停住悬停；
+// 2 次外循环 × (上旋 8 发 + 下旋 8 发)，每发是 13 颗全周 ring；
+// 弹速 0.5 起每发 +0.18（两段各自复位），基角各段重新随机、每发 ±3.75°。
+// 最后 move_velocity(π/2, 1.0) 继续下落，出界由 oob_guard 退场。
+async sub sub2() {
+    set_invuln(65535);
+    set_hitbox(9.33fx);                    // enemy_set_hitbox(28, 28, 32) → 28/3
+    spawn oob_guard();
+
+    var ang: angle = 90deg;                // move_velocity(1.5707964f, 2.0f)
+    var spd: fx = 2.0fx;
+    var acc: fx = 0fx;
+    move_vel(0, ang, spd, 0);
+    wait(40);
+    acc = -0.06666667fx;                   // +40 move_acceleration(-0.06666667f)
+    for k1 in 0..30 { spd = spd + acc; move_vel(0, ang, spd, 0); wait(1); }
+    acc = 0fx;                             // +70 move_acceleration(0.0f)：悬停
+
+    // 发射器常量部分配置一次（sh_xform 与 sh_fire 同在本 sub）
+    sh_reset(0);
+    sh_sprite(0, BALL, 6);
+    sh_aim(0, 0);
+    sh_ring(0, 1);
+    sh_count(0, 13, 1);
+    sh_xform(0, BURST);
+
+    // Sub2_192：I5 = 2 次外循环
+    for outer in 0..2 {
+        // Sub2_256：上旋 8 发，F0 += 3.75°、F1 += 0.18
+        var a1: angle = rand(65536) as angle;   // set_float_rand_bound_min(F0, 2π, -π)
+        var s1: fx = 0.5fx;                     // set_float(F1, 0.5f)
+        for k2 in 0..8 {
+            sh_angle(0, a1, 0deg);
+            sh_speed(0, s1, 0fx);
+            sh_fire(0);
+            a1 = a1 + 683bam;                   // math_float_add(F0, F0, 0.06544985f) = 3.75°
+            s1 = s1 + 0.18fx;                   // math_float_add(F1, F1, 0.18f)
+            wait(4);                            // +4: //74
+        }
+        // Sub2_436：下旋 8 发，重新随机 F0、F1 复位
+        var a2: angle = rand(65536) as angle;
+        var s2: fx = 0.5fx;
+        for k3 in 0..8 {
+            sh_angle(0, a2, 0deg);
+            sh_speed(0, s2, 0fx);
+            sh_fire(0);
+            a2 = a2 - 683bam;                   // math_float_sub(F0, F0, 0.06544985f)
+            s2 = s2 + 0.18fx;
+            wait(4);                            // +4: //78
+        }
+        wait(4);                                // +4: //82（jump_dec(70, Sub2_192, I5) 前的等待）
+    }
+
+    ang = 90deg;                               // move_velocity(1.5707964f, 1.0f)
+    spd = 1.0fx;
+    move_vel(0, ang, spd, 0);                  // 继续下落
+    wait(10000);                               // +9918: //10000 enemy_delete(0)，实际靠出界退场
+}
+
+// 导演：120 帧开场缓冲后按 timeline 帧 2800 出唯一一只 Sub2
+async sub wave() {
+    wait(120);
+    _ = spawn_enemy(0.0fx, -48.0fx, 1, 0, 0, 0, sub2);   // x=0, y=-48
+    loop { wait(1); }
+}
+
+async sub director() {
+    set_invuln(65535);
+    set_enemy_flag(ENEMY_NO_BODY, 1);
+    phase_begin(0, wave, TIME_LIMIT, 0);
+    wait_spell();
+    loop { wait(1); }
+}
+
+sub main() {
+    _ = spawn_enemy(0.0fx, 0.0fx, 1000, 0, 0, 0, director);
+    loop { wait(600); }
+}

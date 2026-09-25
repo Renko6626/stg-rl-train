@@ -1,0 +1,12 @@
+title = "土符「レイジィトリリトン」"
+source = "th06"
+origin = "东方红魔乡 Stage 4 boss 帕秋莉·诺蕾姬 符卡 土符「レイジィトリリトン」（Sub66/67/68），E/N 两档"
+source_ref = "ecldata4.ecl.txt:2222-2228, 2230-2249, 2251-2266"
+ranks = [0, 1]
+marks = [0]
+time_limit = 2100
+original_time_limit = 2100
+tags = ["aimed", "random"]
+laser_approx = false
+lower_half_blocked = false
+notes = "弹型 1→OUTLINE；bullet_random 逐颗 fire；0x40 随机转向量化成 4 档 xformdef；0x1 出生冲刺被同帧 0x40 覆盖故省略。"

@@ -1,0 +1,12 @@
+title = "Stage 7 道中 第 10 波"
+source = "th06"
+origin = "东方红魔乡 Stage 7(Extra) 道中 第 10 波，timeline 帧 4763–5253（Sub6/Sub7 混编，共 31 只），Extra 档"
+source_ref = "ecldata7.ecl.txt:4436-4497, 207-229, 231-253"
+ranks = [4, 4]
+marks = [0]
+time_limit = 910
+original_time_limit = 910
+tags = ["aimed", "mixed"]
+laser_approx = false
+lower_half_blocked = false
+notes = "Extra 单档；小怪无敌（D8），flags 3 的出生冲刺用 BURST xform、出生特效不模拟。"

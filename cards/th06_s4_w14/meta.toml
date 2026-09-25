@@ -1,0 +1,12 @@
+title = "Stage 4 道中 第 14 波"
+source = "th06"
+origin = "东方红魔乡 Stage 4 道中，timeline 帧 5418–5548（Sub7，行 154–167），ENHL 四档"
+source_ref = "ecldata4.ecl.txt:3440-3467, 154-167"
+ranks = [0, 3]
+marks = [0]
+time_limit = 500
+original_time_limit = 500
+tags = ["curve"]
+laser_approx = false
+lower_half_blocked = false
+notes = "Sub7 全段无弹（原文未设 bullet_*，+110 shoot_interval_delayed(0)），只做弧线飞行；小怪无敌且不体碰（D8 + enemy_flag_collision(0)）。"

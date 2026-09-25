@@ -1,0 +1,12 @@
+title = "月符「ムーンライトレイ」"
+source = "th06"
+origin = "东方红魔乡 Stage 1 中 boss 露米娅 符卡 月符「ムーンライトレイ」（Sub10/Sub11/Sub12），H/L 两档"
+source_ref = "ecldata1.ecl.txt:290-295, 297-317, 319-340"
+ranks = [2, 3]
+marks = [0]
+time_limit = 1320
+original_time_limit = 1320
+tags = ["aimed", "ring", "laser"]
+laser_approx = false
+lower_half_blocked = false
+notes = "中 boss 无敌；Sub9 遗留 shoot_offset(0,-12) 使环与激光原点下移 12；激光逐帧转角 86bam 取整、flags=4 出生特效不模拟。"

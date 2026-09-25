@@ -1,0 +1,12 @@
+title = "Stage 7 道中 第 8 波"
+source = "th06"
+origin = "东方红魔乡 Stage 7（Extra，ecldata7.ecl.txt）道中，timeline 帧 3160（Sub3 单只，中心 x=192），Extra 档"
+source_ref = "ecldata7.ecl.txt:4423-4424, 100-139"
+ranks = [4, 4]
+marks = [0]
+time_limit = 720
+original_time_limit = 720
+tags = ["ring", "spiral"]
+laser_approx = false
+lower_half_blocked = false
+notes = "Extra 单档；小怪无敌（D8）。原地 2 轮螺旋，每轮 8 环下行 + 8 环上行、每环 13 颗中玉，flags 513 只模拟 bit0 出生冲刺。"

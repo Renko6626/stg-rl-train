@@ -390,7 +390,7 @@ def measure_density() -> list[dict]:
                 "mean": round(sum(vals) / max(len(vals), 1), 1)}
 
     cards = sorted(p for p in config.CARDS_DIR.iterdir() if (p / "meta.toml").exists())
-    jobs = [(d, r) for d in cards for r in (0, 1, 2, 3)]
+    jobs = [(d, r) for d in cards for r in (0, 1, 2, 3, 4)]   # 4 = Extra（meta.ranks 过滤）
     with ThreadPoolExecutor(max_workers=16) as ex:
         return [r for r in ex.map(one, jobs) if r]
 

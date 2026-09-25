@@ -1,0 +1,12 @@
+title = "水符「ベリーインレイク」"
+source = "th06"
+origin = "东方红魔乡 Stage 4 boss 符卡 水符「ベリーインレイク」（自机 shot1 上级 H/L；ecldata4 Sub54 入口 → Sub55 宣言/移中央 + Sub56 攻击循环，时限 2100）"
+source_ref = "ecldata4.ecl.txt:1943-1949, 1951-1970, 1972-2011"
+ranks = [2, 3]
+marks = [0]
+time_limit = 2100
+original_time_limit = 2100
+tags = ["aimed", "ring", "laser", "random"]
+laser_approx = false
+lower_half_blocked = false
+notes = "boss 无敌按原作 2100 帧超时收段；12 组双向自机狙激光（warn20/active50/fade10，宽 8→4）+ 圆形自机狙环自动射击（22 帧一次，120 帧停）+ 8 轮 BUBBLE 扇形；移动按 Stage 4 boss 边界随机游走。"

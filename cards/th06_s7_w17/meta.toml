@@ -1,0 +1,12 @@
+title = "Stage 7 道中 第 17 波"
+source = "th06"
+origin = "东方红魔乡 Stage 7(Extra) 道中 第 17 波，timeline 帧 7693–8093（Sub9，共 72 只），Extra 档"
+source_ref = "ecldata7.ecl.txt:4665-4769, 275-293"
+ranks = [4, 4]
+marks = [0]
+time_limit = 820
+original_time_limit = 820
+tags = ["aimed", "stream"]
+laser_approx = false
+lower_half_blocked = false
+notes = "Extra 单档；72 只 Sub9 编队下落中转弯，各自机狙 3 向扇（相邻 22.5°）每 70 帧一发（首发随机延迟）。flags 4 出生特效不模拟，小怪无敌（D8）。"

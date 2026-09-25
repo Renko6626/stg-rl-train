@@ -1,0 +1,12 @@
+title = "Stage 7 道中 第 7 波"
+source = "th06"
+origin = "东方红魔乡 Stage 7(Extra) 道中 第 7 波，timeline 帧 3040（Sub2 单只，x=+64），Extra 档"
+source_ref = "ecldata7.ecl.txt:4421-4422, 59-98"
+ranks = [4, 4]
+marks = [0]
+time_limit = 720
+original_time_limit = 720
+tags = ["random", "ring", "spiral"]
+laser_approx = false
+lower_half_blocked = false
+notes = "Extra 单档；小怪无敌（D8）。全周 13 颗 ring、2×(8+8) 发，弹速 0.5 起每发 +0.18，基角随机、每发 ±3.75°；flags 0x201 出生冲刺用 BURST 近似。"

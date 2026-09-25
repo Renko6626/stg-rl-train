@@ -1,0 +1,12 @@
+title = "金符「メタルファティーグ」"
+source = "th06"
+origin = "东方红魔乡 Stage 4 boss 帕秋莉 符卡 金符「メタルファティーグ」（Sub75/76/77），仅 N 档"
+source_ref = "ecldata4.ecl.txt:2368-2374, 2376-2395, 2397-2412"
+ranks = [1, 1]
+marks = [0]
+time_limit = 2100
+original_time_limit = 2100
+tags = ["random", "ring", "stream", "dense"]
+laser_approx = false
+lower_half_blocked = false
+notes = "bullet_effects 0x100 随机终向；xformdef 参数须编译期常量，两次独立随机角合并为一个基准（见 report）"

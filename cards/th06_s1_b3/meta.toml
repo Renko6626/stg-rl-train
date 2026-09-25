@@ -1,0 +1,12 @@
+title = "Stage 1 boss 露米娅 非符 2"
+source = "th06"
+origin = "东方红魔乡 Stage 1 boss 露米娅 非符 2（Sub19 + Sub22/23/24/25 尾调用链），E–L 四档"
+source_ref = "ecldata1.ecl.txt:567-590, 629-675, 677-705, 707-736, 738-778"
+ranks = [0, 3]
+marks = [0]
+time_limit = 1800
+original_time_limit = 1800
+tags = ["aimed", "ring", "stream", "laser"]
+laser_approx = false
+lower_half_blocked = false
+notes = "boss 无敌，按原作 1800 帧超时收段；Sub22 的六条自机狙激光按 mapping §14 逐条转写（宽 16 原作值→8fx）。"

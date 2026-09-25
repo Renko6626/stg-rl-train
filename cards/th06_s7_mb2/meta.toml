@@ -1,0 +1,12 @@
+title = "日符「ロイヤルフレア」"
+source = "th06"
+origin = "东方红魔乡 Extra（Stage 7）中 boss 帕秋莉·诺蕾姬 符卡「日符「ロイヤルフレア」」（Sub18/25/26/27），Extra 档"
+source_ref = "ecldata7.ecl.txt:474-495, 600-606, 608-625, 627-696"
+ranks = [4, 4]
+marks = [0]
+time_limit = 2880
+original_time_limit = 2880
+tags = ["ring", "spiral", "dense"]
+laser_approx = false
+lower_half_blocked = false
+notes = "ex_ins_call(13) 逐帧照 decomp 实现：以场地中心 (0,224) 为心、$F3 为半径的 N 点环上每 6 帧开一批；flags 0x10 用 xform 表达 100 帧加速。"

@@ -1,0 +1,12 @@
+title = "火符「アグニシャイン上級」"
+source = "th06"
+origin = "东方红魔乡 Stage 4 boss 帕秋莉·诺蕾姬 符卡 火符「アグニシャイン上級」（ecldata4 Sub45/46/47），Hard–Lunatic"
+source_ref = "ecldata4.ecl.txt:1750-1756, 1758-1777, 1779-1811"
+ranks = [2, 3]
+marks = [0]
+time_limit = 1800
+original_time_limit = 1800
+laser_approx = false
+lower_half_blocked = false
+tags = ["random", "ring", "curve"]
+notes = "boss 无敌，按原作 1800 帧超时收段。每轮 5 次「随机整周角双环 ×2 层」，正/反两向自转 128 帧（±256bam/帧）；count1 随 $I7 增长（每 3 轮 +1），H 起点 9 / L 起点 10。"

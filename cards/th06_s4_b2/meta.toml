@@ -1,0 +1,12 @@
+title = "火符「アグニシャイン」"
+source = "th06"
+origin = "东方红魔乡 Stage 4 boss 帕秋莉 符卡 火符「アグニシャイン」（Sub42/43/44），E/N 两档"
+source_ref = "ecldata4.ecl.txt:1689-1695, 1697-1716, 1718-1748"
+ranks = [0, 1]
+marks = [0]
+time_limit = 1800
+original_time_limit = 1800
+tags = ["ring", "curve", "random", "dense"]
+laser_approx = false
+lower_half_blocked = false
+notes = "三层旋转火弹环照原文；boss 随机游走沿用 Sub27 的边界 (32,48)-(352,144)；环弹数 i0=i7/3+7(E)/+11(N)。"

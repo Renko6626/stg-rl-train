@@ -1,0 +1,12 @@
+title = "Stage 7 道中 第 2 波"
+source = "th06"
+origin = "东方红魔乡 Stage 7（Extra，ecldata7.ecl.txt）道中，timeline 帧 1260–2360（Sub5 ×52），全档同型"
+source_ref = "ecldata7.ecl.txt:4308-4411, 185-205"
+ranks = [4, 4]
+marks = [0]
+time_limit = 1520
+original_time_limit = 1520
+tags = ["aimed", "stream"]
+laser_approx = false
+lower_half_blocked = false
+notes = "全档同型 [ENHL]，无难度分叉；小怪无敌（D8），一次自机狙 11×3 扇，flags 只模拟 bit1 出生冲刺。"
