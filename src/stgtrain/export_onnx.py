@@ -57,6 +57,7 @@ from .featurize.danger_topk_v2 import DangerTopKV2
 from .featurize.danger_topk_v3 import DangerTopKV3
 from .featurize.danger_topk_v4 import DangerTopKV4
 from .featurize.danger_topk_v5 import DangerTopKV5
+from .featurize.danger_topk_v6 import DangerTopKV6
 from .registry import FEATURIZERS, MODELS, load_builtins
 
 GRAPH_VERSION = 2          # 七输入（v2 / v3）
@@ -122,11 +123,31 @@ class DangerTopKV5Export(_ExportTopK, DangerTopKV5):
     """v5 再多拼一维 slow_held。"""
 
 
+class DangerTopKV6Export(DangerTopKV6):
+    """v6 两条选弹路径各自的可导出写法（`frame` 只影响 `player_velocity`，那一步本来就可导出）。
+
+    - `dt = true`：与 v2–v5 相同，走 `_ExportTopK` 那一份（按 d 选、`d ≤ d_max`）。
+    - `dt = false`：按当前边缘距离选、不设上限。原版用 `masked_fill(inf)` + `isfinite(kval)` 判「这一行是真弹」；
+      这里换成哨兵 1e30 + `kval < 1e29`。真实边缘距离在 1e4 以内，哨兵照样排在所有真弹之后，选出的 `idx`
+      与原版逐位相同；d / t 占位在 `__call__` 里连列删掉，不进图。
+    """
+
+    def _topk(self, p: Tensor, v: Tensor, radius: Tensor, mask: Tensor, hit_r: Tensor, k: int):
+        if self.dt:
+            return _ExportTopK._topk(self, p, v, radius, mask, hit_r, k)
+        edge = p.norm(dim=-1) - radius - hit_r[:, None]
+        kval, idx = torch.topk(torch.where(mask, edge, torch.full_like(edge, SENTINEL)), k, dim=1, largest=False)
+        zeros = torch.zeros_like(kval)
+        return idx, kval < SENTINEL * 0.1, zeros, zeros
+
+
 #: checkpoint 的特征化器名 → 可导出孪生。不在表里的一律拒绝导出。
 EXPORT_FEATURIZERS = {"danger_topk_v2": DangerTopKV2Export, "danger_topk_v3": DangerTopKV3Export,
-                      "danger_topk_v4": DangerTopKV4Export, "danger_topk_v5": DangerTopKV5Export}
+                      "danger_topk_v4": DangerTopKV4Export, "danger_topk_v5": DangerTopKV5Export,
+                      "danger_topk_v6": DangerTopKV6Export}
 #: 特征化器 → 要几个 held 输入（`HELD_INPUTS` 的前几个）。图版本 = GRAPH_VERSION + 这个数
-HELD_FEATURIZERS = {"danger_topk_v4": 1, "danger_topk_v5": 2}
+#: v6（Q1 / Q2 / R1a）的原始输入与 v5 完全相同，图版本仍是 4，DLL 不用改。
+HELD_FEATURIZERS = {"danger_topk_v4": 1, "danger_topk_v5": 2, "danger_topk_v6": 2}
 
 
 def uses_held(cfg: dict) -> int:
