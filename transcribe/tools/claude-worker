@@ -17,6 +17,23 @@ done
 prompt=$1
 cd "$cwd" || exit 2
 mkdir -p "$(dirname "$log")"
-timeout "$to" claude -p --model "${STG_CLAUDE_MODEL:-sonnet}" --dangerously-skip-permissions \
-  --output-format text "$prompt" 2> "$log" | tee -a "$log"
-exit "${PIPESTATUS[0]}"
+# 瞬时网络错误（本机出网走代理，并发长会话偶尔被掐断）：退避后整次重跑，最多 4 次。
+# 限额类错误不在这里重试——原样返回，由 pipeline 的 PROVIDER_FATAL 整批中止。
+TRANSIENT='API Error: Connection|ECONNRESET|socket hang up|overloaded_error|API Error: 5[0-9][0-9]'
+rc=1
+for attempt in 1 2 3 4; do
+  out=$(timeout "$to" claude -p --model "${STG_CLAUDE_MODEL:-sonnet}" --dangerously-skip-permissions \
+    --output-format text "$prompt" 2>> "$log")
+  rc=$?
+  printf '%s\n' "$out" >> "$log"
+  last=$(printf '%s\n' "$out" | tail -n 3)
+  if [ "$rc" -ne 0 ] || printf '%s' "$last" | grep -Eq "^($TRANSIENT)|$TRANSIENT"; then
+    if printf '%s' "$last" | grep -Eq "$TRANSIENT" && [ "$attempt" -lt 4 ]; then
+      echo "[claude-worker] 瞬时错误，第 $attempt 次，$((30 * attempt * attempt)) 秒后重跑：$last" >> "$log"
+      sleep $((30 * attempt * attempt)); continue
+    fi
+  fi
+  break
+done
+printf '%s\n' "$out"
+exit "$rc"
