@@ -12,7 +12,7 @@ from pathlib import Path
 from . import config
 from . import mapping as M
 from . import units as U
-from .thecl import EclFile, Instr
+from .thecl import RANK_ALL, EclFile, Instr
 
 ANNOT = "  //@ "
 HEADER = "// ===== "
@@ -60,7 +60,8 @@ def _angle_note(v: float, strict: bool) -> str | None:
 
 
 def annotate(i: Instr) -> str:
-    notes = [f"[{i.ranks}]"]
+    # 全难度掩码（0xff：无前缀或 !*）含 Extra，标 [ENHLX]；!E…!L 不含 Extra（mapping §2.2）。
+    notes = [f"[{'ENHLX' if i.ranks == RANK_ALL else i.ranks}]"]
     for idx in X_ARGS.get(i.name, ()):
         v = U._float(i.args[idx]) if idx < len(i.args) else None
         if v is not None:

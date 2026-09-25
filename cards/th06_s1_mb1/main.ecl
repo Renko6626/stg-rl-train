@@ -127,7 +127,7 @@ async sub pattern() {
 
 async sub boss_main() {
     set_invuln(65535);
-    set_hitbox(17.33fx);                   // enemy_set_hitbox(48, 56, 32) → 48/3
+    set_hitbox(16.0fx);                    // enemy_set_hitbox(48, 56, 32) → min(48,56)/3
     phase_begin(0, pattern, TIME_LIMIT, 0);
     wait_spell();
     loop { wait(1); }

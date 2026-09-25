@@ -28,7 +28,9 @@ async sub pellet_autoshoot() {
     sh_count(0, 1, 1);
     sh_speed(0, 3.0fx, 0fx);
     sh_angle(0, 0deg, 0deg);
-    wait(120 - rand(120));
+    // delayed：原作首发在设定帧 S 之后 k = 119 − rand(120) 帧；伴生任务首跑已在 S + 1，所以等 k − 1（mapping §4.3）
+    var k: int = 119 - rand(120);
+    if k > 0 { wait(k - 1); }
     loop {
         sh_fire(0);
         wait(120);

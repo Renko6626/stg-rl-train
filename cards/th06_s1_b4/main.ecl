@@ -130,7 +130,7 @@ async sub pattern() {
 
 async sub boss_main() {
     set_invuln(65535);
-    set_hitbox(17.33fx);
+    set_hitbox(16.0fx);
     spell_begin(0, SPELL_ID, pattern, TIME_LIMIT, 0, 0, 0);
     wait_spell();
     loop { wait(1); }

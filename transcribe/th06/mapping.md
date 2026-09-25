@@ -234,7 +234,9 @@ sub main() {
   这只小怪 **E/N/H 一颗弹都不发**。摘录的 `source.txt` 每行行尾都标了生效难度，以那个为准。
 - 回调链按难度分叉（如 `!NHL timer_callback_sub("Sub26")` vs `!E timer_callback_sub("Sub19")`）由切分处理，
   单元内只剩一条路。
-- **Extra（ecldata7）**：Extra 难度只执行 `!*` 的指令；带 `!E`…`!L` 的行在 Extra 里**永不执行**，直接删。
+- **Extra（ecldata7）**：ecldata7 **没有任何难度前缀**（二进制里 3055 条指令的掩码全是 0xff），**每一行都执行**，一行都不删。
+  摘录行尾的全难度标签 `[ENHLX]`（2026-09-25 之前的旧摘录写成 `[ENHL]`，同义）就是这个意思。
+  （一般规则：掩码 0xff，即无前缀或 `!*`，含 Extra；`!E`…`!L` 不含 Extra。但这种行只出现在 ecldata1–6 里，而 Extra 不跑这些文件。）
 
 ### 2.3 变量
 
@@ -256,7 +258,44 @@ sub main() {
   | `%SELF_Z` / `$SELF_Z` | 删（z 无意义） |
 
 - 数学：`math_int_add($I3, $I3, 1)` → `i3 = i3 + 1;`；`math_inc($I7)` → `i7 = i7 + 1;`；`math_float_*` 同理。
-  `math_norm_angle($F0)` 对 `angle` 变量是 no-op（BAM 天然回绕）。
+  ⚠️ **`angle` 变量存的是未回绕的 BAM 整数**（int32；`10deg − 20deg` = −1821，`300deg + 300deg` = 109227），
+  **比较按有符号整数**，只在交给 `sh_angle` / `fire` / `move_*` 这类消费方时才取低 16 位。所以：
+  - `math_norm_angle($F0)`：如果这个值之后**只**用来发弹或移动，可以删；如果之后还要 `cmp_float`、作差、取绝对值、
+    或者这个角每帧都在累加，就**必须手动归一**到 `[−32768, 32768)`（= TH06 的 `[−π, π)`），写法见下。
+  - 角度常量写 `32768bam` 以内；`65536bam` 超出字面量范围，是编译错误。
+
+```ecl
+const BALL: int = 48;
+
+// angle 变量存的是**未回绕**的 BAM 整数（int32）：`10deg − 20deg` 是 −1821，`300deg + 300deg` 是 109227；
+// 比较按有符号整数比。只有交给 sh_angle / fire / move_* 时才取低 16 位。
+// 所以 TH06 的 math_norm_angle 在「后面要比较 / 取绝对值」时必须手动归一到 [−32768, 32768)：
+async sub pattern() {
+    var f0: angle = 0deg;
+    var f1: angle = 0deg;
+    loop {
+        f1 = f1 + 2833bam;
+        // math_norm_angle($F1)
+        while f1 >= 32768bam { f1 = f1 - 32768bam - 32768bam; }
+        while f1 < 0bam - 32768bam { f1 = f1 + 32768bam + 32768bam; }
+        // F2 = |F1 − F0|（圆周距离）
+        var f2: angle = f1 - f0;
+        while f2 >= 32768bam { f2 = f2 - 32768bam - 32768bam; }
+        while f2 < 0bam - 32768bam { f2 = f2 + 32768bam + 32768bam; }
+        if f2 < 0bam { f2 = 0bam - f2; }
+        if f2 < 2731bam {                // < 15°
+            _ = fire(BALL, 6, $self_x, $self_y, 1.0fx, f1, none, none);
+        }
+        wait(1);
+    }
+}
+
+sub main() {
+    _ = spawn_enemy(0.0fx, 100.0fx, 100, 0, 0, 0, pattern);
+    loop { wait(1); }
+}
+```
+
 - `math_atan2(out, x1, y1, x2, y2)` = 从点 (x1,y1) 指向 (x2,y2) 的角（`EnemyEclInstr.cpp:396`，参数名在源码里错位，
   以此为准）→ `out = atan2(y2 − y1, x2 − x1)`，坐标按 §1 换算。
 - `set_var_self_x($F0)` → `f0 = $self_x`（注意坐标系，同上表）。
@@ -296,6 +335,34 @@ sub main() {
   ```
 
   → `for k in 0..16 { wait(2); …; }`
+- **循环退出后，块时间停在 `jump_dec` 自己的静态时间**，而不是「循环总帧数」：最后一次 `jump_dec`
+  计数到 0 时只是往下走（`EclManager.cpp:125-127` 的 `break`），不改时间。所以紧跟的 `+N: //T` 照样
+  `wait(T − jump_dec 的静态时间)`：
+
+  ```text
+  set_int($I4, 8);
+  Sub50_68:
+      bullet_...;
+  +8: //8
+      jump_dec(0, Sub50_68, $I4);   ← 8 轮 × 8 帧；最后一次在块时间 8 处落空
+  +120: //128                       ← 等 128 − 8 = 120，不是 128 − 64
+  ```
+
+  → `for k in 0..8 { …; wait(8); } wait(120);`（一轮 194 帧，s4_b10 实测）
+- **条件跳转也一样**：`jump_neq(t, L)` 等跳转命中时把时间**设为绝对值 `t`**，不耗帧。难度分支的典型写法：
+
+  ```text
+  +40: //40
+      cmp_int($DIFFICULTY, 0);
+      jump_neq(100, L_N);          ← 非 E：时间设为 100，跳过去
+  +60: //100   … E 的攻击 …
+  L_N:
+      cmp_int($DIFFICULTY, 1);
+      jump_neq(160, L_H);
+  +60: //160   … N 的攻击 …        ← N 走到这里只等 160 − 100 = 60，不是 120
+  ```
+
+  每一档都只等 60（s4_b1）。
 - **`cmp_int` / `cmp_float` + `jump_lss/leq/equ/gre/geq/neq`**：比较结果寄存器 → `if` / `while`。
 - **`call("SubX", a, b)`**：TH06 把**调用方整个上下文**（`$I0-7`、`$F0-3`）拷给被调方，再把 `$I0 = a`、`$F0 = b`；
   `ret` 时**整个恢复**（`EclManager.cpp:249-273`）。所以：被调方读到调用方的全部变量，写的全部不回传。
@@ -331,7 +398,11 @@ sub main() {
   「0→A，1→B，其余→C」，不是依次调三个。
 - **`time_set($I0)`**：块时间直接加 `$I0`（`EclManager.cpp:842`），等于把后面指令的等待缩短 `$I0` 帧。
 - `enemy_flag_disable_call_stack`：只影响栈拷贝，丢弃。
-- 容量红线：单任务 locals ≤ 64 字、调用深 ≤ 8、求值栈 ≤ 32。原文 sub 链很长时，把不相干的段拆到不同的 `async sub`。
+- 容量红线：单任务 locals ≤ 64 字、调用深 ≤ 8、求值栈 ≤ 32、**指令 ≤ 1024 条/帧**（超了就 Fault 3 `FAULT_BUDGET`，任务被杀）。
+  原文 sub 链很长时，把不相干的段拆到不同的 `async sub`。
+  ⚠️ **逐颗 `fire` 一帧最多约 30 颗**（每颗带两次 `rand` 约 31 条指令；实测 32 颗 OK、36 颗 Fault）。`sh_fire` 一次算一条，不受影响。
+  更多颗就拆给几个 emitter 任务各发一部分。emitter 出生当帧不跑：要么**整轮都**交给 emitter（整轮晚 1 帧，写进 report），
+  要么提前一帧 spawn 好、在开火帧一起发。**别一半在本任务发、一半在 emitter 里发**，那样同一轮会被劈成两帧。
 - ⚠️ **xformdef 占 locals**：一个 sub 每引用一个 xformdef，就在**这个 sub** 的 locals 里占「物理槽数 × 3」字
   （`step_speed` 占 2 槽）。4 个 `@40 step_speed; turn; set_speed` 就是 48 字，再调一个带变量的 sub 就超 64。
   超了（报「locals 总量 … 超出上限 64」）→ **按弹种拆成几个并行 `async sub`**，同帧 `spawn`、各自数帧（范例 th06_s1_b4）。
@@ -451,7 +522,7 @@ sub main() {
 }
 ```
 
-random 族逐颗发：
+random 族逐颗发（count > 30 时见 §2.4 指令预算）：
 
 ```ecl
 const RICE: int = 64;
@@ -507,19 +578,32 @@ TH06（`EclManager.cpp:428-440`、`980-989`）：
 - `shoot_interval_delayed(n)`：同上，但计时器初值随机 `[0, n)`。
 - **帧对齐**：`RunEcl` 同一帧先执行到期指令、再走移动与开火计时（`EclManager.cpp:116` 起的主循环、`:980-987`），
   设定帧本身就 tick 一次——原作首发在设定帧之后第 `n − 1` 帧（delayed：第 `n − 1 − rand(n)` 帧）。
-  我方写法 A 用 `first = n`（delayed：`n − rand(n)`）再 `wait(first)`，**统一晚 1 帧、开火次数与原作一致**，这是接受的近似。
+  记 **k = 原作开火帧相对设定帧 S 的偏移**：首发 `k = n − 1`（delayed：`k = n − 1 − rand(n)`，取值 0…n−1），之后每次 `k += n`；
+  原作在 `until` 帧先执行 `shoot_interval(0)` 再计时，所以 **`k < until` 才开火**。
+  - 写法 A（伴生任务，在 S 帧 `spawn`）：子任务**出生当帧不跑**（§2.1），首跑已在 S+1，所以 `wait(k − 1)` 正好落在 S+k，**与原作逐帧一致**。
+    唯一例外是 delayed 摇到 `k = 0`，这一发只能在 S+1 发（晚 1 帧，概率 1/n）。
+    （2026-09-25 更正：原文写的是 `first = n` + 「统一晚 1 帧」，实测晚 **2** 帧，因为漏算了子任务晚 1 帧起跑；s4_b11 / s7_b9 审核实测。）
+  - 写法 B（在执行 `shoot_interval` 的那个任务里自己数帧）：在 S+k 帧开火，同样逐帧一致。
+  - **同帧换 props**：原作在同一帧里先执行块指令（`bullet_*` 换 props）再开火，所以 **k 正好落在换 props 那一帧时，用新 props**；
+    落在换 props 之前的，用旧 props（s4_b4）。
+- **计时器是敌身上的状态，跨 `call` / `ret` 持续**（`Enemy.hpp:226-227` 的 `shootInterval` / `shootIntervalTimer` 不在 `EnemyEclContext` 里，
+  `ret` 不会恢复它；`:980` 的开火分支不管当前在跑哪个 sub 都执行）。只有新的一条 `shoot_interval*` 才会重置它。
+  所以伴生任务要一直覆盖到**原文下一次 `shoot_interval*` 的帧**，不能每个 sub 各起一个（每起一个都会把计时重新从 0 算，s4_b4）。
+  如果中途 props 会变，就把它写成贯穿整段模式的调度任务（写法 B），只在原文真正执行 `shoot_interval*` 的帧改间隔、重置 k。
 - 自动开火与块时间轴无关，只要敌活着就一直打；`shoot_disable` 期间不发。
 - `shoot_now()`：立即用 `bulletProps` 开一次火。
 
 **写法 A（常见：配一次参数、之后只靠自动射击）**——伴生任务，带「打到第几帧为止」参数
 （原文后面若有 `shoot_interval(0)` 或参数改变，按原文时间算出 `until`）。
-**停火守卫用 `>`**：原作在 `until` 那一帧先执行 `shoot_interval(0)` 再计时，所以原作开火帧 `k` 须满足 `k < until`；
-我方 `first = k + 1`（见上「帧对齐」），等价于 `first ≤ until` 才开火 ⇒ 守卫写 `first > until` / `t + interval > until`。
-（2026-09-16 曾误改成 `>=`、2026-09-17 核实同帧 tick 后改回；`>=` 会在边界上少打一轮，概率约 1/n。）
+**停火守卫用 `>=`，而且比较的是 k 本身**（`k >= until` 就不发）。`until` 和 `k` 都从设定帧 S 算起。
+（历史：2026-09-17 的守卫 `first > until` 配的是旧的 `first = k + 1`，两者是一套；改成 k 之后守卫必须一起换，别只改一半。）
 
 ```ecl
 const KUNAI: int = 80;
 
+// 在原作执行 shoot_interval(_delayed)(n) 的那一帧 spawn（记为设定帧 S）。
+// k = 原作开火帧相对 S 的偏移：非 delayed 首发 k = n − 1；delayed 首发 k = n − 1 − rand(n)；此后每 n 帧。
+// 伴生任务出生当帧不跑（§2.1），首跑已在 S + 1，所以等 k − 1 帧正好落在 S + k。
 async sub autoshoot(interval: int, delayed: int, until: int) {
     sh_reset(0);
     sh_sprite(0, KUNAI, 6);
@@ -527,17 +611,15 @@ async sub autoshoot(interval: int, delayed: int, until: int) {
     sh_count(0, 6, 1);
     sh_speed(0, 3.0fx, 0fx);
     sh_angle(0, 0deg, 0deg);
-    var t: int = 0;
-    var first: int = interval;
-    if delayed != 0 { first = interval - rand(interval); }
-    if first > until { return; }
-    wait(first);
-    t = first;
+    var k: int = interval - 1;
+    if delayed != 0 { k = interval - 1 - rand(interval); }
+    if k >= until { return; }
+    if k > 0 { wait(k - 1); }        // k == 0（delayed 摇到 n − 1）：只能在 S + 1 发，晚 1 帧，概率 1/n
     loop {
         sh_fire(0);
-        if t + interval > until { return; }
+        if k + interval >= until { return; }
         wait(interval);
-        t = t + interval;
+        k = k + interval;
     }
 }
 
@@ -554,7 +636,8 @@ sub main() {
 }
 ```
 
-**写法 B（参数在自动射击期间还会变）**：在主任务里自己数帧，每帧 `wait(1)` 时判断是否到了开火帧。
+**写法 B（参数在自动射击期间还会变）**：在主任务里自己数帧，每帧 `wait(1)` 时判断是否到了开火帧；开火帧 = S + k（见「帧对齐」），
+同帧先换 props 再判开火。
 
 ### 4.4 `bullet_cancel`
 
@@ -580,7 +663,7 @@ rank 16 下的修正量（`Enemy.hpp` 的 `BulletRank*Inner`，C 整数除法向
 
 | flags 位 | 行为（TH06） | xformdef |
 |---|---|---|
-| `0x1` | 出生后 16 帧内额外速度 5→0 线性衰减 | `add_speed(5.0fx); @16 set_accel(-0.3125fx); stop_fx();` |
+| `0x1` | 出生后 16 帧内额外速度 5→0 线性衰减。**与 `0x40/0x80/0x100` 同用时无效果**：后者每帧用不含冲刺的速度重算 velocity（`BulletManager.cpp:750-829`），直接不写冲刺。与 `0x400/0x800` 同用时冲刺照常（反弹只在出界那帧写速度；全作没有这种组合） | `add_speed(5.0fx); @16 set_accel(-0.3125fx); stop_fx();` |
 | `0x10` | 前 `i0` 帧（`≤0` 视为永久）加速度 `f0`；`f1 ≤ −999` 沿弹自身方向，否则沿固定角 `f1` | 沿自身：`@D set_accel(f0); stop_fx();`；固定角 θ：`@D set_gravity(f0·cosθ, f0·sinθ); stop_fx();` |
 | `0x20` | 前 `i0` 帧每帧 `speed += f0`、`angle += f1` | `set_accel(f0); @D set_ang_vel(f1); stop_fx();` |
 | `0x40` | 每 `i0` 帧一周期：速度从当前值线性减到 0，周期末 **转 `f0`**、速度设为 `f1`（`f1 < 0` 保持原速），共 `i1` 次 | 每周期 `@I step_speed(0fx, I); turn(f0); set_speed(f1);` |
@@ -595,6 +678,56 @@ rank 16 下的修正量（`Enemy.hpp` 的 `BulletRank*Inner`，C 整数除法向
 - `0x1` 与 `0x10` 叠加（如 `flags = 19`）：`0x10` 的计时也从出生算起，`@D` 写成 `@(D−16)` 接在冲刺之后：
   `add_speed(5.0fx); @16 set_accel(-0.3125fx); @(D-16) set_accel(f0); stop_fx();`（`D−16` 请算成数字）。
 - 反弹后改速度、反弹 > 3 次：做不到，近似并在 report 写明。
+- **`f0` / `f1` 是运行期变量**（`%F0`、`%PLAYER_ANGLE`、循环累加量……）：TH06 在**建弹时**把值拷进每颗弹
+  （`BulletManager.cpp:345-356`），所以**同一条 `bullet_*` 的弹共享一个值**。按下面的顺序选：
+  1. 值只有少数几个离散取值（难度、循环计数）：每个值写一个 xformdef，按值分派。
+  2. 连续取值、且 `run` 实测任务峰值加上「每轮颗数 × 同时在场的轮数」≤ 192：用弹上任务，精确。
+     任务出生当帧不跑，比 xformdef 晚 1 帧起跑，等待要减 1（ecl-lang `4-bullets.md`「sh_task 与 xformdef 天生错开 1 帧」）。
+     每轮的值经全局自由段槽传给任务，前提是相邻两轮至少隔 2 帧，否则任务读到的是下一轮的值。
+  3. 否则就量化：值域均分成 N 档，**每档 ≤ 11.25°**（`[−90°, 90°)` 取 16 档），取档中心；每轮 `rand(N)` 选**一档**，全轮共享。
+     每档一个 xformdef，配一个只引用它的同步 sub：兄弟 sub 的 locals 由调用图着色复用，16 档也不超 64 字。
+     report 写明档数和最大误差（半个档宽）。
+- **摘录注释里 `bullet_effects` 的 `a4` / `a5` 未必是角度**：`f0` 在 0x10 下是加速度，`f1` 在 0x40 族下是速度。
+  摘录器对浮点参数一律按 rad→BAM 注释，这两位**以本表为准**，别照抄注释里的 bam。
+
+```ecl
+const RICE: int = 64;
+
+// bullet_effects(180, 1, -1, -1, %F0, 1.4f, …) + flags 0x40，%F0 每轮 set_float_rand_bound_min($F0, π, −π/2) 重摇。
+// 值域 [−90°, 90°) 分 N 档取档中心；同一轮所有弹共享一档（TH06 在弹创建时拷 exFloats，同轮共享）。
+// 每档一个 xformdef + 一个只引用它的同步 sub：兄弟 sub 的 locals 由调用图着色复用，N = 16 也不超 64 字。
+// 示例只写 4 档；实际按「每档 ≤ 11.25°」取 N（[−90°, 90°) → 16 档）。
+xformdef TQ0 { @180 step_speed(0fx, 180); turn(-12288bam); set_speed(1.4fx); }  // [−90°, −45°) → −67.5°
+xformdef TQ1 { @180 step_speed(0fx, 180); turn(-4096bam); set_speed(1.4fx); }   // [−45°, 0°)  → −22.5°
+xformdef TQ2 { @180 step_speed(0fx, 180); turn(4096bam); set_speed(1.4fx); }    // [0°, 45°)   → 22.5°
+xformdef TQ3 { @180 step_speed(0fx, 180); turn(12288bam); set_speed(1.4fx); }   // [45°, 90°)  → 67.5°
+
+sub vol_q0() { sh_xform(0, TQ0); sh_fire(0); }
+sub vol_q1() { sh_xform(0, TQ1); sh_fire(0); }
+sub vol_q2() { sh_xform(0, TQ2); sh_fire(0); }
+sub vol_q3() { sh_xform(0, TQ3); sh_fire(0); }
+
+async sub pattern() {
+    loop {
+        sh_reset(0);
+        sh_sprite(0, RICE, 6);
+        sh_ring(0, 1);
+        sh_count(0, 16, 2);
+        sh_speed(0, 2.0fx, -0.5fx);
+        var q: int = rand(4);            // 每轮一次，全轮共享
+        if q == 0 { vol_q0(); }
+        else if q == 1 { vol_q1(); }
+        else if q == 2 { vol_q2(); }
+        else { vol_q3(); }
+        wait(30);
+    }
+}
+
+sub main() {
+    _ = spawn_enemy(0.0fx, 100.0fx, 100, 0, 0, 0, pattern);
+    loop { wait(1); }
+}
+```
 
 ```ecl
 const RICE: int = 64;
@@ -838,6 +971,9 @@ TH06 的段落靠回调串起来（`EnemyManager.cpp:340-447`）：
 
 - 非符 → `phase_begin(0, pattern, TIME_LIMIT, 0);`
 - 符卡 → `spell_begin(0, SPELL_ID, pattern, TIME_LIMIT, 0, FLAGS, 0);`，`spellcard_flag_timeout(1)`（耐久卡）→ `FLAGS = SPELL_SURVIVAL`，否则 0。
+  `SPELL_ID` 取 `!E`/`!N`/`!H`/`!L` 各行里**本单元 ranks 下界那一档**的 id（`−1` 的档本来就不在单元 ranks 里）。
+  各档 id 不同也不用分支：id 只进 `boss_ui` 做表现，训练不读。想忠实也可以按 rank 取
+  （`var sid: int = …; if rank == RANK_HARD { sid = …; } else if rank >= RANK_LUNATIC { sid = …; }`，再传给 `spell_begin`），两种写法审核都不算发现。
 - `TIME_LIMIT` = `unit.json` 的 `time_limit`（已钳到 3000）。
 - 原文 `spellcard_start` 之后的「移到中央 + 暂不可伤」前奏属于攻击的一部分，照写进 `pattern`。
 - **符卡练习入口**：原文有形如 `call("Sub32"); enemy_flag_death(3); timer_callback_sub(...); life_callback_threshold(0); +60: call("宣言"); call("模式")`

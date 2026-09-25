@@ -181,7 +181,16 @@ def test_extract_units_are_verbatim_and_annotated(ecl, monkeypatch):
     assert "x1=-132" in wt  # enemy_create x 换算
     assert "a7=5.625°=1024bam" in wt  # bullet 角度：π/32 = 65536/64
     assert "弹型→BULLET=128" in wt
-    assert "[ENHL]" in wt
+    assert "[ENHLX]" in wt  # 全难度掩码含 Extra（mapping §2.2）
+
+
+def test_rank_label_all_mask_includes_extra():
+    e = parse("sub A()\n{\n    set_int($I0, 1);\n!L    set_int($I1, 2);\n!*    set_int($I2, 3);\n}\n"
+              "timeline T()\n{\n}\n")
+    notes = [X.annotate(i) for i in e.subs["A"].instrs]
+    assert "[ENHLX]" in notes[0]            # 无前缀 = 掩码 0xff，Extra 也执行
+    assert "[L]" in notes[1] and "X" not in notes[1].split("]")[0]
+    assert "[ENHLX]" in notes[2]            # !* 同样是全掩码
 
 
 def test_maybe_angle_annotations():
