@@ -190,3 +190,24 @@ def test_usage_rows_do_not_mask_unit_state(work):
     pipeline.record("th06_s7_w01", "pending")
     pipeline.record("th06_s7_w01", "usage", kind="transcribe", steps=0)
     assert pipeline.states()["th06_s7_w01"]["state"] == "pending"
+
+
+def test_run_worker_aborts_whole_batch_on_provider_quota(work, monkeypatch, tmp_path):
+    """DeepSeek 余额 / 限流错误时整批中止，不回写任何单元状态（2026-09-25 两次余额耗尽都把状态搞乱，
+    还让没真正返工的旧卡进了审核）。"""
+    fake = tmp_path / "fake-dsh"
+    fake.write_text("#!/bin/sh\necho 'dsh-flash: worker failed (exit 1)'\necho 'dsh: QUOTA: Insufficient Balance (request_id: x)'\nexit 1\n")
+    fake.chmod(0o755)
+    monkeypatch.setattr(pipeline, "dsh_bin", lambda: str(fake))
+
+    class Abort(Exception):
+        pass
+
+    def boom(msg):
+        raise Abort(msg)
+
+    monkeypatch.setattr(pipeline, "_abort_provider", boom)
+    d = tmp_path / "unit"
+    d.mkdir()
+    with pytest.raises(Abort, match="QUOTA"):
+        pipeline.run_worker(d, "x", tmp_path / "logs" / "u.transcribe.0.log")

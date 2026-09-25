@@ -109,7 +109,22 @@ def run_worker(cwd: Path, prompt: str, log: Path, kind: str = "transcribe") -> i
            "--reasoning", reasoning_for(kind), "--log", str(log), prompt]
     with (log.with_suffix(".stdout")).open("w", encoding="utf-8") as out:
         p = subprocess.run(cmd, cwd=cwd, env=env, stdout=out, stderr=subprocess.STDOUT, timeout=DSH_TIMEOUT + 120)
+    if p.returncode != 0:
+        tail = log.with_suffix(".stdout").read_text(encoding="utf-8", errors="replace")[-2000:]
+        if any(k in tail for k in PROVIDER_FATAL):
+            _abort_provider(f"{cwd.name}: {tail.strip().splitlines()[-1]}")
     return p.returncode
+
+
+# 供应商侧的致命错误：余额耗尽 / 因余额降并发。继续跑只会把一批单元误记成 validated / needs_human
+# （旧卡进审核、审核没产出 verdict），所以整批立即中止、不回写该单元状态（2026-09-25 两次踩坑）。
+PROVIDER_FATAL = ("QUOTA:", "RATE_LIMIT:", "Insufficient Balance")
+
+
+def _abort_provider(msg: str) -> None:
+    sys.stderr.write(f"\n[pipeline] 供应商错误，整批中止（未回写本单元状态，充值后重跑同一命令即可接上）：{msg}\n")
+    sys.stderr.flush()
+    os._exit(75)
 
 
 def _paths_block() -> str:
