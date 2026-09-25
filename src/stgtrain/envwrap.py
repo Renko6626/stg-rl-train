@@ -366,6 +366,16 @@ class EnvWrapper:
         self.slow_held = torch.full((self.n,), DIR_HOLD_NEVER, dtype=torch.int64, device=device)
         env_ids = torch.arange(self.n, device=device) % self._group_k if self._group_k else None
         self.motor = MotorLayer(cfg, self.n, device, seed, env_ids=env_ids) if cfg["motor"]["enabled"] else None
+        # 判定点随机增大（实验 S）：每局每 env 一个 m ~ U[lo, hi] px，对模型不可见；引擎按放大的判定真判死。
+        # 只在 CPU 上抽、只在有 env 结束的那步重抽并下发，不碰 GPU 同步。
+        lo, hi = (float(v) for v in e["hit_extra"])
+        self.hit_extra: Tensor | None = None
+        if hi > 0:
+            if groups:
+                raise ValueError("env.hit_extra 只用于训练；批量评测请经 evaluate.eval_cfg 关掉它")
+            self._hit_lo, self._hit_hi = lo, hi
+            self._hit_gen = torch.Generator().manual_seed((int(seed) * 1000003 + 71) % (2**63))
+            self.hit_extra = torch.zeros(self.n)
 
     def _dev(self, t: Tensor) -> Tensor:
         # CUDA：从 pinned 缓冲异步拷贝。安全性来自下一次 step 之前 `buttons.to("cpu")` 的阻塞同步——
@@ -382,8 +392,16 @@ class EnvWrapper:
         """课程学习：改起点采样权重（下一次 reset 生效，即各 env 下一局才换分布）。"""
         self.env.set_start_weights(list(w))
 
+    def _draw_hit(self, mask: Tensor) -> None:
+        if self.hit_extra is None or not bool(mask.any()):
+            return
+        u = torch.rand(self.n, generator=self._hit_gen)
+        self.hit_extra = torch.where(mask, self._hit_lo + (self._hit_hi - self._hit_lo) * u, self.hit_extra)
+        self.env.set_hit_radius_extra(self.hit_extra.tolist())
+
     def reset(self) -> RawObs:
         self.env.reset()
+        self._draw_hit(torch.ones(self.n, dtype=torch.bool))
         self.intent.reset_all()
         self._draw_mirror(torch.ones(self.n, dtype=torch.bool, device=self.device))
         self.prev_buttons = torch.zeros(self.n, dtype=torch.int64, device=self.device)
@@ -431,6 +449,8 @@ class EnvWrapper:
                 mode = mode.clone() if mode is not None else None
                 self.intent.reset(ended)
                 self._draw_mirror(ended)
+                if self.hit_extra is not None:   # 读 CPU 缓冲的 done，不触发 GPU 同步
+                    self._draw_hit(self.buf["done"][:self.n].to(torch.int64) != 0)
                 refreshed = self.intent.advance(self.frame_skip, ~ended)
                 info = StepInfo(done=done, events=events, ep_frames=ep_frames, refreshed=refreshed,
                                 buttons=buttons, prev_buttons=self.prev_buttons,

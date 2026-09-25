@@ -1,0 +1,51 @@
+# 实验 S1（2026-09-25）：R1c + **判定点随机增大** env.hit_extra = [0, 2] px
+#
+# 问题（docs/experiments.md「死亡时间线」）：难卡上八成死亡是「有安全走法却选了擦边的」—— 请求动作的最坏净距中位 −1 px，
+# 当时最好的动作安全 5–6 px；自由档（几乎没有跟点奖励）同样 82% ⇒ 不是拿风险换奖励，是尾部风险没学进价值。
+# 做法：每局每 env 抽 m ~ U[0, 2] px 加到自机中弹判定半径，对模型不可见；**死亡由引擎按放大的判定真判**（终止本局、
+# 丢掉后面全部回报，语义同真死亡）—— stg_rl 0.4.0 的 set_hit_radius_extra。评测一律关（量真实判定下的撑过率）。
+# 与 R1c 只差这一项（引擎同为 0.4.0；对照是同批的 r1c-e04）。S1 / S2 只差 hi（2 / 4 px），看剂量反应。
+#
+# 判读（相对 r1c-e04）：① 贴弹 <12px / <4px 下降；② 难起点死亡（hard_deaths / death_timeline）减少、「决策错·擦边」占比下降；
+# ③ 主判据撑过不低于对照超过 3pp（噪声约 1–2.4pp）；④ 跟点率不大掉。训练侧死亡率会因判定变大而虚高，不作判据。
+[run]
+total_updates = 3500
+ckpt_every = 100
+eval_every = 250
+
+[env]
+num_envs = 4096
+hit_extra = [0.0, 2.0]
+threads = 0
+
+[intent]
+name = "mixed_v1"
+
+[featurize]
+name = "danger_topk_v6"
+frame = "static"
+dt = false
+
+[motor]
+enabled = true
+hold = [2, 6]
+delay = [0, 2]
+slow = true
+
+[reward.terms]
+death = 10.0
+follow_shaping = 1.0
+hold = 0.01
+segment_survived = 0.0
+key_press = -0.003
+quick_change = -0.01
+shift_toggle = 0.0
+edge_hug = -0.02
+
+[model]
+name = "set_attn_v1"
+sa_layers = 1
+density_fp32 = true
+
+[ppo]
+amp = "bf16"

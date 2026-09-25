@@ -66,15 +66,18 @@ def hysteresis_action(logits: Tensor, prev: Tensor, tau: float) -> Tensor:
 
 
 def eval_cfg(cfg: dict) -> dict:
-    """评测用的配置：`eval.intent` 非空时覆盖意图（训练意图换了，尺子不跟着换）。"""
+    """评测用的配置：`eval.intent` 非空时覆盖意图（训练意图换了，尺子不跟着换）；判定点随机增大一律关掉。"""
     name = cfg["eval"].get("intent") or cfg["intent"]["name"]
     motor_off = cfg["eval"].get("motor", "train") == "off" and cfg["motor"]["enabled"]
-    if name == cfg["intent"]["name"] and not motor_off:
+    hit_on = float(cfg.get("env", {}).get("hit_extra", [0.0, 0.0])[1]) > 0
+    if name == cfg["intent"]["name"] and not motor_off and not hit_on:
         return cfg
     c = copy.deepcopy(cfg)
     c["intent"]["name"] = name
     if motor_off:
         c["motor"]["enabled"] = False
+    if hit_on:   # 评测量的永远是真实判定下的撑过率
+        c["env"]["hit_extra"] = [0.0, 0.0]
     return c
 
 

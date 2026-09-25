@@ -352,3 +352,51 @@ def test_threads_zero_means_cpus_this_process_may_use(monkeypatch):
     monkeypatch.setattr(os, "cpu_count", lambda: 112)
     monkeypatch.setattr(os, "sched_getaffinity", lambda pid: set(range(32)), raising=False)
     assert usable_cpus() == 32
+
+
+# ── 判定点随机增大（env.hit_extra，实验 S；stg_rl ≥ 0.4.0 的 set_hit_radius_extra）─────────────────
+
+def _hit_wrap(extra, seed=0, n=16):
+    cfg = small_cfg(env={"num_envs": n, "hit_extra": extra})
+    return EnvWrapper(cfg, IMAGES, [stg_rl.Start("example_ring", 0, 2)], CPU, seed=seed)
+
+
+def test_hit_extra_off_by_default_leaves_table_radius():
+    w = _hit_wrap([0.0, 0.0])
+    o = w.reset()
+    assert w.hit_extra is None
+    base = float(o.player_hit_r[0])
+    assert torch.allclose(o.player_hit_r, torch.full_like(o.player_hit_r, base))
+
+
+def test_hit_extra_draws_per_env_in_range_and_shows_in_engine():
+    w = _hit_wrap([1.0, 4.0])
+    o = w.reset()
+    assert w.hit_extra is not None and w.hit_extra.shape == (16,)
+    assert bool(((w.hit_extra >= 1.0) & (w.hit_extra <= 4.0)).all()) and float(w.hit_extra.std()) > 0
+    o, _ = w.step(torch.zeros(16, dtype=torch.int64))
+    base = float(_hit_wrap([0.0, 0.0]).reset().player_hit_r[0])
+    assert torch.allclose(o.player_hit_r, base + w.hit_extra.to(o.player_hit_r.dtype), atol=1e-4)
+
+
+def test_hit_extra_redraws_only_for_ended_envs_and_is_deterministic():
+    a, b = _hit_wrap([0.0, 4.0], seed=3), _hit_wrap([0.0, 4.0], seed=3)
+    a.reset(); b.reset()
+    ended_seen = False
+    for t in range(400):
+        act = torch.full((16,), t % 18, dtype=torch.int64)
+        before = a.hit_extra.clone()
+        _, ia = a.step(act)
+        b.step(act)
+        ended = ia.done != 0
+        assert torch.equal(a.hit_extra, b.hit_extra), "同种子逐位相同"
+        assert torch.equal(a.hit_extra[~ended], before[~ended]), "没结束的 env 不重抽"
+        ended_seen |= bool(ended.any())
+    assert ended_seen
+
+
+def test_hit_extra_rejects_bad_range():
+    with pytest.raises(ValueError):
+        small_cfg(env={"hit_extra": [3.0, 1.0]})
+    with pytest.raises(ValueError):
+        small_cfg(env={"hit_extra": [-1.0, 2.0]})

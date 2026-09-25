@@ -11,7 +11,10 @@ DEFAULTS: dict = {
             "torch_threads": 2, "max_minutes": 0.0},
     "env": {"cards_dir": "cards", "eval_splits": "eval/splits.toml", "num_envs": 2048, "threads": 0,
             "frame_skip": 1, "max_frames": 3600, "warmup_max": 120, "bullets_cap": 1024, "ranks": [2],
-            "mirror": True},
+            "mirror": True,
+            # 判定点随机增大（实验 S）：每局每 env 抽 m ~ U[lo, hi] px 追加到自机中弹判定半径，对模型不可见；
+            # 死亡由引擎按放大的判定真判（stg_rl ≥ 0.4.0 的 set_hit_radius_extra）。[0, 0] = 关。评测一律关。
+            "hit_extra": [0.0, 0.0]},
     "intent": {"name": "lower_half_uniform_v1", "margin": 16.0, "interval": [120, 300],
                "mix": {"follow": 0.6, "anchor": 0.3, "free": 0.1}},
     "curriculum": {"enabled": True, "interval": 20, "ema_decay": 0.98, "alpha": 1.0, "fail_floor": 0.05,
@@ -111,6 +114,9 @@ def validate(cfg: dict) -> None:
             raise ValueError(f"run.{k} 须 ≥ 1")
     if ppo["amp"] not in ("off", "bf16"):
         raise ValueError(f"ppo.amp 须为 \"off\" / \"bf16\"，得 {ppo['amp']!r}")
+    hx = env["hit_extra"]
+    if len(hx) != 2 or not (0.0 <= float(hx[0]) <= float(hx[1]) <= 64.0):
+        raise ValueError(f"env.hit_extra 须为 [lo, hi] 且 0 ≤ lo ≤ hi ≤ 64，得 {hx}")
     if run["max_minutes"] < 0:
         raise ValueError("run.max_minutes 须 ≥ 0（0 = 不限时）")
 
