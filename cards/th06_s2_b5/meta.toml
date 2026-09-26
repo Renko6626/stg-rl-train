@@ -9,4 +9,4 @@ original_time_limit = 2400
 tags = ["random", "aimed", "dense", "mixed"]
 laser_approx = false
 lower_half_blocked = false
-notes = "boss 无敌；random 环 6 轮 × 5 发 + 扇形 3/5 路；ex_ins_0 的冻结/随机加速用弹挂任务 EPOCH 表达（换色纯表现丢弃）。"
+notes = "boss 无敌；random 环 6 轮 × 5 发 + 扇形 3/5 路；ex_ins_0 的冻结/随机加速用 xformdef + wait_signal 表达（换色纯表现丢弃）。"

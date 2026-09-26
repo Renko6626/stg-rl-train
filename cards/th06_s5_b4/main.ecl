@@ -22,7 +22,7 @@ async sub oob_guard() {
 // Sub38/39/40/41：四只使魔。move_dir_time_decelerate(370, dir, 0.8)（位移 0.8*370/2 = 148）
 // 后在 +50 起每 14 帧发一次 bullet_fan(4, 2, c1, 1, s1, 1.2, %F0, 0.9°=164bam, 2560)，共 17 次，
 // 基准角每发按 inc 递增。四只只有 dir 与 inc 不同；子弹随机基准角由 F0 抽取。
-async sub minion(dir_angle: angle, inc: angle) {
+async sub minion(dir_angle: angle, inc: angle, color: int) {
     set_invuln(65535);
     spawn oob_guard();
     set_hitbox(9.33fx);                       // enemy_set_hitbox(28, 28, 32) → 28/3
@@ -40,7 +40,7 @@ async sub minion(dir_angle: angle, inc: angle) {
     wait(50);
     for k1 in 0..17 {                         // math_int_div($I4, 250, 14) = 17
         sh_reset(0);
-        sh_sprite(0, KUNAI, 2);
+        sh_sprite(0, KUNAI, color);
         sh_aim(0, 0);
         sh_ring(0, 0);
         sh_count(0, c1, 1);
@@ -57,10 +57,10 @@ async sub minion(dir_angle: angle, inc: angle) {
 
 // Sub37：在 boss 当前位置生成四只使魔（Sub38–41），60 帧后返回
 sub sub37() {
-    _ = spawn_enemy($self_x, $self_y, 1, 0, 0, 0, minion(8192bam, 6554bam));    // Sub38 45°,  +36°
-    _ = spawn_enemy($self_x, $self_y, 1, 0, 0, 0, minion(0bam, -2048bam));      // Sub39 0°,   −11.25°
-    _ = spawn_enemy($self_x, $self_y, 1, 0, 0, 0, minion(24576bam, -6554bam));  // Sub40 135°, −36°
-    _ = spawn_enemy($self_x, $self_y, 1, 0, 0, 0, minion(32768bam, 2048bam));   // Sub41 180°, +11.25°
+    _ = spawn_enemy($self_x, $self_y, 1, 0, 0, 0, minion(8192bam, 6554bam, 2));    // Sub38 45°,  +36°
+    _ = spawn_enemy($self_x, $self_y, 1, 0, 0, 0, minion(0bam, -2048bam, 6));      // Sub39 0°,   −11.25°
+    _ = spawn_enemy($self_x, $self_y, 1, 0, 0, 0, minion(24576bam, -6554bam, 6));  // Sub40 135°, −36°
+    _ = spawn_enemy($self_x, $self_y, 1, 0, 0, 0, minion(32768bam, 2048bam, 2));   // Sub41 180°, +11.25°
     wait(60);
 }
 
@@ -82,7 +82,7 @@ sub sub42() {
 
 // Sub36 +60 循环的自动射击：shoot_disable → bullet_circle_aimed(8,3,n,layers,s1,1.0,0,9°,516)
 // → shoot_enable → shoot_interval_delayed(interval)。窗口是每轮 [60, 180)，到 180 停火
-// （shoot_interval_delayed(0)），然后等到 480（= 主循环周期 420）。写法 A，first = n − rand(n)。
+// （shoot_interval_delayed(0)），然后等到 480（= 主循环周期 420）。写法 A，k = n − 1 − rand(n)，k < 120 才发。
 async sub boss_auto(interval: int, n: int, layers: int, s1: fx) {
     sh_reset(0);
     sh_sprite(0, ARROWHEAD, 6);               // TH06 弹型 8 色 3 → 我方色 6
@@ -92,22 +92,21 @@ async sub boss_auto(interval: int, n: int, layers: int, s1: fx) {
     sh_count(0, n, layers);
     sh_speed(0, s1, (1.0fx - s1) / layers);
     sh_angle(0, 0deg, 1638bam);               // 0.15707964f = 9°
-    var first: int = 0;
-    var t: int = 0;
+    var k: int = 0;
+    var pos: int = 1;                         // 当前时刻相对设定帧 S 的偏移（首跑在 S+1）
     wait(60);
     loop {
-        first = interval - rand(interval);
-        t = first;
-        wait(first);
+        k = interval - 1 - rand(interval);    // §4.3 写法 A：首发落在 S+k（k=0 时只能 S+1）
+        if k > 0 { wait(k - 1); pos = k; } else { pos = 1; }
         sh_fire(0);
         loop {
-            if t + interval > 120 { break; }
+            if k + interval >= 120 { break; }
             wait(interval);
-            t = t + interval;
+            k = k + interval;
+            pos = k;
             sh_fire(0);
         }
-        wait(120 - t);
-        wait(300);
+        wait(421 - pos);                      // 回到下一轮 S+1（主循环周期 420）
     }
 }
 
@@ -161,6 +160,7 @@ async sub pattern() {
 
 async sub boss_main() {
     set_invuln(65535);
+    set_hitbox(18.67fx);                      // §6.1b：上游 Sub23 enemy_set_hitbox(56,56,32) → 56/3
     phase_begin(0, pattern, TIME_LIMIT, 0);
     wait_spell();
     loop { wait(1); }

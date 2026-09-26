@@ -28,14 +28,14 @@ async sub autoshoot_h(until: int) {
     sh_count(0, 1, 1);
     sh_speed(0, 2.0fx, 0fx);
     sh_angle(0, 0deg, 1365bam);           // a7 = 7.5°（单颗无展开）
-    var t: int = 60;
-    if t >= until { return; }
-    wait(60);
+    var k: int = 59;                      // 首发 k = n − 1（mapping §4.3 写法 A）
+    if k >= until { return; }
+    wait(k - 1);
     loop {
         sh_fire(0);
-        t = t + 60;
-        if t >= until { return; }
+        if k + 60 >= until { return; }
         wait(60);
+        k = k + 60;
     }
 }
 
@@ -50,14 +50,14 @@ async sub autoshoot_l(until: int) {
     sh_count(0, 10, 2);
     sh_speed(0, 3.0fx, -1.0fx);           // (s2−s1)/c2 = (1.0−3.0)/2
     sh_angle(0, 0deg, 1365bam);           // a7 = 7.5° 逐层偏移
-    var first: int = 200 - rand(200);
-    if first >= until { return; }
-    wait(first);
+    var k: int = 199 - rand(200);         // delayed：k = n − 1 − rand(n)
+    if k >= until { return; }
+    if k > 0 { wait(k - 1); }             // k == 0 只能在 S+1 发，晚 1 帧
     loop {
         sh_fire(0);
-        first = first + 200;
-        if first >= until { return; }
+        if k + 200 >= until { return; }
         wait(200);
+        k = k + 200;
     }
 }
 

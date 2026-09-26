@@ -84,15 +84,15 @@ sub fire_ring(n: int) {
 
 // ---------------------------------------------------------------------------
 // ex_ins_repeat(5) = Stage5Func5（EnemyEclInstr.cpp:655-733）：时停期间每 9 帧一批，
-// 沿一段 90° 弧摆 9 个出弹点，每点 FAN_AIMED 发 count1 颗 DAGGER（E/N 1 颗、H/L 3 颗，间隔 π/6，速 2.0）。
+// 沿一段 90° 弧摆 9 个出弹点，每点 FAN_AIMED 发 count1 颗 DAGGER（逐颗独立抽改向）（E/N 1 颗、H/L 3 颗，间隔 π/6，速 2.0）。
 // 几何（p = 批号 0..6，u = 出弹敌位→自机单位向量）：
 //   scale = 0.5 − p·0.5/9；seed = ±256（p 偶 +，奇 −）
 //   bp = (自机−敌位)·scale + seed·u；base = atan2(自机−敌位) + (p 偶 ? π : 0)
 //   pos_i = 敌位 + bp + 256·unit(base − π/4 + (i+1)·π/18)，i = 0..8
 // 压平后「敌位」取滑行曲线上的采样点 sample_p，而 boss 实体已瞬移到终点，
-// 故出弹口偏移要补上 (sample − self)。一批一个任务：单任务每帧 1024 op 的预算装不下 189 颗（发射器槽是**每任务私有四个**，子任务各用自己的 0 号）。
+// 故出弹口偏移要补上 (sample − self)。一批 × 每颗刀一个任务：单任务每帧 1024 op 的预算装不下 27 发（发射器槽是**每任务私有四个**，子任务各用自己的 0 号）。
 // ---------------------------------------------------------------------------
-async sub knives(sx: fx, sy: fx, p: int, cnt: int, rank: int) {
+async sub knives(sx: fx, sy: fx, p: int, cnt: int, j: int, rank: int) {
     var dx: fx = $player_x - sx;
     var dy: fx = $player_y - sy;
     var th: angle = atan2(dy, dx);
@@ -105,27 +105,32 @@ async sub knives(sx: fx, sy: fx, p: int, cnt: int, rank: int) {
     var bx: fx = sx - $self_x + rad * cos(th);
     var by: fx = sy - $self_y + rad * sin(th);
 
-    sh_reset(4);
+    // FAN_AIMED count1 颗拆成单发：ex_ins_call(4,2) 对每颗 ≥30px 弹**各自**抽 1/4，
+    // 所以同一出弹点的 3 颗互相独立——抽中的单独飞随机角，没抽中的留在自机狙扇的相应一支
+    sh_reset(0);
     sh_sprite(0, ARROWHEAD, 6);
     sh_ring(0, 0);
-    sh_count(0, cnt, 1);
+    sh_count(0, 1, 1);
     sh_speed(0, 2.0fx, 0fx);
 
     var ang: angle = base - 45deg;
     for i in 0..9 {
         ang = ang + 10deg;                         // base − π/4 + (i+1)·π/18
         sh_offset(0, bx + 256.0fx * cos(ang), by + 256.0fx * sin(ang));
-        // 这一批弹的随机改向（与大弹同一次抽签）：抽中就把扇心换成随机角
         if rand(4096) < 3367 {
             sh_aim(0, 0);
             if rank >= RANK_HARD {
-                sh_angle(0, rand(65536) as angle, 5461bam);
+                sh_angle(0, rand(65536) as angle, 0deg);
             } else {
-                sh_angle(0, (8192 + rand(24576)) as angle, 5461bam);
+                sh_angle(0, (8192 + rand(24576)) as angle, 0deg);
             }
         } else {
             sh_aim(0, 1);
-            sh_angle(0, 0deg, 5461bam);            // FAN_AIMED，间隔 π/6
+            if cnt == 1 {
+                sh_angle(0, 0deg, 0deg);
+            } else {
+                sh_angle(0, ((j - 1) * 5461) as angle, 0deg);   // FAN_AIMED 间隔 π/6，3 颗为 −1/0/+1 支
+            }
         }
         sh_fire(0);
     }
@@ -148,6 +153,8 @@ async sub pattern() {
     var ey: fx = 0fx;
     var t: fx = 0fx;
     var u: fx = 0fx;
+    var sxs: fx = 0fx;
+    var sys: fx = 0fx;
     loop {
         // Sub57_0：set_int($I4,32) + 32×4 帧的 effect_particle 循环（丢表现、留时序）→ t=128
         for k in 0..32 { wait(4); }
@@ -180,7 +187,13 @@ async sub pattern() {
         for p in 0..7 {
             t = p * 9.0fx / 60;
             u = 1.0fx - t;
-            spawn knives(ex + (tx - ex) * (1.0fx - u * u), ey + (ty - ey) * (1.0fx - u * u), p, cnt, rank);
+            // 一批 × 每颗刀一个任务：9 点 × 3 颗塞一个任务会超 1024 op/帧
+            u = 1.0fx - u * u;
+            sxs = ex + (tx - ex) * u;
+            sys = ey + (ty - ey) * u;
+            for j in 0..cnt {
+                spawn knives(sxs, sys, p, cnt, j, rank);
+            }
         }
         move_to(0, tx, ty, 0);                     // boss 瞬移到滑行终点
         set_global(EPOCH, global(EPOCH) + 1);      // ex_ins_call(4,2) ×6 → 一次抽签

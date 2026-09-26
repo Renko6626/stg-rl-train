@@ -85,31 +85,25 @@ async sub pattern() {
             var c1: int = i0 + 2;
             for b1 in 0..5 {
                 wait(5);
+                var col1: int = 6;                  // 5 发色号依次 6、2、10、13、14
+                if b1 == 1 { col1 = 2; } else if b1 == 2 { col1 = 10; } else if b1 == 3 { col1 = 13; } else if b1 == 4 { col1 = 14; }
                 for i1 in 0..c1 {
                     var sp1: fx = 1.175fx + (4.35fx - 1.175fx) / 256 * rand(256);
                     var an1: angle = rand(65536) as angle;
-                    _ = fire(OUTLINE, 6, $self_x, $self_y + 8.0fx, sp1, an1, ICE_FREEZE, none);
+                    _ = fire(OUTLINE, col1, $self_x, $self_y + 8.0fx, sp1, an1, ICE_FREEZE, none);
                 }
             }
         }
         wait(60);
         pulse_signal(0);                            // ex_ins_call(0,0)：全场冻住 + 变白
         wait(60);
-        // 第二轮游走 + 扇形循环（Sub38_604，6 轮 × 30 帧）
+        // 第二轮游走 + 扇形循环（Sub38_604，6 轮 × 10 帧：条件跳转把块时间设为绝对值，每轮都恰好等 10 帧）
         wander();
         for r2 in 0..6 {
-            if i7 < 3 {
-                wait(10);
-                fan(5, 4.35fx, 4096bam);
-                wait(20);
-            } else if i7 < 6 {
-                wait(20);
-                fan(7, 4.35fx, 4096bam);
-                wait(10);
-            } else {
-                wait(30);
-                fan(7, 5.35fx, 2048bam);
-            }
+            wait(10);
+            if i7 < 3 { fan(5, 4.35fx, 4096bam); }
+            else if i7 < 6 { fan(7, 4.35fx, 4096bam); }
+            else { fan(7, 5.35fx, 2048bam); }
         }
         wait(120);
         pulse_signal(1);                            // ex_ins_call(0,1)：每颗 0.01 加速（近似）

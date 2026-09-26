@@ -13,13 +13,14 @@ const EPOCH: int = 20;         // 大弹改向纪元（§10.1②，脚本可写�
 // 因为原作里刀是先从 boss 飞出去、被时停就地冻住的。窗口不占时间之后，刀按各层真速正常飞，
 // 半径由飞行时间自然决定，不再需要 sh_dist 与停驻变换。一轮 268 → 191 帧，符卡时限也不烧那 78 帧。
 
-// §10.1② 大弹随机改向（ex_ins_call(4,2)）：原作一个窗口调 7 次、每次 1/4、每颗最多改一次
-// （改过 spriteOffset=5 就不再选）⇒ 累计 1−(3/4)^7 = 3549/4096。H/L 档远距分支 = 整周随机
-// （EnemyEclInstr.cpp:564-648）。压平后就地抽一次，抽完即退，不占任务槽。
+// §10.1② 大弹随机改向（ex_ins_call(4,2)）：原作一个窗口调 7 次、每次扫全场 32px 弹、每颗 1/4、
+// 每次最多 52 颗（H/L）、每颗最多改一次 ⇒ 模拟得总改向数 H≈318/400、L≈364/584；H/L 档远距分支 = 整周随机
+// （EnemyEclInstr.cpp:564-648）。任务池 256 装不下 584 颗，故按 (轮,层) 交错挑约 220 颗挂任务、
+// 被挂的一律改向（p=1），其余不改。压平后抽完即退。
 async sub redirect() {
     var seen: int = global(EPOCH);
     while global(EPOCH) == seen { wait(1); }
-    if rand(4096) < 3549 { set_angle(0, rand(65536) as angle); }
+    set_angle(0, rand(65536) as angle);
 }
 
 // Sub58（行 1489–1507）：H/L 档 I4=8 轮 bullet_circle，每轮 F0 += 45°。
@@ -36,7 +37,6 @@ sub blades_circle() {
     sh_count(0, n, 1);
     sh_speed(0, 2.0fx, 0fx);
     sh_offset(0, 0.0fx, 0.0fx);
-    sh_task(0, redirect);                  // 层 0 作为改向候选（见 report）
     sh_reset(1);
     sh_sprite(1, ARROWHEAD, 6);
     sh_ring(1, 1);
@@ -51,7 +51,12 @@ sub blades_circle() {
     sh_count(2, n, 1);
     sh_speed(2, 1.3333333fx, 0fx);          // bullet_circle 三层速 2.0 − j/3
     sh_offset(2, 0.0fx, 0.0fx);
+    var md: int = 2;                       // 挂改向任务的 (轮+层) 交错周期：H 1/2（120 颗）
+    if rank >= RANK_LUNATIC { md = 3; }    // L 1/3（120 颗）
     for b in 0..8 {
+        for j in 0..3 {
+            if (b + j) % md == 0 { sh_task(j, redirect); } else { sh_task(j, none); }
+        }
         sh_angle(0, f0, 0deg); sh_fire(0);
         sh_angle(1, f0, 0deg); sh_fire(1);
         sh_angle(2, f0, 0deg); sh_fire(2);
@@ -96,7 +101,13 @@ sub blades_fan() {
     sh_count(3, n, 1);
     sh_speed(3, 1.45fx, 0fx);          // bullet_fan 四层速 2.8 − 0.45j
     sh_offset(3, 0.0fx, 0.0fx);
+    var fd: int = 8;                       // 改向任务：(4·轮+层) % fd < ft；H 20 发射 ×5 = 100 颗
+    var ft: int = 5;
+    if rank >= RANK_LUNATIC { fd = 16; ft = 7; }   // L 14 发射 ×7 = 98 颗
     for b in 0..8 {
+        for j in 0..4 {
+            if (4 * b + j) % fd < ft { sh_task(j, redirect); } else { sh_task(j, none); }
+        }
         sh_angle(0, f0, 410bam); sh_fire(0);   // a7 = 2.25° = 410bam
         sh_angle(1, f0, 410bam); sh_fire(1);
         sh_angle(2, f0, 410bam); sh_fire(2);

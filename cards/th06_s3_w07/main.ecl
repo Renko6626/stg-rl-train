@@ -25,7 +25,7 @@ async sub shot_h() {
     sh_count(0, 1, 1);
     sh_speed(0, 2.0fx, 0fx);
     sh_angle(0, 0deg, 1365bam);
-    wait(60);
+    wait(58);                            // §4.3 写法 A：首发 k = n − 1 = 59 → wait(k − 1)
     sh_fire(0);
 }
 
@@ -38,9 +38,9 @@ async sub shot_l() {
     sh_count(0, 10, 2);
     sh_speed(0, 3.0fx, -1.0fx);          // 层速 3.0 / 2.0，第 2 层再错开 1365bam
     sh_angle(0, 0deg, 1365bam);
-    var first: int = 200 - rand(200);    // 首发 n − rand(n)
-    if first > 90 { return; }            // +90 shoot_interval_delayed(0)
-    wait(first);
+    var k: int = 199 - rand(200);        // 首发 k = n − 1 − rand(n)
+    if k >= 90 { return; }               // +90 shoot_interval_delayed(0)
+    if k > 0 { wait(k - 1); }
     sh_fire(0);
 }
 

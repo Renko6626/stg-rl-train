@@ -68,7 +68,7 @@ sub ring_fire_b() {
 // 压平后「敌位置 E」取滑行曲线上的采样点 (sx,sy)，boss 实体已瞬移到终点。
 // ex_ins_call(4,2) 的随机改向就地抽签（EnemyEclInstr.cpp:585-600，E/N 分支）：
 //   >128px → [π/4, π) 随机；≤128px →「弹→自机方向 + π/2 + 整周随机」（等价均匀）。
-//   原作每次调用上限 14 颗、共 6 次；本卡够格的 63 颗 × 0.822 ≈ 52 < 84，上限基本不咬。
+//   原作每次调用上限 14 颗、命中者改色不再重复；压平版不建模（见 report 近似）。
 async sub knives5(sx: fx, sy: fx, pp: int, odd: int) {
     var dx: fx = $player_x - sx;
     var dy: fx = $player_y - sy;
@@ -86,7 +86,7 @@ async sub knives5(sx: fx, sy: fx, pp: int, odd: int) {
     var ty: fx = 0fx - mix * S45 + miy * C45;
     mix = tx;
     miy = ty;
-    var ba: angle = -16384bam;                        // −π/4
+    var ba: angle = -8192bam;                         // −π/4
     var bx: fx = 0fx;
     var by: fx = 0fx;
     var bl: angle = 0deg;
@@ -101,7 +101,7 @@ async sub knives5(sx: fx, sy: fx, pp: int, odd: int) {
         if odd != 0 { bl = bl + ba; }                  // + angle1
         if rand(4096) < 3367 {                         // ex_ins_call(4,2) ×6 的合并抽签
             if dist(bx - $player_x, by - $player_y) > 128.0fx {
-                bl = 16384bam + (rand(49152) as angle);          // [π/4, π)
+                bl = 8192bam + (rand(24576) as angle);           // [π/4, π)
             } else {
                 bl = atan2(by - $player_y, bx - $player_x) + 16384bam + (rand(65536) as angle);
             }

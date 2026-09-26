@@ -36,8 +36,8 @@ sub wander(spd: fx, t: int) {
 }
 
 // Sub44/Sub45 共用的弹：bullet_circle(8, col, c1, 2, s1, 1.2f, %F0, 164bam, 2560)
-// 循环：8 发，每发相位 +=1024bam，间隔 5 帧；循环后 +60 帧 ret。
-sub ring_burst(c1: int, s1: fx, col: int, hi: int) {
+// 循环：8 发，每发相位 += dphi（Sub44 math_float_add = +1024bam；Sub45 math_float_sub = -1024bam），间隔 5 帧；循环后 +60 帧 ret。
+sub ring_burst(c1: int, s1: fx, col: int, hi: int, dphi: angle) {
     var a0: angle = rand(65536) as angle;   // set_float_rand_bound_min($F0, 2π, -π)
     sh_reset(0);
     sh_sprite(0, ARROWHEAD, col);           // 32px 弹色号已查表（mapping §3）
@@ -50,7 +50,7 @@ sub ring_burst(c1: int, s1: fx, col: int, hi: int) {
     for k1 in 0..8 {
         sh_angle(0, a0, 164bam);
         sh_fire(0);
-        a0 = a0 + 1024bam;
+        a0 = a0 + dphi;
         wait(5);
     }
     wait(60);
@@ -63,7 +63,7 @@ sub sub44() {
     if rank == RANK_HARD { c1 = 4; }
     var hi: int = 0;
     if rank >= RANK_HARD { hi = 1; }
-    ring_burst(c1, 1.8fx, 6, hi);
+    ring_burst(c1, 1.8fx, 6, hi, 1024bam);
 }
 
 // Sub45：弹型 8 色 1 → ARROWHEAD 色 2。c1: E5/N6/H5/L5；s1: E/N1.8、H/L2.0
@@ -76,7 +76,7 @@ sub sub45() {
     else if rank >= RANK_LUNATIC { s1 = 2.0fx; }
     var hi: int = 0;
     if rank >= RANK_HARD { hi = 1; }
-    ring_burst(c1, s1, 2, hi);
+    ring_burst(c1, s1, 2, hi, -1024bam);
 }
 
 // Sub43 的调度循环（从 +60 起）：Sub44 → 游走 → +60 → 游走 → Sub45 → +100 → +10 → 回跳 (+60)

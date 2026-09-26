@@ -27,7 +27,7 @@ sub fan3(s1: fx, a7: angle) {
 
 // Sub21：移左 (-96,144) → 自机狙环自动射击（shoot_interval(6)，+60 处 shoot_interval(0)）
 // → 瞬移到 (96,96) → 三连扇形 → 移回 (0,144)。
-// shoot_disable 期间 bullet_circle_aimed 只配置不发，故时间轴上第一发在 +6（原作约 +5，接受的 1 帧滞后）。
+// shoot_disable 期间 bullet_circle_aimed 只配置不发；shoot_interval(6) 首发 S+5（mapping §4.3 写法 B，在本任务里数帧）。
 sub attack_left() {
     var rank: int = global(GVAR_RANK);
     var s1: fx = 5.5fx;
@@ -45,7 +45,9 @@ sub attack_left() {
     sh_speed(0, 1.5fx, (0.8fx - 1.5fx) / 2);
     sh_angle(0, 0deg, 0deg);                 // bullet_circle_aimed a1 = 0°、a2 = 0°
     sh_xform(0, BOUNCE1);
-    for k1 in 0..10 { wait(6); sh_fire(0); } // 第 6,12,…,60 帧各一发（原来 shoot_interval(6)）
+    wait(5); sh_fire(0);                     // shoot_interval(6) 首发 S+5，之后每 6 帧：S+11,…,S+59 共 10 发
+    for k1 in 0..9 { wait(6); sh_fire(0); }
+    wait(1);                                 // 补到 S+60（shoot_interval(0) 处） // 第 6,12,…,60 帧各一发（原来 shoot_interval(6)）
 
     move_to(0, 96.0fx, 96.0fx, 0);           // move_position(288.0f, 96.0f) → x=96
     wait(20);
@@ -74,7 +76,9 @@ sub attack_right() {
     sh_speed(0, 1.5fx, (0.8fx - 1.5fx) / 2);
     sh_angle(0, 0deg, 0deg);
     sh_xform(0, BOUNCE1);
-    for k2 in 0..10 { wait(6); sh_fire(0); }
+    wait(5); sh_fire(0);                     // shoot_interval(6) 首发 S+5，之后每 6 帧：S+11,…,S+59 共 10 发
+    for k2 in 0..9 { wait(6); sh_fire(0); }
+    wait(1);                                 // 补到 S+60（shoot_interval(0) 处）
 
     move_to(0, -96.0fx, 96.0fx, 0);          // move_position(96.0f, 96.0f) → x=-96
     wait(20);

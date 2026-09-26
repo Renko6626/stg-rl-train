@@ -128,14 +128,17 @@ async sub fast_autoshoot(rank: int) {
         sh_ring(0, 0);
         sh_count(0, 1, 1);
         sh_speed(0, 2.0fx, 0fx);
-        wait(60);
+        wait(58);                          // 首发 = S + n − 1（§4.3）
         sh_fire(0);
     } else {
         sh_ring(0, 1);
         sh_count(0, 10, 2);
         sh_speed(0, 3.0fx, -1.0fx);
-        var first: int = 200 - rand(200);
-        if first < 90 { wait(first); sh_fire(0); }
+        var k: int = 199 - rand(200);      // 首发 = S + k（§4.3），k ∈ 0…199
+        if k < 90 {
+            if k > 1 { wait(k - 1); }
+            sh_fire(0);
+        }
     }
     loop { wait(1); }
 }

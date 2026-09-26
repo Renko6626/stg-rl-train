@@ -133,7 +133,7 @@ sub sub29_spawn() {
 // 7 次随机游走 + 后台自动射击（interval 由模式定）+ t=270 call Sub30。
 sub cycle(mode: int, interval: int) {
     var f: int = 0;
-    var next: int = interval;
+    var next: int = interval - 1;   // 原作首发 k = n − 1（§4.3）
     while f < 300 {
         if f == 0 { wander(4.0fx, 30); }
         else if f == 30 { wander(7.0fx, 30); }
@@ -144,7 +144,7 @@ sub cycle(mode: int, interval: int) {
         else if f == 180 { wander(4.0fx, 30); }
         else if f == 210 { set_enemy_flag(ENEMY_NO_BODY, 0); }   // Sub30：interactable(1)
         if f == next {
-            if f <= 210 { fire_mode(mode); }   // 自动射击窗口，t=270 后停
+            if f <= 209 { fire_mode(mode); }   // k < 210 才开火，t=270 后停
             next = next + interval;
         }
         wait(1);

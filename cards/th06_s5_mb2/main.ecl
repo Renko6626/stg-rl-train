@@ -22,7 +22,7 @@ sub attack(mirror: int) {
     move_to(40, xa, 144.0fx, 2);
 
     // bullet_circle_aimed(4, 2, c1, c2, 3.0f, 1.2f, 0.0f, 0.0f, 4) + shoot_interval(6)
-    // → 配置发射器，之后每 6 帧自动开火一次；+60 处 shoot_interval(0) 停（原作 10 发，晚 1 帧）
+    // → 配置发射器，之后每 6 帧自动开火一次；+60 处 shoot_interval(0) 停（原作 10 发，S+5…S+59）
     sh_reset(0);
     sh_sprite(0, KUNAI, 2);
     sh_offset(0, 0.0fx, 0.0fx);       // Sub19 shoot_offset(0.0f, 0.0f, 0.0f)
@@ -31,10 +31,12 @@ sub attack(mirror: int) {
     sh_count(0, n_ang, n_lay);
     sh_speed(0, 3.0fx, (1.2fx - 3.0fx) / n_lay);
     sh_angle(0, 0deg, 0deg);          // a1 = a2 = 0
+    wait(5);                           // 首发 = S + n − 1 = S+5（§4.3）
     for kc in 0..10 {
-        wait(6);
         sh_fire(0);
+        if kc < 9 { wait(6); }         // 末发 S+59
     }
+    wait(1);                           // → S+60
 
     // +60: move_position(288.0f/96.0f, 96.0f)：瞬移到另一侧
     move_to(0, xb, 96.0fx, 0);
@@ -54,11 +56,12 @@ sub attack(mirror: int) {
         wait(18);
     }
 
-    // +158/+218 只有 anm，+218 move_position(192.0f, 144.0f) 回中央，+248 ret
-    wait(24);                          // 134 → 158
-    wait(60);                          // 158 → 218
+    // jump_dec 落空后块时间停在静态 98（真实帧 S+134）；+60/+60 各等 60 帧，
+    // 真实帧 S+254 move_position(192.0f, 144.0f) 回中央，+30 后 ret（§2.4）
+    wait(60);
+    wait(60);
     move_to(0, 0.0fx, 144.0fx, 0);
-    wait(30);                          // 218 → 248
+    wait(30);
 }
 
 // Sub20：i0 = rand(2) 决定先左还是先右，之后 math_int_sub($I0, 1, $I0) 即 i0 = 1 − i0 永远交替
