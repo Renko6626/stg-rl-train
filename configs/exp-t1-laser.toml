@@ -1,0 +1,57 @@
+# 实验 T1（2026-09-26）：S1 + **激光进观测**（danger_topk_v7 + set_attn_v2）；对照 T0 = S1 原样、同卡池同评测划分
+#
+# 背景：引擎激光池（stg_rl 0.3.0 起 Tier 0 lasers 表）之前没进观测——模型看得见激光上挂的弹，看不见激光本身。
+# 卡池 2026-09-26 起有 11 张激光卡（th06 第 1/2/4 关 + Extra），3 张留作评测（eval/splits-laser.toml），8 张进训练。
+# 做法：envwrap 解码 lasers 表 → v7 在 v6 的输出之外加最近 k_lasers 条激光的 token（原始量、自机相对系）→
+# set_attn_v2 加一个激光集合编码器进主干。与 S1 只差这两处（S1 的判定点随机增大、运动层、reward 全照抄）。
+# 部署：ONNX 图版本 5（多 lasers / lasers_mask 两个输入），DLL 侧要跟着填激光表。
+#
+# 已知缺口：脚本 lz_rotate 转的激光观测里 omega = 0（看不出在扫），修引擎前的基线（见 docs/2026-09-26-laser-practice-cards-design.md §2）。
+#
+# 判读（相对 T0）：① 3 张留出激光卡上的撑过率 / 死亡；
+# ② 非激光卡不退步（主判据噪声约 1–2.4pp）；③ 吞吐（多一张 64 行的激光表拷贝 + 一个小编码器）。
+[run]
+total_updates = 3500
+ckpt_every = 100
+eval_every = 250
+
+[env]
+eval_splits = "eval/splits-laser.toml"
+num_envs = 4096
+hit_extra = [0.0, 2.0]
+threads = 0
+
+[intent]
+name = "mixed_v1"
+
+[featurize]
+name = "danger_topk_v7"
+frame = "static"
+dt = false
+k_lasers = 16
+laser_local = false     # true = 激光 token 再加「自机在激光坐标系里的位置」两列（对照开关，见 danger_topk_v7 文档）
+
+[motor]
+enabled = true
+hold = [2, 6]
+delay = [0, 2]
+slow = true
+
+[reward.terms]
+death = 10.0
+follow_shaping = 1.0
+hold = 0.01
+segment_survived = 0.0
+key_press = -0.003
+quick_change = -0.01
+shift_toggle = 0.0
+edge_hug = -0.02
+
+[model]
+name = "set_attn_v2"
+sa_layers = 1
+laser_sa_layers = 0
+density_fp32 = true
+
+[ppo]
+amp = "bf16"

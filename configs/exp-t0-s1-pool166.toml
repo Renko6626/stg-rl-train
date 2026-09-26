@@ -1,0 +1,47 @@
+# 实验 T0（2026-09-26）：**S1 原样**，只换到新卡池（166 张，含 11 张激光卡）与激光留出评测划分 —— T1 的对照。
+#
+# 为什么要重跑：S1（09-25）训练时卡池还是 84 张；09-26 扩到 166 张、评测划分加了 3 张激光卡。T1 与 S1 直接比，
+# 分不清收益来自「激光进观测」还是「卡池变大」。T0 与 T1 只差特征化器 / 模型（v6 + set_attn_v1 看不见激光表）。
+# 其余（判定点随机增大、运动层、reward、引擎 0.4.0）与 S1 / T1 相同。
+[run]
+total_updates = 3500
+ckpt_every = 100
+eval_every = 250
+
+[env]
+eval_splits = "eval/splits-laser.toml"
+num_envs = 4096
+hit_extra = [0.0, 2.0]
+threads = 0
+
+[intent]
+name = "mixed_v1"
+
+[featurize]
+name = "danger_topk_v6"
+frame = "static"
+dt = false
+
+[motor]
+enabled = true
+hold = [2, 6]
+delay = [0, 2]
+slow = true
+
+[reward.terms]
+death = 10.0
+follow_shaping = 1.0
+hold = 0.01
+segment_survived = 0.0
+key_press = -0.003
+quick_change = -0.01
+shift_toggle = 0.0
+edge_hug = -0.02
+
+[model]
+name = "set_attn_v1"
+sa_layers = 1
+density_fp32 = true
+
+[ppo]
+amp = "bf16"
