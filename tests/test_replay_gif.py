@@ -32,6 +32,47 @@ def test_decode_env_matches_rawobs(cfg):
         assert f.player == pytest.approx(tuple(obs.player_xy[i].tolist()))
 
 
+def test_decode_lasers_matches_rawobs_and_renders():
+    import math
+
+    import stg_rl
+
+    from conftest import FIXTURES
+    from stgtrain.envwrap import LASER_COLS
+
+    load_builtins()
+    C = {name: k for k, name in enumerate(LASER_COLS)}
+    images = compile_cards(discover(FIXTURES / "laser_cards"))
+    envw = EnvWrapper(small_cfg(), images, [stg_rl.Start("example_laser", 0, 2)], torch.device("cpu"), seed=5,
+                      num_envs=3, mirror=False)
+    envw.reset()
+    for _ in range(140):
+        obs, _info = envw.step(torch.zeros(3, dtype=torch.int64))
+    seen = 0
+    for i in range(3):
+        lz = R.decode_env(envw.buf, i).lasers
+        k = int(obs.lasers_mask[i].sum())
+        assert len(lz) == k
+        seen += k
+        for j, l in enumerate(lz):
+            row = obs.lasers[i, j]
+            assert (l.ox, l.oy, l.start, l.end) == pytest.approx(
+                (row[C["x"]].item(), row[C["y"]].item(), row[C["start"]].item(), row[C["end"]].item()), abs=1e-4)
+            assert math.radians(l.deg) == pytest.approx(row[C["angle"]].item(), abs=1e-4)
+            assert l.width == pytest.approx(2 * row[C["half_h"]].item()) and l.state == int(row[C["state"]])
+    assert seen > 0
+    im = preview.draw_lasers(Image.new("RGB", (preview.FIELD_W, preview.FIELD_H + preview.HEADER_H)),
+                             R.decode_env(envw.buf, 0).lasers)
+    assert im.getbbox() is not None or not R.decode_env(envw.buf, 0).lasers
+
+
+def test_laser_warn_display_ramps_by_t_active():
+    """t_active 30 → 细线、0 → 近全宽（换算成 preview 的 warn / timer）。"""
+    def width(t):
+        return preview.laser_display(preview.Laser(0, 0, 0, 0, 100, 20.0, 0, R.LASER_RAMP - t, R.LASER_RAMP, 2, 13))[0]
+    assert width(30) == pytest.approx(1.2) and width(0) == pytest.approx(20.0) and width(15) < width(5)
+
+
 def test_gif_durations_average_to_real_time():
     d = R.gif_durations(n=6, frames_per_image=2)   # 2 帧 = 33.3 ms，GIF 只有 10 ms 精度
     assert all(x % 10 == 0 for x in d) and sum(d) == 200

@@ -1,0 +1,6 @@
+title = "测试：激光"
+source = "original"
+ranks = [2, 2]
+marks = [0]
+time_limit = 1800
+tags = ["laser"]

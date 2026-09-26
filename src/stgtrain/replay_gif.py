@@ -31,7 +31,7 @@ from . import actions
 from .cards import allowed_ranks, discover
 from .checkpoint import load_checkpoint
 from .config import deep_merge, from_dict
-from .envwrap import EnvWrapper, _fx, _off, _u16
+from .envwrap import EnvWrapper, _fx, _i32, _off, _u16
 from .ppo import PPO
 from .train import build_components, pick_device
 
@@ -41,6 +41,8 @@ TRAIL = 30
 _DIR_COLORS = [(70, 70, 80), (90, 170, 255), (80, 220, 220), (90, 230, 120), (220, 230, 90),
                (255, 170, 60), (255, 100, 90), (230, 90, 220), (150, 110, 255)]  # 方向 0–8，同 actions.DIR_BUTTONS
 _DIR_ARROWS = ["--", "U", "UR", "R", "DR", "D", "DL", "L", "UL"]
+LASER_COLOR = 13          # RL 的激光表不带颜色，回放一律画黄色（preview.LASER_COLORS 的色号）
+LASER_RAMP = 30           # 预警最后 30 帧由细线长到全宽（同 stg-godot `laser_display`）
 
 
 @dataclass
@@ -49,6 +51,7 @@ class EnvFrame:
     enemies: list[P.Enemy]
     player: tuple[float, float]
     focus: bool
+    lasers: list[P.Laser] = field(default_factory=list)
 
 
 @dataclass
@@ -84,10 +87,29 @@ def decode_env(buf: dict, i: int) -> EnvFrame:
     en = buf["enemies"][i, :ne]
     enemies = [P.Enemy(x, y, 0) for x, y in zip(_fx(en, _off("enemies", "x")).tolist(),
                                                   _fx(en, _off("enemies", "y")).tolist())] if ne else []
+    lasers = decode_lasers(buf, i)
     pl = buf["player"][i]
     px = float(_fx(pl[None], _off("player", "x"))[0])
     py = float(_fx(pl[None], _off("player", "y"))[0])
-    return EnvFrame(bullets, enemies, (px, py), bool(pl[_off("player", "focus")]))
+    return EnvFrame(bullets, enemies, (px, py), bool(pl[_off("player", "focus")]), lasers)
+
+
+def decode_lasers(buf: dict, i: int) -> list[P.Laser]:
+    """第 i 个 env 的激光行 → 预览用的 `Laser`。表里只有 `t_active`（预警还剩几帧），没有 warn / timer / fade：
+    预警按「还剩 ≤ 30 帧就开始变宽」换算，收缩态画半宽。"""
+    nl = int(buf["lasers_count"][i])
+    if not nl:
+        return []
+    lz = buf["lasers"][i, :nl]
+    f = lambda name: _fx(lz, _off("lasers", name)).tolist()  # noqa: E731
+    ang = (_u16(lz, _off("lasers", "angle")).to(torch.float32) * (360.0 / 65536.0)).tolist()
+    t_active = _i32(lz, _off("lasers", "t_active")).tolist()
+    state = lz[:, _off("lasers", "state")].tolist()
+    out = []
+    for x, y, a, st, en, h, t, s in zip(f("x"), f("y"), ang, f("start"), f("end"), f("half_h"), t_active, state):
+        timer = LASER_RAMP - min(max(int(t), 0), LASER_RAMP) if s == 0 else 1
+        out.append(P.Laser(x, y, a, st, en, 2.0 * h, int(s), timer, LASER_RAMP, 2, LASER_COLOR))
+    return out
 
 
 def gif_durations(n: int, frames_per_image: int) -> list[int]:
@@ -161,8 +183,9 @@ def render_episode(ep: Episode, out_path: Path, every: int) -> Path:
     idxs = list(range(0, len(ep.frames), every))
     for k in idxs:
         f = ep.frames[k]
-        title = f"{ep.card} {P.RANK_NAMES[ep.rank]} e{ep.index} f{f.frame} b{len(f.env.bullets)}"
-        snap = P.Snapshot(f.frame, f.env.enemies, f.env.bullets)
+        title = f"{ep.card} {P.RANK_NAMES[ep.rank]} e{ep.index} f{f.frame} b{len(f.env.bullets)}" + \
+            (f" L{len(f.env.lasers)}" if f.env.lasers else "")
+        snap = P.Snapshot(f.frame, f.env.enemies, f.env.bullets, f.env.lasers)
         field_im = r.draw(snap, title, player_xy=f.env.player)
         d = ImageDraw.Draw(field_im)
         ox, oy = P.HALF_W, P.HEADER_H

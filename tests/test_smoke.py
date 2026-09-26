@@ -20,6 +20,16 @@ def test_repo_configs_load():
     assert smoke["run"]["device"] == "cpu" and not smoke["ppo"]["compile"] and not smoke["ppo"]["cudagraphs"]
 
 
+def test_laser_experiment_config_builds():
+    from stgtrain.registry import FEATURIZERS, MODELS, check_compat, load_builtins
+
+    load_builtins()
+    cfg = load_config(REPO / "configs" / "exp-t1-laser.toml")
+    feat = FEATURIZERS.get(cfg["featurize"]["name"])(cfg)
+    check_compat(MODELS.get(cfg["model"]["name"])(cfg, feat.spec()).requires(), feat.spec())
+    assert "lasers" in feat.spec()
+
+
 def test_train_end_to_end_then_resume(tmp_path):
     cfg = small_cfg(run={"total_updates": 2, "ckpt_every": 2, "eval_every": 2}, log={"tensorboard": True})
     run_dir = make_run_dir(tmp_path, "smoke")
@@ -137,3 +147,26 @@ def test_gradient_norm_tolerance_is_looser_than_the_loss_one():
     assert not g.close_enough(0.35315809, 0.35306996, rel=g.TOLERANCE)
     # 真的错了还是要抓出来：1% 的差异在任何一档都不该过
     assert not g.close_enough(0.353, 0.357, rel=g.GN_REL)
+
+
+def test_train_laser_model_end_to_end_and_export(tmp_path):
+    """v7 特征化 + set_attn_v2 在激光夹具卡上：rollout → 更新 → 评测 → checkpoint → ONNX 部署包装。"""
+    from conftest import FIXTURES
+    from stgtrain.export_onnx import build_deploy
+
+    cfg = small_cfg(
+        run={"total_updates": 2, "ckpt_every": 2, "eval_every": 2},
+        env={"cards_dir": str(FIXTURES / "laser_cards"), "eval_splits": str(FIXTURES / "laser_eval_splits.toml")},
+        featurize={"name": "danger_topk_v7", "frame": "static", "dt": False, "k_lasers": 8},
+        model={"name": "set_attn_v2", "sa_layers": 1, "laser_sa_layers": 1},
+    )
+    run_dir = make_run_dir(tmp_path, "laser")
+    train(cfg, run_dir, pack_result=False)
+    rows = read_jsonl(run_dir / "metrics.jsonl")
+    assert [r["update"] for r in rows if "ppo/pg_loss" in r] == [1, 2]
+    assert any("eval/survival" in r for r in rows)
+    ck = load_checkpoint(run_dir / "checkpoints" / "latest.pt")
+    assert ck["model_name"] == "set_attn_v2" and ck["featurizer_name"] == "danger_topk_v7"
+    assert any(k.startswith("model.lasers.") for k in ck["state"]["agent"])
+    wrap, meta = build_deploy(run_dir / "checkpoints" / "latest.pt")
+    assert meta["with_lasers"]

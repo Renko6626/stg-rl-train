@@ -17,9 +17,9 @@ from . import actions
 from .perf import maybe_record
 from .registry import INTENTS
 
-_STG_RL_MIN = (0, 2, 0)   # 敌人行带 vx/vy（引擎第二刀）
+_STG_RL_MIN = (0, 4, 0)   # 敌人行带 vx/vy（0.2.0）、lasers 表有内容且 t_active 定稿（0.3.x → 0.4.0）
 if tuple(int(x) for x in stg_rl.build_info()["version"].split(".")[:3]) < _STG_RL_MIN:
-    raise ImportError(f"stg_rl >= 0.2.0 required (敌人速度字段), got {stg_rl.build_info()['version']}")
+    raise ImportError(f"stg_rl >= 0.4.0 required (敌人速度 + 激光表), got {stg_rl.build_info()['version']}")
 
 FX_SCALE = 1.0 / 65536.0
 ENEMY_FLAG_BOSS = 0x01
@@ -41,6 +41,8 @@ class RawObs:
     prev_action: Tensor | None = None  # 上一步**实际执行**的动作 id（智能体坐标系、镜像前），新局首步为 0（不动）；v2 特征化用
     dir_held: Tensor | None = None     # 当前方向已经执行了多少帧（新局 = 很大）；v4 特征化用
     slow_held: Tensor | None = None    # 当前低速位（按着 / 松着）已经执行了多少帧（新局 = 很大）；v5 特征化用
+    lasers: Tensor | None = None       # [n, LASERS_CAP, LASER_COLS]，列见 LASER_COLS；v7 特征化用
+    lasers_mask: Tensor | None = None  # 活激光（预警 / 生效 / 收缩三态都算，收缩态由特征化器自己挑掉）
 
 
 @dataclass
@@ -57,19 +59,38 @@ class StepInfo:
     intent_mode: Tensor | None = None   # 混合意图的模式（0 跟点 / 1 锚点 / 2 自由），无混合时 None
 
 
+# 激光行（stg_rl 0.3.0 起 Tier 0 的 lasers 表，引擎按「离自机最近」排好、至多 LASERS_CAP 条）解码后的列。
+# 全是世界坐标下的原始量（部署侧 DLL 照同一口径填）：原点 x / y、方向角（弧度，y 朝下、0 = 向右）、射线上
+# [start, end] 一段（px）、判定半宽 half_h（= width / 2）、生长速度 speed（px/帧）、角速度 omega（弧度/帧）、
+# 原点本帧位移 vx / vy、t_active（预警态还有几帧开始判定；生效 / 收缩态恒 0）、state（0 预警 · 1 生效 · 2 收缩）。
+LASER_COLS = ("x", "y", "angle", "start", "end", "half_h", "speed", "omega", "vx", "vy", "t_active", "state")
+LASER_WIDTHS = (8, 16, 32, stg_rl.LASERS_CAP)
+_TWO_PI_OVER_BAM = 2.0 * 3.141592653589793 / 65536.0
+
+
+def laser_width(lmax: int) -> int:
+    """激光表本步要解码的列数：盖住 lmax 的最小档（同 `enemy_width`）。"""
+    return next(w for w in LASER_WIDTHS if w >= lmax)
+
+
 def _off(table: str, field: str) -> int:
     return stg_rl.OFFSETS[table][field][0]
 
 
-def _fx(rows: Tensor, off: int) -> Tensor:
-    """rows[..., off:off+4] 小端 int32 定点 → float32 像素。先压平再 view：规避 size-1 维度步长不整除 4 的问题。"""
+def _i32(rows: Tensor, off: int) -> Tensor:
+    """rows[..., off:off+4] 小端 int32。先压平再 view：规避 size-1 维度步长不整除 4 的问题。"""
     part = rows[..., off:off + 4]
     flat = part.contiguous().reshape(-1)
     if flat.storage_offset() % 4 != 0:
         # size-1 / 空张量在 PyTorch 眼里“连续”，`.contiguous()` 是 no-op，会留下不整除 4 的存储偏移
         # （如 bullets `radius` 偏移 22），`view(int32)` 仍会报错；clone 成偏移 0 的紧凑副本。
         flat = flat.clone()
-    return flat.view(torch.int32).reshape(part.shape[:-1]).to(torch.float32) * FX_SCALE
+    return flat.view(torch.int32).reshape(part.shape[:-1])
+
+
+def _fx(rows: Tensor, off: int) -> Tensor:
+    """rows[..., off:off+4] 小端 int32 定点 → float32 像素。"""
+    return _i32(rows, off).to(torch.float32) * FX_SCALE
 
 
 def _u16(rows: Tensor, off: int) -> Tensor:
@@ -253,7 +274,7 @@ class MultiVecEnv:
     def _gather(self) -> None:
         bs = self.bufs
         out = {key: torch.cat([b[key] for b in bs]) for key in ("done", "events", "ep_frames", "player", "enemies",
-                                                                "enemies_count")}
+                                                                "enemies_count", "lasers", "lasers_count")}
         counts = [int(b["bullets_offsets"][self.k]) for b in bs]
         out["bullets"] = torch.cat([b["bullets"][:m] for b, m in zip(bs, counts)])
         base, offs = 0, []
@@ -362,6 +383,7 @@ class EnvWrapper:
         self._mirror = actions.mirror_table(device)
         self._arange_n = torch.arange(self.n, device=device)
         self._arange_e = torch.arange(stg_rl.ENEMIES_CAP, device=device)
+        self._arange_l = torch.arange(stg_rl.LASERS_CAP, device=device)
         self.dir_hold = torch.full((self.n,), DIR_HOLD_NEVER, dtype=torch.int64, device=device)
         self.slow_held = torch.full((self.n,), DIR_HOLD_NEVER, dtype=torch.int64, device=device)
         env_ids = torch.arange(self.n, device=device) % self._group_k if self._group_k else None
@@ -481,11 +503,12 @@ class EnvWrapper:
                 dropped = b["bullets_dropped"]
                 maybe_record(timer, "bullets_dropped", int(dropped.sum()))
                 maybe_record(timer, "bullets_drop_envs", int((dropped > 0).sum()))
+        lmax = int(b["lasers_count"].max())
         raw = {k: self._dev(b[k]) for k in ("done", "events", "ep_frames", "start_index", "player", "enemies",
-                                             "enemies_count")}
+                                             "enemies_count", "lasers", "lasers_count")}
         raw["bullets"] = self._dev(b["bullets"][:m])
         raw["bullets_offsets"] = self._dev(b["bullets_offsets"])
-        raw["m"], raw["emax"] = m, emax
+        raw["m"], raw["emax"], raw["lmax"] = m, emax, lmax
         return raw
 
     def _decode_enemies(self, en: Tensor, ecount: Tensor, emax: int, timer=None) -> tuple[Tensor, Tensor]:
@@ -515,6 +538,24 @@ class EnvWrapper:
             emask[:, :ew] = emask_w
         return enemies, emask
 
+    def _decode_lasers(self, lz: Tensor, lcount: Tensor, lmax: int, timer=None) -> tuple[Tensor, Tensor]:
+        """激光字节表 → (未镜像的 [n, LASERS_CAP, 12], 掩码)。只解码前 `laser_width(lmax)` 列；陈旧行清零。"""
+        with _phase(timer, "h2d_lasers"):
+            lw = laser_width(lmax)
+            lz = lz[:, :lw]
+            live = self._arange_l[None, :lw] < lcount.to(torch.int64)[:, None]
+            f = lambda name: _fx(lz, _off("lasers", name))   # noqa: E731
+            cols = [f("x"), f("y"), _u16(lz, _off("lasers", "angle")).to(torch.float32) * _TWO_PI_OVER_BAM,
+                    f("start"), f("end"), f("half_h"), f("speed"), f("omega"), f("vx"), f("vy"),
+                    _i32(lz, _off("lasers", "t_active")).to(torch.float32),
+                    lz[..., _off("lasers", "state")].to(torch.float32)]
+            rows = torch.stack(cols, dim=-1) * live.unsqueeze(-1)
+            lasers = torch.zeros(self.n, stg_rl.LASERS_CAP, len(LASER_COLS), device=self.device)
+            lmask = torch.zeros(self.n, stg_rl.LASERS_CAP, dtype=torch.bool, device=self.device)
+            lasers[:, :lw] = rows
+            lmask[:, :lw] = live
+        return lasers, lmask
+
     def _decode(self, raw: dict | None = None, timer=None) -> RawObs:
         raw = self._copy_in() if raw is None else raw
         n, cap, dev = self.n, self.cap, self.device
@@ -539,6 +580,7 @@ class EnvWrapper:
             bmask[env_idx, slot] = collidable
 
         enemies, emask = self._decode_enemies(raw["enemies"], raw["enemies_count"], raw["emax"], timer)
+        lasers, lmask = self._decode_lasers(raw["lasers"], raw["lasers_count"], raw["lmax"], timer)
         with _phase(timer, "h2d_finish"):
             if hasattr(self.intent, "track"):   # 自由躲弹诊断：目标点锁自机（未镜像坐标）
                 self.intent.track(torch.stack([px, py], dim=-1))
@@ -554,10 +596,24 @@ class EnvWrapper:
             bullets[..., 2] *= sign[:, None]
             enemies[..., 0] *= sign[:, None]
             enemies[..., 4] *= sign[:, None]   # 敌人速度 x 分量随镜像取反
+            mirror_lasers_(lasers, self.mirrored[:, None] & lmask)
             target[:, 0] *= sign
         return RawObs(
             player_xy=torch.stack([px, py], dim=-1), player_hit_r=hit_r, player_speed=speed, player_focus=focus,
             bullets=bullets, bullets_mask=bmask, enemies=enemies, enemies_mask=emask, target_xy=target,
             prev_action=self.prev_action.clone(), dir_held=(self.dir_hold + 1).clone(),
-            slow_held=self.slow_held.clone(),
+            slow_held=self.slow_held.clone(), lasers=lasers, lasers_mask=lmask,
         )
+
+
+def mirror_lasers_(lasers: Tensor, rows: Tensor) -> Tensor:
+    """就地左右镜像 `rows`（[n, L] 布尔）选中的激光行：x、vx 取反，方向角 θ → π − θ（归到 [0, 2π)），角速度取反。
+    start / end / half_h / speed / t_active / state 与方向无关，不动。调用方只选活行，空行保持全零。"""
+    m = rows
+    lasers[..., 0] = torch.where(m, -lasers[..., 0], lasers[..., 0])
+    lasers[..., 8] = torch.where(m, -lasers[..., 8], lasers[..., 8])
+    lasers[..., 7] = torch.where(m, -lasers[..., 7], lasers[..., 7])
+    two_pi = 2.0 * 3.141592653589793
+    flipped = torch.remainder(3.141592653589793 - lasers[..., 2], two_pi)
+    lasers[..., 2] = torch.where(m, flipped, lasers[..., 2])
+    return lasers
