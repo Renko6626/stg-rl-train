@@ -36,6 +36,37 @@ def test_parse_at_tables():
         (41.32, 70.16, 65.47, 86), (-21.0, -26.2, 331.35, 54), (-56.96, 170.06, 49.42, 86)]
 
 
+LASER_TEXT = """\
+峰值：弹 84（帧 184）· 敌 1（帧 2）· 任务 4（帧 124）· 道具 0（帧 0）· 自机弹 0（帧 0）· 激光 2（帧 124）
+
+帧 150 · 活激光 2 条（池索引升序）
+   idx        ox        oy angleBAM      deg    start      end   width   speed  omega state timer warn/act/fade color
+     0      0.00     84.00     4096    22.50     0.00   500.00   16.00    0.00      0     0    27     30/120/16    13
+     1      0.00     84.00    28672   157.50     0.00   500.00   16.00    0.00      0     1     5     30/120/16    13
+"""
+
+
+def test_parse_laser_table_and_peak():
+    snap = preview.parse_at(LASER_TEXT)
+    assert snap.frame == 150 and snap.bullets == []
+    a, b = snap.lasers
+    assert (a.ox, a.oy, a.deg, a.start, a.end, a.width) == (0.0, 84.0, 22.5, 0.0, 500.0, 16.0)
+    assert (a.state, a.timer, a.warn, a.fade, a.color) == (0, 27, 30, 16, 13)
+    assert b.state == 1
+    s = preview.parse_summary(LASER_TEXT)
+    assert (s.peak_lasers, s.peak_laser_frame) == (2, 124)
+
+
+def test_laser_display_matches_godot():
+    """照 stg-godot frame.rs `laser_display` 的三条单测。"""
+    L = lambda state, timer, warn, fade: preview.Laser(0, 0, 0, 0, 100, 100.0, state, timer, warn, fade, 3)  # noqa: E731
+    assert preview.laser_display(L(0, 89, 120, 16)) == (1.2, 1.0)
+    w, _ = preview.laser_display(L(0, 29, 30, 16))
+    assert 95 < w < 100
+    assert preview.laser_display(L(1, 0, 30, 16)) == (100.0, 1.0)
+    assert preview.laser_display(L(2, 5, 30, 10)) == (50.0, 1.0)
+    assert preview.laser_display(L(2, 0, 30, 0)) == (0.0, 1.0)
+
 def test_parse_summary():
     s = preview.parse_summary(AT_TEXT)
     assert (s.peak_bullets, s.peak_frame, s.phase_end) == (1630, 293, 783)

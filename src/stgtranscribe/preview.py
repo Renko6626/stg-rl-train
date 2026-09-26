@@ -25,7 +25,7 @@ from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
 
-from PIL import Image, ImageDraw
+from PIL import Image, ImageChops, ImageDraw
 
 from . import config
 
@@ -55,10 +55,26 @@ class Enemy:
 
 
 @dataclass(frozen=True)
+class Laser:
+    ox: float
+    oy: float
+    deg: float
+    start: float
+    end: float
+    width: float
+    state: int   # 0 预警 · 1 生效 · 2 收缩
+    timer: int
+    warn: int
+    fade: int
+    color: int
+
+
+@dataclass(frozen=True)
 class Snapshot:
     frame: int
     enemies: list[Enemy]
     bullets: list[Bullet]
+    lasers: list[Laser] = ()
 
 
 @dataclass(frozen=True)
@@ -66,6 +82,8 @@ class Summary:
     peak_bullets: int
     peak_frame: int
     phase_end: int | None
+    peak_lasers: int = 0
+    peak_laser_frame: int = 0
 
 
 def atlas_path() -> Path:
@@ -78,14 +96,15 @@ def player_path() -> Path:
 
 # ── 解析 harness 输出 ────────────────────────────────────────────────────────
 
-_TABLE_RE = re.compile(r"^帧 (\d+) · 活(敌|弹) \d+ ")
+_TABLE_RE = re.compile(r"^帧 (\d+) · 活(敌|弹|激光) \d+ ")
 _PEAK_RE = re.compile(r"^峰值：弹 (\d+)（帧 (\d+)）")
+_LASER_PEAK_RE = re.compile(r"激光 (\d+)（帧 (\d+)）")
 _PHASE_END_RE = re.compile(r"PHASE_ENDED@(\d+)")
 
 
 def parse_at(text: str) -> Snapshot:
-    """`run --at F` 的活敌 / 活弹两张表。表头之后逐行读到第一条不是数据行为止。"""
-    frame, enemies, bullets = -1, [], []
+    """`run --at F` 的活敌 / 活弹 / 活激光三张表。表头之后逐行读到第一条不是数据行为止。"""
+    frame, enemies, bullets, lasers = -1, [], [], []
     lines = text.splitlines()
     i = 0
     while i < len(lines):
@@ -101,24 +120,31 @@ def parse_at(text: str) -> Snapshot:
                 enemies.append(Enemy(float(p[1]), float(p[2]), int(p[4])))
             elif kind == "弹" and len(p) == 7 and p[0].isdigit():
                 bullets.append(Bullet(float(p[1]), float(p[2]), float(p[4]), int(p[6])))
+            elif kind == "激光" and len(p) == 14 and p[0].isdigit():
+                warn, _, fade = (int(v) for v in p[12].split("/"))
+                lasers.append(Laser(float(p[1]), float(p[2]), float(p[4]), float(p[5]), float(p[6]),
+                                    float(p[7]), int(p[10]), int(p[11]), warn, fade, int(p[13])))
             else:
                 break
             i += 1
-    return Snapshot(frame, enemies, bullets)
+    return Snapshot(frame, enemies, bullets, lasers)
 
 
 def parse_summary(text: str) -> Summary:
-    peak, peak_frame, end = 0, 0, None
+    peak, peak_frame, end, lpeak, lframe = 0, 0, None, 0, 0
     for line in text.splitlines():
         if m := _PEAK_RE.match(line):
             peak, peak_frame = int(m.group(1)), int(m.group(2))
+            if lm := _LASER_PEAK_RE.search(line):
+                lpeak, lframe = int(lm.group(1)), int(lm.group(2))
         elif line.startswith("段结束：") and (m := _PHASE_END_RE.search(line)):
             end = int(m.group(1))
-    return Summary(peak, peak_frame, end)
+    return Summary(peak, peak_frame, end, lpeak, lframe)
 
 
 _COUNT_ROW_RE = re.compile(r"^\s+(\d+)\s+(\d+)(?:\s+\d+){6}\s*$")
 _BULLET_COUNT_RE = re.compile(r"^帧 \d+ · 活弹 (\d+) 条", re.M)
+_LASER_COUNT_RE = re.compile(r"^帧 \d+ · 活激光 (\d+) 条", re.M)
 
 
 def parse_counts(text: str) -> list[tuple[int, int]]:
@@ -145,6 +171,15 @@ def active_window(counts: list[tuple[int, int]], count_at, end: int) -> tuple[in
     return max(1, first), min(lo, end)
 
 
+def first_nonzero(count_at, hi: int) -> int:
+    """(0, hi] 里第一个 `count_at > 0` 的帧（已知 count_at(hi) > 0、count_at(0) = 0；按单调近似二分）。"""
+    lo = 0
+    while hi - lo > 1:
+        mid = (lo + hi) // 2
+        lo, hi = (lo, mid) if count_at(mid) > 0 else (mid, hi)
+    return hi
+
+
 def pick_frames(end: int, peak: int, n: int, start: int = 1) -> list[int]:
     """[start, end] 里均匀取 n 帧，离峰值帧最近的那一帧换成峰值帧。"""
     if end - start + 1 <= n:
@@ -167,6 +202,63 @@ def cell_box(sprite: int) -> tuple[int, int, int, int]:
 def pil_rotation(deg: float) -> float:
     """贴图朝上；桥 `bullet_basis` 旋转 angle + 90°（y 朝下）。PIL `rotate` 逆时针为正，所以取负。"""
     return -(deg + 90.0)
+
+
+# 16 色表照 stg-engine godot/shaders/laser.gdshader（颜色号 = bullets.ecl 的色列顺序）
+LASER_COLORS = [
+    (164, 164, 164), (170, 40, 40), (255, 0, 0), (170, 40, 170), (255, 80, 255), (0, 0, 200),
+    (0, 40, 255), (0, 200, 248), (0, 248, 248), (40, 180, 90), (0, 248, 120), (120, 248, 48),
+    (200, 220, 60), (255, 240, 0), (255, 160, 40), (255, 255, 255),
+]
+LASER_BANDS = 5  # 截面分几层叠加：层层加色近似 shader 的「中心白芯、两侧渐暗」
+
+
+def laser_display(lz: Laser) -> tuple[float, float]:
+    """显示宽度 / alpha，照 stg-godot frame.rs `laser_display`：预警 1.2 px、最后 min(warn,30) 帧长到全宽；
+    生效全宽；收缩宽度线性到 0（harness 不印 flags，淡出 alpha 那条腿按变窄画）。"""
+    if lz.state == 0:
+        ramp = min(lz.warn, 30)
+        t0 = lz.warn - ramp
+        if ramp > 0 and lz.timer >= t0:
+            return 1.2 + (lz.width - 1.2) * (lz.timer - t0) / ramp, 1.0
+        return 1.2, 1.0
+    if lz.state == 1:
+        return lz.width, 1.0
+    k = 0.0 if lz.fade == 0 else 1.0 - lz.timer / lz.fade
+    return lz.width * k, 1.0
+
+
+def draw_lasers(im: Image.Image, lasers) -> Image.Image:
+    """加色混合画激光（压在自机之上、弹层之下）。"""
+    if not lasers:
+        return im
+    glow = Image.new("RGB", im.size, (0, 0, 0))
+    for lz in lasers:
+        w, alpha = laser_display(lz)
+        if w <= 0 or alpha <= 0 or lz.end <= lz.start:
+            continue
+        rad = math.radians(lz.deg)
+        dx, dy = math.cos(rad), math.sin(rad)
+        cx, cy = -dy, dx
+        ox, oy = lz.ox + HALF_W, lz.oy + HEADER_H
+        a = (ox + dx * lz.start, oy + dy * lz.start)
+        b = (ox + dx * lz.end, oy + dy * lz.end)
+        base = LASER_COLORS[lz.color % 16]
+        if w < 3:  # 预警细线
+            layer = Image.new("RGB", im.size, (0, 0, 0))
+            ImageDraw.Draw(layer).line((a, b), fill=tuple(round(c * 0.8 * alpha) for c in base), width=1)
+            glow = ImageChops.add(glow, layer)
+            continue
+        for j in range(LASER_BANDS):
+            hw = w / 2 * (1 - j / LASER_BANDS)
+            t = ((j + 1) / LASER_BANDS) ** 2  # 越靠内越白
+            col = tuple(round((c + (255 - c) * t) * alpha * 1.6 / LASER_BANDS) for c in base)
+            poly = [(a[0] + cx * hw, a[1] + cy * hw), (b[0] + cx * hw, b[1] + cy * hw),
+                    (b[0] - cx * hw, b[1] - cy * hw), (a[0] - cx * hw, a[1] - cy * hw)]
+            layer = Image.new("RGB", im.size, (0, 0, 0))
+            ImageDraw.Draw(layer).polygon(poly, fill=col)
+            glow = ImageChops.add(glow, layer)
+    return ImageChops.add(im, glow)
 
 
 class Renderer:
@@ -198,6 +290,7 @@ class Renderer:
         if self.player is not None:
             px, py = player_xy[0] + HALF_W, player_xy[1] + HEADER_H
             im.paste(self.player, (round(px - self.player.width / 2), round(py - self.player.height / 2)), self.player)
+        im = draw_lasers(im, snap.lasers)
         for b in snap.bullets:
             spr = self.sprite(b.sprite, b.deg)
             im.paste(spr, (round(b.x + HALF_W - spr.width / 2), round(b.y + HEADER_H - spr.height / 2)), spr)
@@ -235,11 +328,14 @@ def render_card(card: Path, rank: int, out_dir: Path = OUT_DIR, n_frames: int = 
     summary = parse_summary(run_text)
     count_at = lambda f: int(m.group(1)) if (m := _BULLET_COUNT_RE.search(harness(card, rank, f, at=f))) else 0  # noqa: E731
     start, end = active_window(parse_counts(run_text), count_at, summary.phase_end or limit)
+    if summary.peak_lasers > 0 and summary.peak_laser_frame < start:  # 采样计数表不含激光
+        laser_at = lambda f: int(m.group(1)) if (m := _LASER_COUNT_RE.search(harness(card, rank, f, at=f))) else 0  # noqa: E731
+        start = max(1, first_nonzero(laser_at, summary.peak_laser_frame))
     dst = Path(out_dir) / card.name
     dst.mkdir(parents=True, exist_ok=True)
     r = Renderer()
     tag = RANK_NAMES[rank] if 0 <= rank < len(RANK_NAMES) else str(rank)
-    title = lambda s: f"{card.name}  {tag}  f{s.frame}  b{len(s.bullets)}"  # noqa: E731
+    title = lambda s: f"{card.name}  {tag}  f{s.frame}  b{len(s.bullets)}" + (f"  L{len(s.lasers)}" if s.lasers else "")  # noqa: E731
 
     frames = pick_frames(end, summary.peak_frame, n_frames, start=start)
     snaps = snapshots(card, rank, frames, threads)
