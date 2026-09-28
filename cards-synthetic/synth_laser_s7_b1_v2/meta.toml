@@ -1,0 +1,20 @@
+title = "Extra boss 芙兰朵露 非符 1 — synthetic randomized short-rod fan"
+source = "synthetic"
+data_kind = "synthetic"
+base_card = "th06_s7_b1"
+mutation_id = "synth_laser_s7_b1_v2"
+origin = "东方红魔乡 Extra（Stage 7）boss 芙兰朵露 非符 1（ecldata7 Sub38，由 Sub37 的 enemy_interrupt_set(Sub38) 切入），Extra 档"
+source_ref = "ecldata7.ecl.txt:873-924"
+ranks = [4, 4]
+marks = [0]
+time_limit = 1800
+original_time_limit = 1800
+tags = ["ring", "laser", "random"]
+laser_approx = false
+lower_half_blocked = false
+notes = "Synthetic mutation: randomized three-segment short-rod fan; Extra rank only."
+
+[provenance]
+base_source = "th06"
+base_source_ref = "ecldata7.ecl.txt:873-924"
+base_files_sha256 = { "main.ecl" = "5d6f823b323fecbaa0bc7d8772f4ba9c56c6c539837061c893382cbf6ea76774" }

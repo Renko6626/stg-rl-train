@@ -1,0 +1,15 @@
+{
+  "key_frames": [
+    {"frame": 124, "count": 2, "state": 0, "width": 8, "x_min": -100, "x_max": 100, "y_min": 78, "y_max": 114, "angle_deg_min": 0, "angle_deg_max": 180, "start_min": 0, "start_max": 0, "end_min": 5, "end_max": 5},
+    {"frame": 184, "count": 2, "state": 1, "width": 8, "x_min": -100, "x_max": 100, "y_min": 78, "y_max": 114, "angle_deg_min": 0, "angle_deg_max": 180, "start_min": 67, "start_max": 67, "end_min": 155, "end_max": 155},
+    {"frame": 214, "count": 2, "state": 1, "width": 8, "x_min": -100, "x_max": 100, "y_min": 78, "y_max": 114, "angle_deg_min": 0, "angle_deg_max": 180, "start_min": 142, "start_max": 142, "end_min": 230, "end_max": 230},
+    {"frame": 254, "count": 2, "state": 1, "width": 8, "x_min": -100, "x_max": 100, "y_min": 78, "y_max": 114, "angle_deg_min": 0, "angle_deg_max": 180, "start_min": 242, "start_max": 242, "end_min": 330, "end_max": 330},
+    {"frame": 334, "count": 2, "state": 0, "width": 8, "x_min": -100, "x_max": 100, "y_min": 78, "y_max": 114, "angle_deg_min": 0, "angle_deg_max": 180, "start_min": 0, "start_max": 0, "end_min": 5, "end_max": 5}
+  ],
+  "max_added_lasers": 2,
+  "first_spawn_frame": 123,
+  "last_spawn_before": 1500,
+  "last_spawn_frame": 1173,
+  "last_expiry_frame": 1350,
+  "synthetic_color": 15
+}

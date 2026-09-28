@@ -1,0 +1,14 @@
+{
+  "key_frames": [
+    {"frame": 124, "count": 1, "state": 0, "width": 8, "x": -80, "y": 80, "angle_deg": 90, "start_min": 0, "start_max": 0, "end_min": 4, "end_max": 4},
+    {"frame": 184, "count": 1, "state": 1, "width": 8, "x": -80, "y": 80, "angle_deg": 90, "start_min": 28, "start_max": 28, "end_min": 124, "end_max": 124},
+    {"frame": 214, "count": 1, "state": 1, "width": 8, "x": -80, "y": 80, "angle_deg": 90, "start_min": 88, "start_max": 88, "end_min": 184, "end_max": 184},
+    {"frame": 254, "count": 1, "state": 1, "width": 8, "x": -80, "y": 80, "angle_deg": 90, "start_min": 168, "start_max": 168, "end_min": 264, "end_max": 264},
+    {"frame": 334, "count": 1, "state": 0, "width": 8, "x": 80, "y": 80, "angle_deg": 90, "start_min": 0, "start_max": 0, "end_min": 4, "end_max": 4}
+  ],
+  "max_added_lasers": 1,
+  "first_spawn_frame": 123,
+  "last_spawn_before": 1500,
+  "last_spawn_frame": 1173,
+  "synthetic_color": 15
+}

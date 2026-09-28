@@ -1,0 +1,20 @@
+title = "Stage 3 boss 红美铃 非符 1 — synthetic delayed horizontal sweeps"
+source = "synthetic"
+data_kind = "synthetic"
+base_card = "th06_s3_b1"
+mutation_id = "synth_laser_s3_b1_v3"
+origin = "东方红魔乡 Stage 3 boss 红美铃 非符 1（ecldata3.ecl.txt Sub22 + Sub23），E–L 四档"
+source_ref = "ecldata3.ecl.txt:505-535, 537-592"
+ranks = [0, 3]
+marks = [0]
+time_limit = 1800
+original_time_limit = 1800
+tags = ["aimed", "ring", "spiral", "curve", "laser"]
+laser_approx = false
+lower_half_blocked = false
+notes = "Synthetic mutation: randomized delayed horizontal sweeps; original pattern and timeout retained."
+
+[provenance]
+base_source = "th06"
+base_source_ref = "ecldata3.ecl.txt:505-535, 537-592"
+base_files_sha256 = { "main.ecl" = "47a85fdae06eae8077226507de657478b2ce07bcfdac7f0d8bb223d115e3b3a5" }

@@ -19,7 +19,7 @@ import torch
 
 from . import console, plots
 from .actions import ACTION_TABLE_VERSION
-from .cards import compile_cards, discover, load_splits, train_starts
+from .cards import card_manifest, compile_cards, discover, load_splits, train_starts
 from .checkpoint import load_checkpoint, restore_rng, save_checkpoint
 from .config import deep_merge, dump_toml, from_dict, load_config
 from .curriculum import Curriculum
@@ -120,7 +120,8 @@ def train(cfg: dict, run_dir: Path, resume: dict | None = None, pack_result: boo
         _update_env_json(run_dir, stg_rl=stg_rl.build_info(), train_repo_sha=git_sha(),
                          action_table_version=ACTION_TABLE_VERSION, machine=machine_info(),
                          # 起点顺序 = 课程权重向量的列序（curriculum.jsonl 按它回看）
-                         starts=[f"{s.image}:{s.mark}:{s.rank}" for s in starts])
+                         starts=[f"{s.image}:{s.mark}:{s.rank}" for s in starts],
+                         cards=card_manifest(discover(cfg["env"]["cards_dir"])))
 
     envw = EnvWrapper(cfg, images, starts, device, seed=int(cfg["run"]["seed"]) + start - 1)  # Ruling 7
     curriculum = Curriculum(len(starts), cfg["curriculum"])

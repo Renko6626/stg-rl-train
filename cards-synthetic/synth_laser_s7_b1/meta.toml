@@ -1,0 +1,20 @@
+title = "Extra boss 芙兰朵露 非符 1 — synthetic randomized short-rod stream"
+source = "synthetic"
+data_kind = "synthetic"
+base_card = "th06_s7_b1"
+mutation_id = "synth_laser_s7_b1"
+origin = "东方红魔乡 Extra boss 芙兰朵露 非符 1（Sub38），Extra rank 4"
+source_ref = "ecldata7.ecl.txt:873-924"
+ranks = [4, 4]
+marks = [0]
+time_limit = 1800
+original_time_limit = 1800
+tags = ["ring", "laser", "random"]
+laser_approx = false
+lower_half_blocked = false
+notes = "Synthetic mutation: randomized fixed-axis origins/directions and 2–3px/frame finite rods; Extra rank only."
+
+[provenance]
+base_source = "th06"
+base_source_ref = "ecldata7.ecl.txt:873-924"
+base_files_sha256 = { "main.ecl" = "5d6f823b323fecbaa0bc7d8772f4ba9c56c6c539837061c893382cbf6ea76774" }

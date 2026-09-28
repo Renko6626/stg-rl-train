@@ -1,0 +1,191 @@
+{
+  "date": "2026-09-27",
+  "authored": 10,
+  "machine_pass": 10,
+  "reviewer_pass": 10,
+  "complete_harness_runs": 70,
+  "original_cards_unchanged": 166,
+  "original_rank2_starts": 153,
+  "combined_rank2_starts": 163,
+  "eval_cards": 13,
+  "branch": "main",
+  "trained": false,
+  "committed": false,
+  "pushed": false,
+  "validation_command": ".venv/bin/python -m stgtrain.practice_validate cards-synthetic --all --json docs/practice-cards/reports",
+  "test_command": ".venv/bin/pytest -q tests/test_cards.py tests/test_practice_validate.py tests/test_config.py",
+  "related_tests_passed": 26,
+  "cards": [
+    {
+      "id": "synth_laser_s1_b1",
+      "base_card": "th06_s1_b1",
+      "data_kind": "synthetic",
+      "status": "accepted",
+      "machine_report": "docs/practice-cards/reports/synth_laser_s1_b1.machine.json",
+      "review_report": "docs/practice-cards/reports/pilot-review.md",
+      "reviewer_is_not_author": true,
+      "hashes_current": true,
+      "file_sha256": {
+        "TASK.md": "8556ad75fa3b8cc9b93df5f2e023d938d3c72b56a83bde51a382854835bcaab0",
+        "machine-spec.json": "18d582f3d8c824ab2ad062a35de1b7f6a26c4f71395ac71e1a8ab40bb7c10893",
+        "main.ecl": "4a46d0172d5558e781279beb59fa22dfc49f770344a04e1b1e458c67fd91b426",
+        "meta.toml": "f171396abc4ddf856f67f708a53f14cb71dbcdc5aa36bf1d74119b87bfa02cb3",
+        "overlay.ecl": "4e2052e1347986dc7f5d36221038cb4f32e6001eb3e54577e6040f9b9135e379"
+      }
+    },
+    {
+      "id": "synth_laser_s2_b1",
+      "base_card": "th06_s2_b1",
+      "data_kind": "synthetic",
+      "status": "accepted",
+      "machine_report": "docs/practice-cards/reports/synth_laser_s2_b1.machine.json",
+      "review_report": "docs/practice-cards/reports/pilot-review.md",
+      "reviewer_is_not_author": true,
+      "hashes_current": true,
+      "file_sha256": {
+        "TASK.md": "8cdd28a082dccf298fda1f67fbfc7f9d99e78bffe88a783d205200301d825648",
+        "machine-spec.json": "c2bfe7c9a8066a596c27145bfbd704eccab1f2054dad409783e5d225718d3fbe",
+        "main.ecl": "66afe4aaac7e500ee92fa587fcec6225a84a067237a66c87fa73ad9acae9a04a",
+        "meta.toml": "e2def039a11cca861dbfd4abb189140d169280b1ea5244f5308d6512f1689d15",
+        "overlay.ecl": "9283576a0b8d3b765b25c402ab676debc1bc1cf656ce46a15605dd0e5de2b9d4"
+      }
+    },
+    {
+      "id": "synth_laser_s2_b3",
+      "base_card": "th06_s2_b3",
+      "data_kind": "synthetic",
+      "status": "accepted",
+      "machine_report": "docs/practice-cards/reports/synth_laser_s2_b3.machine.json",
+      "review_report": "docs/practice-cards/reports/batch-review.md",
+      "reviewer_is_not_author": true,
+      "hashes_current": true,
+      "file_sha256": {
+        "TASK.md": "18db62ca8e8afecd80d68f15e74ce8a1687fb5d9e330d04f323e8a75bc11c48b",
+        "machine-spec.json": "5aff9a0194f405bbc5277187487922df1afb459b3097eecb4bbd0915e04961ef",
+        "main.ecl": "6fbd1043f0c70f419023f87d9aa77fa100094b2f6ff1cb3b29b87ee392eb9517",
+        "meta.toml": "93f777965c89350968d7f987516f93d1f04982c029f258bbacd2f8a6c0670b85",
+        "overlay.ecl": "17498e1ac2a5e9518396d913d4cae992533aeb1d413c9508f72b9b5c4dc65d0a"
+      }
+    },
+    {
+      "id": "synth_laser_s3_b1",
+      "base_card": "th06_s3_b1",
+      "data_kind": "synthetic",
+      "status": "accepted",
+      "machine_report": "docs/practice-cards/reports/synth_laser_s3_b1.machine.json",
+      "review_report": "docs/practice-cards/reports/batch-review.md",
+      "reviewer_is_not_author": true,
+      "hashes_current": true,
+      "file_sha256": {
+        "TASK.md": "ad8a6f9eb94cbbb6677b767b613bc92f35cde6c51d9a0e97f577c80f95d87b47",
+        "machine-spec.json": "d9ebd7f6b42c739c1265c63313f45a503785a7af927d9b5058cc1940bb9becc6",
+        "main.ecl": "31ed943fc65f1b9a43245cbb7a3784256a879b5b516014782a56b3fb659f7682",
+        "meta.toml": "37732f7d5f2cbe5f1ee2424bee65da0f8cf2c786118d7d9bea8a48dd1a582f51",
+        "overlay.ecl": "c0338e6fb2821ca8407dc0a98adbcf25a2ff9a12031a945b7fd7b2ba6741727a"
+      }
+    },
+    {
+      "id": "synth_laser_s4_b1",
+      "base_card": "th06_s4_b1",
+      "data_kind": "synthetic",
+      "status": "accepted",
+      "machine_report": "docs/practice-cards/reports/synth_laser_s4_b1.machine.json",
+      "review_report": "docs/practice-cards/reports/batch-review.md",
+      "reviewer_is_not_author": true,
+      "hashes_current": true,
+      "file_sha256": {
+        "TASK.md": "194d14483fcad63f4525eaa34fc1811e454ca7729e3b69b27dc84a8a24bf4bd6",
+        "machine-spec.json": "03d3b1ebc8f9b940ba0d7fe53bfc564700292ae9a8a3a5c34060cedd691157c9",
+        "main.ecl": "17e880d54f187528084db6c937229b4387c0bfa60336d6ff7a9d5e75b54ad900",
+        "meta.toml": "85eeadef32de2ef3bcf452e952f8e00d6adf5b1215f8b0e32e29bd4ae75e09db",
+        "overlay.ecl": "ad5a1088a8342152ab7479e45cac9c0a3c4a3014ffd511697c84e274800b2dda"
+      }
+    },
+    {
+      "id": "synth_laser_s4_w10",
+      "base_card": "th06_s4_w10",
+      "data_kind": "synthetic",
+      "status": "accepted",
+      "machine_report": "docs/practice-cards/reports/synth_laser_s4_w10.machine.json",
+      "review_report": "docs/practice-cards/reports/batch-review.md",
+      "reviewer_is_not_author": true,
+      "hashes_current": true,
+      "file_sha256": {
+        "TASK.md": "3752285ffd2152f81827c8ec243d7b495f33708b3f5b19c138178dc56ec70ce0",
+        "machine-spec.json": "8fa8da5b851094ac38d779af634c2ef334984d29b6aaa85bd1480643a2775fc7",
+        "main.ecl": "23de0cd3304c48ae5e1cbf1d81c561020a040bbaa949a08551654ecf77ceea19",
+        "meta.toml": "4a5f3ce5a9003689de07c9d4a596271aa601e5e8a1199ad8af1522d0e1d0daa3",
+        "overlay.ecl": "f8b0c1c2bccc74e4faff81dcd52dd887ef54d18939262f64d300dbdb1f20f497"
+      }
+    },
+    {
+      "id": "synth_laser_s5_b1",
+      "base_card": "th06_s5_b1",
+      "data_kind": "synthetic",
+      "status": "accepted",
+      "machine_report": "docs/practice-cards/reports/synth_laser_s5_b1.machine.json",
+      "review_report": "docs/practice-cards/reports/batch-review.md",
+      "reviewer_is_not_author": true,
+      "hashes_current": true,
+      "file_sha256": {
+        "TASK.md": "6f42b8897b206b97d7aff4b9cd071d7ef41b1a156cfdb3c4a12332fcc2cbfd68",
+        "machine-spec.json": "f4152f3a1cdb918fabda910a66bae6a7160def874ffed560fe5d3735aea90bc4",
+        "main.ecl": "b6195d692358d23126a36ff9f4e1d1c486abeb582774f5e035361a5f77a8d2a1",
+        "meta.toml": "73fe3cb94546adda1201ebabc417f18d018925fd1b145aa5ac2c7b88764bdcc9",
+        "overlay.ecl": "859f35b4c60a040cb52719a8b2fcaca24863a12c30a010c79e3bb86bdfa74881"
+      }
+    },
+    {
+      "id": "synth_laser_s5_w05",
+      "base_card": "th06_s5_w05",
+      "data_kind": "synthetic",
+      "status": "accepted",
+      "machine_report": "docs/practice-cards/reports/synth_laser_s5_w05.machine.json",
+      "review_report": "docs/practice-cards/reports/batch-review.md",
+      "reviewer_is_not_author": true,
+      "hashes_current": true,
+      "file_sha256": {
+        "TASK.md": "50838f74de0bfbffe7415783330b06e699c6cd63f8f22e0fc70b37c2a270f67b",
+        "machine-spec.json": "d98eb6e8a420c63f3485dea3b59b07146121c410ebd27a3fb0b1b9d21844bf67",
+        "main.ecl": "72d6bb9427273f8bede3bcb8b51aae818cd653bee0305887e786aa1395474e97",
+        "meta.toml": "534998c3c5387d639ceeee57d63e874d3511564bbe40fa38374b5e40c1caa5e6",
+        "overlay.ecl": "3936cfe37b7c4eadfd27b665c9e4339e7ef35f4b3084854a8248e0328327d3c7"
+      }
+    },
+    {
+      "id": "synth_laser_s6_b1",
+      "base_card": "th06_s6_b1",
+      "data_kind": "synthetic",
+      "status": "accepted",
+      "machine_report": "docs/practice-cards/reports/synth_laser_s6_b1.machine.json",
+      "review_report": "docs/practice-cards/reports/tail-review.md",
+      "reviewer_is_not_author": true,
+      "hashes_current": true,
+      "file_sha256": {
+        "TASK.md": "bf88c87b2399d913fed7e7500d031fddfcf5c86b49c52876b95ca22349829f35",
+        "machine-spec.json": "276956a2977086ef09aa24392960903cf8b91dd8bb6b766865cfef78b8557d54",
+        "main.ecl": "d937d1370de0f4396d62b3b2167cf882929975db5621bf269e0042bdc87f6c07",
+        "meta.toml": "2ee8240f358b8ab29ac6d9f0447596c36d5bc4e365017e5d584f4130f3b6c4e8",
+        "overlay.ecl": "d7397debdf2416006a9c9c3ffc7c6936bc2f0ecefc1ea16218e3897c44cae3c3"
+      }
+    },
+    {
+      "id": "synth_laser_s7_b1",
+      "base_card": "th06_s7_b1",
+      "data_kind": "synthetic",
+      "status": "accepted",
+      "machine_report": "docs/practice-cards/reports/synth_laser_s7_b1.machine.json",
+      "review_report": "docs/practice-cards/reports/tail-review.md",
+      "reviewer_is_not_author": true,
+      "hashes_current": true,
+      "file_sha256": {
+        "TASK.md": "52f7ecf34583b33ee34b8cab6840ad0e42f10b952f2b66b6d0d7d50f480c47ac",
+        "machine-spec.json": "078ee17c6b783d8617d6dabb5344c4a3921e31a19901f77ad5bf8c437dac9a3a",
+        "main.ecl": "1d6c5b9aa1910cf1924cd4b5c75f34d669f278bb8c4541765d7ce3631f2155b5",
+        "meta.toml": "93181ad72a5860167153c05a81e66be2bfe65856b4a0ef116250c31209d732f2",
+        "overlay.ecl": "ba357950ff369652a3577b0260428194e8a1ec7a286184d548caa56eb25547b8"
+      }
+    }
+  ],
+  "limitations": "Mechanical/specification acceptance; no training benefit or solvability claim. Generic spec-field/duplicate-JSON/tl cleanup/metadata gates remain next-batch hardening; current cards independently reviewed."
+}

@@ -1,0 +1,20 @@
+title = "Stage 4 道中 第 10 波 — synthetic translated diagonal line"
+source = "synthetic"
+data_kind = "synthetic"
+base_card = "th06_s4_w10"
+mutation_id = "synth_laser_s4_w10_v3"
+origin = "东方红魔乡 Stage 4 道中，timeline 帧 3088–3178（Sub3 ×5 对镜像，共 10 只），E–L 四档"
+source_ref = "ecldata4.ecl.txt:3350-3369, 66-89"
+ranks = [0, 3]
+marks = [0]
+time_limit = 460
+original_time_limit = 460
+tags = ["aimed", "laser"]
+laser_approx = false
+lower_half_blocked = false
+notes = "Synthetic mutation: one translated diagonal short line; original stage wave remains unchanged."
+
+[provenance]
+base_source = "th06"
+base_source_ref = "ecldata4.ecl.txt:3350-3369, 66-89"
+base_files_sha256 = { "main.ecl" = "d267db71e888817d1e4e1afa730f6771f4f7c3f3d37d4ce58c776c7f424ffbdf" }

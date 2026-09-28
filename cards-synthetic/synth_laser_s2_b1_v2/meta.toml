@@ -1,0 +1,20 @@
+title = "Stage 2 boss 琪露诺 非符 1 — synthetic opposed flying rods v2"
+source = "synthetic"
+data_kind = "synthetic"
+base_card = "th06_s2_b1"
+mutation_id = "synth_laser_s2_b1_v2"
+origin = "东方红魔乡 Stage 2 boss 琪露诺 第一非符（Sub22 登场设置 + Sub23/Sub24 尾调用互调），E–L 四档"
+source_ref = "ecldata2.ecl.txt:406-430, 432-465, 467-504"
+ranks = [0, 3]
+marks = [0]
+time_limit = 1500
+original_time_limit = 1500
+tags = ["aimed", "random", "ring", "curve", "laser"]
+laser_approx = false
+lower_half_blocked = false
+notes = "Synthetic mutation v2: seeded opposed short rods with randomized lateral origins; original pattern and timeout retained."
+
+[provenance]
+base_source = "th06"
+base_source_ref = "ecldata2.ecl.txt:406-430, 432-465, 467-504"
+base_files_sha256 = { "main.ecl" = "f54c27c8c3eb20b95ddd4dfd8e9eb3b0d739e8cb21fdda221d99b5d8faf3f3c8" }

@@ -1,0 +1,1480 @@
+{
+  "card": "synth_laser_s5_w05_v2",
+  "data_kind": "synthetic",
+  "errors": [],
+  "runs": [
+    {
+      "rank": 0,
+      "seed": 1,
+      "exit": 0,
+      "errors": [],
+      "peak_lasers": 1,
+      "output": "run: cards-synthetic/synth_laser_s5_w05_v2 —— 2 个单元（按名排序）[main.ecl, overlay.ecl]\n     seed 1 · rank 0 · 660 帧 · 无输入（不按键）\n     帧 N = 第 N 次 step 之后；帧 0 = 未 step 的开局\n\n  frame  bullet   shot  enemy   item   task   fault   viol\n      0       0      0      0      0      1       0      0\n     66       0      0      1      0      4       0      0\n    132       0      0      3      0      8       0      0\n    198      48      0      3      0      8       0      0\n    264     196      0      5      0     12       0      0\n    330     338      0      7      0     16       0      0\n    396     461      0      7      0     15       0      0\n    462     302      0      5      0     11       0      0\n    528     138      0      5      0     11       0      0\n    594      48      0      3      0      7       0      0\n    660       0      0      1      0      2       0      0\n\n峰值：弹 465（帧 395）· 敌 7（帧 304）· 任务 16（帧 305）· 道具 0（帧 0）· 自机弹 0（帧 0）· 激光 1（帧 123）\n末帧 660：弹 0 · 敌 1 · 任务 2 · 道具 0 · 自机弹 0 · 激光 0\n段结束：PHASE_ENDED@603 · SPELL_CAPTURED — · SPELL_FAILED — · STAGE_CLEARED —\n诊断：task_faults 0 · contract_viol 0 · pool_full 0 · hits_ovf 0 · events_ovf 0 · reqs_dropped 0\n"
+    },
+    {
+      "rank": 0,
+      "seed": 7,
+      "exit": 0,
+      "errors": [],
+      "peak_lasers": 1,
+      "output": "run: cards-synthetic/synth_laser_s5_w05_v2 —— 2 个单元（按名排序）[main.ecl, overlay.ecl]\n     seed 7 · rank 0 · 660 帧 · 无输入（不按键）\n     帧 N = 第 N 次 step 之后；帧 0 = 未 step 的开局\n\n  frame  bullet   shot  enemy   item   task   fault   viol\n      0       0      0      0      0      1       0      0\n     66       0      0      1      0      4       0      0\n    132       0      0      3      0      8       0      0\n    198      48      0      3      0      8       0      0\n    264     196      0      5      0     12       0      0\n    330     338      0      7      0     16       0      0\n    396     461      0      7      0     15       0      0\n    462     302      0      5      0     11       0      0\n    528     138      0      5      0     11       0      0\n    594      48      0      3      0      7       0      0\n    660       0      0      1      0      2       0      0\n\n峰值：弹 465（帧 395）· 敌 7（帧 304）· 任务 16（帧 305）· 道具 0（帧 0）· 自机弹 0（帧 0）· 激光 1（帧 123）\n末帧 660：弹 0 · 敌 1 · 任务 2 · 道具 0 · 自机弹 0 · 激光 0\n段结束：PHASE_ENDED@603 · SPELL_CAPTURED — · SPELL_FAILED — · STAGE_CLEARED —\n诊断：task_faults 0 · contract_viol 0 · pool_full 0 · hits_ovf 0 · events_ovf 0 · reqs_dropped 0\n"
+    },
+    {
+      "rank": 1,
+      "seed": 1,
+      "exit": 0,
+      "errors": [],
+      "peak_lasers": 1,
+      "output": "run: cards-synthetic/synth_laser_s5_w05_v2 —— 2 个单元（按名排序）[main.ecl, overlay.ecl]\n     seed 1 · rank 1 · 660 帧 · 无输入（不按键）\n     帧 N = 第 N 次 step 之后；帧 0 = 未 step 的开局\n\n  frame  bullet   shot  enemy   item   task   fault   viol\n      0       0      0      0      0      1       0      0\n     66       0      0      1      0      4       0      0\n    132       0      0      3      0      8       0      0\n    198      48      0      3      0      8       0      0\n    264     323      0      5      0     12       0      0\n    330     536      0      7      0     16       0      0\n    396     575      0      7      0     15       0      0\n    462     462      0      5      0     11       0      0\n    528     193      0      5      0     11       0      0\n    594      58      0      3      0      7       0      0\n    660       0      0      1      0      2       0      0\n\n峰值：弹 672（帧 410）· 敌 7（帧 304）· 任务 16（帧 305）· 道具 0（帧 0）· 自机弹 0（帧 0）· 激光 1（帧 123）\n末帧 660：弹 0 · 敌 1 · 任务 2 · 道具 0 · 自机弹 0 · 激光 0\n段结束：PHASE_ENDED@603 · SPELL_CAPTURED — · SPELL_FAILED — · STAGE_CLEARED —\n诊断：task_faults 0 · contract_viol 0 · pool_full 0 · hits_ovf 0 · events_ovf 0 · reqs_dropped 0\n"
+    },
+    {
+      "rank": 1,
+      "seed": 7,
+      "exit": 0,
+      "errors": [],
+      "peak_lasers": 1,
+      "output": "run: cards-synthetic/synth_laser_s5_w05_v2 —— 2 个单元（按名排序）[main.ecl, overlay.ecl]\n     seed 7 · rank 1 · 660 帧 · 无输入（不按键）\n     帧 N = 第 N 次 step 之后；帧 0 = 未 step 的开局\n\n  frame  bullet   shot  enemy   item   task   fault   viol\n      0       0      0      0      0      1       0      0\n     66       0      0      1      0      4       0      0\n    132       0      0      3      0      8       0      0\n    198      48      0      3      0      8       0      0\n    264     323      0      5      0     12       0      0\n    330     536      0      7      0     16       0      0\n    396     575      0      7      0     15       0      0\n    462     462      0      5      0     11       0      0\n    528     193      0      5      0     11       0      0\n    594      58      0      3      0      7       0      0\n    660       0      0      1      0      2       0      0\n\n峰值：弹 672（帧 410）· 敌 7（帧 304）· 任务 16（帧 305）· 道具 0（帧 0）· 自机弹 0（帧 0）· 激光 1（帧 123）\n末帧 660：弹 0 · 敌 1 · 任务 2 · 道具 0 · 自机弹 0 · 激光 0\n段结束：PHASE_ENDED@603 · SPELL_CAPTURED — · SPELL_FAILED — · STAGE_CLEARED —\n诊断：task_faults 0 · contract_viol 0 · pool_full 0 · hits_ovf 0 · events_ovf 0 · reqs_dropped 0\n"
+    },
+    {
+      "rank": 2,
+      "seed": 1,
+      "exit": 0,
+      "errors": [],
+      "peak_lasers": 1,
+      "output": "run: cards-synthetic/synth_laser_s5_w05_v2 —— 2 个单元（按名排序）[main.ecl, overlay.ecl]\n     seed 1 · rank 2 · 660 帧 · 无输入（不按键）\n     帧 N = 第 N 次 step 之后；帧 0 = 未 step 的开局\n\n  frame  bullet   shot  enemy   item   task   fault   viol\n      0       0      0      0      0      1       0      0\n     66       0      0      1      0      4       0      0\n    132       0      0      3      0      8       0      0\n    198      48      0      3      0      8       0      0\n    264     469      0      5      0     12       0      0\n    330     684      0      7      0     16       0      0\n    396     670      0      7      0     15       0      0\n    462     616      0      7      0     15       0      0\n    528     230      0      5      0     11       0      0\n    594      62      0      3      0      7       0      0\n    660       0      0      1      0      2       0      0\n\n峰值：弹 831（帧 425）· 敌 7（帧 304）· 任务 16（帧 305）· 道具 0（帧 0）· 自机弹 0（帧 0）· 激光 1（帧 123）\n末帧 660：弹 0 · 敌 1 · 任务 2 · 道具 0 · 自机弹 0 · 激光 0\n段结束：PHASE_ENDED@603 · SPELL_CAPTURED — · SPELL_FAILED — · STAGE_CLEARED —\n诊断：task_faults 0 · contract_viol 0 · pool_full 0 · hits_ovf 0 · events_ovf 0 · reqs_dropped 0\n"
+    },
+    {
+      "rank": 2,
+      "seed": 7,
+      "exit": 0,
+      "errors": [],
+      "peak_lasers": 1,
+      "output": "run: cards-synthetic/synth_laser_s5_w05_v2 —— 2 个单元（按名排序）[main.ecl, overlay.ecl]\n     seed 7 · rank 2 · 660 帧 · 无输入（不按键）\n     帧 N = 第 N 次 step 之后；帧 0 = 未 step 的开局\n\n  frame  bullet   shot  enemy   item   task   fault   viol\n      0       0      0      0      0      1       0      0\n     66       0      0      1      0      4       0      0\n    132       0      0      3      0      8       0      0\n    198      48      0      3      0      8       0      0\n    264     469      0      5      0     12       0      0\n    330     684      0      7      0     16       0      0\n    396     670      0      7      0     15       0      0\n    462     616      0      7      0     15       0      0\n    528     230      0      5      0     11       0      0\n    594      62      0      3      0      7       0      0\n    660       0      0      1      0      2       0      0\n\n峰值：弹 831（帧 425）· 敌 7（帧 304）· 任务 16（帧 305）· 道具 0（帧 0）· 自机弹 0（帧 0）· 激光 1（帧 123）\n末帧 660：弹 0 · 敌 1 · 任务 2 · 道具 0 · 自机弹 0 · 激光 0\n段结束：PHASE_ENDED@603 · SPELL_CAPTURED — · SPELL_FAILED — · STAGE_CLEARED —\n诊断：task_faults 0 · contract_viol 0 · pool_full 0 · hits_ovf 0 · events_ovf 0 · reqs_dropped 0\n"
+    },
+    {
+      "rank": 3,
+      "seed": 1,
+      "exit": 0,
+      "errors": [],
+      "peak_lasers": 1,
+      "output": "run: cards-synthetic/synth_laser_s5_w05_v2 —— 2 个单元（按名排序）[main.ecl, overlay.ecl]\n     seed 1 · rank 3 · 660 帧 · 无输入（不按键）\n     帧 N = 第 N 次 step 之后；帧 0 = 未 step 的开局\n\n  frame  bullet   shot  enemy   item   task   fault   viol\n      0       0      0      0      0      1       0      0\n     66       0      0      1      0      4       0      0\n    132       0      0      3      0      8       0      0\n    198      96      0      3      0      8       0      0\n    264     661      0      5      0     12       0      0\n    330     724      0      7      0     16       0      0\n    396     874      0      7      0     15       0      0\n    462     646      0      7      0     15       0      0\n    528     340      0      5      0     11       0      0\n    594     141      0      3      0      7       0      0\n    660       0      0      1      0      2       0      0\n\n峰值：弹 908（帧 400）· 敌 7（帧 304）· 任务 16（帧 305）· 道具 0（帧 0）· 自机弹 0（帧 0）· 激光 1（帧 123）\n末帧 660：弹 0 · 敌 1 · 任务 2 · 道具 0 · 自机弹 0 · 激光 0\n段结束：PHASE_ENDED@603 · SPELL_CAPTURED — · SPELL_FAILED — · STAGE_CLEARED —\n诊断：task_faults 0 · contract_viol 0 · pool_full 0 · hits_ovf 0 · events_ovf 0 · reqs_dropped 0\n"
+    },
+    {
+      "rank": 3,
+      "seed": 7,
+      "exit": 0,
+      "errors": [],
+      "peak_lasers": 1,
+      "output": "run: cards-synthetic/synth_laser_s5_w05_v2 —— 2 个单元（按名排序）[main.ecl, overlay.ecl]\n     seed 7 · rank 3 · 660 帧 · 无输入（不按键）\n     帧 N = 第 N 次 step 之后；帧 0 = 未 step 的开局\n\n  frame  bullet   shot  enemy   item   task   fault   viol\n      0       0      0      0      0      1       0      0\n     66       0      0      1      0      4       0      0\n    132       0      0      3      0      8       0      0\n    198      96      0      3      0      8       0      0\n    264     661      0      5      0     12       0      0\n    330     724      0      7      0     16       0      0\n    396     874      0      7      0     15       0      0\n    462     646      0      7      0     15       0      0\n    528     340      0      5      0     11       0      0\n    594     141      0      3      0      7       0      0\n    660       0      0      1      0      2       0      0\n\n峰值：弹 908（帧 400）· 敌 7（帧 304）· 任务 16（帧 305）· 道具 0（帧 0）· 自机弹 0（帧 0）· 激光 1（帧 123）\n末帧 660：弹 0 · 敌 1 · 任务 2 · 道具 0 · 自机弹 0 · 激光 0\n段结束：PHASE_ENDED@603 · SPELL_CAPTURED — · SPELL_FAILED — · STAGE_CLEARED —\n诊断：task_faults 0 · contract_viol 0 · pool_full 0 · hits_ovf 0 · events_ovf 0 · reqs_dropped 0\n"
+    }
+  ],
+  "key_frames": [
+    {
+      "rank": 0,
+      "seed": 1,
+      "frame": 124,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 309.35,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 0,
+          "timer": 2,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 0,
+      "seed": 7,
+      "frame": 124,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 290.09,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 0,
+          "timer": 2,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 0,
+      "seed": 1,
+      "frame": 168,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 299.68,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 1,
+          "timer": 1,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 0,
+      "seed": 7,
+      "frame": 168,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 280.42,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 1,
+          "timer": 1,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 0,
+      "seed": 1,
+      "frame": 184,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 296.16,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 1,
+          "timer": 17,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 0,
+      "seed": 7,
+      "frame": 184,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 276.9,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 1,
+          "timer": 17,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 0,
+      "seed": 1,
+      "frame": 214,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 289.57,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 1,
+          "timer": 47,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 0,
+      "seed": 7,
+      "frame": 214,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 270.31,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 1,
+          "timer": 47,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 0,
+      "seed": 1,
+      "frame": 254,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 280.78,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 1,
+          "timer": 87,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 0,
+      "seed": 7,
+      "frame": 254,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 261.52,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 1,
+          "timer": 87,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 0,
+      "seed": 1,
+      "frame": 288,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 273.31,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 2,
+          "timer": 1,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 0,
+      "seed": 7,
+      "frame": 288,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 254.05,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 2,
+          "timer": 1,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 0,
+      "seed": 1,
+      "frame": 300,
+      "lasers": []
+    },
+    {
+      "rank": 0,
+      "seed": 7,
+      "frame": 300,
+      "lasers": []
+    },
+    {
+      "rank": 0,
+      "seed": 1,
+      "frame": 334,
+      "lasers": []
+    },
+    {
+      "rank": 0,
+      "seed": 7,
+      "frame": 334,
+      "lasers": []
+    },
+    {
+      "rank": 0,
+      "frame": 122,
+      "schedule_check": true,
+      "lasers": []
+    },
+    {
+      "rank": 0,
+      "frame": 123,
+      "schedule_check": true,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 309.57,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 0,
+          "timer": 1,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 0,
+      "frame": 123,
+      "schedule_check": true,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 309.57,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 0,
+          "timer": 1,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 0,
+      "frame": 600,
+      "deadline_check": true,
+      "lasers": []
+    },
+    {
+      "rank": 0,
+      "frame": 660,
+      "lasers": []
+    },
+    {
+      "rank": 1,
+      "seed": 1,
+      "frame": 124,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 309.17,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 0,
+          "timer": 2,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 1,
+      "seed": 7,
+      "frame": 124,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 289.91,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 0,
+          "timer": 2,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 1,
+      "seed": 1,
+      "frame": 168,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 295.64,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 1,
+          "timer": 1,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 1,
+      "seed": 7,
+      "frame": 168,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 276.38,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 1,
+          "timer": 1,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 1,
+      "seed": 1,
+      "frame": 184,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 290.71,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 1,
+          "timer": 17,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 1,
+      "seed": 7,
+      "frame": 184,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 271.46,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 1,
+          "timer": 17,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 1,
+      "seed": 1,
+      "frame": 214,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 281.49,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 1,
+          "timer": 47,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 1,
+      "seed": 7,
+      "frame": 214,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 262.23,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 1,
+          "timer": 47,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 1,
+      "seed": 1,
+      "frame": 254,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 269.18,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 1,
+          "timer": 87,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 1,
+      "seed": 7,
+      "frame": 254,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 249.92,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 1,
+          "timer": 87,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 1,
+      "seed": 1,
+      "frame": 288,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 258.72,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 2,
+          "timer": 1,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 1,
+      "seed": 7,
+      "frame": 288,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 239.46,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 2,
+          "timer": 1,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 1,
+      "seed": 1,
+      "frame": 300,
+      "lasers": []
+    },
+    {
+      "rank": 1,
+      "seed": 7,
+      "frame": 300,
+      "lasers": []
+    },
+    {
+      "rank": 1,
+      "seed": 1,
+      "frame": 334,
+      "lasers": []
+    },
+    {
+      "rank": 1,
+      "seed": 7,
+      "frame": 334,
+      "lasers": []
+    },
+    {
+      "rank": 1,
+      "frame": 122,
+      "schedule_check": true,
+      "lasers": []
+    },
+    {
+      "rank": 1,
+      "frame": 123,
+      "schedule_check": true,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 309.48,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 0,
+          "timer": 1,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 1,
+      "frame": 123,
+      "schedule_check": true,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 309.48,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 0,
+          "timer": 1,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 1,
+      "frame": 600,
+      "deadline_check": true,
+      "lasers": []
+    },
+    {
+      "rank": 1,
+      "frame": 660,
+      "lasers": []
+    },
+    {
+      "rank": 2,
+      "seed": 1,
+      "frame": 124,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 308.91,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 0,
+          "timer": 2,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "seed": 7,
+      "frame": 124,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 289.65,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 0,
+          "timer": 2,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "seed": 1,
+      "frame": 168,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 289.57,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 1,
+          "timer": 1,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "seed": 7,
+      "frame": 168,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 270.31,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 1,
+          "timer": 1,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "seed": 1,
+      "frame": 184,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 282.54,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 1,
+          "timer": 17,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "seed": 7,
+      "frame": 184,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 263.28,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 1,
+          "timer": 17,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "seed": 1,
+      "frame": 214,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 269.36,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 1,
+          "timer": 47,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "seed": 7,
+      "frame": 214,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 250.1,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 1,
+          "timer": 47,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "seed": 1,
+      "frame": 254,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 251.78,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 1,
+          "timer": 87,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "seed": 7,
+      "frame": 254,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 232.52,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 1,
+          "timer": 87,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "seed": 1,
+      "frame": 288,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 236.84,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 2,
+          "timer": 1,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "seed": 7,
+      "frame": 288,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 217.58,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 2,
+          "timer": 1,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "seed": 1,
+      "frame": 300,
+      "lasers": []
+    },
+    {
+      "rank": 2,
+      "seed": 7,
+      "frame": 300,
+      "lasers": []
+    },
+    {
+      "rank": 2,
+      "seed": 1,
+      "frame": 334,
+      "lasers": []
+    },
+    {
+      "rank": 2,
+      "seed": 7,
+      "frame": 334,
+      "lasers": []
+    },
+    {
+      "rank": 2,
+      "frame": 122,
+      "schedule_check": true,
+      "lasers": []
+    },
+    {
+      "rank": 2,
+      "frame": 123,
+      "schedule_check": true,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 309.35,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 0,
+          "timer": 1,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "frame": 123,
+      "schedule_check": true,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 309.35,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 0,
+          "timer": 1,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "frame": 600,
+      "deadline_check": true,
+      "lasers": []
+    },
+    {
+      "rank": 2,
+      "frame": 660,
+      "lasers": []
+    },
+    {
+      "rank": 3,
+      "seed": 1,
+      "frame": 124,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 308.56,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 0,
+          "timer": 2,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "seed": 7,
+      "frame": 124,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 289.3,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 0,
+          "timer": 2,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "seed": 1,
+      "frame": 168,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 281.49,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 1,
+          "timer": 1,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "seed": 7,
+      "frame": 168,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 262.23,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 1,
+          "timer": 1,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "seed": 1,
+      "frame": 184,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 271.64,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 1,
+          "timer": 17,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "seed": 7,
+      "frame": 184,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 252.38,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 1,
+          "timer": 17,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "seed": 1,
+      "frame": 214,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 253.19,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 1,
+          "timer": 47,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "seed": 7,
+      "frame": 214,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 233.93,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 1,
+          "timer": 47,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "seed": 1,
+      "frame": 254,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 228.58,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 1,
+          "timer": 87,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "seed": 7,
+      "frame": 254,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 209.32,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 1,
+          "timer": 87,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "seed": 1,
+      "frame": 288,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 207.66,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 2,
+          "timer": 1,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "seed": 7,
+      "frame": 288,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 188.4,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 2,
+          "timer": 1,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "seed": 1,
+      "frame": 300,
+      "lasers": []
+    },
+    {
+      "rank": 3,
+      "seed": 7,
+      "frame": 300,
+      "lasers": []
+    },
+    {
+      "rank": 3,
+      "seed": 1,
+      "frame": 334,
+      "lasers": []
+    },
+    {
+      "rank": 3,
+      "seed": 7,
+      "frame": 334,
+      "lasers": []
+    },
+    {
+      "rank": 3,
+      "frame": 122,
+      "schedule_check": true,
+      "lasers": []
+    },
+    {
+      "rank": 3,
+      "frame": 123,
+      "schedule_check": true,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 309.17,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 0,
+          "timer": 1,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "frame": 123,
+      "schedule_check": true,
+      "lasers": [
+        {
+          "ox": 0.0,
+          "oy": 80.0,
+          "deg": 309.17,
+          "start": 120.0,
+          "end": 300.0,
+          "width": 8.0,
+          "state": 0,
+          "timer": 1,
+          "warn": 45,
+          "fade": 12,
+          "color": 15
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "frame": 600,
+      "deadline_check": true,
+      "lasers": []
+    },
+    {
+      "rank": 3,
+      "frame": 660,
+      "lasers": []
+    }
+  ],
+  "seeds": [
+    1,
+    7
+  ],
+  "machine_spec": {
+    "key_frames": [
+      {
+        "frame": 124,
+        "count": 1,
+        "state": 0,
+        "width": 8,
+        "x": 0,
+        "y": 80,
+        "angle_deg_min": 0,
+        "angle_deg_max": 360,
+        "start_min": 120,
+        "start_max": 120,
+        "end_min": 300,
+        "end_max": 300
+      },
+      {
+        "frame": 168,
+        "count": 1,
+        "state": 1,
+        "width": 8,
+        "x": 0,
+        "y": 80,
+        "angle_deg_min": 0,
+        "angle_deg_max": 360,
+        "start_min": 120,
+        "start_max": 120,
+        "end_min": 300,
+        "end_max": 300
+      },
+      {
+        "frame": 184,
+        "count": 1,
+        "state": 1,
+        "width": 8,
+        "x": 0,
+        "y": 80,
+        "angle_deg_min": 0,
+        "angle_deg_max": 360,
+        "start_min": 120,
+        "start_max": 120,
+        "end_min": 300,
+        "end_max": 300
+      },
+      {
+        "frame": 214,
+        "count": 1,
+        "state": 1,
+        "width": 8,
+        "x": 0,
+        "y": 80,
+        "angle_deg_min": 0,
+        "angle_deg_max": 360,
+        "start_min": 120,
+        "start_max": 120,
+        "end_min": 300,
+        "end_max": 300
+      },
+      {
+        "frame": 254,
+        "count": 1,
+        "state": 1,
+        "width": 8,
+        "x": 0,
+        "y": 80,
+        "angle_deg_min": 0,
+        "angle_deg_max": 360,
+        "start_min": 120,
+        "start_max": 120,
+        "end_min": 300,
+        "end_max": 300
+      },
+      {
+        "frame": 288,
+        "count": 1,
+        "state": 2,
+        "width": 8,
+        "x": 0,
+        "y": 80,
+        "angle_deg_min": 0,
+        "angle_deg_max": 360,
+        "start_min": 120,
+        "start_max": 120,
+        "end_min": 300,
+        "end_max": 300
+      },
+      {
+        "frame": 300,
+        "count": 0
+      },
+      {
+        "frame": 334,
+        "count": 0
+      }
+    ],
+    "max_added_lasers": 1,
+    "first_spawn_frame": 123,
+    "last_spawn_frame": 123,
+    "last_expiry_frame": 299,
+    "last_spawn_before": 600,
+    "synthetic_color": 15,
+    "rank_omega_bam_per_frame": [
+      40,
+      56,
+      80,
+      112
+    ]
+  },
+  "file_sha256": {
+    "TASK.md": "7894d02c443c23a83202577344ced5c9bd8d64d86c98eb6d4380513b87e4928f",
+    "machine-spec.json": "b7df4abfbd36607046c3e320eb51640fc6a128de692b875bcdbcaa87e95fce0b",
+    "main.ecl": "72d6bb9427273f8bede3bcb8b51aae818cd653bee0305887e786aa1395474e97",
+    "meta.toml": "da96bf5063bbb3c5b8ad2f10593a5e6ff4b2e98d97e1b894def657c8dc4ad62e",
+    "overlay.ecl": "1135c49a071fdb4468d59f815dab5e8e5c90ec73623dd3cef695e2af28561fee"
+  },
+  "harness_sha256": "01ea4b6cc8f1248e67eb9e09e291f8484a7eff551b2e962c7dc2719792de7730",
+  "validator_sha256": "4290f9e7d585c21f5732cff3657b90dd3ced149bd78d610963a8cad842b1ab33",
+  "stg_rl_version": "0.4.0",
+  "ok": true
+}

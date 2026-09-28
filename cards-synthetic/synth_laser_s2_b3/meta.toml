@@ -1,0 +1,20 @@
+title = "雹符「ヘイルストーム」 — synthetic signed omega laser"
+source = "synthetic"
+data_kind = "synthetic"
+base_card = "th06_s2_b3"
+mutation_id = "synth_laser_s2_b3"
+origin = "东方红魔乡 Stage 2 boss 琪露诺 符卡 雹符「ヘイルストーム」（ecldata2 Sub33/Sub34/Sub35），Hard–Lunatic"
+source_ref = "ecldata2.ecl.txt:700-704, 706-719, 721-760"
+ranks = [2, 3]
+marks = [0]
+time_limit = 2100
+original_time_limit = 2100
+tags = ["ring", "curve", "stream", "laser"]
+laser_approx = false
+lower_half_blocked = false
+notes = "Synthetic mutation: one deterministic-per-seed diagonal laser with random signed omega; original pattern and 2100-frame timeout retained."
+
+[provenance]
+base_source = "th06"
+base_source_ref = "ecldata2.ecl.txt:700-704, 706-719, 721-760"
+base_files_sha256 = { "main.ecl" = "63c4aaa75e7384b4050905113ab52e1bb84e586e8755e13cab749c97f17aa024" }

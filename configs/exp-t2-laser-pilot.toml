@@ -1,0 +1,59 @@
+# 实验 T2-30（2026-09-28；待提交 Magnus）：T1 模型与训练设置不变，只将 30 张合成激光卡加入训练池。
+#
+# 背景：引擎激光池（stg_rl 0.3.0 起 Tier 0 lasers 表）之前没进观测——模型看得见激光上挂的弹，看不见激光本身。
+# 原作卡池 166 张，其中 11 张激光卡；3 张留出（eval/splits-laser.toml）、8 张进训练。
+# cards-synthetic/ 当前另有 30 张合成激光变异，均只进训练；固定提交 SHA 是本次卡池快照。
+# 做法：envwrap 解码 lasers 表 → v7 在 v6 的输出之外加最近 k_lasers 条激光的 token（原始量、自机相对系）→
+# set_attn_v2 加一个激光集合编码器进主干。与 S1 只差这两处（S1 的判定点随机增大、运动层、reward 全照抄）。
+# 部署：ONNX 图版本 5（多 lasers / lasers_mask 两个输入），DLL 侧要跟着填激光表。
+#
+# 2026-09-27 核查订正：stg_rl 0.4.0 的 omega 实为帧间 dang，已包含脚本 lz_rotate；无需为此改引擎。
+#
+# 判读（相对 T1，同一模型/预算/留出）：① 3 张留出激光卡逐卡×rank×意图的撑过率；
+# ② 原 10 张非激光留出卡不退步；③ 吞吐与课程实际采样。单臂 T2 不能区分形态覆盖和采样总量。
+[run]
+total_updates = 3500
+ckpt_every = 100
+eval_every = 250
+
+[env]
+cards_dir = ["cards", "cards-synthetic"]
+eval_splits = "eval/splits-laser.toml"
+num_envs = 4096
+hit_extra = [0.0, 2.0]
+threads = 0
+
+[intent]
+name = "mixed_v1"
+
+[featurize]
+name = "danger_topk_v7"
+frame = "static"
+dt = false
+k_lasers = 16
+laser_local = false     # true = 激光 token 再加「自机在激光坐标系里的位置」两列（对照开关，见 danger_topk_v7 文档）
+
+[motor]
+enabled = true
+hold = [2, 6]
+delay = [0, 2]
+slow = true
+
+[reward.terms]
+death = 10.0
+follow_shaping = 1.0
+hold = 0.01
+segment_survived = 0.0
+key_press = -0.003
+quick_change = -0.01
+shift_toggle = 0.0
+edge_hug = -0.02
+
+[model]
+name = "set_attn_v2"
+sa_layers = 1
+laser_sa_layers = 0
+density_fp32 = true
+
+[ppo]
+amp = "bf16"

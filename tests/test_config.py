@@ -45,3 +45,9 @@ def test_load_config_overrides(tmp_path):
     p.write_text('[run]\nseed = 7\n', encoding="utf-8")
     cfg = load_config(p, overrides={"run": {"total_updates": 3}})
     assert cfg["run"]["seed"] == 7 and cfg["run"]["total_updates"] == 3
+
+
+def test_multiple_card_roots_round_trip(tmp_path):
+    cfg = from_dict({'env': {'cards_dir': ['cards', 'cards-synthetic']}})
+    dump_toml(cfg, tmp_path / 'config.toml')
+    assert load_config(tmp_path / 'config.toml')['env']['cards_dir'] == ['cards', 'cards-synthetic']
