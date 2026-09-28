@@ -69,11 +69,24 @@ class MixedIntent(LowerHalfUniform):
         if p.min() < 0 or p.sum() <= 0:
             raise ValueError(f"intent.mix 须非负且和 > 0，得 {mix}")
         self.p = (p / p.sum()).to(device)
+        self.env_p: Tensor | None = None
         self.mode = torch.zeros(int(num_envs), dtype=torch.int64, device=device)
         super().__init__(cfg, num_envs, device, seed)
 
     def _sample_modes(self) -> Tensor:
-        return torch.multinomial(self.p.expand(self.n, -1), 1, replacement=True, generator=self.gen).squeeze(-1)
+        p = self.p.expand(self.n, -1) if self.env_p is None else self.env_p
+        return torch.multinomial(p, 1, replacement=True, generator=self.gen).squeeze(-1)
+
+    def set_start_mixes(self, mixes: list[dict[str, float]]) -> None:
+        """训练专用起点表，不进入目标点、观测或 reward。"""
+        from .cards import Card
+        from pathlib import Path
+        rows = [Card(str(i), Path(), {"laser_intent_mix": mix}).laser_intent_mix for i, mix in enumerate(mixes)]
+        table = torch.tensor([[row[k] for k in self.MODES] for row in rows], dtype=torch.float64, device=self.device)
+        self.start_p = table / table.sum(dim=1, keepdim=True)
+
+    def use_start_indices(self, indices: Tensor) -> None:
+        self.env_p = self.start_p[indices]
 
     def _refresh(self, mask: Tensor) -> None:
         """只换目标点，**不换模式**——跟点档的定期刷新走这条；锚点/自由档拿 NEVER 倒计时。"""

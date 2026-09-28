@@ -1,3 +1,4 @@
+laser_intent_mix = { follow = 0.3, anchor = 0.3, free = 0.4 }
 title = "Stage 2 boss 琪露诺 非符 1 — synthetic flying short rods"
 source = "synthetic"
 data_kind = "synthetic"

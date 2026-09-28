@@ -16,6 +16,7 @@ DEFAULTS: dict = {
             # 死亡由引擎按放大的判定真判（stg_rl ≥ 0.4.0 的 set_hit_radius_extra）。[0, 0] = 关。评测一律关。
             "hit_extra": [0.0, 0.0]},
     "intent": {"name": "lower_half_uniform_v1", "margin": 16.0, "interval": [120, 300],
+               "card_mix_enabled": False,
                "mix": {"follow": 0.6, "anchor": 0.3, "free": 0.1}},
     "curriculum": {"enabled": True, "interval": 20, "ema_decay": 0.98, "alpha": 1.0, "fail_floor": 0.05,
                    "fail_ceil": 0.95, "w_lo": 0.25, "w_hi": 4.0, "min_episodes": 30},
@@ -102,6 +103,10 @@ def validate(cfg: dict) -> None:
     if cfg["eval"]["motor"] not in ("train", "off"):
         raise ValueError(f"eval.motor 须为 train/off，得 {cfg['eval']['motor']!r}")
     mix = intent["mix"]
+    if not isinstance(intent["card_mix_enabled"], bool):
+        raise ValueError("intent.card_mix_enabled 须为布尔值")
+    if intent["card_mix_enabled"] and intent["name"] != "mixed_v1":
+        raise ValueError("intent.card_mix_enabled 需要 intent.name = mixed_v1")
     if any(v < 0 for v in mix.values()) or sum(mix.values()) <= 0:
         raise ValueError(f"intent.mix 须非负且和 > 0，得 {mix}")
     lo, hi = intent["interval"]

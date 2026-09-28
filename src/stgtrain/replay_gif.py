@@ -122,6 +122,7 @@ def gif_durations(n: int, frames_per_image: int) -> list[int]:
 def record(cfg: dict, ppo, featurizer, image, card: str, rank: int, episodes: int, indices: list[int],
            device, max_frames: int | None) -> list[Episode]:
     """与 evaluate.run_group 同一组 VecEnv；按顺序记录指定 env 的第一局，每步记「当前状态 + 本步按键」。"""
+    cfg = deep_merge(cfg, {"intent": {"card_mix_enabled": False}})
     envw = EnvWrapper(cfg, {card: image}, [stg_rl.Start(card, 0, rank)], device,
                       seed=int(cfg["eval"]["seed"]), num_envs=episodes, mirror=False)
     hold_r = float(cfg["reward"]["hold_radius"])
@@ -242,9 +243,9 @@ def main(argv: list[str] | None = None) -> int:
             raise SystemExit(f"缺 {need}（stg-engine 路径见 STG_ENGINE_DIR）")
     ckp = Path(a.checkpoint)
     ck = load_checkpoint(ckp, map_location="cpu")
-    over = {"run": {"device": a.device}}
+    over = {"run": {"device": a.device}, "intent": {"card_mix_enabled": False}}
     if a.intent:
-        over["intent"] = {"name": a.intent}
+        over["intent"]["name"] = a.intent
     cfg = from_dict(deep_merge(ck["cfg"], over))
     device = pick_device(cfg["run"]["device"])
     torch.set_num_threads(int(cfg["run"]["torch_threads"]))

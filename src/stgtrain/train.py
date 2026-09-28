@@ -19,7 +19,7 @@ import torch
 
 from . import console, plots
 from .actions import ACTION_TABLE_VERSION
-from .cards import card_manifest, compile_cards, discover, load_splits, train_starts
+from .cards import card_manifest, compile_cards, discover, load_splits, train_starts, start_intent_mixes
 from .checkpoint import load_checkpoint, restore_rng, save_checkpoint
 from .config import deep_merge, dump_toml, from_dict, load_config
 from .curriculum import Curriculum
@@ -105,6 +105,8 @@ def train(cfg: dict, run_dir: Path, resume: dict | None = None, pack_result: boo
     torch.set_num_threads(int(cfg["run"]["torch_threads"]))
     dump_toml(cfg, run_dir / "config.toml")
     images, starts, specs, featurizer, factory = build_components(cfg, device)
+    start_mixes = start_intent_mixes(discover(cfg["env"]["cards_dir"]), starts, cfg["intent"]["mix"],
+                                     cfg["intent"].get("card_mix_enabled", False))
     ppo = PPO(cfg, factory, device)
 
     start, env_steps, best = 1, 0, None
@@ -121,9 +123,11 @@ def train(cfg: dict, run_dir: Path, resume: dict | None = None, pack_result: boo
                          action_table_version=ACTION_TABLE_VERSION, machine=machine_info(),
                          # 起点顺序 = 课程权重向量的列序（curriculum.jsonl 按它回看）
                          starts=[f"{s.image}:{s.mark}:{s.rank}" for s in starts],
-                         cards=card_manifest(discover(cfg["env"]["cards_dir"])))
+                         cards=card_manifest(discover(cfg["env"]["cards_dir"])),
+                         start_intent_mixes=start_mixes)
 
-    envw = EnvWrapper(cfg, images, starts, device, seed=int(cfg["run"]["seed"]) + start - 1)  # Ruling 7
+    envw = EnvWrapper(cfg, images, starts, device, seed=int(cfg["run"]["seed"]) + start - 1,
+                      start_intent_mixes=start_mixes)  # Ruling 7
     curriculum = Curriculum(len(starts), cfg["curriculum"])
     reward_fn = RewardFn(cfg)
     tracker = EpisodeTracker(envw.n, device, list(reward_fn.terms), cfg["reward"]["hold_radius"],

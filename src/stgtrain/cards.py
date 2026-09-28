@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import tomllib
 import re
+import math
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -24,6 +25,25 @@ class Card:
         if explicit not in ("original", "synthetic", "unknown") or explicit != inferred:
             raise ValueError(f"{self.id}: data_kind 与 source 不一致")
         return explicit
+
+    @property
+    def laser_intent_mix(self) -> dict[str, float] | None:
+        value = self.meta.get("laser_intent_mix")
+        if "laser_intent_mix" not in self.meta:
+            return None
+        keys = {"follow", "anchor", "free"}
+        if not isinstance(value, dict) or set(value) != keys:
+            raise ValueError(f"{self.id}: laser_intent_mix 须恰好包含 follow/anchor/free")
+        if any(isinstance(v, bool) or not isinstance(v, (int, float)) for v in value.values()):
+            raise ValueError(f"{self.id}: laser_intent_mix 必须是有限数值")
+        try:
+            vals = {k: float(value[k]) for k in keys}
+        except (TypeError, ValueError) as exc:
+            raise ValueError(f"{self.id}: laser_intent_mix 必须是有限数值") from exc
+        total = sum(vals.values())
+        if any(not math.isfinite(v) or v < 0 for v in vals.values()) or not math.isfinite(total) or total <= 0:
+            raise ValueError(f"{self.id}: laser_intent_mix 必须非负、有限且和 > 0")
+        return vals
 
 
 @dataclass(frozen=True)
@@ -53,6 +73,7 @@ def discover(cards_dir: str | Path | list[str | Path]) -> dict[str, Card]:
         meta_path = d / "meta.toml"
         meta = tomllib.loads(meta_path.read_text(encoding="utf-8")) if meta_path.exists() else {}
         card = Card(id=d.name, path=d, meta=meta)
+        card.laser_intent_mix  # Validate before compiling or constructing an environment.
         if card.data_kind == "synthetic" and not meta.get("base_card"):
             raise ValueError(f"{d.name}: 合成卡缺 base_card")
         out[d.name] = card
@@ -138,8 +159,21 @@ def train_starts(cards: dict[str, Card], eval_ids: set[str], ranks: list[int]) -
     return starts
 
 
+def start_intent_mixes(cards: dict[str, Card], starts: list[stg_rl.Start], default: dict[str, float], enabled: bool = False) -> list[dict[str, float]]:
+    """Return one normalized intent mix per start, preserving start order."""
+    if not enabled:
+        return [dict(default) for _ in starts]
+    out = []
+    for start in starts:
+        mix = cards[start.image].laser_intent_mix or default
+        total = sum(mix.values())
+        out.append({k: float(mix[k]) / total for k in ("follow", "anchor", "free")})
+    return out
+
+
 def card_manifest(cards: dict[str, Card]) -> dict[str, dict]:
     """run元数据映射；课程/episode的card_id可关联来源，不改变策略输入。"""
     return {cid: {"data_kind": card.data_kind, "source": card.meta.get("source"),
-                  "base_card": card.meta.get("base_card"), "mutation_id": card.meta.get("mutation_id")}
+                  "base_card": card.meta.get("base_card"), "mutation_id": card.meta.get("mutation_id"),
+                  **({"laser_intent_mix": card.laser_intent_mix} if "laser_intent_mix" in card.meta else {})}
             for cid, card in cards.items()}

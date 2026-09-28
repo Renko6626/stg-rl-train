@@ -1,3 +1,4 @@
+laser_intent_mix = { follow = 0.3, anchor = 0.3, free = 0.4 }
 title = "Stage 5 boss 十六夜咲夜 非符 1 — synthetic random-start horizontal sweep"
 source = "synthetic"
 data_kind = "synthetic"

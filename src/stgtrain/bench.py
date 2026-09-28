@@ -19,6 +19,7 @@ import torch
 from tensordict import TensorDict
 
 from .config import deep_merge
+from .cards import discover, start_intent_mixes
 from .envwrap import EnvWrapper, usable_cpus
 from .perf import machine_info
 from .ppo import PPO
@@ -74,6 +75,8 @@ def minibatch_seconds(cfg: dict, device: torch.device, featurizer, factory, obs)
 def run_bench(cfg: dict, out_dir: Path) -> dict:
     device = pick_device(cfg["run"]["device"])
     images, starts, _, featurizer, factory = build_components(cfg, device)
+    start_mixes = start_intent_mixes(discover(cfg["env"]["cards_dir"]), starts, cfg["intent"]["mix"],
+                                     cfg["intent"].get("card_mix_enabled", False))
     model = factory().to(device).eval()
     cpu = usable_cpus()
     # 线程网格：大机器上线程数远超实际并行度反而崩（255 核机实测 255 线程只有 63 线程的 1/8），
@@ -91,7 +94,8 @@ def run_bench(cfg: dict, out_dir: Path) -> dict:
         for threads in sorted({min(t, int(n)) for t in grid}):
             c = deep_merge(cfg, {"env": {"num_envs": int(n), "threads": threads}})
             try:
-                envw = EnvWrapper(c, images, starts, device, seed=int(c["run"]["seed"]))
+                envw = EnvWrapper(c, images, starts, device, seed=int(c["run"]["seed"]),
+                                  start_intent_mixes=start_mixes)
                 with torch.no_grad():
                     obs = envw.reset()
                     for _ in range(10):

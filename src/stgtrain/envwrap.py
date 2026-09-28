@@ -350,7 +350,8 @@ def _phase(timer, name: str):
 class EnvWrapper:
     def __init__(self, cfg: dict, images: dict, starts: list, device: torch.device, seed: int,
                  num_envs: int | None = None, mirror: bool | None = None,
-                 groups: list[tuple[dict, "stg_rl.Start"]] | None = None):
+                 groups: list[tuple[dict, "stg_rl.Start"]] | None = None,
+                 start_intent_mixes: list[dict[str, float]] | None = None):
         """`groups` 非空 = 批量评测：每个 (images, start) 一组、每组 `num_envs` 个 env，并成一批（见 `MultiVecEnv`）。
         此时 `images` / `starts` 不用；意图与运动层的随机数按组各自为政，与逐组单跑逐位相同。"""
         e = cfg["env"]
@@ -359,6 +360,14 @@ class EnvWrapper:
         self.cap = int(e["bullets_cap"])
         self.frame_skip = int(e["frame_skip"])
         self.device = device
+        self.card_mix_enabled = bool(cfg["intent"].get("card_mix_enabled", False))
+        if self.card_mix_enabled:
+            if groups or cfg["intent"]["name"] != "mixed_v1":
+                raise ValueError("card_mix_enabled 只用于 mixed_v1 训练环境")
+            if start_intent_mixes is None or len(start_intent_mixes) != len(starts):
+                raise ValueError("card_mix_enabled 需要每个训练起点的 start_intent_mixes")
+            if not hasattr(stg_rl.VecEnv, "current_start_indices"):
+                raise RuntimeError("card_mix_enabled requires stg_rl current_start_indices() API (>= 0.4.1)")
         threads = max(1, min(int(e["threads"]) or usable_cpus(), k))
         make_intent = lambda: INTENTS.get(cfg["intent"]["name"])(cfg, k, device, seed)   # noqa: E731
         if groups:
@@ -372,6 +381,8 @@ class EnvWrapper:
                 warmup_max=int(e["warmup_max"]), bullets_cap=self.cap, seed=int(seed), buffers=self.buf,
             )
             self.intent = make_intent()
+        if self.card_mix_enabled:
+            self.intent.set_start_mixes(start_intent_mixes)
         self._group_k = k if groups else None
         self.mirror_enabled = bool(e["mirror"] if mirror is None else mirror)
         self._mirror_gen = torch.Generator(device=device)
@@ -424,6 +435,8 @@ class EnvWrapper:
     def reset(self) -> RawObs:
         self.env.reset()
         self._draw_hit(torch.ones(self.n, dtype=torch.bool))
+        if self.card_mix_enabled:
+            self._sync_intent_starts()
         self.intent.reset_all()
         self._draw_mirror(torch.ones(self.n, dtype=torch.bool, device=self.device))
         self.prev_buttons = torch.zeros(self.n, dtype=torch.int64, device=self.device)
@@ -433,6 +446,11 @@ class EnvWrapper:
         if self.motor is not None:
             self.motor.reset_all()
         return self._decode()
+
+    def _sync_intent_starts(self) -> None:
+        # 当前/下一局的起点独立读取；step 缓冲 start_index 仍归属于刚结束的一局。
+        indices = torch.as_tensor(self.env.current_start_indices(), dtype=torch.int64, device=self.device)
+        self.intent.use_start_indices(indices)
 
     def step(self, action_ids: Tensor, timer=None) -> tuple[RawObs, StepInfo]:
         # 运动层：策略给的是「想按的」，从这里往下（镜像、env、上一步动作、按键统计、reward）全按**实际执行的**算。
@@ -469,6 +487,8 @@ class EnvWrapper:
                 self.dir_hold = torch.where(dir_chg, torch.zeros_like(self.dir_hold), self.dir_hold)
                 mode = getattr(self.intent, "mode", None)
                 mode = mode.clone() if mode is not None else None
+                if self.card_mix_enabled and bool(self.buf["done"].any()):
+                    self._sync_intent_starts()
                 self.intent.reset(ended)
                 self._draw_mirror(ended)
                 if self.hit_extra is not None:   # 读 CPU 缓冲的 done，不触发 GPU 同步

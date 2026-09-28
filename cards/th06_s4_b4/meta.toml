@@ -1,3 +1,4 @@
+laser_intent_mix = { follow = 0.3, anchor = 0.3, free = 0.4 }
 title = "Stage 4 boss 帕秋莉 非符 2"
 source = "th06"
 origin = "东方红魔乡 Stage 4 boss 帕秋莉·诺蕾姬 第二非符（Sub37 +120 起主循环：模式 Sub28–35 + Sub38 随机移动环弹），E–L 四档"

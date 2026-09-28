@@ -70,10 +70,12 @@ def eval_cfg(cfg: dict) -> dict:
     name = cfg["eval"].get("intent") or cfg["intent"]["name"]
     motor_off = cfg["eval"].get("motor", "train") == "off" and cfg["motor"]["enabled"]
     hit_on = float(cfg.get("env", {}).get("hit_extra", [0.0, 0.0])[1]) > 0
-    if name == cfg["intent"]["name"] and not motor_off and not hit_on:
+    card_mix_on = cfg["intent"].get("card_mix_enabled", False)
+    if name == cfg["intent"]["name"] and not motor_off and not hit_on and not card_mix_on:
         return cfg
     c = copy.deepcopy(cfg)
     c["intent"]["name"] = name
+    c["intent"]["card_mix_enabled"] = False
     if motor_off:
         c["motor"]["enabled"] = False
     if hit_on:   # 评测量的永远是真实判定下的撑过率

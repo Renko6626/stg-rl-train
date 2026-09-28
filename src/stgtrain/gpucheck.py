@@ -32,6 +32,7 @@ import argparse
 import torch
 
 from .config import deep_merge, load_config
+from .cards import discover, start_intent_mixes
 from .envwrap import EnvWrapper
 from .episodes import EpisodeTracker
 from .ppo import PPO
@@ -79,7 +80,9 @@ def check_gae_graph(ppo: PPO, container, next_value, calls: int = 6) -> tuple:
 
 
 def check_rollout_graphs(cfg: dict, images, starts, featurizer, ppo: PPO, device) -> list[tuple]:
-    envw = EnvWrapper(cfg, images, starts, device, seed=0)
+    mixes = start_intent_mixes(discover(cfg["env"]["cards_dir"]), starts, cfg["intent"]["mix"],
+                              cfg["intent"].get("card_mix_enabled", False))
+    envw = EnvWrapper(cfg, images, starts, device, seed=0, start_intent_mixes=mixes)
     rf = RewardFn(cfg)
 
     def tracker():
@@ -140,7 +143,9 @@ def main(argv: list[str] | None = None) -> int:
 
     off = make({"compile": False, "cudagraphs": False})
     on = make({"compile": True, "cudagraphs": True})
-    envw = EnvWrapper(base, images, starts, device, seed=0)
+    mixes = start_intent_mixes(discover(base["env"]["cards_dir"]), starts, base["intent"]["mix"],
+                              base["intent"].get("card_mix_enabled", False))
+    envw = EnvWrapper(base, images, starts, device, seed=0, start_intent_mixes=mixes)
     rf = RewardFn(base)
     tracker = EpisodeTracker(envw.n, device, list(rf.terms), base["reward"]["hold_radius"],
                              base["reward"]["edge_margin"], envw.frame_skip, base["intent"]["interval"][1])

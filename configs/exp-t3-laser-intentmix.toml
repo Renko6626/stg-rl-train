@@ -1,0 +1,59 @@
+# 实验 T3：固定 T2-30 卡池与训练预算，只降低激光训练卡的跟点目标压力。
+#
+# T2: follow/anchor/free = 0.6/0.3/0.1。
+# T3: 带 laser_intent_mix metadata 的激光卡使用 0.3/0.3/0.4；普通卡仍为 0.6/0.3/0.1。
+# 目的：检查宏观激光下，更多“先活下来”的训练分布是否改善激光留出卡；
+# 不修改观测、reward、课程采样器或模型，不把几何规则写进观测。
+# 主评测仍使用固定 lower_half_uniform_v1 跟点评测口径，避免训练意图变化污染主判据。
+[run]
+total_updates = 3500
+ckpt_every = 100
+eval_every = 250
+
+[env]
+cards_dir = ["cards", "cards-synthetic"]
+eval_splits = "eval/splits-laser.toml"
+num_envs = 4096
+hit_extra = [0.0, 2.0]
+threads = 0
+
+[intent]
+name = "mixed_v1"
+card_mix_enabled = true
+
+[intent.mix]
+follow = 0.6
+anchor = 0.3
+free = 0.1
+
+[featurize]
+name = "danger_topk_v7"
+frame = "static"
+dt = false
+k_lasers = 16
+laser_local = false
+
+[motor]
+enabled = true
+hold = [2, 6]
+delay = [0, 2]
+slow = true
+
+[reward.terms]
+death = 10.0
+follow_shaping = 1.0
+hold = 0.01
+segment_survived = 0.0
+key_press = -0.003
+quick_change = -0.01
+shift_toggle = 0.0
+edge_hug = -0.02
+
+[model]
+name = "set_attn_v2"
+sa_layers = 1
+laser_sa_layers = 0
+density_fp32 = true
+
+[ppo]
+amp = "bf16"
