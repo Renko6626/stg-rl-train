@@ -22,7 +22,7 @@ import numpy as np
 
 
 class Curriculum:
-    def __init__(self, n_starts: int, cfg: dict):
+    def __init__(self, n_starts: int, cfg: dict, laser_indices: set[int] | None = None):
         self.n = int(n_starts)
         self.enabled = bool(cfg["enabled"])
         self.decay = float(cfg["ema_decay"])
@@ -31,6 +31,10 @@ class Curriculum:
         self.w_lo, self.w_hi = float(cfg["w_lo"]), float(cfg["w_hi"])
         self.interval = int(cfg["interval"])
         self.min_episodes = int(cfg["min_episodes"])
+        self.laser_stratified = bool(cfg.get("laser_stratified", False))
+        self.laser_indices = frozenset(int(i) for i in (laser_indices or ()))
+        if self.laser_stratified and not self.laser_indices.issubset(range(self.n)):
+            raise ValueError("curriculum.laser_indices 超出起点范围")
         self.fail = np.full(self.n, 0.5, dtype=np.float64)
         self.seen = np.zeros(self.n, dtype=np.int64)
 
@@ -50,6 +54,15 @@ class Curriculum:
         if ready.any():
             raw = np.clip(self.fail[ready], self.floor, self.ceil) ** self.alpha
             w[ready] = np.clip(raw / raw.mean(), self.w_lo, self.w_hi)
+        if self.laser_stratified and self.laser_indices and len(self.laser_indices) < self.n:
+            # 保持激光组的总体采样占比为卡池占比，只在组内按难度重新分配。
+            # 这样不会把全局课程的难卡偏置误认为激光覆盖率提升。
+            laser = np.fromiter(sorted(self.laser_indices), dtype=np.int64)
+            other = np.setdiff1d(np.arange(self.n), laser, assume_unique=True)
+            for group in (laser, other):
+                mean = float(w[group].mean())
+                if mean > 0:
+                    w[group] /= mean
         return w.tolist()
 
     def due(self, update: int) -> bool:

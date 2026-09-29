@@ -128,7 +128,9 @@ def train(cfg: dict, run_dir: Path, resume: dict | None = None, pack_result: boo
 
     envw = EnvWrapper(cfg, images, starts, device, seed=int(cfg["run"]["seed"]) + start - 1,
                       start_intent_mixes=start_mixes)  # Ruling 7
-    curriculum = Curriculum(len(starts), cfg["curriculum"])
+    laser_indices = {i for i, s in enumerate(starts)
+                     if discover(cfg["env"]["cards_dir"])[s.image].laser_intent_mix is not None}
+    curriculum = Curriculum(len(starts), cfg["curriculum"], laser_indices=laser_indices)
     reward_fn = RewardFn(cfg)
     tracker = EpisodeTracker(envw.n, device, list(reward_fn.terms), cfg["reward"]["hold_radius"],
                              cfg["reward"]["edge_margin"], envw.frame_skip, cfg["intent"]["interval"][1])

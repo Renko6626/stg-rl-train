@@ -57,3 +57,13 @@ def test_due_only_when_enabled():
     assert c.due(10) and not c.due(11)
     off = Curriculum(2, {**cfg(interval=5), "enabled": False})
     assert not off.due(10)
+
+
+def test_laser_stratified_keeps_group_mass_and_reweights_within_group():
+    c = Curriculum(4, cfg(min_episodes=1, laser_stratified=True), laser_indices={0, 1})
+    for _ in range(50):
+        c.observe([rec(0, 1), rec(1, 2), rec(2, 1), rec(3, 2)])
+    w = c.weights()
+    assert sum(w[:2]) == pytest.approx(2.0)
+    assert sum(w[2:]) == pytest.approx(2.0)
+    assert w[0] > w[1] and w[2] > w[3]

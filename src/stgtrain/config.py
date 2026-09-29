@@ -19,7 +19,8 @@ DEFAULTS: dict = {
                "card_mix_enabled": False,
                "mix": {"follow": 0.6, "anchor": 0.3, "free": 0.1}},
     "curriculum": {"enabled": True, "interval": 20, "ema_decay": 0.98, "alpha": 1.0, "fail_floor": 0.05,
-                   "fail_ceil": 0.95, "w_lo": 0.25, "w_hi": 4.0, "min_episodes": 30},
+                   "fail_ceil": 0.95, "w_lo": 0.25, "w_hi": 4.0, "min_episodes": 30,
+                   "laser_stratified": False},
     # 手部运动层（实验 N）：策略只说「想按哪个方向」，实际按出去的由 envwrap.MotorLayer 决定。
     # hold = 每段方向最短保持帧数的抽样区间（闭区间，换段时抽，对模型不可见）；delay = 变向生效延迟的抽样区间。
     "motor": {"enabled": False, "hold": [2, 6], "delay": [0, 0], "slow": False},   # slow：低速键也过运动层（N3）
@@ -95,6 +96,8 @@ def validate(cfg: dict) -> None:
         raise ValueError("curriculum 须满足 0 < w_lo <= 1 <= w_hi")
     if cur["interval"] < 1 or cur["min_episodes"] < 1 or cur["alpha"] <= 0:
         raise ValueError("curriculum.interval / min_episodes 须 ≥ 1，alpha 须 > 0")
+    if not isinstance(cur.get("laser_stratified", False), bool):
+        raise ValueError("curriculum.laser_stratified 须为布尔值")
     mot = cfg["motor"]
     for k in ("hold", "delay"):
         lo_hi = mot[k]
