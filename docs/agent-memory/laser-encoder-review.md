@@ -34,3 +34,13 @@
 当日运行：`uv run --frozen pytest -q tests/test_model_v2.py tests/test_featurize_v7.py tests/test_envwrap_lasers.py tests/test_export_v7.py`，结果 **44 passed in 11.08s**。
 
 验证覆盖本地 CPU 的激光解码、特征化、模型和 ONNX 路径；未验证实际 CUDA 图执行，未启动新训练，未修改实现。现有测试全部通过不代表上述等距离边界已被覆盖。
+
+## 2026-10-01 后续：已确认并实现新版
+
+用户随后确认14维激光token和弹／激光联合自注意力设计，并明确要求立即写模型和适配代码。已新增`danger_topk_v8`、`set_attn_v3`与`configs/exp-t6-laser-joint.toml`：独立MLP映射、类型嵌入、一层共享SA替换弹专用层、交流后分类型池化；主干保持704→256→256。
+
+`RawObs.laser_start_len`独立承载设定棒长，不改旧12列。图版本6在旧版激光输入后追加同名向量；旧版本2–5保留。观测`omega`来自总转角`dang`，v8按有限旋转计算附近观测位移，不解释为未来持续角速度。
+
+本地CPU／ONNX和torch2.5.1+cpu、tensordict0.6.2旧CPU栈相关检查通过，含bf16 CPU PPO冒烟；独立只读审查无实质性缺陷。实际参数只增加192。详细命令、结果和字段见[设计与实施记录](../superpowers/specs/2026-10-01-laser-token-joint-attention-design.md)。实现阶段游戏部署调用方尚未适配版本6，CUDA／GPU和正式训练未执行，收益未验证。
+
+用户随后明确授权提交、推送和启动新训练；使用T6配置与`GPUCHECK=1`，先做严格fp32 GPU对拍再启动bf16训练。实际快照、Job及状态见[T6实验记录](../practice-cards/2026-10-01-t6-experiment.md)，不能把该授权外推为游戏部署授权。

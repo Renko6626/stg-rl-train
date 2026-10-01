@@ -43,6 +43,7 @@ class RawObs:
     slow_held: Tensor | None = None    # 当前低速位（按着 / 松着）已经执行了多少帧（新局 = 很大）；v5 特征化用
     lasers: Tensor | None = None       # [n, LASERS_CAP, LASER_COLS]，列见 LASER_COLS；v7 特征化用
     lasers_mask: Tensor | None = None  # 活激光（预警 / 生效 / 收缩三态都算，收缩态由特征化器自己挑掉）
+    laser_start_len: Tensor | None = None  # [n, LASERS_CAP]；v8用，设定棒长，与lasers严格同行
 
 
 @dataclass
@@ -558,8 +559,8 @@ class EnvWrapper:
             emask[:, :ew] = emask_w
         return enemies, emask
 
-    def _decode_lasers(self, lz: Tensor, lcount: Tensor, lmax: int, timer=None) -> tuple[Tensor, Tensor]:
-        """激光字节表 → (未镜像的 [n, LASERS_CAP, 12], 掩码)。只解码前 `laser_width(lmax)` 列；陈旧行清零。"""
+    def _decode_lasers(self, lz: Tensor, lcount: Tensor, lmax: int, timer=None) -> tuple[Tensor, Tensor, Tensor]:
+        """激光字节表 → (未镜像的12列、掩码、设定棒长)。陈旧行清零。"""
         with _phase(timer, "h2d_lasers"):
             lw = laser_width(lmax)
             lz = lz[:, :lw]
@@ -574,7 +575,9 @@ class EnvWrapper:
             lmask = torch.zeros(self.n, stg_rl.LASERS_CAP, dtype=torch.bool, device=self.device)
             lasers[:, :lw] = rows
             lmask[:, :lw] = live
-        return lasers, lmask
+            start_len = torch.zeros(self.n, stg_rl.LASERS_CAP, device=self.device)
+            start_len[:, :lw] = f("start_len") * live
+        return lasers, lmask, start_len
 
     def _decode(self, raw: dict | None = None, timer=None) -> RawObs:
         raw = self._copy_in() if raw is None else raw
@@ -600,7 +603,7 @@ class EnvWrapper:
             bmask[env_idx, slot] = collidable
 
         enemies, emask = self._decode_enemies(raw["enemies"], raw["enemies_count"], raw["emax"], timer)
-        lasers, lmask = self._decode_lasers(raw["lasers"], raw["lasers_count"], raw["lmax"], timer)
+        lasers, lmask, start_len = self._decode_lasers(raw["lasers"], raw["lasers_count"], raw["lmax"], timer)
         with _phase(timer, "h2d_finish"):
             if hasattr(self.intent, "track"):   # 自由躲弹诊断：目标点锁自机（未镜像坐标）
                 self.intent.track(torch.stack([px, py], dim=-1))
@@ -622,7 +625,7 @@ class EnvWrapper:
             player_xy=torch.stack([px, py], dim=-1), player_hit_r=hit_r, player_speed=speed, player_focus=focus,
             bullets=bullets, bullets_mask=bmask, enemies=enemies, enemies_mask=emask, target_xy=target,
             prev_action=self.prev_action.clone(), dir_held=(self.dir_hold + 1).clone(),
-            slow_held=self.slow_held.clone(), lasers=lasers, lasers_mask=lmask,
+            slow_held=self.slow_held.clone(), lasers=lasers, lasers_mask=lmask, laser_start_len=start_len,
         )
 
 

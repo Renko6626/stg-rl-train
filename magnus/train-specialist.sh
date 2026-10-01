@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# T5 runner: standard training/probes plus specialist held-out evaluation before upload.
+# Specialist runner: standard training/probes plus held-out evaluation before upload.
 # Based on train.sh; original 13-card best selection remains in the trainer.
 # The run directory is packed and uploaded on exit even if training fails or the Job is
 # terminated, so checkpoints written so far are never lost with the workspace.
@@ -25,6 +25,17 @@ on_exit() {
 }
 trap on_exit EXIT
 trap 'echo "收到 SIGTERM，停止训练并打包已有结果" >&2; exit 0' TERM INT
+
+# New architectures may opt into strict GPU preflight before the full training.
+# gpucheck compares eager/compiled paths in fp32; the actual run keeps its own AMP setting.
+if [[ "${GPUCHECK:-0}" == 1 ]]; then
+    python - "$1" "$out_dir/gpucheck.toml" <<'PY'
+import sys
+from stgtrain.config import dump_toml, load_config
+dump_toml(load_config(sys.argv[1], {"ppo": {"amp": "off"}}), sys.argv[2])
+PY
+    python -u -m stgtrain.gpucheck "$out_dir/gpucheck.toml" 2>&1 | tee "$out_dir/gpucheck.log"
+fi
 
 (
     set -o pipefail

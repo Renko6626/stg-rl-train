@@ -48,6 +48,8 @@ def test_decode_matches_raw_buffers():
         k = int(cnt[i])
         r = lz[i, :k]
         fx = lambda name: col(r, off[name], "<i4", 4, 1 / 65536)  # noqa: E731
+        assert np.allclose(o.laser_start_len[i, :k].numpy(), fx("start_len"), atol=1e-6)
+        assert (o.laser_start_len[i, k:] == 0).all()
         for name in ("x", "y", "start", "end", "half_h", "speed", "omega", "vx", "vy"):
             assert np.allclose(o.lasers[i, :k, C[name]].numpy(), fx(name), atol=1e-6), name
         ang = col(r, off["angle"], "<u2", 2, 2 * math.pi / 65536)

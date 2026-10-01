@@ -149,7 +149,11 @@ def test_gradient_norm_tolerance_is_looser_than_the_loss_one():
     assert not g.close_enough(0.353, 0.357, rel=g.GN_REL)
 
 
-def test_train_laser_model_end_to_end_and_export(tmp_path):
+@pytest.mark.parametrize("feat_name,model_name,layers", [
+    ("danger_topk_v7", "set_attn_v2", {"sa_layers": 1, "laser_sa_layers": 1}),
+    ("danger_topk_v8", "set_attn_v3", {"joint_sa_layers": 1}),
+])
+def test_train_laser_model_end_to_end_and_export(tmp_path, feat_name, model_name, layers):
     """v7 特征化 + set_attn_v2 在激光夹具卡上：rollout → 更新 → 评测 → checkpoint → ONNX 部署包装。"""
     from conftest import FIXTURES
     from stgtrain.export_onnx import build_deploy
@@ -157,8 +161,9 @@ def test_train_laser_model_end_to_end_and_export(tmp_path):
     cfg = small_cfg(
         run={"total_updates": 2, "ckpt_every": 2, "eval_every": 2},
         env={"cards_dir": str(FIXTURES / "laser_cards"), "eval_splits": str(FIXTURES / "laser_eval_splits.toml")},
-        featurize={"name": "danger_topk_v7", "frame": "static", "dt": False, "k_lasers": 8},
-        model={"name": "set_attn_v2", "sa_layers": 1, "laser_sa_layers": 1},
+        featurize={"name": feat_name, "frame": "static", "dt": False, "k_lasers": 8},
+        model={"name": model_name, **layers},
+        ppo={"amp": "bf16" if model_name == "set_attn_v3" else "off"},
     )
     run_dir = make_run_dir(tmp_path, "laser")
     train(cfg, run_dir, pack_result=False)
@@ -166,7 +171,8 @@ def test_train_laser_model_end_to_end_and_export(tmp_path):
     assert [r["update"] for r in rows if "ppo/pg_loss" in r] == [1, 2]
     assert any("eval/survival" in r for r in rows)
     ck = load_checkpoint(run_dir / "checkpoints" / "latest.pt")
-    assert ck["model_name"] == "set_attn_v2" and ck["featurizer_name"] == "danger_topk_v7"
+    assert ck["model_name"] == model_name and ck["featurizer_name"] == feat_name
     assert any(k.startswith("model.lasers.") for k in ck["state"]["agent"])
     wrap, meta = build_deploy(run_dir / "checkpoints" / "latest.pt")
     assert meta["with_lasers"]
+    assert meta["with_start_len"] == (feat_name == "danger_topk_v8")

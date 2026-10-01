@@ -38,6 +38,12 @@ v2 的 checkpoint 也按六列签名导出（那两列进了图没人读），�
 
 C 侧照 th06nc 抽取器的激光口径填（`t_active` = 预警还剩几帧，同 `mods/th06nc/autoplay/TARGET.md`）。
 
+**图版本 6（2026-10-01）**：`danger_topk_v8` 在版本5输入之后追加
+
+    laser_start_len f32[L]  引擎设定棒长，严格与lasers行对齐，不可用当前长度替代
+
+旧图签名不变。版本6需部署调用方适配；本模块完成训练侧包装和torch/ORT对拍。
+
 只有 v4 / v5 的 checkpoint 才导出成八 / 九输入；v2 / v3 仍是七输入的版本 2（整个输入没人读的话导出器会把它剪掉，
 所以没法像敌人速度那样「同一套签名、旧图不读」）。C 侧 `sa_onnx` 两种都收，并据此知道这张图是不是
 在运动层下练出来的。`prev_action` 在 v4 下的含义是上一步**实际执行**的动作（运动层之后的），不是策略想按的。
@@ -67,6 +73,7 @@ from .featurize.danger_topk_v4 import DangerTopKV4
 from .featurize.danger_topk_v5 import DangerTopKV5
 from .featurize.danger_topk_v6 import DangerTopKV6
 from .featurize.danger_topk_v7 import DangerTopKV7
+from .featurize.danger_topk_v8 import DangerTopKV8
 from .registry import FEATURIZERS, MODELS, load_builtins
 
 GRAPH_VERSION = 2          # 七输入（v2 / v3）
@@ -156,15 +163,19 @@ class DangerTopKV7Export(DangerTopKV6Export, DangerTopKV7):
     """v7 = v6 的可导出写法 + 激光。激光那一路本来就用哨兵挑行（没有 inf / isfinite），训练与导出同一份代码。"""
 
 
+class DangerTopKV8Export(DangerTopKV6Export, DangerTopKV8):
+    """v8激光公式与训练一致，子弹沿用v6导出选择逻辑。"""
+
+
 #: checkpoint 的特征化器名 → 可导出孪生。不在表里的一律拒绝导出。
 EXPORT_FEATURIZERS = {"danger_topk_v2": DangerTopKV2Export, "danger_topk_v3": DangerTopKV3Export,
                       "danger_topk_v4": DangerTopKV4Export, "danger_topk_v5": DangerTopKV5Export,
-                      "danger_topk_v6": DangerTopKV6Export, "danger_topk_v7": DangerTopKV7Export}
+                      "danger_topk_v6": DangerTopKV6Export, "danger_topk_v7": DangerTopKV7Export, "danger_topk_v8": DangerTopKV8Export}
 #: 特征化器 → 要几个 held 输入（`HELD_INPUTS` 的前几个）。图版本 = GRAPH_VERSION + 这个数（+ 1 若带激光）
 #: v6（Q1 / Q2 / R1a）的原始输入与 v5 完全相同，图版本仍是 4，DLL 不用改。
-HELD_FEATURIZERS = {"danger_topk_v4": 1, "danger_topk_v5": 2, "danger_topk_v6": 2, "danger_topk_v7": 2}
+HELD_FEATURIZERS = {"danger_topk_v4": 1, "danger_topk_v5": 2, "danger_topk_v6": 2, "danger_topk_v7": 2, "danger_topk_v8": 2}
 #: 带激光输入的特征化器（图版本 5）
-LASER_FEATURIZERS = {"danger_topk_v7"}
+LASER_FEATURIZERS = {"danger_topk_v7", "danger_topk_v8"}
 
 
 def uses_held(cfg: dict) -> int:
@@ -177,23 +188,31 @@ def uses_lasers(cfg: dict) -> bool:
     return cfg["featurize"]["name"] in LASER_FEATURIZERS
 
 
+def uses_start_len(cfg: dict) -> bool:
+    """v8独立追加设定棒长输入，图版本6。"""
+    return cfg["featurize"]["name"] == "danger_topk_v8"
+
+
 def held_names(with_held: int) -> tuple[str, ...]:
     return HELD_INPUTS[:int(with_held)]
 
 
-def extra_names(with_held: int, with_lasers: bool = False) -> tuple[str, ...]:
+def extra_names(with_held: int, with_lasers: bool = False, with_start_len: bool = False) -> tuple[str, ...]:
     """七个基本输入之后追加的输入名。激光只跟在两个 held 之后（v7）。"""
     if with_lasers and int(with_held) != len(HELD_INPUTS):
         raise ValueError("激光输入只接在两个 held 之后（v7）")
-    return held_names(with_held) + (LASER_INPUTS if with_lasers else ())
+    if with_start_len and not with_lasers:
+        raise ValueError("laser_start_len需要激光输入")
+    return held_names(with_held) + (LASER_INPUTS if with_lasers else ()) + (("laser_start_len",) if with_start_len else ())
 
 
-def graph_version(with_held: int, with_lasers: bool = False) -> int:
-    return GRAPH_VERSION + int(with_held) + int(bool(with_lasers))
+def graph_version(with_held: int, with_lasers: bool = False, with_start_len: bool = False) -> int:
+    extra_names(with_held, with_lasers, with_start_len)
+    return GRAPH_VERSION + int(with_held) + int(bool(with_lasers)) + int(bool(with_start_len))
 
 
 def input_names(cfg: dict) -> tuple[str, ...]:
-    return INPUT_NAMES + extra_names(uses_held(cfg), uses_lasers(cfg))
+    return INPUT_NAMES + extra_names(uses_held(cfg), uses_lasers(cfg), uses_start_len(cfg))
 
 
 def export_featurizer(cfg: dict):
@@ -212,6 +231,7 @@ class DeployWrapper(nn.Module):
         self.feat = export_featurizer(cfg)
         self.with_held = int(uses_held(cfg))
         self.with_lasers = uses_lasers(cfg)
+        self.with_start_len = uses_start_len(cfg)
         self.model = model
         self.bullets_rows = int(bullets_rows)
         self.enemies_rows = int(enemies_rows)
@@ -223,7 +243,7 @@ class DeployWrapper(nn.Module):
     def forward(self, bullets: Tensor, bullets_mask: Tensor, enemies: Tensor, enemies_mask: Tensor,
                 player: Tensor, target: Tensor, prev_action: Tensor, dir_held: Tensor | None = None,
                 slow_held: Tensor | None = None, lasers: Tensor | None = None,
-                lasers_mask: Tensor | None = None) -> Tensor:
+                lasers_mask: Tensor | None = None, laser_start_len: Tensor | None = None) -> Tensor:
         obs = RawObs(
             player_xy=player[0:2].reshape(1, 2),
             player_hit_r=player[2:3],
@@ -240,6 +260,7 @@ class DeployWrapper(nn.Module):
             slow_held=slow_held if self.with_held >= 2 else None,
             lasers=lasers.unsqueeze(0) if self.with_lasers else None,
             lasers_mask=lasers_mask.unsqueeze(0) if self.with_lasers else None,
+            laser_start_len=laser_start_len.unsqueeze(0) if self.with_start_len else None,
         )
         logits, _ = self.model(self.feat(obs))
         return logits.reshape(NUM_ACTIONS)
@@ -247,7 +268,7 @@ class DeployWrapper(nn.Module):
 
 def deploy_inputs(obs: RawObs, env: int, *, bullets_rows: int, enemies_rows: int,
                   with_held: bool = False, with_lasers: bool = False,
-                  lasers_rows: int = DEPLOY_LASERS_ROWS) -> tuple[Tensor, ...]:
+                  lasers_rows: int = DEPLOY_LASERS_ROWS, with_start_len: bool = False) -> tuple[Tensor, ...]:
     """从训练侧 `RawObs` 取第 `env` 个 env，摊成图的七个输入（+ held + 激光）。行数不足补零行 + 假掩码，超出则截断。
 
     `enemies` 六列全取（后两列是引擎 Tier 0 给出的速度，`stg_rl` 0.2.0 起）。摊出来的形状与 dtype 就是 `INPUT_NAMES` 的契约，
@@ -265,6 +286,10 @@ def deploy_inputs(obs: RawObs, env: int, *, bullets_rows: int, enemies_rows: int
         out[:n] = t[:n].to(torch.bool)
         return out
 
+    extra_names(with_held, with_lasers, with_start_len)
+    if with_start_len and obs.laser_start_len is None:
+        raise ValueError("v8部署输入缺少laser_start_len")
+    start_len = (fit(obs.laser_start_len[env, :, None], lasers_rows, 1).squeeze(-1),) if with_start_len else ()
     prev = obs.prev_action
     prev_id = 0 if prev is None else int(prev[env])
     def one(t: Tensor | None) -> Tensor:
@@ -283,7 +308,7 @@ def deploy_inputs(obs: RawObs, env: int, *, bullets_rows: int, enemies_rows: int
                       float(obs.player_focus[env])], dtype=torch.float32),
         obs.target_xy[env].to(torch.float32).clone(),
         torch.tensor([prev_id], dtype=torch.int64),
-    ) + held + lasers
+    ) + held + lasers + start_len
 
 
 def build_deploy(ckpt_path, *, bullets_rows: int = DEPLOY_BULLETS_ROWS,
@@ -310,6 +335,7 @@ def build_deploy(ckpt_path, *, bullets_rows: int = DEPLOY_BULLETS_ROWS,
         "featurize": dict(cfg["featurize"]), "model": dict(cfg["model"]),
         "hold_radius": float(cfg["reward"]["hold_radius"]),
         "motor": dict(cfg["motor"]), "with_held": uses_held(cfg), "with_lasers": uses_lasers(cfg),
+        "with_start_len": uses_start_len(cfg),
         "extra": ck.get("extra", {}),
     }
     return wrap, meta
@@ -350,9 +376,9 @@ def export_graph(wrap: DeployWrapper, example: tuple[Tensor, ...], out_path) -> 
     """导出定形图，权重内联成单文件。dynamo 导出器优先，失败退回 TorchScript 路径。"""
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    extra = len(example) - len(INPUT_NAMES)
-    with_lasers = extra > len(HELD_INPUTS)
-    names = INPUT_NAMES + extra_names(extra - len(LASER_INPUTS) if with_lasers else extra, with_lasers)
+    names = INPUT_NAMES + extra_names(wrap.with_held, wrap.with_lasers, wrap.with_start_len)
+    if len(example) != len(names):
+        raise ValueError("导出样例输入个数与图签名不符")
     kw = dict(input_names=list(names), output_names=list(OUTPUT_NAMES), opset_version=OPSET)
     try:
         torch.onnx.export(wrap, example, str(out_path), dynamo=True, **kw)
@@ -372,7 +398,7 @@ def _sha256(path) -> str:
 
 
 def graph_signature(bullets_rows: int, enemies_rows: int, with_held: bool = False, with_lasers: bool = False,
-                    lasers_rows: int = DEPLOY_LASERS_ROWS) -> list[dict]:
+                    lasers_rows: int = DEPLOY_LASERS_ROWS, with_start_len: bool = False) -> list[dict]:
     shapes = {
         "bullets": ([bullets_rows, BULLET_COLS], "float32"),
         "bullets_mask": ([bullets_rows], "bool"),
@@ -384,8 +410,9 @@ def graph_signature(bullets_rows: int, enemies_rows: int, with_held: bool = Fals
         **{name: ([1], "int64") for name in HELD_INPUTS},
         "lasers": ([lasers_rows, len(LASER_COLS)], "float32"),
         "lasers_mask": ([lasers_rows], "bool"),
+        "laser_start_len": ([lasers_rows], "float32"),
     }
-    names = INPUT_NAMES + extra_names(with_held, with_lasers)
+    names = INPUT_NAMES + extra_names(with_held, with_lasers, with_start_len)
     return [{"name": n, "dtype": shapes[n][1], "shape": shapes[n][0]} for n in names]
 
 
@@ -395,8 +422,9 @@ def write_manifest(path, *, checkpoint, onnx, meta: dict, bullets_rows: int, ene
     path = Path(path)
     with_held = int(meta.get("with_held", 0))
     with_lasers = bool(meta.get("with_lasers", False))
+    with_start_len = bool(meta.get("with_start_len", False))
     payload = {
-        "graph_version": graph_version(with_held, with_lasers),
+        "graph_version": graph_version(with_held, with_lasers, with_start_len),
         "opset": OPSET,
         "num_actions": NUM_ACTIONS,
         "action_table_version": meta.get("action_table_version", ACTION_TABLE_VERSION),
@@ -412,7 +440,7 @@ def write_manifest(path, *, checkpoint, onnx, meta: dict, bullets_rows: int, ene
         # 这张图是在什么运动层下练出来的 —— 部署侧 DLL 要照这组参数跑同一个运动层
         "motor": meta.get("motor"),
         "eval": meta.get("extra", {}).get("eval"),
-        "inputs": graph_signature(bullets_rows, enemies_rows, with_held, with_lasers, lasers_rows),
+        "inputs": graph_signature(bullets_rows, enemies_rows, with_held, with_lasers, lasers_rows, with_start_len),
         "outputs": [{"name": "logits", "dtype": "float32", "shape": [NUM_ACTIONS]}],
         "sha256": {"checkpoint": _sha256(checkpoint), "onnx": _sha256(onnx)},
     }
@@ -422,8 +450,9 @@ def write_manifest(path, *, checkpoint, onnx, meta: dict, bullets_rows: int, ene
 
 
 def _example_inputs(bullets_rows: int, enemies_rows: int, with_held: int = 0, with_lasers: bool = False,
-                    lasers_rows: int = DEPLOY_LASERS_ROWS) -> tuple[Tensor, ...]:
+                    lasers_rows: int = DEPLOY_LASERS_ROWS, with_start_len: bool = False) -> tuple[Tensor, ...]:
     """导出用的样例输入：一颗迎面弹 + 一只敌（+ 一条生效中的竖激光），够让每一路都有非零值。"""
+    extra_names(with_held, with_lasers, with_start_len)
     bullets = torch.zeros(bullets_rows, BULLET_COLS)
     bullets[0] = torch.tensor([8.0, 320.0, 0.0, 3.0, 4.0])
     bmask = torch.zeros(bullets_rows, dtype=torch.bool)
@@ -442,7 +471,9 @@ def _example_inputs(bullets_rows: int, enemies_rows: int, with_held: int = 0, wi
     lasers[0] = torch.tensor([30.0, 100.0, 1.5707964, 0.0, 400.0, 8.0, 0.0, 0.01, 0.0, 0.0, 0.0, 1.0])
     lmask = torch.zeros(lasers_rows, dtype=torch.bool)
     lmask[0] = True
-    return base + held + (lasers, lmask)
+    start_len = torch.zeros(lasers_rows)
+    start_len[0] = 400.0
+    return base + held + (lasers, lmask) + ((start_len,) if with_start_len else ())
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -459,7 +490,7 @@ def main(argv: list[str] | None = None) -> int:
     out_dir = Path(a.out)
     onnx_path = out_dir / f"{a.name}.onnx"
     example = _example_inputs(a.bullets_rows, a.enemies_rows, with_held=int(meta["with_held"]),
-                              with_lasers=meta["with_lasers"], lasers_rows=a.lasers_rows)
+                              with_lasers=meta["with_lasers"], lasers_rows=a.lasers_rows, with_start_len=meta["with_start_len"])
     export_graph(wrap, example, onnx_path)
     man = write_manifest(out_dir / f"{a.name}.manifest.json", checkpoint=a.checkpoint, onnx=onnx_path, meta=meta,
                          bullets_rows=a.bullets_rows, enemies_rows=a.enemies_rows, lasers_rows=a.lasers_rows)
@@ -472,7 +503,7 @@ def main(argv: list[str] | None = None) -> int:
         print("[export] 没装 onnxruntime，跳过导出后自检（CI 与本地 pytest 会跑）")
     else:
         sess = ort.InferenceSession(str(onnx_path), providers=["CPUExecutionProvider"])
-        names = INPUT_NAMES + extra_names(meta["with_held"], meta["with_lasers"])
+        names = INPUT_NAMES + extra_names(meta["with_held"], meta["with_lasers"], meta["with_start_len"])
         got = torch.from_numpy(sess.run(["logits"], {n: t.numpy() for n, t in zip(names, example)})[0])
         dev = (got - ref).abs().max().item()
         if dev > 1e-5 or got.argmax().item() != ref.argmax().item():
