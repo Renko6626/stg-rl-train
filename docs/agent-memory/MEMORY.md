@@ -20,7 +20,7 @@
 - [T5专项混合训练（2026-10-01）](../practice-cards/2026-10-01-t5-experiment.md) — 快照889a9d3，Job4aba4850f7ba4dff已完成3500updates并取回；12张专项训练、5张另测
 - [T5阶段性结果与结构实验交接（2026-10-01）](../practice-cards/2026-10-01-t5-results.md) — 主激光评测小幅改善、专项泛化未学稳；用户怀疑模型结构，下一会话做结构实验，具体方案未定；取回码数字长度不可写死
 - [T6联合注意力训练（2026-10-01）](../practice-cards/2026-10-01-t6-experiment.md) — Job cec000c4981cc5af已完成3500轮并取回；GPU对拍PASS；原作激光56.90→80.73%、专项18.95→54.34%，普通卡−3.63pp；单seed组合改动，部署未适配
-- [T7／T8激光数量训练对照（2026-10-02）](../practice-cards/2026-10-02-t7-t8-experiment.md) — K8／K4，编码器及联合层实际长度缩短；仅改k_lasers，从头seed1、3500轮，用户恢复授权挂任务；Job及当前状态见记录
+- [T7／T8激光数量训练对照（2026-10-02）](../practice-cards/2026-10-02-t7-t8-experiment.md) — K8／K4，仅改k_lasers，从头seed1、3500轮；快照5997cec、Job82677c563c5b0cc1／28a4532abf792cc4已提交B2，实查Pending，自动取回器已启动
 - [后台任务要确认真在跑](verify-background-launch.md) — env 变量写在 taskset 前；ps 看 python 进程；监视要盯提前退出
 - [stg_rl 升版两边同步](stg-rl-wheel-sync.md) — pyproject/uv.lock 与 magnus/wheels+SHA256SUMS 必须同一版
 - [转写 worker 可换 Sonnet](transcribe-claude-worker-fallback.md) — DeepSeek 没余额就 STG_DSH_BIN=claude-worker；并发 4；dsh 审核必须配 opus 抽检

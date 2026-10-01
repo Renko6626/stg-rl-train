@@ -40,3 +40,18 @@
 缩短序列在数学上减少计算：attention配对减少19%／27.75%，现有联合block主要矩阵乘MAC约减少12.14%／18.04%。实际GPU内核和训练SPS是否提升、提升多少仍由本次运行测量，不保证理论比例或固定完成时刻。
 
 不改游戏部署调用方，不扩大稀疏注意力范围。工作目录中既有`:memory:.ses`与实验无关，保留本地。
+
+## 提交记录（2026-10-02）
+
+实验配置和T6结果记录已提交并推送到origin/main，训练快照为`5997cecdda500e87ff794da1e7ecd1959007e7c1`。
+
+| 实验 | Job | 状态（提交后实查） | 入口 |
+|---|---|---|---|
+| T7，K8 | [82677c563c5b0cc1](http://162.105.151.134:3011/jobs/82677c563c5b0cc1) | Pending | GPUCHECK=1 bash magnus/train-specialist.sh configs/exp-t7-laser-k8.toml t7-laser-k8 |
+| T8，K4 | [28a4532abf792cc4](http://162.105.151.134:3011/jobs/28a4532abf792cc4) | Pending | GPUCHECK=1 bash magnus/train-specialist.sh configs/exp-t8-laser-k4.toml t8-laser-k4 |
+
+Job list逐项核验了固定SHA、B2、1GPU和32CPU。两条均为64G内存、20G临时盘、CUDA12.4 devel镜像；目前尚未进入安装／GPU验收／正式训练。排队等待不可据GPU历史速度预测，未承诺半夜完成时刻。
+
+分别在`runs/t7-monitor/`、`runs/t8-monitor/`启动本机监视器，Python PID2548425／2548447已确认存活并记录Pending。它们每60秒检查状态，在Success或提前退出时保存日志、尝试取回结果，检查u3500、最终原作评测和8份专项JSON。领取码数字长度不固定；监视最长72小时以覆盖排队，不会修改Job时限。进程若因本机关闭而停止，仍需在240分钟领取窗口内人工取回。
+
+用户本次明确要求将两项任务挂上去；没有新增续训、稀疏注意力或其他卡池实验。
