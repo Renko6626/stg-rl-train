@@ -1,0 +1,49 @@
+# T7：T6激光数量对照，k_lasers=16→8；其余参数保持。
+# GPUCHECK=1先验证CUDA图；图版本6需要部署调用方适配laser_start_len。
+[run]
+total_updates = 3500
+ckpt_every = 250
+eval_every = 250
+
+[env]
+cards_dir = ["cards", "cards-synthetic", "cards-laser-specialist"]
+eval_splits = "eval/splits-laser.toml"
+num_envs = 4096
+hit_extra = [0.0, 2.0]
+threads = 0
+
+[intent]
+name = "mixed_v1"
+
+[featurize]
+name = "danger_topk_v8"
+frame = "static"
+dt = false
+k_lasers = 8
+
+[motor]
+enabled = true
+hold = [2, 6]
+delay = [0, 2]
+slow = true
+
+[reward.terms]
+death = 10.0
+follow_shaping = 1.0
+hold = 0.01
+segment_survived = 0.0
+key_press = -0.003
+quick_change = -0.01
+shift_toggle = 0.0
+edge_hug = -0.02
+
+[model]
+name = "set_attn_v3"
+sa_layers = 0
+laser_sa_layers = 0
+joint_sa_layers = 1
+action_query = false
+density_fp32 = true
+
+[ppo]
+amp = "bf16"

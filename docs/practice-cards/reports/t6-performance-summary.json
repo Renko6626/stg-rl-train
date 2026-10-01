@@ -1,0 +1,46 @@
+{
+  "window": {
+    "updates_min": 250,
+    "sampled_updates_mod20": 0
+  },
+  "runs": {
+    "T5": {
+      "n_samples": 163,
+      "mean_seconds_or_rows": {
+        "perf/total_s": 3.542616246793808,
+        "perf/env_step_s": 0.5948021398525845,
+        "perf/h2d_s": 0.7558355563851588,
+        "perf/h2d_lasers_s": 0.07526273755756624,
+        "perf/featurize_s": 0.24585035659281387,
+        "perf/policy_s": 0.1729063428481298,
+        "perf/reward_s": 0.0919148600745969,
+        "perf/update_s": 1.5662074844278624,
+        "perf/update_minibatches_s": 1.5508914693641516,
+        "perf/bullet_rows_mean": 812224.4499616565,
+        "perf/enemies_max_mean": 62.22306365030675
+      }
+    },
+    "T6": {
+      "n_samples": 163,
+      "mean_seconds_or_rows": {
+        "perf/total_s": 4.413892634430089,
+        "perf/env_step_s": 0.6114150356569904,
+        "perf/h2d_s": 0.7731768435518618,
+        "perf/h2d_lasers_s": 0.08465986779999514,
+        "perf/featurize_s": 0.2536541838655991,
+        "perf/policy_s": 0.2399428917175056,
+        "perf/reward_s": 0.09281948614477015,
+        "perf/update_s": 2.32563030799748,
+        "perf/update_minibatches_s": 2.30998368229877,
+        "perf/bullet_rows_mean": 812575.316142638,
+        "perf/enemies_max_mean": 62.455809049079754
+      }
+    }
+  },
+  "sources": {
+    "runs/job-4aba4850f7ba4dff/20261001-124836-t5-specialist/metrics.jsonl": "d531b7c2fea5c78305f4f6867559c03c4300abc37d37c0eba160372286aa32fa",
+    "runs/job-cec000c4981cc5af/20261001-185732-t6-laser-joint/metrics.jsonl": "09f77488b17d973484f5eb8ebc8245dfa0d2205416c6071407ebf2f5fd133e7c"
+  },
+  "extra_time_model_share": 0.9485616552528489,
+  "resume_lr_to_5000": 9e-05
+}

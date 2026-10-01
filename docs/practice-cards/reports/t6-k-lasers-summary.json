@@ -1,0 +1,281 @@
+{
+  "checkpoint_update": 3500,
+  "device": "cpu",
+  "episodes_per_card_rank": 32,
+  "sources": {
+    "runs/t6-k-lasers/k16-original-laser.json": "08beb24b563cdab4e61c9fce08c5c8b49d5cd6e9002bfb1dee0daae70f29d9d9",
+    "runs/t6-k-lasers/k16-specialist.json": "5414db4b2cfdc3c3edcf8c3f8b17fa142a0114cada2a201ad9205c226da96c30",
+    "runs/t6-k-lasers/arm8/k8-original-laser.json": "4ed0e471a129fe63ad0cfdb1952982607c1d5f3beb88185c159377f7a016c2fd",
+    "runs/t6-k-lasers/arm8/k8-specialist.json": "e16a00ff5bb2985588175f4c7911166fc571e8f857405c29fc74124ccbe48a1f",
+    "runs/t6-k-lasers/arm4/k4-original-laser.json": "de17929130268e5ee913c89f4a1c3dec559b195f367724fcc9c559996eb6dd40",
+    "runs/t6-k-lasers/arm4/k4-specialist.json": "7fcec5efc018567d672221f0bd20e9ff867569cc62856a223ea01cad3d5c6727"
+  },
+  "arms": {
+    "16": {
+      "original-laser": {
+        "survived": 165,
+        "episodes": 192,
+        "survival": 0.859375,
+        "cards": {
+          "th06_s4_w16": 0.890625,
+          "th06_s4_b12": 0.703125,
+          "th06_s1_b3": 0.984375
+        },
+        "cards_by_rank": {
+          "th06_s4_w16": {
+            "r2": 0.96875,
+            "r3": 0.8125
+          },
+          "th06_s4_b12": {
+            "r2": 0.65625,
+            "r3": 0.75
+          },
+          "th06_s1_b3": {
+            "r2": 1.0,
+            "r3": 0.96875
+          }
+        },
+        "occupancy_all_batched_env_steps": {
+          "observations": 405504,
+          "over4": 144365,
+          "over8": 52367,
+          "over16": 0,
+          "max": 14
+        }
+      },
+      "specialist": {
+        "survived": 368,
+        "episodes": 640,
+        "survival": 0.575,
+        "cards": {
+          "laser_sp_aimed_04": 0.453125,
+          "laser_sp_bars_04": 0.6015625,
+          "laser_sp_corridor_04": 0.8515625,
+          "laser_sp_stagger_04": 0.5078125,
+          "laser_sp_sweep_04": 0.4609375
+        },
+        "cards_by_rank": {
+          "laser_sp_aimed_04": {
+            "r0": 0.71875,
+            "r1": 0.4375,
+            "r2": 0.4375,
+            "r3": 0.21875
+          },
+          "laser_sp_bars_04": {
+            "r0": 0.5,
+            "r1": 0.65625,
+            "r2": 0.59375,
+            "r3": 0.65625
+          },
+          "laser_sp_corridor_04": {
+            "r0": 1.0,
+            "r1": 1.0,
+            "r2": 0.78125,
+            "r3": 0.625
+          },
+          "laser_sp_stagger_04": {
+            "r0": 0.53125,
+            "r1": 0.5,
+            "r2": 0.5625,
+            "r3": 0.4375
+          },
+          "laser_sp_sweep_04": {
+            "r0": 0.5625,
+            "r1": 0.71875,
+            "r2": 0.5,
+            "r3": 0.0625
+          }
+        },
+        "occupancy_all_batched_env_steps": {
+          "observations": 1187840,
+          "over4": 552693,
+          "over8": 300419,
+          "over16": 0,
+          "max": 16
+        }
+      },
+      "theoretical_attention_pair_reduction": 0.0,
+      "theoretical_joint_block_matmul_MAC_reduction": 0.0
+    },
+    "8": {
+      "original-laser": {
+        "survived": 157,
+        "episodes": 192,
+        "survival": 0.8177083333333334,
+        "cards": {
+          "th06_s4_w16": 0.890625,
+          "th06_s4_b12": 0.578125,
+          "th06_s1_b3": 0.984375
+        },
+        "cards_by_rank": {
+          "th06_s4_w16": {
+            "r2": 0.96875,
+            "r3": 0.8125
+          },
+          "th06_s4_b12": {
+            "r2": 0.4375,
+            "r3": 0.71875
+          },
+          "th06_s1_b3": {
+            "r2": 1.0,
+            "r3": 0.96875
+          }
+        },
+        "occupancy_all_batched_env_steps": {
+          "observations": 405504,
+          "over4": 144887,
+          "over8": 52799,
+          "over16": 0,
+          "max": 14
+        }
+      },
+      "specialist": {
+        "survived": 375,
+        "episodes": 640,
+        "survival": 0.5859375,
+        "cards": {
+          "laser_sp_aimed_04": 0.3984375,
+          "laser_sp_bars_04": 0.7109375,
+          "laser_sp_corridor_04": 0.8515625,
+          "laser_sp_stagger_04": 0.5078125,
+          "laser_sp_sweep_04": 0.4609375
+        },
+        "cards_by_rank": {
+          "laser_sp_aimed_04": {
+            "r0": 0.5,
+            "r1": 0.4375,
+            "r2": 0.4375,
+            "r3": 0.21875
+          },
+          "laser_sp_bars_04": {
+            "r0": 0.75,
+            "r1": 0.65625,
+            "r2": 0.75,
+            "r3": 0.6875
+          },
+          "laser_sp_corridor_04": {
+            "r0": 1.0,
+            "r1": 1.0,
+            "r2": 0.78125,
+            "r3": 0.625
+          },
+          "laser_sp_stagger_04": {
+            "r0": 0.53125,
+            "r1": 0.5,
+            "r2": 0.5625,
+            "r3": 0.4375
+          },
+          "laser_sp_sweep_04": {
+            "r0": 0.5625,
+            "r1": 0.71875,
+            "r2": 0.5,
+            "r3": 0.0625
+          }
+        },
+        "occupancy_all_batched_env_steps": {
+          "observations": 1187840,
+          "over4": 551078,
+          "over8": 299185,
+          "over16": 0,
+          "max": 16
+        }
+      },
+      "theoretical_attention_pair_reduction": 0.18999999999999995,
+      "theoretical_joint_block_matmul_MAC_reduction": 0.12142857142857144
+    },
+    "4": {
+      "original-laser": {
+        "survived": 156,
+        "episodes": 192,
+        "survival": 0.8125,
+        "cards": {
+          "th06_s4_w16": 0.90625,
+          "th06_s4_b12": 0.5625,
+          "th06_s1_b3": 0.96875
+        },
+        "cards_by_rank": {
+          "th06_s4_w16": {
+            "r2": 0.9375,
+            "r3": 0.875
+          },
+          "th06_s4_b12": {
+            "r2": 0.625,
+            "r3": 0.5
+          },
+          "th06_s1_b3": {
+            "r2": 0.96875,
+            "r3": 0.96875
+          }
+        },
+        "occupancy_all_batched_env_steps": {
+          "observations": 405504,
+          "over4": 145262,
+          "over8": 52788,
+          "over16": 0,
+          "max": 14
+        }
+      },
+      "specialist": {
+        "survived": 388,
+        "episodes": 640,
+        "survival": 0.60625,
+        "cards": {
+          "laser_sp_aimed_04": 0.390625,
+          "laser_sp_bars_04": 0.796875,
+          "laser_sp_corridor_04": 0.8515625,
+          "laser_sp_stagger_04": 0.53125,
+          "laser_sp_sweep_04": 0.4609375
+        },
+        "cards_by_rank": {
+          "laser_sp_aimed_04": {
+            "r0": 0.375,
+            "r1": 0.46875,
+            "r2": 0.4375,
+            "r3": 0.28125
+          },
+          "laser_sp_bars_04": {
+            "r0": 0.84375,
+            "r1": 0.90625,
+            "r2": 0.65625,
+            "r3": 0.78125
+          },
+          "laser_sp_corridor_04": {
+            "r0": 1.0,
+            "r1": 1.0,
+            "r2": 0.78125,
+            "r3": 0.625
+          },
+          "laser_sp_stagger_04": {
+            "r0": 0.5,
+            "r1": 0.5,
+            "r2": 0.625,
+            "r3": 0.5
+          },
+          "laser_sp_sweep_04": {
+            "r0": 0.5625,
+            "r1": 0.71875,
+            "r2": 0.5,
+            "r3": 0.0625
+          }
+        },
+        "occupancy_all_batched_env_steps": {
+          "observations": 1187840,
+          "over4": 549872,
+          "over8": 296531,
+          "over16": 0,
+          "max": 16
+        }
+      },
+      "theoretical_attention_pair_reduction": 0.27749999999999997,
+      "theoretical_joint_block_matmul_MAC_reduction": 0.18035714285714288
+    }
+  },
+  "checkpoint_sha256": "80da1a554b25a81e8534d5dcb3c5373edd2725c4e3328a799850c514b906d74f",
+  "limitations": [
+    "Single fixed checkpoint, no retraining and no multiple training seeds.",
+    "CPU eager comparisons use their own K16 baseline, not the earlier GPU baseline.",
+    "No paired episode outcomes saved; no statistical significance claim.",
+    "Occupancy includes reset/post-first-episode environments while other groups finish.",
+    "Parallel CPU wall times are not GPU training throughput measurements."
+  ]
+}
