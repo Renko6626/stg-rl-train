@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "checker": "supplementary causal-observation longer-horizon diagnostic; not canonical18f; not trainedpolicy",
+  "card": "/tmp/sunyunbo/stg-laser-batch3/laser_sp_corridor_01",
+  "card_file_sha256": {
+    "TASK.md": "4f074081c324a28fac0da27d84fb5ff6cb66ca28d80c432f7bd253d279c95251",
+    "machine-spec.json": "8540bea6e26a75084499a3845a965c3e15b2eaf422930fb754c99545d5e80099",
+    "main.ecl": "2a06fc8d99f64c3329eb00936343beb0fb5d711c20acf026bdddc69fad1799c2",
+    "meta.toml": "280d374d49c280f24d8dee35b07c9a057d4f70eccce82504ca33038b709d207c"
+  },
+  "driver_sha256": "8e4eaccdb8a709be8ec030804c2f24679f21e61dc7f06a1cd025f21646cb601a",
+  "choose_action_module_sha256": "02afa09a64d91a94eecee9b61d7deeb28aac81e4d489d713accb58622cd60681",
+  "stg_rl_build_info": {
+    "git_sha": "5dfc08d-dirty",
+    "tables_hash": "37a7ff12fe40e24e",
+    "version": "0.4.1",
+    "engine_ver": "24"
+  },
+  "config": {
+    "horizon": 45,
+    "max_frames": 3600,
+    "frame_skip": 1,
+    "num_envs": 1,
+    "threads": 1,
+    "device": "cpu",
+    "hit_extra": [
+      2,
+      2
+    ],
+    "motor": {
+      "hold": [
+        2,
+        6
+      ],
+      "delay": [
+        0,
+        2
+      ],
+      "slow": true
+    },
+    "ranks": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "seeds": [
+      1,
+      7
+    ],
+    "mirror": false
+  },
+  "runs": [
+    {
+      "rank": 0,
+      "seed": 1,
+      "done": 1,
+      "status": "DEATH",
+      "steps": 383,
+      "ep_frames": 383,
+      "trajectory": "/tmp/sunyunbo/stg-laser-batch3/horizon-trajectories/laser_sp_corridor_01/3790f00a2d1c/h45/r0-s1.jsonl",
+      "trajectory_sha256": "6184d774d2af79c922fea0324325671c46f6ff6326a593f5394c63b81d36ccab"
+    },
+    {
+      "rank": 0,
+      "seed": 7,
+      "done": 1,
+      "status": "DEATH",
+      "steps": 274,
+      "ep_frames": 274,
+      "trajectory": "/tmp/sunyunbo/stg-laser-batch3/horizon-trajectories/laser_sp_corridor_01/3790f00a2d1c/h45/r0-s7.jsonl",
+      "trajectory_sha256": "ac006332866125a9af75bb85f3d4322474de3d4a81cf8425ff3a46ec3a7f58e6"
+    },
+    {
+      "rank": 1,
+      "seed": 1,
+      "done": 1,
+      "status": "DEATH",
+      "steps": 385,
+      "ep_frames": 385,
+      "trajectory": "/tmp/sunyunbo/stg-laser-batch3/horizon-trajectories/laser_sp_corridor_01/3790f00a2d1c/h45/r1-s1.jsonl",
+      "trajectory_sha256": "db2ecfadf56bae9ca5f779f4ced2934a5e3ea5f533f59f9b9739ec300f41d431"
+    },
+    {
+      "rank": 1,
+      "seed": 7,
+      "done": 1,
+      "status": "DEATH",
+      "steps": 255,
+      "ep_frames": 255,
+      "trajectory": "/tmp/sunyunbo/stg-laser-batch3/horizon-trajectories/laser_sp_corridor_01/3790f00a2d1c/h45/r1-s7.jsonl",
+      "trajectory_sha256": "d411962cb2dd382e7168809d02d78da023cda2c68031de53b2c5c2112ede636e"
+    },
+    {
+      "rank": 2,
+      "seed": 1,
+      "done": 1,
+      "status": "DEATH",
+      "steps": 281,
+      "ep_frames": 281,
+      "trajectory": "/tmp/sunyunbo/stg-laser-batch3/horizon-trajectories/laser_sp_corridor_01/3790f00a2d1c/h45/r2-s1.jsonl",
+      "trajectory_sha256": "923c40aa679845806829a79aef3a33cc5c4857d517a875ada7165e1c9c6a295a"
+    },
+    {
+      "rank": 2,
+      "seed": 7,
+      "done": 1,
+      "status": "DEATH",
+      "steps": 203,
+      "ep_frames": 203,
+      "trajectory": "/tmp/sunyunbo/stg-laser-batch3/horizon-trajectories/laser_sp_corridor_01/3790f00a2d1c/h45/r2-s7.jsonl",
+      "trajectory_sha256": "340d7b548a87f9278f64930e679335a18b31366b377ec7a22db07034ddcb1045"
+    },
+    {
+      "rank": 3,
+      "seed": 1,
+      "done": 1,
+      "status": "DEATH",
+      "steps": 226,
+      "ep_frames": 226,
+      "trajectory": "/tmp/sunyunbo/stg-laser-batch3/horizon-trajectories/laser_sp_corridor_01/3790f00a2d1c/h45/r3-s1.jsonl",
+      "trajectory_sha256": "4de55f3698ede6b973b65be4830ef7201b29c4f92bf8541119bf0b13c55655b7"
+    },
+    {
+      "rank": 3,
+      "seed": 7,
+      "done": 1,
+      "status": "DEATH",
+      "steps": 232,
+      "ep_frames": 232,
+      "trajectory": "/tmp/sunyunbo/stg-laser-batch3/horizon-trajectories/laser_sp_corridor_01/3790f00a2d1c/h45/r3-s7.jsonl",
+      "trajectory_sha256": "06c086a396d7d52be047b09da0d303b231bba603605a0e092dc4ae8958d78365"
+    }
+  ],
+  "limitations": [
+    "Same current-observation velocity/warning extrapolation with longer window; no new-spawn or hidden-RNG knowledge",
+    "No ECL future execution used in controller; physics unchanged",
+    "Failure NOT_PROVEN; success finite witness only"
+  ],
+  "reproduction": ".venv/bin/python /tmp/sunyunbo/stg-laser-batch3/check_corridor_horizon.py /tmp/sunyunbo/stg-laser-batch3/laser_sp_corridor_01 --horizon 45"
+}

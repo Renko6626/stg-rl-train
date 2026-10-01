@@ -1,0 +1,13 @@
+title = "原创激光专项：双侧反向扇面接力"
+source = "synthetic"
+data_kind = "synthetic"
+synthetic_kind = "laser_specialist"
+generation_mode = "standalone"
+family = "sweep"
+layout_id = "laser_sp_sweep_03"
+split = "train"
+contract_version = 1
+ranks = [0, 3]
+marks = [0]
+time_limit = 1800
+tags = ["laser", "specialist"]

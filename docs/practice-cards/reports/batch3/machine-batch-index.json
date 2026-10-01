@@ -1,0 +1,302 @@
+{
+  "completed": [
+    {
+      "card": "laser_sp_stagger_04",
+      "exit": 1,
+      "ok": false,
+      "errors": [
+        "r0关键帧缺少frame 1800零激光时限快照",
+        "r1关键帧缺少frame 1800零激光时限快照",
+        "r2关键帧缺少frame 1800零激光时限快照",
+        "r3关键帧缺少frame 1800零激光时限快照"
+      ],
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/laser_sp_stagger_04.machine.json",
+      "output": "laser_sp_stagger_04: FAIL (4 errors)\nr0关键帧缺少frame 1800零激光时限快照\nr1关键帧缺少frame 1800零激光时限快照\nr2关键帧缺少frame 1800零激光时限快照\nr3关键帧缺少frame 1800零激光时限快照\n",
+      "stderr": ""
+    },
+    {
+      "card": "laser_sp_corridor_01",
+      "exit": 1,
+      "ok": false,
+      "errors": [
+        "r0关键帧缺少自然回收后的零激光快照",
+        "r1关键帧缺少自然回收后的零激光快照",
+        "r2关键帧缺少自然回收后的零激光快照",
+        "r3关键帧缺少自然回收后的零激光快照"
+      ],
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/laser_sp_corridor_01.machine.json",
+      "output": "laser_sp_corridor_01: FAIL (4 errors)\nr0关键帧缺少自然回收后的零激光快照\nr1关键帧缺少自然回收后的零激光快照\nr2关键帧缺少自然回收后的零激光快照\nr3关键帧缺少自然回收后的零激光快照\n",
+      "stderr": ""
+    },
+    {
+      "card": "laser_sp_corridor_02",
+      "exit": 1,
+      "ok": false,
+      "errors": [
+        "r0关键帧缺少自然回收后的零激光快照",
+        "r1关键帧缺少自然回收后的零激光快照",
+        "r2关键帧缺少自然回收后的零激光快照",
+        "r3关键帧缺少自然回收后的零激光快照"
+      ],
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/laser_sp_corridor_02.machine.json",
+      "output": "laser_sp_corridor_02: FAIL (4 errors)\nr0关键帧缺少自然回收后的零激光快照\nr1关键帧缺少自然回收后的零激光快照\nr2关键帧缺少自然回收后的零激光快照\nr3关键帧缺少自然回收后的零激光快照\n",
+      "stderr": ""
+    },
+    {
+      "card": "laser_sp_stagger_01",
+      "exit": 0,
+      "ok": true,
+      "errors": [],
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/laser_sp_stagger_01.machine.json",
+      "output": "laser_sp_stagger_01: MECHANICAL PASS · independent review pending (0 errors)\n",
+      "stderr": ""
+    },
+    {
+      "card": "laser_sp_stagger_02",
+      "exit": 0,
+      "ok": true,
+      "errors": [],
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/laser_sp_stagger_02.machine.json",
+      "output": "laser_sp_stagger_02: MECHANICAL PASS · independent review pending (0 errors)\n",
+      "stderr": ""
+    },
+    {
+      "card": "laser_sp_stagger_03",
+      "exit": 0,
+      "ok": true,
+      "errors": [],
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/laser_sp_stagger_03.machine.json",
+      "output": "laser_sp_stagger_03: MECHANICAL PASS · independent review pending (0 errors)\n",
+      "stderr": ""
+    },
+    {
+      "card": "laser_sp_corridor_04",
+      "exit": 1,
+      "ok": false,
+      "errors": [
+        "r0关键帧缺少有激光的收缩(state 2)快照",
+        "r0关键帧缺少frame 1800零激光时限快照",
+        "r1关键帧缺少有激光的收缩(state 2)快照",
+        "r1关键帧缺少frame 1800零激光时限快照",
+        "r2关键帧缺少有激光的收缩(state 2)快照",
+        "r2关键帧缺少frame 1800零激光时限快照",
+        "r3关键帧缺少有激光的收缩(state 2)快照",
+        "r3关键帧缺少frame 1800零激光时限快照"
+      ],
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/laser_sp_corridor_04.machine.json",
+      "output": "laser_sp_corridor_04: FAIL (8 errors)\nr0关键帧缺少有激光的收缩(state 2)快照\nr0关键帧缺少frame 1800零激光时限快照\nr1关键帧缺少有激光的收缩(state 2)快照\nr1关键帧缺少frame 1800零激光时限快照\nr2关键帧缺少有激光的收缩(state 2)快照\nr2关键帧缺少frame 1800零激光时限快照\nr3关键帧缺少有激光的收缩(state 2)快照\nr3关键帧缺少frame 1800零激光时限快照\n",
+      "stderr": ""
+    },
+    {
+      "card": "laser_sp_sweep_01",
+      "exit": 1,
+      "ok": false,
+      "errors": [
+        "r0关键帧缺少frame 1800零激光时限快照",
+        "r1关键帧缺少frame 1800零激光时限快照",
+        "r2关键帧缺少frame 1800零激光时限快照",
+        "r3关键帧缺少frame 1800零激光时限快照"
+      ],
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/laser_sp_sweep_01.machine.json",
+      "output": "laser_sp_sweep_01: FAIL (4 errors)\nr0关键帧缺少frame 1800零激光时限快照\nr1关键帧缺少frame 1800零激光时限快照\nr2关键帧缺少frame 1800零激光时限快照\nr3关键帧缺少frame 1800零激光时限快照\n",
+      "stderr": ""
+    },
+    {
+      "card": "laser_sp_sweep_02",
+      "exit": 1,
+      "ok": false,
+      "errors": [
+        "r0关键帧缺少frame 1800零激光时限快照",
+        "r1关键帧缺少frame 1800零激光时限快照",
+        "r2关键帧缺少frame 1800零激光时限快照",
+        "r3关键帧缺少frame 1800零激光时限快照"
+      ],
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/laser_sp_sweep_02.machine.json",
+      "output": "laser_sp_sweep_02: FAIL (4 errors)\nr0关键帧缺少frame 1800零激光时限快照\nr1关键帧缺少frame 1800零激光时限快照\nr2关键帧缺少frame 1800零激光时限快照\nr3关键帧缺少frame 1800零激光时限快照\n",
+      "stderr": ""
+    },
+    {
+      "card": "laser_sp_corridor_03",
+      "exit": 0,
+      "ok": true,
+      "errors": [],
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/laser_sp_corridor_03.machine.json",
+      "output": "laser_sp_corridor_03: MECHANICAL PASS · independent review pending (0 errors)\n",
+      "stderr": ""
+    },
+    {
+      "card": "laser_sp_sweep_03",
+      "exit": 1,
+      "ok": false,
+      "errors": [
+        "r0关键帧缺少自然回收后的零激光快照",
+        "r1关键帧缺少自然回收后的零激光快照",
+        "r2关键帧缺少自然回收后的零激光快照",
+        "r3关键帧缺少自然回收后的零激光快照"
+      ],
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/laser_sp_sweep_03.machine.json",
+      "output": "laser_sp_sweep_03: FAIL (4 errors)\nr0关键帧缺少自然回收后的零激光快照\nr1关键帧缺少自然回收后的零激光快照\nr2关键帧缺少自然回收后的零激光快照\nr3关键帧缺少自然回收后的零激光快照\n",
+      "stderr": ""
+    },
+    {
+      "card": "laser_sp_sweep_04",
+      "exit": 1,
+      "ok": false,
+      "errors": [
+        "r0关键帧缺少frame 1800零激光时限快照",
+        "r1关键帧缺少frame 1800零激光时限快照",
+        "r2关键帧缺少frame 1800零激光时限快照",
+        "r3关键帧缺少frame 1800零激光时限快照"
+      ],
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/laser_sp_sweep_04.machine.json",
+      "output": "laser_sp_sweep_04: FAIL (4 errors)\nr0关键帧缺少frame 1800零激光时限快照\nr1关键帧缺少frame 1800零激光时限快照\nr2关键帧缺少frame 1800零激光时限快照\nr3关键帧缺少frame 1800零激光时限快照\n",
+      "stderr": ""
+    },
+    {
+      "card": "laser_sp_aimed_04",
+      "exit": 1,
+      "ok": false,
+      "errors": [
+        "r0关键帧缺少frame 1800零激光时限快照",
+        "r1关键帧缺少frame 1800零激光时限快照",
+        "r2关键帧缺少frame 1800零激光时限快照",
+        "r3关键帧缺少frame 1800零激光时限快照"
+      ],
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/laser_sp_aimed_04.machine.json",
+      "output": "laser_sp_aimed_04: FAIL (4 errors)\nr0关键帧缺少frame 1800零激光时限快照\nr1关键帧缺少frame 1800零激光时限快照\nr2关键帧缺少frame 1800零激光时限快照\nr3关键帧缺少frame 1800零激光时限快照\n",
+      "stderr": ""
+    },
+    {
+      "card": "laser_sp_aimed_03",
+      "exit": 1,
+      "ok": false,
+      "errors": [
+        "r0关键帧缺少自然回收后的零激光快照",
+        "r3关键帧缺少有激光的收缩(state 2)快照"
+      ],
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/laser_sp_aimed_03.machine.json",
+      "output": "laser_sp_aimed_03: FAIL (2 errors)\nr0关键帧缺少自然回收后的零激光快照\nr3关键帧缺少有激光的收缩(state 2)快照\n",
+      "stderr": ""
+    },
+    {
+      "card": "laser_sp_aimed_01",
+      "exit": 1,
+      "ok": false,
+      "errors": [
+        "r0/seed1: 段结束缺失或不在time_limit前后120帧窗口",
+        "r0/seed7: 段结束缺失或不在time_limit前后120帧窗口",
+        "r1/seed1: 段结束缺失或不在time_limit前后120帧窗口",
+        "r1/seed7: 段结束缺失或不在time_limit前后120帧窗口",
+        "r2/seed1: 段结束缺失或不在time_limit前后120帧窗口",
+        "r2/seed7: 段结束缺失或不在time_limit前后120帧窗口",
+        "r3/seed1: 段结束缺失或不在time_limit前后120帧窗口",
+        "r3/seed7: 段结束缺失或不在time_limit前后120帧窗口",
+        "r0关键帧未覆盖首波出生边界f94±1",
+        "r1关键帧未覆盖首波出生边界f94±1",
+        "r2关键帧未覆盖首波出生边界f94±1",
+        "r3关键帧未覆盖首波出生边界f94±1"
+      ],
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/laser_sp_aimed_01.machine.json",
+      "output": "laser_sp_aimed_01: FAIL (12 errors)\nr0/seed1: 段结束缺失或不在time_limit前后120帧窗口\nr0/seed7: 段结束缺失或不在time_limit前后120帧窗口\nr1/seed1: 段结束缺失或不在time_limit前后120帧窗口\nr1/seed7: 段结束缺失或不在time_limit前后120帧窗口\nr2/seed1: 段结束缺失或不在time_limit前后120帧窗口\nr2/seed7: 段结束缺失或不在time_limit前后120帧窗口\nr3/seed1: 段结束缺失或不在time_limit前后120帧窗口\nr3/seed7: 段结束缺失或不在time_limit前后120帧窗口\nr0关键帧未覆盖首波出生边界f94±1\nr1关键帧未覆盖首波出生边界f94±1\nr2关键帧未覆盖首波出生边界f94±1\nr3关键帧未覆盖首波出生边界f94±1\n",
+      "stderr": ""
+    },
+    {
+      "card": "laser_sp_aimed_02",
+      "exit": 1,
+      "ok": false,
+      "errors": [
+        "r0/seed1: 段结束缺失或不在time_limit前后120帧窗口",
+        "r0/seed7: 段结束缺失或不在time_limit前后120帧窗口",
+        "r1/seed1: 段结束缺失或不在time_limit前后120帧窗口",
+        "r1/seed7: 段结束缺失或不在time_limit前后120帧窗口",
+        "r2/seed1: 段结束缺失或不在time_limit前后120帧窗口",
+        "r2/seed7: 段结束缺失或不在time_limit前后120帧窗口",
+        "r3/seed1: 段结束缺失或不在time_limit前后120帧窗口",
+        "r3/seed7: 段结束缺失或不在time_limit前后120帧窗口",
+        "r0关键帧未覆盖首波出生边界f94±1",
+        "r1关键帧未覆盖首波出生边界f94±1",
+        "r2关键帧未覆盖首波出生边界f94±1",
+        "r3关键帧未覆盖首波出生边界f94±1"
+      ],
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/laser_sp_aimed_02.machine.json",
+      "output": "laser_sp_aimed_02: FAIL (12 errors)\nr0/seed1: 段结束缺失或不在time_limit前后120帧窗口\nr0/seed7: 段结束缺失或不在time_limit前后120帧窗口\nr1/seed1: 段结束缺失或不在time_limit前后120帧窗口\nr1/seed7: 段结束缺失或不在time_limit前后120帧窗口\nr2/seed1: 段结束缺失或不在time_limit前后120帧窗口\nr2/seed7: 段结束缺失或不在time_limit前后120帧窗口\nr3/seed1: 段结束缺失或不在time_limit前后120帧窗口\nr3/seed7: 段结束缺失或不在time_limit前后120帧窗口\nr0关键帧未覆盖首波出生边界f94±1\nr1关键帧未覆盖首波出生边界f94±1\nr2关键帧未覆盖首波出生边界f94±1\nr3关键帧未覆盖首波出生边界f94±1\n",
+      "stderr": ""
+    },
+    {
+      "card": "laser_sp_bars_03",
+      "exit": 1,
+      "ok": false,
+      "errors": [
+        "r0关键帧缺少自然回收后的零激光快照",
+        "r1关键帧缺少自然回收后的零激光快照",
+        "r2关键帧缺少自然回收后的零激光快照",
+        "r3关键帧缺少自然回收后的零激光快照"
+      ],
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/laser_sp_bars_03.machine.json",
+      "output": "laser_sp_bars_03: FAIL (4 errors)\nr0关键帧缺少自然回收后的零激光快照\nr1关键帧缺少自然回收后的零激光快照\nr2关键帧缺少自然回收后的零激光快照\nr3关键帧缺少自然回收后的零激光快照\n",
+      "stderr": ""
+    },
+    {
+      "card": "laser_sp_bars_01",
+      "exit": 0,
+      "ok": true,
+      "errors": [],
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/laser_sp_bars_01.machine.json",
+      "output": "laser_sp_bars_01: MECHANICAL PASS · independent review pending (0 errors)\n",
+      "stderr": ""
+    },
+    {
+      "card": "laser_sp_bars_02",
+      "exit": 0,
+      "ok": true,
+      "errors": [],
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/laser_sp_bars_02.machine.json",
+      "output": "laser_sp_bars_02: MECHANICAL PASS · independent review pending (0 errors)\n",
+      "stderr": ""
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "exit": 1,
+      "ok": false,
+      "errors": [
+        "r0关键帧未覆盖末波出生边界f1385±1",
+        "r0关键帧未覆盖末句柄回收后的精确空场帧f1697",
+        "r0实测快照未覆盖末次回收前的收缩状态",
+        "r1关键帧未覆盖末波出生边界f1385±1",
+        "r1关键帧未覆盖末句柄回收后的精确空场帧f1682",
+        "r1实测快照未覆盖末次回收前的收缩状态",
+        "r2关键帧未覆盖末波出生边界f1385±1",
+        "r2关键帧未覆盖末句柄回收后的精确空场帧f1667",
+        "r2实测快照未覆盖末次回收前的收缩状态",
+        "r3关键帧未覆盖末波出生边界f1385±1",
+        "r3关键帧未覆盖末句柄回收后的精确空场帧f1652",
+        "r3实测快照未覆盖末次回收前的收缩状态"
+      ],
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/laser_sp_bars_04.machine.json",
+      "output": "laser_sp_bars_04: FAIL (12 errors)\nr0关键帧未覆盖末波出生边界f1385±1\nr0关键帧未覆盖末句柄回收后的精确空场帧f1697\nr0实测快照未覆盖末次回收前的收缩状态\nr1关键帧未覆盖末波出生边界f1385±1\nr1关键帧未覆盖末句柄回收后的精确空场帧f1682\nr1实测快照未覆盖末次回收前的收缩状态\nr2关键帧未覆盖末波出生边界f1385±1\nr2关键帧未覆盖末句柄回收后的精确空场帧f1667\nr2实测快照未覆盖末次回收前的收缩状态\nr3关键帧未覆盖末波出生边界f1385±1\nr3关键帧未覆盖末句柄回收后的精确空场帧f1652\nr3实测快照未覆盖末次回收前的收缩状态\n",
+      "stderr": ""
+    }
+  ],
+  "expected_cards": [
+    "laser_sp_stagger_01",
+    "laser_sp_stagger_02",
+    "laser_sp_stagger_03",
+    "laser_sp_stagger_04",
+    "laser_sp_corridor_01",
+    "laser_sp_corridor_02",
+    "laser_sp_corridor_03",
+    "laser_sp_corridor_04",
+    "laser_sp_sweep_01",
+    "laser_sp_sweep_02",
+    "laser_sp_sweep_03",
+    "laser_sp_sweep_04",
+    "laser_sp_aimed_01",
+    "laser_sp_aimed_02",
+    "laser_sp_aimed_03",
+    "laser_sp_aimed_04",
+    "laser_sp_bars_01",
+    "laser_sp_bars_02",
+    "laser_sp_bars_03",
+    "laser_sp_bars_04"
+  ]
+}

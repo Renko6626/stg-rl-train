@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "tool_sha256": "02afa09a64d91a94eecee9b61d7deeb28aac81e4d489d713accb58622cd60681",
+  "reports": [
+    {
+      "card": "laser_sp_stagger_02",
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/final/laser_sp_stagger_02/feasibility/laser_sp_stagger_02.json",
+      "runs": 88,
+      "report_sha256": "9037d63ba5631ff64c71501c66df5b0327e5f830494ddec25c9cc8204f16bd18"
+    }
+  ]
+}

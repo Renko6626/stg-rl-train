@@ -13,6 +13,11 @@
 - [Magnus 节点 CPU 是瓶颈](magnus-cluster-cpu-bound.md) — 6×A100 只配 112 核；提交前 magnus cluster 看 cpu_free；kill 要 -f
 - [rank 从 0 开始](rank-is-zero-based.md) — r2 = Hard、r3 = Lunatic（0 Easy · 1 Normal · 2 Hard · 3 Lunatic）
 - [少构造、改真实机制](prefer-real-mechanics-over-shaping.md) — 不喂构造特征、不用罚款塑形；改环境 / 直接改引擎
+- [激光编码器审阅待办（2026-10-01）](laser-encoder-review.md) — 用户要求先记、之后改；等距离 Top-K 行序依赖已复现，组合建模等为待验证风险；44 项 CPU/ONNX 测试通过
+- [激光专项练习方向（2026-09-30）](../practice-cards/2026-09-30-laser-specialist-design.md) — 用户认可激光成为绝对主体、持续提供避让练习；已落档设计，尚未制卡或训练，具体参数与采样待定
+- [专项卡派发模板（2026-10-01）](../practice-cards/laser-specialist-dispatch-prompts.md) — 从零专项卡的冻结任务单和写审/返工 prompt；执行后补骨架、单卡自检和源码安全带检查要求
+- [第三批专项卡结果（2026-10-01）](../practice-cards/2026-10-01-batch3-results.md) — 20张生成、机器20/20、17有限样本候选（12训练/5留出）、3 NOT_PROVEN隔离；部分rank未获完成轨迹，不代表训练收益，未训练/提交
+- [T5专项混合训练准备（2026-10-01）](../practice-cards/2026-10-01-t5-experiment.md) — 用户选混合训练；T2设置加12张专项，5张另测，3500updates；本地/旧栈检查与CPU冒烟通过，尚未提交代码/推送/提交Job
 - [后台任务要确认真在跑](verify-background-launch.md) — env 变量写在 taskset 前；ps 看 python 进程；监视要盯提前退出
 - [stg_rl 升版两边同步](stg-rl-wheel-sync.md) — pyproject/uv.lock 与 magnus/wheels+SHA256SUMS 必须同一版
 - [转写 worker 可换 Sonnet](transcribe-claude-worker-fallback.md) — DeepSeek 没余额就 STG_DSH_BIN=claude-worker；并发 4；dsh 审核必须配 opus 抽检

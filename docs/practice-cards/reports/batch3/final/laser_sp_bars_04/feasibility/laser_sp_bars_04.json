@@ -1,0 +1,4088 @@
+{
+  "schema_version": 1,
+  "checker": "offline observational heuristic; not a trained policy",
+  "card": "/tmp/sunyunbo/stg-laser-batch3/laser_sp_bars_04",
+  "card_id": "laser_sp_bars_04",
+  "declared_rank_range": [
+    0,
+    3
+  ],
+  "declared_ranks": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "card_file_sha256": {
+    "TASK.md": "874e10ab298399c2ed940dd8937ca8ca19c6bd87e50effb61b1803081ebf177b",
+    "machine-spec.json": "eb981b8a01bc50705ba1983b357e98c30a989e5ff49e51cfb795147ed8026c88",
+    "main.ecl": "dee59177160d8e750765d8c52924ae615c8860f26e30f307833730ffeda122bf",
+    "meta.toml": "1414ab1f9dd7e462d25934da226a4555a29069b50099358e707aff015eff195b"
+  },
+  "stg_rl_version": "0.4.1",
+  "stg_rl_build_info": {
+    "engine_ver": "24",
+    "version": "0.4.1",
+    "tables_hash": "37a7ff12fe40e24e",
+    "git_sha": "5dfc08d-dirty"
+  },
+  "tool": "/data/sunyunbo/www/stg-rl-train/src/stgtrain/specialist_feasibility.py",
+  "tool_sha256": "02afa09a64d91a94eecee9b61d7deeb28aac81e4d489d713accb58622cd60681",
+  "config": {
+    "num_envs": 1,
+    "threads": 1,
+    "device": "cpu",
+    "frame_skip": 1,
+    "hit_extra": [
+      2,
+      2
+    ],
+    "motor": {
+      "enabled": true,
+      "hold": [
+        2,
+        6
+      ],
+      "delay": [
+        0,
+        2
+      ],
+      "slow": true
+    },
+    "max_frames": 1860,
+    "horizon": 18,
+    "prediction_stride": 1,
+    "ranks": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "seeds": [
+      1,
+      7
+    ],
+    "mirror": false
+  },
+  "movement_bounds": {
+    "x": [
+      -192.0,
+      192.0
+    ],
+    "y": [
+      0.0,
+      448.0
+    ],
+    "coverage": "player moves from engine spawn; baseline target is counted only if physically reached"
+  },
+  "runs": [
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 0,
+      "seed": 1,
+      "mode": "heuristic",
+      "status": "SUCCESS",
+      "done": 2,
+      "steps": 1793,
+      "engine_ep_frames": 1793,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": null,
+      "target_reached_step": null,
+      "target_reached_xy": null,
+      "target_tolerance_px": null,
+      "stationary_required_frames": null,
+      "stationary_radius_px": null,
+      "stationary_frames_max": null,
+      "stationary_max_drift_px": null,
+      "stationary_settled_xy": null,
+      "stationary_offset_from_target_px": null,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": null,
+      "stationary_qualified": false,
+      "stationary_qualification_status": "NOT_APPLICABLE",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r0_s1_heuristic.jsonl",
+      "trajectory_sha256": "3a694581004efa2394f2e75fc48f08c0f46cf83f998357f9a3355a0e58af41d8",
+      "trajectory_bytes": 271824,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 0,
+      "seed": 1,
+      "mode": "stationary_at_actual_spawn",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 767,
+      "engine_ep_frames": 767,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "target_reached_step": 0,
+      "target_reached_xy": [
+        -31.82,
+        415.82
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 766,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -31.82,
+        415.82
+      ],
+      "stationary_offset_from_target_px": 0.0,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": 0.0,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r0_s1_baseline_spawn.jsonl",
+      "trajectory_sha256": "3b8d12610e137d1c8be2e21692e94b59323947b4f67f6142cf8c991346459170",
+      "trajectory_bytes": 115729,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 0,
+      "seed": 1,
+      "mode": "still_center_lower",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 767,
+      "engine_ep_frames": 767,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        0.0,
+        392.0
+      ],
+      "target_reached_step": 22,
+      "target_reached_xy": [
+        -3.535,
+        393.192
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 743,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -2.121,
+        394.607
+      ],
+      "stationary_offset_from_target_px": 3.361,
+      "post_arrival_nonzero_direction_frames": 1,
+      "post_arrival_max_drift_from_target_px": 3.731,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r0_s1_baseline_0.0_392.0.jsonl",
+      "trajectory_sha256": "259a0991d30a7b92b2b0d7238a74254f9c1fe74c537eafb0f7afb2fbe4ad48d5",
+      "trajectory_bytes": 116507,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 0,
+      "seed": 1,
+      "mode": "still_left_lower",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 438,
+      "engine_ep_frames": 438,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -128.0,
+        392.0
+      ],
+      "target_reached_step": 57,
+      "target_reached_xy": [
+        -126.004,
+        391.778
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 379,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -128.004,
+        391.778
+      ],
+      "stationary_offset_from_target_px": 0.222,
+      "post_arrival_nonzero_direction_frames": 1,
+      "post_arrival_max_drift_from_target_px": 2.009,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r0_s1_baseline_-128.0_392.0.jsonl",
+      "trajectory_sha256": "04cff46b9e203d077bacabf686e1042107d9b5c7f9ca642064df1f1047fd889f",
+      "trajectory_bytes": 67367,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 0,
+      "seed": 1,
+      "mode": "still_right_lower",
+      "status": "SUCCESS",
+      "done": 2,
+      "steps": 1793,
+      "engine_ep_frames": 1793,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        128.0,
+        392.0
+      ],
+      "target_reached_step": 88,
+      "target_reached_xy": [
+        124.364,
+        391.778
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 1702,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        128.364,
+        391.778
+      ],
+      "stationary_offset_from_target_px": 0.426,
+      "post_arrival_nonzero_direction_frames": 2,
+      "post_arrival_max_drift_from_target_px": 3.643,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r0_s1_baseline_128.0_392.0.jsonl",
+      "trajectory_sha256": "72dcf2f5906057c8d32d361bc98f8b6933df869587c3c4ca1a4347fe7ceea158",
+      "trajectory_bytes": 275113,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 0,
+      "seed": 1,
+      "mode": "still_left_upper",
+      "status": "SUCCESS",
+      "done": 2,
+      "steps": 1793,
+      "engine_ep_frames": 1793,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -128.0,
+        80.0
+      ],
+      "target_reached_step": 188,
+      "target_reached_xy": [
+        -127.986,
+        83.653
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 1604,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -127.986,
+        83.653
+      ],
+      "stationary_offset_from_target_px": 3.653,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": 3.653,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r0_s1_baseline_-128.0_80.0.jsonl",
+      "trajectory_sha256": "99a3aa4d780582cb0b2705555e81659ce4d6937217ac8c7e864553f11d1d7977",
+      "trajectory_bytes": 275362,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 0,
+      "seed": 1,
+      "mode": "still_right_upper",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 351,
+      "engine_ep_frames": 351,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        128.0,
+        80.0
+      ],
+      "target_reached_step": 202,
+      "target_reached_xy": [
+        127.987,
+        82.013
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 147,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        127.987,
+        80.013
+      ],
+      "stationary_offset_from_target_px": 0.019,
+      "post_arrival_nonzero_direction_frames": 1,
+      "post_arrival_max_drift_from_target_px": 2.014,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r0_s1_baseline_128.0_80.0.jsonl",
+      "trajectory_sha256": "81941f889ba5d6acefcc6a15f366049c6801ad9f7ebe4807dfcbf16269e8b57f",
+      "trajectory_bytes": 53328,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 0,
+      "seed": 1,
+      "mode": "still_top_left",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 269,
+      "engine_ep_frames": 269,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -192.0,
+        0.0
+      ],
+      "target_reached_step": 242,
+      "target_reached_xy": [
+        -192.0,
+        2.599
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 24,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": null,
+      "stationary_offset_from_target_px": null,
+      "post_arrival_nonzero_direction_frames": 2,
+      "post_arrival_max_drift_from_target_px": 2.599,
+      "stationary_qualified": false,
+      "stationary_qualification_status": "NOT_PROVEN",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r0_s1_baseline_-192.0_0.0.jsonl",
+      "trajectory_sha256": "a739aa8a3ff66864084436773147379a57cb0bc3c6cc044bea973041d757fdaf",
+      "trajectory_bytes": 40887,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 0,
+      "seed": 1,
+      "mode": "still_top_right",
+      "status": "SUCCESS",
+      "done": 2,
+      "steps": 1793,
+      "engine_ep_frames": 1793,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        192.0,
+        0.0
+      ],
+      "target_reached_step": 255,
+      "target_reached_xy": [
+        192.0,
+        3.545
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 1537,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        192.0,
+        3.545
+      ],
+      "stationary_offset_from_target_px": 3.545,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": 3.545,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r0_s1_baseline_192.0_0.0.jsonl",
+      "trajectory_sha256": "00e84689e6dc8ce109971d9f95d568a9bc9a5058f741a7c97f5ab5faf915b538",
+      "trajectory_bytes": 268665,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 0,
+      "seed": 1,
+      "mode": "still_bottom_left",
+      "status": "SUCCESS",
+      "done": 2,
+      "steps": 1793,
+      "engine_ep_frames": 1793,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -192.0,
+        448.0
+      ],
+      "target_reached_step": 87,
+      "target_reached_xy": [
+        -188.347,
+        448.0
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 1704,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -190.347,
+        448.0
+      ],
+      "stationary_offset_from_target_px": 1.653,
+      "post_arrival_nonzero_direction_frames": 1,
+      "post_arrival_max_drift_from_target_px": 3.653,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r0_s1_baseline_-192.0_448.0.jsonl",
+      "trajectory_sha256": "1346e369f433601215a4a3d10b962daf8c240f149452ddf00fb95d62bf172785",
+      "trajectory_bytes": 273474,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 0,
+      "seed": 1,
+      "mode": "still_bottom_right",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 1451,
+      "engine_ep_frames": 1451,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        192.0,
+        448.0
+      ],
+      "target_reached_step": 119,
+      "target_reached_xy": [
+        188.707,
+        448.0
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 1331,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        188.707,
+        448.0
+      ],
+      "stationary_offset_from_target_px": 3.293,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": 3.293,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r0_s1_baseline_192.0_448.0.jsonl",
+      "trajectory_sha256": "926e147df238b8ed010e5c473ff9d6cf7eae362d67a959c5ffa73b89d4efd20f",
+      "trajectory_bytes": 219615,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 0,
+      "seed": 7,
+      "mode": "heuristic",
+      "status": "SUCCESS",
+      "done": 2,
+      "steps": 1747,
+      "engine_ep_frames": 1747,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": null,
+      "target_reached_step": null,
+      "target_reached_xy": null,
+      "target_tolerance_px": null,
+      "stationary_required_frames": null,
+      "stationary_radius_px": null,
+      "stationary_frames_max": null,
+      "stationary_max_drift_px": null,
+      "stationary_settled_xy": null,
+      "stationary_offset_from_target_px": null,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": null,
+      "stationary_qualified": false,
+      "stationary_qualification_status": "NOT_APPLICABLE",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r0_s7_heuristic.jsonl",
+      "trajectory_sha256": "7be6f9df8e4113d95a8ef7fa5e3c9d210c79eeb5a0e271cad6173284c2b83a70",
+      "trajectory_bytes": 265459,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 0,
+      "seed": 7,
+      "mode": "stationary_at_actual_spawn",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 733,
+      "engine_ep_frames": 733,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "target_reached_step": 0,
+      "target_reached_xy": [
+        -13.859,
+        448.0
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 732,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -13.859,
+        448.0
+      ],
+      "stationary_offset_from_target_px": 0.0,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": 0.0,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r0_s7_baseline_spawn.jsonl",
+      "trajectory_sha256": "ea6d0e201cc1ca4ba1463b37780aef1c59e8fc6313a9e81ee4d70d8701116541",
+      "trajectory_bytes": 110669,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 0,
+      "seed": 7,
+      "mode": "still_center_lower",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 733,
+      "engine_ep_frames": 733,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        0.0,
+        392.0
+      ],
+      "target_reached_step": 30,
+      "target_reached_xy": [
+        -1.131,
+        395.272
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 700,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -1.131,
+        388.772
+      ],
+      "stationary_offset_from_target_px": 3.42,
+      "post_arrival_nonzero_direction_frames": 2,
+      "post_arrival_max_drift_from_target_px": 3.462,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r0_s7_baseline_0.0_392.0.jsonl",
+      "trajectory_sha256": "58503f22184ba25774f7bf692998ea0c54202045f4ae1f07323c6a313064a69a",
+      "trajectory_bytes": 111399,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 0,
+      "seed": 7,
+      "mode": "still_left_lower",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 391,
+      "engine_ep_frames": 391,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -128.0,
+        392.0
+      ],
+      "target_reached_step": 68,
+      "target_reached_xy": [
+        -125.013,
+        392.846
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 321,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -127.013,
+        392.846
+      ],
+      "stationary_offset_from_target_px": 1.3,
+      "post_arrival_nonzero_direction_frames": 1,
+      "post_arrival_max_drift_from_target_px": 3.104,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r0_s7_baseline_-128.0_392.0.jsonl",
+      "trajectory_sha256": "240dedd14ef1da58fa7806efbf97113e9cbf6a8aba1209d95cd2ab64bce82db4",
+      "trajectory_bytes": 60100,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 0,
+      "seed": 7,
+      "mode": "still_right_lower",
+      "status": "SUCCESS",
+      "done": 2,
+      "steps": 1747,
+      "engine_ep_frames": 1747,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        128.0,
+        392.0
+      ],
+      "target_reached_step": 82,
+      "target_reached_xy": [
+        125.296,
+        392.846
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 1663,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        127.296,
+        392.846
+      ],
+      "stationary_offset_from_target_px": 1.101,
+      "post_arrival_nonzero_direction_frames": 1,
+      "post_arrival_max_drift_from_target_px": 2.833,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r0_s7_baseline_128.0_392.0.jsonl",
+      "trajectory_sha256": "fd0ca11d8b051d35e8d82c56c90d71cea35de30c9431a2193eb76e7294d4544d",
+      "trajectory_bytes": 268036,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 0,
+      "seed": 7,
+      "mode": "still_left_upper",
+      "status": "SUCCESS",
+      "done": 2,
+      "steps": 1747,
+      "engine_ep_frames": 1747,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -128.0,
+        80.0
+      ],
+      "target_reached_step": 207,
+      "target_reached_xy": [
+        -126.996,
+        82.863
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 1539,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -126.996,
+        82.863
+      ],
+      "stationary_offset_from_target_px": 3.034,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": 3.034,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r0_s7_baseline_-128.0_80.0.jsonl",
+      "trajectory_sha256": "a35301c5c3cf09427f6aa0e899fc7d05d5614f1114c535fcfa452d659d9a17af",
+      "trajectory_bytes": 268318,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 0,
+      "seed": 7,
+      "mode": "still_right_upper",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 303,
+      "engine_ep_frames": 303,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        128.0,
+        80.0
+      ],
+      "target_reached_step": 213,
+      "target_reached_xy": [
+        128.977,
+        83.164
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 88,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": null,
+      "stationary_offset_from_target_px": null,
+      "post_arrival_nonzero_direction_frames": 1,
+      "post_arrival_max_drift_from_target_px": 3.312,
+      "stationary_qualified": false,
+      "stationary_qualification_status": "NOT_PROVEN",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r0_s7_baseline_128.0_80.0.jsonl",
+      "trajectory_sha256": "d4873e5cb7e15daa84e0ea0d5e9efe6e4e60b4ab38b630a518a3ee2ff74be9a1",
+      "trajectory_bytes": 46042,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 0,
+      "seed": 7,
+      "mode": "still_top_left",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 233,
+      "engine_ep_frames": 233,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -192.0,
+        0.0
+      ],
+      "target_reached_step": null,
+      "target_reached_xy": null,
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 0,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": null,
+      "stationary_offset_from_target_px": null,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": 0.0,
+      "stationary_qualified": false,
+      "stationary_qualification_status": "NOT_REACHED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r0_s7_baseline_-192.0_0.0.jsonl",
+      "trajectory_sha256": "04d53ca9ce75f2fc8a0a6dd2562b413e0e813e056fc4b5e9a3d3fcb259991a3e",
+      "trajectory_bytes": 35575,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 0,
+      "seed": 7,
+      "mode": "still_top_right",
+      "status": "SUCCESS",
+      "done": 2,
+      "steps": 1747,
+      "engine_ep_frames": 1747,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        192.0,
+        0.0
+      ],
+      "target_reached_step": 267,
+      "target_reached_xy": [
+        192.0,
+        2.11
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 1477,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        192.0,
+        0.0
+      ],
+      "stationary_offset_from_target_px": 0.0,
+      "post_arrival_nonzero_direction_frames": 2,
+      "post_arrival_max_drift_from_target_px": 2.11,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r0_s7_baseline_192.0_0.0.jsonl",
+      "trajectory_sha256": "2a3305a96afd766341cfecaf1ab5131d68c546dddbb2fa1b50f9aed64efc7b5c",
+      "trajectory_bytes": 258715,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 0,
+      "seed": 7,
+      "mode": "still_bottom_left",
+      "status": "SUCCESS",
+      "done": 2,
+      "steps": 1747,
+      "engine_ep_frames": 1747,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -192.0,
+        448.0
+      ],
+      "target_reached_step": 89,
+      "target_reached_xy": [
+        -189.859,
+        448.0
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 1656,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -191.859,
+        448.0
+      ],
+      "stationary_offset_from_target_px": 0.141,
+      "post_arrival_nonzero_direction_frames": 1,
+      "post_arrival_max_drift_from_target_px": 2.141,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r0_s7_baseline_-192.0_448.0.jsonl",
+      "trajectory_sha256": "3193905142b1410dcbb6ebd4b33df967ddf391f423005d7ffa35dfeafc2a7f43",
+      "trajectory_bytes": 266419,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 0,
+      "seed": 7,
+      "mode": "still_bottom_right",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 1411,
+      "engine_ep_frames": 1411,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        192.0,
+        448.0
+      ],
+      "target_reached_step": 102,
+      "target_reached_xy": [
+        188.141,
+        448.0
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 1306,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        192.0,
+        448.0
+      ],
+      "stationary_offset_from_target_px": 0.0,
+      "post_arrival_nonzero_direction_frames": 2,
+      "post_arrival_max_drift_from_target_px": 3.859,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r0_s7_baseline_192.0_448.0.jsonl",
+      "trajectory_sha256": "c4b5378168fc4d7b50d302dfa61aeaa90b516a7636f6a003b2a4bbb0f74988b2",
+      "trajectory_bytes": 210881,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 1,
+      "seed": 1,
+      "mode": "heuristic",
+      "status": "SUCCESS",
+      "done": 2,
+      "steps": 1793,
+      "engine_ep_frames": 1793,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": null,
+      "target_reached_step": null,
+      "target_reached_xy": null,
+      "target_tolerance_px": null,
+      "stationary_required_frames": null,
+      "stationary_radius_px": null,
+      "stationary_frames_max": null,
+      "stationary_max_drift_px": null,
+      "stationary_settled_xy": null,
+      "stationary_offset_from_target_px": null,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": null,
+      "stationary_qualified": false,
+      "stationary_qualification_status": "NOT_APPLICABLE",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r1_s1_heuristic.jsonl",
+      "trajectory_sha256": "1b1672dff91dd0b383584cf2fad35064ae61948983798b3f6c7f0eea9adc71ab",
+      "trajectory_bytes": 271980,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 1,
+      "seed": 1,
+      "mode": "stationary_at_actual_spawn",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 752,
+      "engine_ep_frames": 752,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "target_reached_step": 0,
+      "target_reached_xy": [
+        -31.82,
+        415.82
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 751,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -31.82,
+        415.82
+      ],
+      "stationary_offset_from_target_px": 0.0,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": 0.0,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r1_s1_baseline_spawn.jsonl",
+      "trajectory_sha256": "049a6f233bc7c43f897544076b21888cb2115a1dc7123970a403af7e98db9164",
+      "trajectory_bytes": 113464,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 1,
+      "seed": 1,
+      "mode": "still_center_lower",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 752,
+      "engine_ep_frames": 752,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        0.0,
+        392.0
+      ],
+      "target_reached_step": 22,
+      "target_reached_xy": [
+        -3.535,
+        393.192
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 728,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -2.121,
+        394.607
+      ],
+      "stationary_offset_from_target_px": 3.361,
+      "post_arrival_nonzero_direction_frames": 1,
+      "post_arrival_max_drift_from_target_px": 3.731,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r1_s1_baseline_0.0_392.0.jsonl",
+      "trajectory_sha256": "1bc98028ab2193cb4c91d09a33a8fbfbf43c67a0ce7029513e18e4b202454f47",
+      "trajectory_bytes": 114227,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 1,
+      "seed": 1,
+      "mode": "still_left_lower",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 420,
+      "engine_ep_frames": 420,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -128.0,
+        392.0
+      ],
+      "target_reached_step": 57,
+      "target_reached_xy": [
+        -126.004,
+        391.778
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 361,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -128.004,
+        391.778
+      ],
+      "stationary_offset_from_target_px": 0.222,
+      "post_arrival_nonzero_direction_frames": 1,
+      "post_arrival_max_drift_from_target_px": 2.009,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r1_s1_baseline_-128.0_392.0.jsonl",
+      "trajectory_sha256": "a7e82c31ef93daf0db6cf8deb0c55d83cc7c886bde7910b2221ddc248aed4c54",
+      "trajectory_bytes": 64595,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 1,
+      "seed": 1,
+      "mode": "still_right_lower",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 1344,
+      "engine_ep_frames": 1344,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        128.0,
+        392.0
+      ],
+      "target_reached_step": 88,
+      "target_reached_xy": [
+        124.364,
+        391.778
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 1253,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        128.364,
+        391.778
+      ],
+      "stationary_offset_from_target_px": 0.426,
+      "post_arrival_nonzero_direction_frames": 2,
+      "post_arrival_max_drift_from_target_px": 3.643,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r1_s1_baseline_128.0_392.0.jsonl",
+      "trajectory_sha256": "f4b8c783745b8fd3134792526cb87139d5c751c4211276f7a091717ad5ca5cda",
+      "trajectory_bytes": 205945,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 1,
+      "seed": 1,
+      "mode": "still_left_upper",
+      "status": "SUCCESS",
+      "done": 2,
+      "steps": 1793,
+      "engine_ep_frames": 1793,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -128.0,
+        80.0
+      ],
+      "target_reached_step": 188,
+      "target_reached_xy": [
+        -127.986,
+        83.653
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 1604,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -127.986,
+        83.653
+      ],
+      "stationary_offset_from_target_px": 3.653,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": 3.653,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r1_s1_baseline_-128.0_80.0.jsonl",
+      "trajectory_sha256": "a4bcb17a64d878aae8cd61416a59728dc8726b1ed7d5ce240a663fe93bd01d7e",
+      "trajectory_bytes": 275362,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 1,
+      "seed": 1,
+      "mode": "still_right_upper",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 336,
+      "engine_ep_frames": 336,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        128.0,
+        80.0
+      ],
+      "target_reached_step": 202,
+      "target_reached_xy": [
+        127.987,
+        82.013
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 132,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        127.987,
+        80.013
+      ],
+      "stationary_offset_from_target_px": 0.019,
+      "post_arrival_nonzero_direction_frames": 1,
+      "post_arrival_max_drift_from_target_px": 2.014,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r1_s1_baseline_128.0_80.0.jsonl",
+      "trajectory_sha256": "6698ed7a6878ec43aa1e64c12305a364a6a1ad938ae2d54f705d95a0d53f4005",
+      "trajectory_bytes": 51048,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 1,
+      "seed": 1,
+      "mode": "still_top_left",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 254,
+      "engine_ep_frames": 254,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -192.0,
+        0.0
+      ],
+      "target_reached_step": 242,
+      "target_reached_xy": [
+        -192.0,
+        2.599
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 9,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": null,
+      "stationary_offset_from_target_px": null,
+      "post_arrival_nonzero_direction_frames": 2,
+      "post_arrival_max_drift_from_target_px": 2.599,
+      "stationary_qualified": false,
+      "stationary_qualification_status": "NOT_PROVEN",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r1_s1_baseline_-192.0_0.0.jsonl",
+      "trajectory_sha256": "1437b35f5ef405519b29921aac05ae73975c41f4505c79f26ae090abb693faf0",
+      "trajectory_bytes": 38667,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 1,
+      "seed": 1,
+      "mode": "still_top_right",
+      "status": "SUCCESS",
+      "done": 2,
+      "steps": 1793,
+      "engine_ep_frames": 1793,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        192.0,
+        0.0
+      ],
+      "target_reached_step": 255,
+      "target_reached_xy": [
+        192.0,
+        3.545
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 1537,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        192.0,
+        3.545
+      ],
+      "stationary_offset_from_target_px": 3.545,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": 3.545,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r1_s1_baseline_192.0_0.0.jsonl",
+      "trajectory_sha256": "684e6ebdc85e9ab19599a5f991a47a0afa345aebddca3cc1226257f9ac61516d",
+      "trajectory_bytes": 268665,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 1,
+      "seed": 1,
+      "mode": "still_bottom_left",
+      "status": "SUCCESS",
+      "done": 2,
+      "steps": 1793,
+      "engine_ep_frames": 1793,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -192.0,
+        448.0
+      ],
+      "target_reached_step": 87,
+      "target_reached_xy": [
+        -188.347,
+        448.0
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 1704,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -190.347,
+        448.0
+      ],
+      "stationary_offset_from_target_px": 1.653,
+      "post_arrival_nonzero_direction_frames": 1,
+      "post_arrival_max_drift_from_target_px": 3.653,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r1_s1_baseline_-192.0_448.0.jsonl",
+      "trajectory_sha256": "147ccb261246718973ed110dd3d3a52cab7afc29c5afe9985bb6ef4cbed0d294",
+      "trajectory_bytes": 273474,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 1,
+      "seed": 1,
+      "mode": "still_bottom_right",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 1436,
+      "engine_ep_frames": 1436,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        192.0,
+        448.0
+      ],
+      "target_reached_step": 119,
+      "target_reached_xy": [
+        188.707,
+        448.0
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 1316,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        188.707,
+        448.0
+      ],
+      "stationary_offset_from_target_px": 3.293,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": 3.293,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r1_s1_baseline_192.0_448.0.jsonl",
+      "trajectory_sha256": "18fc22ccaacd639de10e65ed4ea58ac2b6ea17bc083390e94c53c0f5c482faf1",
+      "trajectory_bytes": 217335,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 1,
+      "seed": 7,
+      "mode": "heuristic",
+      "status": "SUCCESS",
+      "done": 2,
+      "steps": 1747,
+      "engine_ep_frames": 1747,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": null,
+      "target_reached_step": null,
+      "target_reached_xy": null,
+      "target_tolerance_px": null,
+      "stationary_required_frames": null,
+      "stationary_radius_px": null,
+      "stationary_frames_max": null,
+      "stationary_max_drift_px": null,
+      "stationary_settled_xy": null,
+      "stationary_offset_from_target_px": null,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": null,
+      "stationary_qualified": false,
+      "stationary_qualification_status": "NOT_APPLICABLE",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r1_s7_heuristic.jsonl",
+      "trajectory_sha256": "05eeac927121c3c0b865a90ba16d08e35c284b7c24c805c9bf7e8f597da7d100",
+      "trajectory_bytes": 265014,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 1,
+      "seed": 7,
+      "mode": "stationary_at_actual_spawn",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 718,
+      "engine_ep_frames": 718,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "target_reached_step": 0,
+      "target_reached_xy": [
+        -13.859,
+        448.0
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 717,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -13.859,
+        448.0
+      ],
+      "stationary_offset_from_target_px": 0.0,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": 0.0,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r1_s7_baseline_spawn.jsonl",
+      "trajectory_sha256": "cfb709cd229e4d089af7293c424a2ced70d5b4964d451e322c45266a8aec0aa8",
+      "trajectory_bytes": 108404,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 1,
+      "seed": 7,
+      "mode": "still_center_lower",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 718,
+      "engine_ep_frames": 718,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        0.0,
+        392.0
+      ],
+      "target_reached_step": 30,
+      "target_reached_xy": [
+        -1.131,
+        395.272
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 685,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -1.131,
+        388.772
+      ],
+      "stationary_offset_from_target_px": 3.42,
+      "post_arrival_nonzero_direction_frames": 2,
+      "post_arrival_max_drift_from_target_px": 3.462,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r1_s7_baseline_0.0_392.0.jsonl",
+      "trajectory_sha256": "b228897af9ff61651e6e25c7e0acb254112fc616fd6c3d4e2b398ed4b24e1832",
+      "trajectory_bytes": 109119,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 1,
+      "seed": 7,
+      "mode": "still_left_lower",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 376,
+      "engine_ep_frames": 376,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -128.0,
+        392.0
+      ],
+      "target_reached_step": 68,
+      "target_reached_xy": [
+        -125.013,
+        392.846
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 306,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -127.013,
+        392.846
+      ],
+      "stationary_offset_from_target_px": 1.3,
+      "post_arrival_nonzero_direction_frames": 1,
+      "post_arrival_max_drift_from_target_px": 3.104,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r1_s7_baseline_-128.0_392.0.jsonl",
+      "trajectory_sha256": "16a145aeb8072aa8647ad8bb5e82830574df2b33f43375077b0f4d30adf6b92a",
+      "trajectory_bytes": 57790,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 1,
+      "seed": 7,
+      "mode": "still_right_lower",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 1303,
+      "engine_ep_frames": 1303,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        128.0,
+        392.0
+      ],
+      "target_reached_step": 82,
+      "target_reached_xy": [
+        125.296,
+        392.846
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 1219,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        127.296,
+        392.846
+      ],
+      "stationary_offset_from_target_px": 1.101,
+      "post_arrival_nonzero_direction_frames": 1,
+      "post_arrival_max_drift_from_target_px": 2.833,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r1_s7_baseline_128.0_392.0.jsonl",
+      "trajectory_sha256": "9b21c5264a07ae407de576d4487d243626de972772913087a30fd0bdb667a045",
+      "trajectory_bytes": 199641,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 1,
+      "seed": 7,
+      "mode": "still_left_upper",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 472,
+      "engine_ep_frames": 472,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -128.0,
+        80.0
+      ],
+      "target_reached_step": 207,
+      "target_reached_xy": [
+        -126.996,
+        82.863
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 264,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -126.996,
+        82.863
+      ],
+      "stationary_offset_from_target_px": 3.034,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": 3.034,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r1_s7_baseline_-128.0_80.0.jsonl",
+      "trajectory_sha256": "f3d61809252fc3d364c84693009d3a63ad3279b786036f5667e2edb7957a2ea2",
+      "trajectory_bytes": 72320,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 1,
+      "seed": 7,
+      "mode": "still_right_upper",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 288,
+      "engine_ep_frames": 288,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        128.0,
+        80.0
+      ],
+      "target_reached_step": 213,
+      "target_reached_xy": [
+        128.977,
+        83.164
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 73,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": null,
+      "stationary_offset_from_target_px": null,
+      "post_arrival_nonzero_direction_frames": 1,
+      "post_arrival_max_drift_from_target_px": 3.312,
+      "stationary_qualified": false,
+      "stationary_qualification_status": "NOT_PROVEN",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r1_s7_baseline_128.0_80.0.jsonl",
+      "trajectory_sha256": "9d891b8eb53915671f6d9a90c845e61d7756a04ab01aa87db4e23c0e69da6c02",
+      "trajectory_bytes": 43762,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 1,
+      "seed": 7,
+      "mode": "still_top_left",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 226,
+      "engine_ep_frames": 226,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -192.0,
+        0.0
+      ],
+      "target_reached_step": null,
+      "target_reached_xy": null,
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 0,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": null,
+      "stationary_offset_from_target_px": null,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": 0.0,
+      "stationary_qualified": false,
+      "stationary_qualification_status": "NOT_REACHED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r1_s7_baseline_-192.0_0.0.jsonl",
+      "trajectory_sha256": "cd816bab7e2c260116ffac030c1079962114c2ad14b5bbb5426eb601d881f1c9",
+      "trajectory_bytes": 34518,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 1,
+      "seed": 7,
+      "mode": "still_top_right",
+      "status": "SUCCESS",
+      "done": 2,
+      "steps": 1747,
+      "engine_ep_frames": 1747,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        192.0,
+        0.0
+      ],
+      "target_reached_step": 267,
+      "target_reached_xy": [
+        192.0,
+        2.11
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 1477,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        192.0,
+        0.0
+      ],
+      "stationary_offset_from_target_px": 0.0,
+      "post_arrival_nonzero_direction_frames": 2,
+      "post_arrival_max_drift_from_target_px": 2.11,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r1_s7_baseline_192.0_0.0.jsonl",
+      "trajectory_sha256": "43d7e3e4115a1366c2ffb6c44f7ee951b6f54133f20b95e79461a908a6fbc132",
+      "trajectory_bytes": 258715,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 1,
+      "seed": 7,
+      "mode": "still_bottom_left",
+      "status": "SUCCESS",
+      "done": 2,
+      "steps": 1747,
+      "engine_ep_frames": 1747,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -192.0,
+        448.0
+      ],
+      "target_reached_step": 89,
+      "target_reached_xy": [
+        -189.859,
+        448.0
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 1656,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -191.859,
+        448.0
+      ],
+      "stationary_offset_from_target_px": 0.141,
+      "post_arrival_nonzero_direction_frames": 1,
+      "post_arrival_max_drift_from_target_px": 2.141,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r1_s7_baseline_-192.0_448.0.jsonl",
+      "trajectory_sha256": "94f72213f387ae12e3a04972c478435e426526664b24149ead3e4b24f85ed5c2",
+      "trajectory_bytes": 266419,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 1,
+      "seed": 7,
+      "mode": "still_bottom_right",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 1396,
+      "engine_ep_frames": 1396,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        192.0,
+        448.0
+      ],
+      "target_reached_step": 102,
+      "target_reached_xy": [
+        188.141,
+        448.0
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 1291,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        192.0,
+        448.0
+      ],
+      "stationary_offset_from_target_px": 0.0,
+      "post_arrival_nonzero_direction_frames": 2,
+      "post_arrival_max_drift_from_target_px": 3.859,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r1_s7_baseline_192.0_448.0.jsonl",
+      "trajectory_sha256": "42799cdba6b96f4259ab8b2466fe52eea74d0c7f67fe1716ca24e433717d75c7",
+      "trajectory_bytes": 208631,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 2,
+      "seed": 1,
+      "mode": "heuristic",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 1344,
+      "engine_ep_frames": 1344,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": null,
+      "target_reached_step": null,
+      "target_reached_xy": null,
+      "target_tolerance_px": null,
+      "stationary_required_frames": null,
+      "stationary_radius_px": null,
+      "stationary_frames_max": null,
+      "stationary_max_drift_px": null,
+      "stationary_settled_xy": null,
+      "stationary_offset_from_target_px": null,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": null,
+      "stationary_qualified": false,
+      "stationary_qualification_status": "NOT_APPLICABLE",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r2_s1_heuristic.jsonl",
+      "trajectory_sha256": "d9badfd561870c4053875757546451de8a537289eafdd5f5bc80f83c33aa4720",
+      "trajectory_bytes": 202944,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 2,
+      "seed": 1,
+      "mode": "stationary_at_actual_spawn",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 737,
+      "engine_ep_frames": 737,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "target_reached_step": 0,
+      "target_reached_xy": [
+        -31.82,
+        415.82
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 736,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -31.82,
+        415.82
+      ],
+      "stationary_offset_from_target_px": 0.0,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": 0.0,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r2_s1_baseline_spawn.jsonl",
+      "trajectory_sha256": "1ed56ecd1a99cca19741684fce46d0bf62466aed0b886f7e324614c19d9a560d",
+      "trajectory_bytes": 111199,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 2,
+      "seed": 1,
+      "mode": "still_center_lower",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 737,
+      "engine_ep_frames": 737,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        0.0,
+        392.0
+      ],
+      "target_reached_step": 22,
+      "target_reached_xy": [
+        -3.535,
+        393.192
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 713,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -2.121,
+        394.607
+      ],
+      "stationary_offset_from_target_px": 3.361,
+      "post_arrival_nonzero_direction_frames": 1,
+      "post_arrival_max_drift_from_target_px": 3.731,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r2_s1_baseline_0.0_392.0.jsonl",
+      "trajectory_sha256": "ef717d1a8aab7038355f73f0ab37853b4fceffe063a7498cf60cd77be6e49d01",
+      "trajectory_bytes": 111947,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 2,
+      "seed": 1,
+      "mode": "still_left_lower",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 404,
+      "engine_ep_frames": 404,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -128.0,
+        392.0
+      ],
+      "target_reached_step": 57,
+      "target_reached_xy": [
+        -126.004,
+        391.778
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 345,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -128.004,
+        391.778
+      ],
+      "stationary_offset_from_target_px": 0.222,
+      "post_arrival_nonzero_direction_frames": 1,
+      "post_arrival_max_drift_from_target_px": 2.009,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r2_s1_baseline_-128.0_392.0.jsonl",
+      "trajectory_sha256": "44b92755c7063fe742ccdc1ecb1c1cd835927a0218925f55b7d925315414f509",
+      "trajectory_bytes": 62131,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 2,
+      "seed": 1,
+      "mode": "still_right_lower",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 1295,
+      "engine_ep_frames": 1295,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        128.0,
+        392.0
+      ],
+      "target_reached_step": 88,
+      "target_reached_xy": [
+        124.364,
+        391.778
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 1204,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        128.364,
+        391.778
+      ],
+      "stationary_offset_from_target_px": 0.426,
+      "post_arrival_nonzero_direction_frames": 2,
+      "post_arrival_max_drift_from_target_px": 3.643,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r2_s1_baseline_128.0_392.0.jsonl",
+      "trajectory_sha256": "2065c78ddbd9c1cc67dcf1f6d561adbe5178c9f837af531be0fa14545d7dc3ab",
+      "trajectory_bytes": 198399,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 2,
+      "seed": 1,
+      "mode": "still_left_upper",
+      "status": "SUCCESS",
+      "done": 2,
+      "steps": 1793,
+      "engine_ep_frames": 1793,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -128.0,
+        80.0
+      ],
+      "target_reached_step": 188,
+      "target_reached_xy": [
+        -127.986,
+        83.653
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 1604,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -127.986,
+        83.653
+      ],
+      "stationary_offset_from_target_px": 3.653,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": 3.653,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r2_s1_baseline_-128.0_80.0.jsonl",
+      "trajectory_sha256": "fd28e52575bb2ee77bdd0c09b03e93b4aa9193cb3db6fa4ffa3e1260b868103a",
+      "trajectory_bytes": 275362,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 2,
+      "seed": 1,
+      "mode": "still_right_upper",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 321,
+      "engine_ep_frames": 321,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        128.0,
+        80.0
+      ],
+      "target_reached_step": 202,
+      "target_reached_xy": [
+        127.987,
+        82.013
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 117,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": null,
+      "stationary_offset_from_target_px": null,
+      "post_arrival_nonzero_direction_frames": 1,
+      "post_arrival_max_drift_from_target_px": 2.014,
+      "stationary_qualified": false,
+      "stationary_qualification_status": "NOT_PROVEN",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r2_s1_baseline_128.0_80.0.jsonl",
+      "trajectory_sha256": "5fa76e10ccd3d5c0e74e1f787df06b452f374f60844f1237ab1738641288ea62",
+      "trajectory_bytes": 48768,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 2,
+      "seed": 1,
+      "mode": "still_top_left",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 239,
+      "engine_ep_frames": 239,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -192.0,
+        0.0
+      ],
+      "target_reached_step": null,
+      "target_reached_xy": null,
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 0,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": null,
+      "stationary_offset_from_target_px": null,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": 0.0,
+      "stationary_qualified": false,
+      "stationary_qualification_status": "NOT_REACHED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r2_s1_baseline_-192.0_0.0.jsonl",
+      "trajectory_sha256": "965b120b4df83696cb1aebd2d03b2c6b73bbda3a09c3b7e10ee60ffc9ada0246",
+      "trajectory_bytes": 36440,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 2,
+      "seed": 1,
+      "mode": "still_top_right",
+      "status": "SUCCESS",
+      "done": 2,
+      "steps": 1793,
+      "engine_ep_frames": 1793,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        192.0,
+        0.0
+      ],
+      "target_reached_step": 255,
+      "target_reached_xy": [
+        192.0,
+        3.545
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 1537,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        192.0,
+        3.545
+      ],
+      "stationary_offset_from_target_px": 3.545,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": 3.545,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r2_s1_baseline_192.0_0.0.jsonl",
+      "trajectory_sha256": "a158af432d032a8dedf1fee115ef6892252ec9f044b231a961ec44fb9f84a178",
+      "trajectory_bytes": 268665,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 2,
+      "seed": 1,
+      "mode": "still_bottom_left",
+      "status": "SUCCESS",
+      "done": 2,
+      "steps": 1793,
+      "engine_ep_frames": 1793,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -192.0,
+        448.0
+      ],
+      "target_reached_step": 87,
+      "target_reached_xy": [
+        -188.347,
+        448.0
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 1704,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -190.347,
+        448.0
+      ],
+      "stationary_offset_from_target_px": 1.653,
+      "post_arrival_nonzero_direction_frames": 1,
+      "post_arrival_max_drift_from_target_px": 3.653,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r2_s1_baseline_-192.0_448.0.jsonl",
+      "trajectory_sha256": "7b0116f32259d1a24187df227da3c5e9f3672e7ab3702bd7fce71a1b87bfc356",
+      "trajectory_bytes": 273474,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 2,
+      "seed": 1,
+      "mode": "still_bottom_right",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 1421,
+      "engine_ep_frames": 1421,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        192.0,
+        448.0
+      ],
+      "target_reached_step": 119,
+      "target_reached_xy": [
+        188.707,
+        448.0
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 1301,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        188.707,
+        448.0
+      ],
+      "stationary_offset_from_target_px": 3.293,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": 3.293,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r2_s1_baseline_192.0_448.0.jsonl",
+      "trajectory_sha256": "57dfead2c29224d9b3c6681f772347f10e60026e6332279a846a5fd8e691fac7",
+      "trajectory_bytes": 215055,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 2,
+      "seed": 7,
+      "mode": "heuristic",
+      "status": "SUCCESS",
+      "done": 2,
+      "steps": 1747,
+      "engine_ep_frames": 1747,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": null,
+      "target_reached_step": null,
+      "target_reached_xy": null,
+      "target_tolerance_px": null,
+      "stationary_required_frames": null,
+      "stationary_radius_px": null,
+      "stationary_frames_max": null,
+      "stationary_max_drift_px": null,
+      "stationary_settled_xy": null,
+      "stationary_offset_from_target_px": null,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": null,
+      "stationary_qualified": false,
+      "stationary_qualification_status": "NOT_APPLICABLE",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r2_s7_heuristic.jsonl",
+      "trajectory_sha256": "378711d96c6e3b7ab1fccd7dfac5148dbd1ffdc1ac22f265db0dfd1dd07aa9d0",
+      "trajectory_bytes": 264988,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 2,
+      "seed": 7,
+      "mode": "stationary_at_actual_spawn",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 703,
+      "engine_ep_frames": 703,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "target_reached_step": 0,
+      "target_reached_xy": [
+        -13.859,
+        448.0
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 702,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -13.859,
+        448.0
+      ],
+      "stationary_offset_from_target_px": 0.0,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": 0.0,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r2_s7_baseline_spawn.jsonl",
+      "trajectory_sha256": "415958cd31af03c8daa5789dd0fd2274da8b8d4c3f3ae177939ddad6634e63a0",
+      "trajectory_bytes": 106139,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 2,
+      "seed": 7,
+      "mode": "still_center_lower",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 703,
+      "engine_ep_frames": 703,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        0.0,
+        392.0
+      ],
+      "target_reached_step": 30,
+      "target_reached_xy": [
+        -1.131,
+        395.272
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 670,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -1.131,
+        388.772
+      ],
+      "stationary_offset_from_target_px": 3.42,
+      "post_arrival_nonzero_direction_frames": 2,
+      "post_arrival_max_drift_from_target_px": 3.462,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r2_s7_baseline_0.0_392.0.jsonl",
+      "trajectory_sha256": "890518f8fe226e704da4d00c4871b388c47dfc1125f122e5c68f32fa80c00998",
+      "trajectory_bytes": 106839,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 2,
+      "seed": 7,
+      "mode": "still_left_lower",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 361,
+      "engine_ep_frames": 361,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -128.0,
+        392.0
+      ],
+      "target_reached_step": 68,
+      "target_reached_xy": [
+        -125.013,
+        392.846
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 291,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -127.013,
+        392.846
+      ],
+      "stationary_offset_from_target_px": 1.3,
+      "post_arrival_nonzero_direction_frames": 1,
+      "post_arrival_max_drift_from_target_px": 3.104,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r2_s7_baseline_-128.0_392.0.jsonl",
+      "trajectory_sha256": "faa984025646bd575dba3cdef847071a157a1beb2985ecbd47d40d45cf56d5ca",
+      "trajectory_bytes": 55480,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 2,
+      "seed": 7,
+      "mode": "still_right_lower",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 1254,
+      "engine_ep_frames": 1254,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        128.0,
+        392.0
+      ],
+      "target_reached_step": 82,
+      "target_reached_xy": [
+        125.296,
+        392.846
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 1170,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        127.296,
+        392.846
+      ],
+      "stationary_offset_from_target_px": 1.101,
+      "post_arrival_nonzero_direction_frames": 1,
+      "post_arrival_max_drift_from_target_px": 2.833,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r2_s7_baseline_128.0_392.0.jsonl",
+      "trajectory_sha256": "41924e832a8f0ddd20ceb873fb4f0d36a3550474406ca9d926744460430ae793",
+      "trajectory_bytes": 192092,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 2,
+      "seed": 7,
+      "mode": "still_left_upper",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 420,
+      "engine_ep_frames": 420,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -128.0,
+        80.0
+      ],
+      "target_reached_step": 207,
+      "target_reached_xy": [
+        -126.996,
+        82.863
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 212,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -126.996,
+        82.863
+      ],
+      "stationary_offset_from_target_px": 3.034,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": 3.034,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r2_s7_baseline_-128.0_80.0.jsonl",
+      "trajectory_sha256": "15b1f935c32ed04f793514bbf6836c8a97709ba4fe35a7c6a5aed74863e1750d",
+      "trajectory_bytes": 64346,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 2,
+      "seed": 7,
+      "mode": "still_right_upper",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 273,
+      "engine_ep_frames": 273,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        128.0,
+        80.0
+      ],
+      "target_reached_step": 213,
+      "target_reached_xy": [
+        128.977,
+        83.164
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 58,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": null,
+      "stationary_offset_from_target_px": null,
+      "post_arrival_nonzero_direction_frames": 1,
+      "post_arrival_max_drift_from_target_px": 3.312,
+      "stationary_qualified": false,
+      "stationary_qualification_status": "NOT_PROVEN",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r2_s7_baseline_128.0_80.0.jsonl",
+      "trajectory_sha256": "ea04759e42d845ac06d7d951a8a4888ea3430111be2e1bd8ee5424651288987c",
+      "trajectory_bytes": 41482,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 2,
+      "seed": 7,
+      "mode": "still_top_left",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 218,
+      "engine_ep_frames": 218,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -192.0,
+        0.0
+      ],
+      "target_reached_step": null,
+      "target_reached_xy": null,
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 0,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": null,
+      "stationary_offset_from_target_px": null,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": 0.0,
+      "stationary_qualified": false,
+      "stationary_qualification_status": "NOT_REACHED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r2_s7_baseline_-192.0_0.0.jsonl",
+      "trajectory_sha256": "8e9b7786fca0e93c3eacd61eeba2acce4084834464c079d2c4d92ca0dacc08df",
+      "trajectory_bytes": 33310,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 2,
+      "seed": 7,
+      "mode": "still_top_right",
+      "status": "SUCCESS",
+      "done": 2,
+      "steps": 1747,
+      "engine_ep_frames": 1747,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        192.0,
+        0.0
+      ],
+      "target_reached_step": 267,
+      "target_reached_xy": [
+        192.0,
+        2.11
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 1477,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        192.0,
+        0.0
+      ],
+      "stationary_offset_from_target_px": 0.0,
+      "post_arrival_nonzero_direction_frames": 2,
+      "post_arrival_max_drift_from_target_px": 2.11,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r2_s7_baseline_192.0_0.0.jsonl",
+      "trajectory_sha256": "69dae03d852ecf473fda43cc37de2bbe0241c199c72c47ab2d3d5d284433173e",
+      "trajectory_bytes": 258715,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 2,
+      "seed": 7,
+      "mode": "still_bottom_left",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 1471,
+      "engine_ep_frames": 1471,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -192.0,
+        448.0
+      ],
+      "target_reached_step": 89,
+      "target_reached_xy": [
+        -189.859,
+        448.0
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 1380,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -191.859,
+        448.0
+      ],
+      "stationary_offset_from_target_px": 0.141,
+      "post_arrival_nonzero_direction_frames": 1,
+      "post_arrival_max_drift_from_target_px": 2.141,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r2_s7_baseline_-192.0_448.0.jsonl",
+      "trajectory_sha256": "80c0ee0caa74c3d9a258059f34e3240dcd6f800f3f75f0e210f549257fa32b86",
+      "trajectory_bytes": 224191,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 2,
+      "seed": 7,
+      "mode": "still_bottom_right",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 1381,
+      "engine_ep_frames": 1381,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        192.0,
+        448.0
+      ],
+      "target_reached_step": 102,
+      "target_reached_xy": [
+        188.141,
+        448.0
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 1276,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        192.0,
+        448.0
+      ],
+      "stationary_offset_from_target_px": 0.0,
+      "post_arrival_nonzero_direction_frames": 2,
+      "post_arrival_max_drift_from_target_px": 3.859,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r2_s7_baseline_192.0_448.0.jsonl",
+      "trajectory_sha256": "ae9e9ecf616a495a2a3dc0098f8631faeba4666fb71b4c62b7486434f3d45f45",
+      "trajectory_bytes": 206381,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 3,
+      "seed": 1,
+      "mode": "heuristic",
+      "status": "SUCCESS",
+      "done": 2,
+      "steps": 1793,
+      "engine_ep_frames": 1793,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": null,
+      "target_reached_step": null,
+      "target_reached_xy": null,
+      "target_tolerance_px": null,
+      "stationary_required_frames": null,
+      "stationary_radius_px": null,
+      "stationary_frames_max": null,
+      "stationary_max_drift_px": null,
+      "stationary_settled_xy": null,
+      "stationary_offset_from_target_px": null,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": null,
+      "stationary_qualified": false,
+      "stationary_qualification_status": "NOT_APPLICABLE",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r3_s1_heuristic.jsonl",
+      "trajectory_sha256": "96c3875e6ac638a92a83bd63cb887eb5d9ff7d668a5971ab32cae2c024edd578",
+      "trajectory_bytes": 272281,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 3,
+      "seed": 1,
+      "mode": "stationary_at_actual_spawn",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 722,
+      "engine_ep_frames": 722,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "target_reached_step": 0,
+      "target_reached_xy": [
+        -31.82,
+        415.82
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 721,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -31.82,
+        415.82
+      ],
+      "stationary_offset_from_target_px": 0.0,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": 0.0,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r3_s1_baseline_spawn.jsonl",
+      "trajectory_sha256": "3c01433d8cbe4a69a507dc1ee956fe9435447dfca9723374edff74cb8888bf55",
+      "trajectory_bytes": 108934,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 3,
+      "seed": 1,
+      "mode": "still_center_lower",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 722,
+      "engine_ep_frames": 722,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        0.0,
+        392.0
+      ],
+      "target_reached_step": 22,
+      "target_reached_xy": [
+        -3.535,
+        393.192
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 698,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -2.121,
+        394.607
+      ],
+      "stationary_offset_from_target_px": 3.361,
+      "post_arrival_nonzero_direction_frames": 1,
+      "post_arrival_max_drift_from_target_px": 3.731,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r3_s1_baseline_0.0_392.0.jsonl",
+      "trajectory_sha256": "4dea507ec316b8f8634d389182ee2da0fb893a02b4be0072cdfe76ae8c30bec0",
+      "trajectory_bytes": 109667,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 3,
+      "seed": 1,
+      "mode": "still_left_lower",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 389,
+      "engine_ep_frames": 389,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -128.0,
+        392.0
+      ],
+      "target_reached_step": 57,
+      "target_reached_xy": [
+        -126.004,
+        391.778
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 330,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -128.004,
+        391.778
+      ],
+      "stationary_offset_from_target_px": 0.222,
+      "post_arrival_nonzero_direction_frames": 1,
+      "post_arrival_max_drift_from_target_px": 2.009,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r3_s1_baseline_-128.0_392.0.jsonl",
+      "trajectory_sha256": "e27d5d70f16bcee5ef6ede150ad98ab0094c6485fdf59a45b4d70c971296b6d6",
+      "trajectory_bytes": 59821,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 3,
+      "seed": 1,
+      "mode": "still_right_lower",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 1250,
+      "engine_ep_frames": 1250,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        128.0,
+        392.0
+      ],
+      "target_reached_step": 88,
+      "target_reached_xy": [
+        124.364,
+        391.778
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 1159,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        128.364,
+        391.778
+      ],
+      "stationary_offset_from_target_px": 0.426,
+      "post_arrival_nonzero_direction_frames": 2,
+      "post_arrival_max_drift_from_target_px": 3.643,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r3_s1_baseline_128.0_392.0.jsonl",
+      "trajectory_sha256": "46bbcc7c29f0f63a27d79151750a4bb129af1a7a73dec98b0cf14e50f5b973c7",
+      "trajectory_bytes": 191453,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 3,
+      "seed": 1,
+      "mode": "still_left_upper",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 449,
+      "engine_ep_frames": 449,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -128.0,
+        80.0
+      ],
+      "target_reached_step": 188,
+      "target_reached_xy": [
+        -127.986,
+        83.653
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 260,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -127.986,
+        83.653
+      ],
+      "stationary_offset_from_target_px": 3.653,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": 3.653,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r3_s1_baseline_-128.0_80.0.jsonl",
+      "trajectory_sha256": "c37d65d89203b57d0f581867286f4e4de511ec9cd88c6a6ef21f62c73adc003d",
+      "trajectory_bytes": 68787,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 3,
+      "seed": 1,
+      "mode": "still_right_upper",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 306,
+      "engine_ep_frames": 306,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        128.0,
+        80.0
+      ],
+      "target_reached_step": 202,
+      "target_reached_xy": [
+        127.987,
+        82.013
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 102,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": null,
+      "stationary_offset_from_target_px": null,
+      "post_arrival_nonzero_direction_frames": 1,
+      "post_arrival_max_drift_from_target_px": 2.014,
+      "stationary_qualified": false,
+      "stationary_qualification_status": "NOT_PROVEN",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r3_s1_baseline_128.0_80.0.jsonl",
+      "trajectory_sha256": "97aced00730c2b4aa8b249ff843a2a7e666d20db51d7df77c42bee9fbe6ab493",
+      "trajectory_bytes": 46488,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 3,
+      "seed": 1,
+      "mode": "still_top_left",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 224,
+      "engine_ep_frames": 224,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -192.0,
+        0.0
+      ],
+      "target_reached_step": null,
+      "target_reached_xy": null,
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 0,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": null,
+      "stationary_offset_from_target_px": null,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": 0.0,
+      "stationary_qualified": false,
+      "stationary_qualification_status": "NOT_REACHED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r3_s1_baseline_-192.0_0.0.jsonl",
+      "trajectory_sha256": "6b96ae59102ddce8df22a5834acd94c59faf5602b87d2bdd703ce8f8851bb9e7",
+      "trajectory_bytes": 34175,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 3,
+      "seed": 1,
+      "mode": "still_top_right",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 300,
+      "engine_ep_frames": 300,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        192.0,
+        0.0
+      ],
+      "target_reached_step": 255,
+      "target_reached_xy": [
+        192.0,
+        3.545
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 44,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": null,
+      "stationary_offset_from_target_px": null,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": 3.545,
+      "stationary_qualified": false,
+      "stationary_qualification_status": "NOT_PROVEN",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r3_s1_baseline_192.0_0.0.jsonl",
+      "trajectory_sha256": "c25c1a7256834640ac904be156b23985d28277fc8d825c72dd55c46c9808f42a",
+      "trajectory_bytes": 45245,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 3,
+      "seed": 1,
+      "mode": "still_bottom_left",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 1484,
+      "engine_ep_frames": 1484,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -192.0,
+        448.0
+      ],
+      "target_reached_step": 87,
+      "target_reached_xy": [
+        -188.347,
+        448.0
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 1395,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -190.347,
+        448.0
+      ],
+      "stationary_offset_from_target_px": 1.653,
+      "post_arrival_nonzero_direction_frames": 1,
+      "post_arrival_max_drift_from_target_px": 3.653,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r3_s1_baseline_-192.0_448.0.jsonl",
+      "trajectory_sha256": "cfd74105c669547ee5afe3a9e657622a86669e5451f6c3e4890993047bb05bf9",
+      "trajectory_bytes": 226197,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 3,
+      "seed": 1,
+      "mode": "still_bottom_right",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 1406,
+      "engine_ep_frames": 1406,
+      "start_xy": [
+        -31.81976318359375,
+        415.81976318359375
+      ],
+      "end_xy": null,
+      "target_xy": [
+        192.0,
+        448.0
+      ],
+      "target_reached_step": 119,
+      "target_reached_xy": [
+        188.707,
+        448.0
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 1286,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        188.707,
+        448.0
+      ],
+      "stationary_offset_from_target_px": 3.293,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": 3.293,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r3_s1_baseline_192.0_448.0.jsonl",
+      "trajectory_sha256": "f7fd58dac5da682ff589e034989c6f26ca18bb7130af6eb6d0e168f058697ff3",
+      "trajectory_bytes": 212775,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 3,
+      "seed": 7,
+      "mode": "heuristic",
+      "status": "SUCCESS",
+      "done": 2,
+      "steps": 1747,
+      "engine_ep_frames": 1747,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": null,
+      "target_reached_step": null,
+      "target_reached_xy": null,
+      "target_tolerance_px": null,
+      "stationary_required_frames": null,
+      "stationary_radius_px": null,
+      "stationary_frames_max": null,
+      "stationary_max_drift_px": null,
+      "stationary_settled_xy": null,
+      "stationary_offset_from_target_px": null,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": null,
+      "stationary_qualified": false,
+      "stationary_qualification_status": "NOT_APPLICABLE",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r3_s7_heuristic.jsonl",
+      "trajectory_sha256": "dd225563f3909582387d47a1096c620734ac840186468b4fcb226054fb9ed63e",
+      "trajectory_bytes": 265276,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 3,
+      "seed": 7,
+      "mode": "stationary_at_actual_spawn",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 688,
+      "engine_ep_frames": 688,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "target_reached_step": 0,
+      "target_reached_xy": [
+        -13.859,
+        448.0
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 687,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -13.859,
+        448.0
+      ],
+      "stationary_offset_from_target_px": 0.0,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": 0.0,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r3_s7_baseline_spawn.jsonl",
+      "trajectory_sha256": "5a77b99a2be1c7866e53a89881123496f1782842368cabf80f7dff3cc3e1c8d0",
+      "trajectory_bytes": 103874,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 3,
+      "seed": 7,
+      "mode": "still_center_lower",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 688,
+      "engine_ep_frames": 688,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        0.0,
+        392.0
+      ],
+      "target_reached_step": 30,
+      "target_reached_xy": [
+        -1.131,
+        395.272
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 655,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -1.131,
+        388.772
+      ],
+      "stationary_offset_from_target_px": 3.42,
+      "post_arrival_nonzero_direction_frames": 2,
+      "post_arrival_max_drift_from_target_px": 3.462,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r3_s7_baseline_0.0_392.0.jsonl",
+      "trajectory_sha256": "5a1857e1bd53869e782c9a9a2544030bc7467e536d781376d7fed1be179c0731",
+      "trajectory_bytes": 104559,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 3,
+      "seed": 7,
+      "mode": "still_left_lower",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 346,
+      "engine_ep_frames": 346,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -128.0,
+        392.0
+      ],
+      "target_reached_step": 68,
+      "target_reached_xy": [
+        -125.013,
+        392.846
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 276,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -127.013,
+        392.846
+      ],
+      "stationary_offset_from_target_px": 1.3,
+      "post_arrival_nonzero_direction_frames": 1,
+      "post_arrival_max_drift_from_target_px": 3.104,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r3_s7_baseline_-128.0_392.0.jsonl",
+      "trajectory_sha256": "62e3fcfb0355b0988d3a6f5da8bddf234cd8ac47ac867b01b7ad87178ba79b8f",
+      "trajectory_bytes": 53170,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 3,
+      "seed": 7,
+      "mode": "still_right_lower",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 1208,
+      "engine_ep_frames": 1208,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        128.0,
+        392.0
+      ],
+      "target_reached_step": 82,
+      "target_reached_xy": [
+        125.296,
+        392.846
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 1124,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        127.296,
+        392.846
+      ],
+      "stationary_offset_from_target_px": 1.101,
+      "post_arrival_nonzero_direction_frames": 1,
+      "post_arrival_max_drift_from_target_px": 2.833,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r3_s7_baseline_128.0_392.0.jsonl",
+      "trajectory_sha256": "d40a56baebdab96a7a30efad2e8683571e204318c731a810b5ba4a0b663bc3e8",
+      "trajectory_bytes": 185008,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 3,
+      "seed": 7,
+      "mode": "still_left_upper",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 367,
+      "engine_ep_frames": 367,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -128.0,
+        80.0
+      ],
+      "target_reached_step": 207,
+      "target_reached_xy": [
+        -126.996,
+        82.863
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 159,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -126.996,
+        82.863
+      ],
+      "stationary_offset_from_target_px": 3.034,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": 3.034,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r3_s7_baseline_-128.0_80.0.jsonl",
+      "trajectory_sha256": "d47fc2dd87b9480628256038968696aa2b9f85313faa4ecbfd9c9de2c50b252f",
+      "trajectory_bytes": 56237,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 3,
+      "seed": 7,
+      "mode": "still_right_upper",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 258,
+      "engine_ep_frames": 258,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        128.0,
+        80.0
+      ],
+      "target_reached_step": 213,
+      "target_reached_xy": [
+        128.977,
+        83.164
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 43,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": null,
+      "stationary_offset_from_target_px": null,
+      "post_arrival_nonzero_direction_frames": 1,
+      "post_arrival_max_drift_from_target_px": 3.312,
+      "stationary_qualified": false,
+      "stationary_qualification_status": "NOT_PROVEN",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r3_s7_baseline_128.0_80.0.jsonl",
+      "trajectory_sha256": "5411364c478abd250c3a681add20d358eca70b5b084c9be6f35e6994deab7b79",
+      "trajectory_bytes": 39202,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 3,
+      "seed": 7,
+      "mode": "still_top_left",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 208,
+      "engine_ep_frames": 208,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -192.0,
+        0.0
+      ],
+      "target_reached_step": null,
+      "target_reached_xy": null,
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 0,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": null,
+      "stationary_offset_from_target_px": null,
+      "post_arrival_nonzero_direction_frames": 0,
+      "post_arrival_max_drift_from_target_px": 0.0,
+      "stationary_qualified": false,
+      "stationary_qualification_status": "NOT_REACHED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r3_s7_baseline_-192.0_0.0.jsonl",
+      "trajectory_sha256": "2ac9658a4f188c9ed0c170ec7296f566693b777c44ab1d6d4fd8eb8b9bbc792d",
+      "trajectory_bytes": 31795,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 3,
+      "seed": 7,
+      "mode": "still_top_right",
+      "status": "SUCCESS",
+      "done": 2,
+      "steps": 1747,
+      "engine_ep_frames": 1747,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        192.0,
+        0.0
+      ],
+      "target_reached_step": 267,
+      "target_reached_xy": [
+        192.0,
+        2.11
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 1477,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        192.0,
+        0.0
+      ],
+      "stationary_offset_from_target_px": 0.0,
+      "post_arrival_nonzero_direction_frames": 2,
+      "post_arrival_max_drift_from_target_px": 2.11,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r3_s7_baseline_192.0_0.0.jsonl",
+      "trajectory_sha256": "6a77bfbca5ff8beea89768edd47a7e7529cbd276bff99648e096ba975d82cf1f",
+      "trajectory_bytes": 258715,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 3,
+      "seed": 7,
+      "mode": "still_bottom_left",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 1412,
+      "engine_ep_frames": 1412,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        -192.0,
+        448.0
+      ],
+      "target_reached_step": 89,
+      "target_reached_xy": [
+        -189.859,
+        448.0
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 1321,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        -191.859,
+        448.0
+      ],
+      "stationary_offset_from_target_px": 0.141,
+      "post_arrival_nonzero_direction_frames": 1,
+      "post_arrival_max_drift_from_target_px": 2.141,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r3_s7_baseline_-192.0_448.0.jsonl",
+      "trajectory_sha256": "ebe45fc529fe2ab9a2280ecc9aeecc164310d4339a29160c5694cf19ee971ad4",
+      "trajectory_bytes": 215164,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "rank": 3,
+      "seed": 7,
+      "mode": "still_bottom_right",
+      "status": "DEATH",
+      "done": 1,
+      "steps": 1366,
+      "engine_ep_frames": 1366,
+      "start_xy": [
+        -13.858734130859375,
+        448.0
+      ],
+      "end_xy": null,
+      "target_xy": [
+        192.0,
+        448.0
+      ],
+      "target_reached_step": 102,
+      "target_reached_xy": [
+        188.141,
+        448.0
+      ],
+      "target_tolerance_px": 4.0,
+      "stationary_required_frames": 120,
+      "stationary_radius_px": 4.0,
+      "stationary_frames_max": 1261,
+      "stationary_max_drift_px": 0.0,
+      "stationary_settled_xy": [
+        192.0,
+        448.0
+      ],
+      "stationary_offset_from_target_px": 0.0,
+      "post_arrival_nonzero_direction_frames": 2,
+      "post_arrival_max_drift_from_target_px": 3.859,
+      "stationary_qualified": true,
+      "stationary_qualification_status": "QUALIFIED",
+      "player_state_start": {
+        "hit_radius_px": 2.5,
+        "speed_px_per_frame": 4.5,
+        "focus": false
+      },
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_bars_04/042c46297ba9/trajectories/laser_sp_bars_04_r3_s7_baseline_192.0_448.0.jsonl",
+      "trajectory_sha256": "78f39954ffb0fda1454622a1ec5410a95389fcb788d67a33fb87518b7d9f6797",
+      "trajectory_bytes": 204131,
+      "auto_reset_note": "stopped on first done; returned observation may be the next reset state"
+    }
+  ],
+  "limitations": [
+    "heuristic failure is NOT_PROVEN, not evidence of mathematical unsolvability",
+    "prediction is linear over current visible laser velocities and does not inspect ECL or future RNG",
+    "unknown future spawns, changing velocities and motor random draws can invalidate the short horizon",
+    "baselines that fail to reach a requested point report target_reached_step=null"
+  ],
+  "reproducible_cli": ".venv/bin/python -m stgtrain.specialist_feasibility /tmp/sunyunbo/stg-laser-batch3/laser_sp_bars_04 --json /data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/final/laser_sp_bars_04/feasibility --ranks 0 1 2 3 --seeds 1 7 --max-frames 1860 --baselines"
+}

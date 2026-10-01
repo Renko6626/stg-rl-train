@@ -53,6 +53,45 @@ class EvalSpec:
     episodes: int
 
 
+_SPECIALIST_FAMILIES = {"stagger", "corridor", "sweep", "aimed", "bars"}
+
+
+def _standalone_specialist(meta: dict) -> bool:
+    return meta.get("synthetic_kind") == "laser_specialist" and meta.get("generation_mode") == "standalone"
+
+
+def _specialist_metadata_errors(card_id: str, meta: dict) -> list[str]:
+    errors = []
+    if not isinstance(meta.get("title"), str) or not meta.get("title", "").strip():
+        errors.append("title须为非空字符串")
+    if meta.get("source") != "synthetic" or meta.get("data_kind") != "synthetic":
+        errors.append("须显式标记source/data_kind=synthetic")
+    if meta.get("synthetic_kind") != "laser_specialist" or meta.get("generation_mode") != "standalone":
+        errors.append("专项卡须标记synthetic_kind=laser_specialist且generation_mode=standalone")
+    if meta.get("family") not in _SPECIALIST_FAMILIES:
+        errors.append("family无效")
+    if meta.get("layout_id") != card_id:
+        errors.append("layout_id必须等于卡ID")
+    if meta.get("split") not in ("train", "held-out"):
+        errors.append("split须为train或held-out")
+    if type(meta.get("contract_version")) is not int or meta.get("contract_version") != 1:
+        errors.append("contract_version须为整数1")
+    if meta.get("ranks") != [0, 3]:
+        errors.append("ranks须为[0, 3]")
+    if meta.get("marks") != [0]:
+        errors.append("marks须为[0]")
+    if type(meta.get("time_limit")) is not int or meta.get("time_limit") != 1800:
+        errors.append("time_limit须为1800")
+    tags = meta.get("tags")
+    if not isinstance(tags, list) or any(not isinstance(tag, str) for tag in tags) or not {"laser", "specialist"}.issubset(set(tags)):
+        errors.append("tags须包含laser和specialist")
+    forged = ("base_card", "source_ref", "provenance", "mutation_id", "original_time_limit")
+    for field in forged:
+        if field in meta:
+            errors.append(f"standalone专项卡禁止{field}")
+    return [f"{card_id}: {error}" for error in errors]
+
+
 def discover(cards_dir: str | Path | list[str | Path]) -> dict[str, Card]:
     """默认单目录保持旧池；合成卡仅在配置显式列出多个目录时加载。"""
     if isinstance(cards_dir, list):
@@ -74,7 +113,13 @@ def discover(cards_dir: str | Path | list[str | Path]) -> dict[str, Card]:
         meta = tomllib.loads(meta_path.read_text(encoding="utf-8")) if meta_path.exists() else {}
         card = Card(id=d.name, path=d, meta=meta)
         card.laser_intent_mix  # Validate before compiling or constructing an environment.
-        if card.data_kind == "synthetic" and not meta.get("base_card"):
+        if _standalone_specialist(meta):
+            errors = _specialist_metadata_errors(d.name, meta)
+            if errors:
+                raise ValueError("; ".join(errors))
+        elif meta.get("synthetic_kind") == "laser_specialist":
+            raise ValueError(f"{d.name}: 专项卡须使用generation_mode=standalone")
+        elif card.data_kind == "synthetic" and not meta.get("base_card"):
             raise ValueError(f"{d.name}: 合成卡缺 base_card")
         out[d.name] = card
     return out
@@ -129,6 +174,8 @@ def source_ranges_overlap(a: str, b: str) -> bool:
 def _synthetic_held_out(card: Card, cards: dict[str, Card], eval_ids: set[str]) -> bool:
     if card.data_kind != "synthetic":
         return False  # 原作历史划分保持不变；新增合成数据作更严格的血缘检查。
+    if _standalone_specialist(card.meta):
+        return card.meta.get("split") == "held-out"
     seen = set()
     current = card
     while current.meta.get("base_card") in cards:
@@ -175,5 +222,6 @@ def card_manifest(cards: dict[str, Card]) -> dict[str, dict]:
     """run元数据映射；课程/episode的card_id可关联来源，不改变策略输入。"""
     return {cid: {"data_kind": card.data_kind, "source": card.meta.get("source"),
                   "base_card": card.meta.get("base_card"), "mutation_id": card.meta.get("mutation_id"),
+                  **({key: card.meta[key] for key in ("synthetic_kind", "generation_mode", "family", "layout_id", "split", "contract_version") if key in card.meta}),
                   **({"laser_intent_mix": card.laser_intent_mix} if "laser_intent_mix" in card.meta else {})}
             for cid, card in cards.items()}

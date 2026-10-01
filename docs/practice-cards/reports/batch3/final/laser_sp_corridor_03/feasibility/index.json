@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "tool_sha256": "02afa09a64d91a94eecee9b61d7deeb28aac81e4d489d713accb58622cd60681",
+  "reports": [
+    {
+      "card": "laser_sp_corridor_03",
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/final/laser_sp_corridor_03/feasibility/laser_sp_corridor_03.json",
+      "runs": 88,
+      "report_sha256": "61b4d3c9150dc24c407f7450f527b9744c4f4df3df00107f59d05748403d3f7e"
+    }
+  ]
+}

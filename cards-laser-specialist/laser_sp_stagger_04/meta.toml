@@ -1,0 +1,13 @@
+title = "双斜线接力"
+source = "synthetic"
+data_kind = "synthetic"
+synthetic_kind = "laser_specialist"
+generation_mode = "standalone"
+family = "stagger"
+layout_id = "laser_sp_stagger_04"
+split = "held-out"
+contract_version = 1
+ranks = [0, 3]
+marks = [0]
+time_limit = 1800
+tags = ["laser", "specialist"]

@@ -1,0 +1,831 @@
+{
+  "schema_version": 1,
+  "max_visible_lasers": 16,
+  "max_live_lasers": 20,
+  "first_spawn_frame": 93,
+  "last_spawn_frame": 1485,
+  "last_expiry_frame": 1750,
+  "max_idle_gap": 0,
+  "key_frames": [
+    {
+      "rank": 0,
+      "frame": 92,
+      "count_min": 0,
+      "count_max": 0
+    },
+    {
+      "rank": 0,
+      "frame": 93,
+      "count_min": 2,
+      "count_max": 2,
+      "states": [
+        0
+      ],
+      "width_min": 6,
+      "width_max": 6,
+      "start_min": 0,
+      "start_max": 0,
+      "x_min": -192,
+      "x_max": -192,
+      "y_min": -13.0,
+      "y_max": 65.0,
+      "angle_min": 0,
+      "angle_max": 0,
+      "end_min": 384,
+      "end_max": 384
+    },
+    {
+      "rank": 0,
+      "frame": 183,
+      "count_min": 4,
+      "count_max": 4,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 6,
+      "width_max": 6,
+      "start_min": 0,
+      "start_max": 0,
+      "x_min": -192,
+      "x_max": -192,
+      "y_min": -13.0,
+      "y_max": 461.0,
+      "angle_min": 0,
+      "angle_max": 0,
+      "end_min": 384,
+      "end_max": 384
+    },
+    {
+      "rank": 0,
+      "frame": 900,
+      "count_min": 4,
+      "count_max": 4,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 6,
+      "width_max": 6,
+      "start_min": 0,
+      "start_max": 0,
+      "x_min": -192,
+      "x_max": -192,
+      "y_min": -13.0,
+      "y_max": 461.0,
+      "angle_min": 0,
+      "angle_max": 0,
+      "end_min": 384,
+      "end_max": 384
+    },
+    {
+      "rank": 0,
+      "frame": 1484,
+      "count_min": 6,
+      "count_max": 6,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 6,
+      "width_max": 6,
+      "start_min": 0,
+      "start_max": 0,
+      "x_min": -192,
+      "x_max": -192,
+      "y_min": -13.0,
+      "y_max": 461.0,
+      "angle_min": 0,
+      "angle_max": 0,
+      "end_min": 384,
+      "end_max": 384
+    },
+    {
+      "rank": 0,
+      "frame": 1485,
+      "count_min": 8,
+      "count_max": 8,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 6,
+      "width_max": 6,
+      "start_min": 0,
+      "start_max": 0,
+      "x_min": -192,
+      "x_max": -192,
+      "y_min": -13.0,
+      "y_max": 461.0,
+      "angle_min": 0,
+      "angle_max": 0,
+      "end_min": 384,
+      "end_max": 384
+    },
+    {
+      "rank": 0,
+      "frame": 1734,
+      "count_min": 2,
+      "count_max": 2,
+      "states": [
+        1
+      ],
+      "width_min": 6,
+      "width_max": 6,
+      "start_min": 0,
+      "start_max": 0,
+      "x_min": -192,
+      "x_max": -192,
+      "y_min": -13.0,
+      "y_max": 461.0,
+      "angle_min": 0,
+      "angle_max": 0,
+      "end_min": 384,
+      "end_max": 384
+    },
+    {
+      "rank": 0,
+      "frame": 1735,
+      "count_min": 2,
+      "count_max": 2,
+      "states": [
+        2
+      ],
+      "width_min": 6,
+      "width_max": 6,
+      "start_min": 0,
+      "start_max": 0,
+      "x_min": -192,
+      "x_max": -192,
+      "y_min": -13.0,
+      "y_max": 461.0,
+      "angle_min": 0,
+      "angle_max": 0,
+      "end_min": 384,
+      "end_max": 384
+    },
+    {
+      "rank": 0,
+      "frame": 1746,
+      "count_min": 2,
+      "count_max": 2,
+      "states": [
+        2
+      ],
+      "width_min": 6,
+      "width_max": 6,
+      "start_min": 0,
+      "start_max": 0,
+      "x_min": -192,
+      "x_max": -192,
+      "y_min": -13.0,
+      "y_max": 461.0,
+      "angle_min": 0,
+      "angle_max": 0,
+      "end_min": 384,
+      "end_max": 384
+    },
+    {
+      "rank": 0,
+      "frame": 1747,
+      "count_min": 0,
+      "count_max": 0
+    },
+    {
+      "rank": 0,
+      "frame": 1800,
+      "count_min": 0,
+      "count_max": 0
+    },
+    {
+      "rank": 1,
+      "frame": 92,
+      "count_min": 0,
+      "count_max": 0
+    },
+    {
+      "rank": 1,
+      "frame": 93,
+      "count_min": 2,
+      "count_max": 2,
+      "states": [
+        0
+      ],
+      "width_min": 8,
+      "width_max": 8,
+      "start_min": 0,
+      "start_max": 0,
+      "x_min": -192,
+      "x_max": -192,
+      "y_min": -14.0,
+      "y_max": 58.0,
+      "angle_min": 0,
+      "angle_max": 0,
+      "end_min": 384,
+      "end_max": 384
+    },
+    {
+      "rank": 1,
+      "frame": 168,
+      "count_min": 2,
+      "count_max": 2,
+      "states": [
+        1
+      ],
+      "width_min": 8,
+      "width_max": 8,
+      "start_min": 0,
+      "start_max": 0,
+      "x_min": -192,
+      "x_max": -192,
+      "y_min": -14.0,
+      "y_max": 462.0,
+      "angle_min": 0,
+      "angle_max": 0,
+      "end_min": 384,
+      "end_max": 384
+    },
+    {
+      "rank": 1,
+      "frame": 183,
+      "count_min": 4,
+      "count_max": 4,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 8,
+      "width_max": 8,
+      "start_min": 0,
+      "start_max": 0,
+      "x_min": -192,
+      "x_max": -192,
+      "y_min": -14.0,
+      "y_max": 462.0,
+      "angle_min": 0,
+      "angle_max": 0,
+      "end_min": 384,
+      "end_max": 384
+    },
+    {
+      "rank": 1,
+      "frame": 900,
+      "count_min": 4,
+      "count_max": 4,
+      "states": [
+        1
+      ],
+      "width_min": 8,
+      "width_max": 8,
+      "start_min": 0,
+      "start_max": 0,
+      "x_min": -192,
+      "x_max": -192,
+      "y_min": -14.0,
+      "y_max": 462.0,
+      "angle_min": 0,
+      "angle_max": 0,
+      "end_min": 384,
+      "end_max": 384
+    },
+    {
+      "rank": 1,
+      "frame": 1484,
+      "count_min": 6,
+      "count_max": 6,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 8,
+      "width_max": 8,
+      "start_min": 0,
+      "start_max": 0,
+      "x_min": -192,
+      "x_max": -192,
+      "y_min": -14.0,
+      "y_max": 462.0,
+      "angle_min": 0,
+      "angle_max": 0,
+      "end_min": 384,
+      "end_max": 384
+    },
+    {
+      "rank": 1,
+      "frame": 1485,
+      "count_min": 8,
+      "count_max": 8,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 8,
+      "width_max": 8,
+      "start_min": 0,
+      "start_max": 0,
+      "x_min": -192,
+      "x_max": -192,
+      "y_min": -14.0,
+      "y_max": 462.0,
+      "angle_min": 0,
+      "angle_max": 0,
+      "end_min": 384,
+      "end_max": 384
+    },
+    {
+      "rank": 1,
+      "frame": 1721,
+      "count_min": 2,
+      "count_max": 2,
+      "states": [
+        1
+      ],
+      "width_min": 8,
+      "width_max": 8,
+      "start_min": 0,
+      "start_max": 0,
+      "x_min": -192,
+      "x_max": -192,
+      "y_min": -14.0,
+      "y_max": 462.0,
+      "angle_min": 0,
+      "angle_max": 0,
+      "end_min": 384,
+      "end_max": 384
+    },
+    {
+      "rank": 1,
+      "frame": 1722,
+      "count_min": 2,
+      "count_max": 2,
+      "states": [
+        2
+      ],
+      "width_min": 8,
+      "width_max": 8,
+      "start_min": 0,
+      "start_max": 0,
+      "x_min": -192,
+      "x_max": -192,
+      "y_min": -14.0,
+      "y_max": 462.0,
+      "angle_min": 0,
+      "angle_max": 0,
+      "end_min": 384,
+      "end_max": 384
+    },
+    {
+      "rank": 1,
+      "frame": 1733,
+      "count_min": 2,
+      "count_max": 2,
+      "states": [
+        2
+      ],
+      "width_min": 8,
+      "width_max": 8,
+      "start_min": 0,
+      "start_max": 0,
+      "x_min": -192,
+      "x_max": -192,
+      "y_min": -14.0,
+      "y_max": 462.0,
+      "angle_min": 0,
+      "angle_max": 0,
+      "end_min": 384,
+      "end_max": 384
+    },
+    {
+      "rank": 1,
+      "frame": 1734,
+      "count_min": 0,
+      "count_max": 0
+    },
+    {
+      "rank": 1,
+      "frame": 1800,
+      "count_min": 0,
+      "count_max": 0
+    },
+    {
+      "rank": 2,
+      "frame": 92,
+      "count_min": 0,
+      "count_max": 0
+    },
+    {
+      "rank": 2,
+      "frame": 93,
+      "count_min": 2,
+      "count_max": 2,
+      "states": [
+        0
+      ],
+      "width_min": 10,
+      "width_max": 10,
+      "start_min": 0,
+      "start_max": 0,
+      "x_min": -192,
+      "x_max": -192,
+      "y_min": -15.0,
+      "y_max": 51.0,
+      "angle_min": 0,
+      "angle_max": 0,
+      "end_min": 384,
+      "end_max": 384
+    },
+    {
+      "rank": 2,
+      "frame": 153,
+      "count_min": 2,
+      "count_max": 2,
+      "states": [
+        1
+      ],
+      "width_min": 10,
+      "width_max": 10,
+      "start_min": 0,
+      "start_max": 0,
+      "x_min": -192,
+      "x_max": -192,
+      "y_min": -15.0,
+      "y_max": 463.0,
+      "angle_min": 0,
+      "angle_max": 0,
+      "end_min": 384,
+      "end_max": 384
+    },
+    {
+      "rank": 2,
+      "frame": 183,
+      "count_min": 4,
+      "count_max": 4,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 10,
+      "width_max": 10,
+      "start_min": 0,
+      "start_max": 0,
+      "x_min": -192,
+      "x_max": -192,
+      "y_min": -15.0,
+      "y_max": 463.0,
+      "angle_min": 0,
+      "angle_max": 0,
+      "end_min": 384,
+      "end_max": 384
+    },
+    {
+      "rank": 2,
+      "frame": 900,
+      "count_min": 4,
+      "count_max": 4,
+      "states": [
+        1
+      ],
+      "width_min": 10,
+      "width_max": 10,
+      "start_min": 0,
+      "start_max": 0,
+      "x_min": -192,
+      "x_max": -192,
+      "y_min": -15.0,
+      "y_max": 463.0,
+      "angle_min": 0,
+      "angle_max": 0,
+      "end_min": 384,
+      "end_max": 384
+    },
+    {
+      "rank": 2,
+      "frame": 1484,
+      "count_min": 6,
+      "count_max": 6,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 10,
+      "width_max": 10,
+      "start_min": 0,
+      "start_max": 0,
+      "x_min": -192,
+      "x_max": -192,
+      "y_min": -15.0,
+      "y_max": 463.0,
+      "angle_min": 0,
+      "angle_max": 0,
+      "end_min": 384,
+      "end_max": 384
+    },
+    {
+      "rank": 2,
+      "frame": 1485,
+      "count_min": 8,
+      "count_max": 8,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 10,
+      "width_max": 10,
+      "start_min": 0,
+      "start_max": 0,
+      "x_min": -192,
+      "x_max": -192,
+      "y_min": -15.0,
+      "y_max": 463.0,
+      "angle_min": 0,
+      "angle_max": 0,
+      "end_min": 384,
+      "end_max": 384
+    },
+    {
+      "rank": 2,
+      "frame": 1724,
+      "count_min": 2,
+      "count_max": 2,
+      "states": [
+        1
+      ],
+      "width_min": 10,
+      "width_max": 10,
+      "start_min": 0,
+      "start_max": 0,
+      "x_min": -192,
+      "x_max": -192,
+      "y_min": -15.0,
+      "y_max": 463.0,
+      "angle_min": 0,
+      "angle_max": 0,
+      "end_min": 384,
+      "end_max": 384
+    },
+    {
+      "rank": 2,
+      "frame": 1725,
+      "count_min": 2,
+      "count_max": 2,
+      "states": [
+        2
+      ],
+      "width_min": 10,
+      "width_max": 10,
+      "start_min": 0,
+      "start_max": 0,
+      "x_min": -192,
+      "x_max": -192,
+      "y_min": -15.0,
+      "y_max": 463.0,
+      "angle_min": 0,
+      "angle_max": 0,
+      "end_min": 384,
+      "end_max": 384
+    },
+    {
+      "rank": 2,
+      "frame": 1736,
+      "count_min": 2,
+      "count_max": 2,
+      "states": [
+        2
+      ],
+      "width_min": 10,
+      "width_max": 10,
+      "start_min": 0,
+      "start_max": 0,
+      "x_min": -192,
+      "x_max": -192,
+      "y_min": -15.0,
+      "y_max": 463.0,
+      "angle_min": 0,
+      "angle_max": 0,
+      "end_min": 384,
+      "end_max": 384
+    },
+    {
+      "rank": 2,
+      "frame": 1737,
+      "count_min": 0,
+      "count_max": 0
+    },
+    {
+      "rank": 2,
+      "frame": 1800,
+      "count_min": 0,
+      "count_max": 0
+    },
+    {
+      "rank": 3,
+      "frame": 92,
+      "count_min": 0,
+      "count_max": 0
+    },
+    {
+      "rank": 3,
+      "frame": 93,
+      "count_min": 2,
+      "count_max": 2,
+      "states": [
+        0
+      ],
+      "width_min": 12,
+      "width_max": 12,
+      "start_min": 0,
+      "start_max": 0,
+      "x_min": -192,
+      "x_max": -192,
+      "y_min": -14.0,
+      "y_max": 50.0,
+      "angle_min": 0,
+      "angle_max": 0,
+      "end_min": 384,
+      "end_max": 384
+    },
+    {
+      "rank": 3,
+      "frame": 138,
+      "count_min": 2,
+      "count_max": 2,
+      "states": [
+        1
+      ],
+      "width_min": 12,
+      "width_max": 12,
+      "start_min": 0,
+      "start_max": 0,
+      "x_min": -192,
+      "x_max": -192,
+      "y_min": -14.0,
+      "y_max": 462.0,
+      "angle_min": 0,
+      "angle_max": 0,
+      "end_min": 384,
+      "end_max": 384
+    },
+    {
+      "rank": 3,
+      "frame": 183,
+      "count_min": 4,
+      "count_max": 4,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 12,
+      "width_max": 12,
+      "start_min": 0,
+      "start_max": 0,
+      "x_min": -192,
+      "x_max": -192,
+      "y_min": -14.0,
+      "y_max": 462.0,
+      "angle_min": 0,
+      "angle_max": 0,
+      "end_min": 384,
+      "end_max": 384
+    },
+    {
+      "rank": 3,
+      "frame": 900,
+      "count_min": 4,
+      "count_max": 4,
+      "states": [
+        1
+      ],
+      "width_min": 12,
+      "width_max": 12,
+      "start_min": 0,
+      "start_max": 0,
+      "x_min": -192,
+      "x_max": -192,
+      "y_min": -14.0,
+      "y_max": 462.0,
+      "angle_min": 0,
+      "angle_max": 0,
+      "end_min": 384,
+      "end_max": 384
+    },
+    {
+      "rank": 3,
+      "frame": 1484,
+      "count_min": 6,
+      "count_max": 6,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 12,
+      "width_max": 12,
+      "start_min": 0,
+      "start_max": 0,
+      "x_min": -192,
+      "x_max": -192,
+      "y_min": -14.0,
+      "y_max": 462.0,
+      "angle_min": 0,
+      "angle_max": 0,
+      "end_min": 384,
+      "end_max": 384
+    },
+    {
+      "rank": 3,
+      "frame": 1485,
+      "count_min": 8,
+      "count_max": 8,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 12,
+      "width_max": 12,
+      "start_min": 0,
+      "start_max": 0,
+      "x_min": -192,
+      "x_max": -192,
+      "y_min": -14.0,
+      "y_max": 462.0,
+      "angle_min": 0,
+      "angle_max": 0,
+      "end_min": 384,
+      "end_max": 384
+    },
+    {
+      "rank": 3,
+      "frame": 1737,
+      "count_min": 2,
+      "count_max": 2,
+      "states": [
+        1
+      ],
+      "width_min": 12,
+      "width_max": 12,
+      "start_min": 0,
+      "start_max": 0,
+      "x_min": -192,
+      "x_max": -192,
+      "y_min": -14.0,
+      "y_max": 462.0,
+      "angle_min": 0,
+      "angle_max": 0,
+      "end_min": 384,
+      "end_max": 384
+    },
+    {
+      "rank": 3,
+      "frame": 1738,
+      "count_min": 2,
+      "count_max": 2,
+      "states": [
+        2
+      ],
+      "width_min": 12,
+      "width_max": 12,
+      "start_min": 0,
+      "start_max": 0,
+      "x_min": -192,
+      "x_max": -192,
+      "y_min": -14.0,
+      "y_max": 462.0,
+      "angle_min": 0,
+      "angle_max": 0,
+      "end_min": 384,
+      "end_max": 384
+    },
+    {
+      "rank": 3,
+      "frame": 1749,
+      "count_min": 2,
+      "count_max": 2,
+      "states": [
+        2
+      ],
+      "width_min": 12,
+      "width_max": 12,
+      "start_min": 0,
+      "start_max": 0,
+      "x_min": -192,
+      "x_max": -192,
+      "y_min": -14.0,
+      "y_max": 462.0,
+      "angle_min": 0,
+      "angle_max": 0,
+      "end_min": 384,
+      "end_max": 384
+    },
+    {
+      "rank": 3,
+      "frame": 1750,
+      "count_min": 0,
+      "count_max": 0
+    },
+    {
+      "rank": 3,
+      "frame": 1800,
+      "count_min": 0,
+      "count_max": 0
+    }
+  ]
+}

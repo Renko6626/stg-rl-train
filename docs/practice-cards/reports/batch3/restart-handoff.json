@@ -1,0 +1,110 @@
+{
+  "status": "complete",
+  "user_instruction": "User resumed batch synthesis and explicitly requests Luna parallel delegation.",
+  "completed_agents": [
+    "/root/specialist_tools",
+    "/root/specialist_feasibility",
+    "/root/writer_stagger_0102"
+  ],
+  "running_agent": null,
+  "file_sha256": {
+    "src/stgtrain/cards.py": "764d473a39f6802ca3a9bd2d29efdbb4d279f9c60bcdd1116a570b076c6d19ed",
+    "src/stgtrain/specialist_validate.py": "3ef048233ac02e88621345e4708cbfa27e1a64da6ebf3d2843a2df22ee7cc92c",
+    "src/stgtrain/specialist_feasibility.py": "ac3f7ff8c56f9957fc9077b413a72fefa7939271d449957da8d87dab606d1b7e",
+    "tests/test_cards.py": "5f259a0484c94a73fe3389f6f0f0d3fef8c4e30a3b911b82db67ecbb7f4831aa",
+    "tests/test_specialist_validate.py": "d2cd64a3d0b971ff5030375419cf43ae8c829e3f7d5af2100d21a7137f4a2dec",
+    "tests/test_specialist_feasibility.py": "45c3bc6ad66910fe9bd97f4646c79b970d0f7effe085ba036ac3dc52a5c1df75",
+    "docs/practice-cards/reports/batch3/tools-author.md": "5ad892ae1af90fc1ac461cbdb39ad249cfed3da310f7f7ccd388a1f018f86ab1",
+    "docs/practice-cards/reports/batch3/feasibility-author.md": "286201e014b7b59948430bdcd08feb62343a533dd0d5cf87cec5e5de6b3584e2",
+    "docs/practice-cards/reports/batch3/stagger-0102-author.md": "769b4544a452d74236b68fe1d03a658f12065d1d852d8c39d255304678f88959"
+  },
+  "tests_reported": {
+    "tools": "26 passed targeted",
+    "feasibility": "6 passed targeted"
+  },
+  "independent_review": "not_started",
+  "batch_acceptance": "not_started",
+  "pending_tool_limits": [
+    "Mechanical trace provenance/mandatory seeds/meaningful keyframe coverage review corrections running"
+  ],
+  "configured_subagent_limit": 16,
+  "current_session_subagent_limit_observed": 16,
+  "cards": {
+    "laser_sp_stagger_01": {
+      "path": "/tmp/sunyunbo/stg-laser-batch3/laser_sp_stagger_01",
+      "status": "AUTHOR_READY_FROZEN",
+      "file_sha256": {
+        "main.ecl": "022f16b4e0eab4b8fac3185ffadf0b0fd1c199d3934d87f5266e2aae207d8039",
+        "meta.toml": "4e9917b5b0b08456daa77e0afa9eab270cf708ec29201e0c7fb4b251d9c4ba4e",
+        "TASK.md": "9dcd19649c2f284f79480320500dc55abc44f9daeb02ce8de7967d8ea7621ab2",
+        "machine-spec.json": "46e860d1a79b635f56973c4b4441060a5f719da848b938a0e85d661895f704e1"
+      },
+      "formal_machine": "PASS current machine report",
+      "feasibility": "pending",
+      "independent_review": "pending"
+    },
+    "laser_sp_stagger_02": {
+      "path": "/tmp/sunyunbo/stg-laser-batch3/laser_sp_stagger_02",
+      "status": "AUTHOR_READY_FROZEN",
+      "file_sha256": {
+        "main.ecl": "253445e0a839739b3fed63b86cae8f9e1d98fed77cc4ef2346e5e520a2b02bbc",
+        "meta.toml": "17f7b1694535793fd653cabc45a9cfad04ca64a9c555bdcd5a9e3209a3f48948",
+        "TASK.md": "c7179aa316e00ef0000737ceffd20b10c7e4f65a33df08a6d8b808e33444603a",
+        "machine-spec.json": "07b66cc96d492a388d36099a8b4d62b1b9d0fa934443153d25f526ec69256ba5"
+      },
+      "formal_machine": "PASS current machine report",
+      "feasibility": "pending",
+      "independent_review": "pending"
+    }
+  },
+  "next_steps": [
+    "No generation or review task remains active.",
+    "Future training/config inclusion requires new instruction; existing configs unchanged.",
+    "Quarantined cases need new real causal-motion evidence and current-SHA review before admission; not claimed unsolvable."
+  ],
+  "active_author_tasks": [],
+  "active_tool_tasks": [],
+  "dispatch_counts": {
+    "first_draft_cards": 20,
+    "prior_two_in_rework": 2,
+    "other_frozen_cards": 18
+  },
+  "completed_tool_reviews": {
+    "feasibility": "REVISE: double halfwidth, baseline dwell evidence, declared rank interval"
+  },
+  "runtime_sessions": {},
+  "active_review_tasks": [],
+  "stagger_stationary_observation": {
+    "01": "both bottom corners successful8/8; sourceproven strip",
+    "02": "righttop/rightbottom each qualified8/8 but wholeepisode success6/8; frequent shortcut not universalproof"
+  },
+  "full_test_result": "490 passed, 1 skipped, 4 existing CUDA/tensordict warnings; .venv/bin/pytest -q, 243.77s",
+  "tool_reviews": {
+    "mechanical": "round1 PASS limited mechanical integration",
+    "feasibility": "round1 PASS limited observational tool"
+  },
+  "source_reviews": {
+    "stagger": "02/03 limitedpass;01round2source-spanfix awaitingcurrentplayers/reviewer",
+    "corridor": "all3 mechanical selfpass;01/02qualstationarysurvivors0,butshort18f heuristic0/8;longerh45/90temporary diagnostic under samephysics",
+    "sweep": "01/02 round1 running; 03 doc fixed; 04 doc fixed",
+    "aimed": "01/02 phase/period fixed; 03 spec fix running; 04 spec fixed round2",
+    "bars": "01/03 source quality round1 running; 02 limited source pass; 04 round2 ongoing",
+    "heldout": "stagger04 lower bypass round1 running; others need final snapshot reviews"
+  },
+  "first_machine_batch": "6/20 pass; mostly missing lifecycle snapshots; aimed01/02 phase end bug",
+  "final_machine_result": "All20current mechanical passes;01round3 andsweep03docfix have separatefreshreports",
+  "supplementary_motion_evidence": {
+    "corridor_cell": "02fouractualwitnesses r0/r1seeds1/7;01/03zero",
+    "longer45_90": "corridor01/02/03 andsweep02zero ineach8-case matrix; notunsolvableproof"
+  },
+  "results": "docs/practice-cards/2026-10-01-batch3-results.md",
+  "acceptance_summary": "docs/practice-cards/reports/batch3/batch3-acceptance-summary.json",
+  "counts": {
+    "generated": 20,
+    "mechanical_pass": 20,
+    "qualified": 17,
+    "train": 12,
+    "held_out": 5,
+    "quarantined": 3
+  }
+}

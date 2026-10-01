@@ -1,0 +1,944 @@
+{
+  "schema_version": 1,
+  "max_visible_lasers": 16,
+  "max_live_lasers": 20,
+  "first_spawn_frame": 95,
+  "last_spawn_frame": 1423,
+  "last_expiry_frame": 1735,
+  "max_idle_gap": 0,
+  "key_frames": [
+    {
+      "rank": 0,
+      "frame": 90,
+      "count_min": 0,
+      "count_max": 0
+    },
+    {
+      "rank": 0,
+      "frame": 95,
+      "count_min": 2,
+      "count_max": 2,
+      "states": [
+        0
+      ],
+      "width_min": 6.0,
+      "width_max": 6.0,
+      "x_min": -244.0,
+      "x_max": 251.0,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 82.0,
+      "end_max": 119.0
+    },
+    {
+      "rank": 0,
+      "frame": 178,
+      "count_min": 4,
+      "count_max": 4,
+      "states": [
+        0
+      ],
+      "width_min": 6.0,
+      "width_max": 6.0,
+      "x_min": -258.0,
+      "x_max": 251.0,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 82.0,
+      "end_max": 119.0
+    },
+    {
+      "rank": 0,
+      "frame": 185,
+      "count_min": 4,
+      "count_max": 4,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 6.0,
+      "width_max": 6.0,
+      "x_min": -258.0,
+      "x_max": 250.0,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 82.0,
+      "end_max": 119.0
+    },
+    {
+      "rank": 0,
+      "frame": 225,
+      "count_min": 4,
+      "count_max": 4,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 6.0,
+      "width_max": 6.0,
+      "x_min": -258.0,
+      "x_max": 228.0,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 82.0,
+      "end_max": 119.0
+    },
+    {
+      "rank": 0,
+      "frame": 394,
+      "count_min": 8,
+      "count_max": 8,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 6.0,
+      "width_max": 6.0,
+      "x_min": -258.0,
+      "x_max": 233.0,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 81.0,
+      "end_max": 119.0
+    },
+    {
+      "rank": 0,
+      "frame": 288,
+      "count_min": 6,
+      "count_max": 6,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 6.0,
+      "width_max": 6.0,
+      "x_min": -248.0,
+      "x_max": 258.0,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 82.0,
+      "end_max": 119.0
+    },
+    {
+      "rank": 0,
+      "frame": 879,
+      "count_min": 8,
+      "count_max": 8,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 6.0,
+      "width_max": 6.0,
+      "x_min": -260.0,
+      "x_max": 258.0,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 82.0,
+      "end_max": 117.0
+    },
+    {
+      "rank": 0,
+      "frame": 1423,
+      "count_min": 8,
+      "count_max": 8,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 6.0,
+      "width_max": 6.0,
+      "x_min": -264.0,
+      "x_max": 245.0,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 87.0,
+      "end_max": 120.0
+    },
+    {
+      "rank": 0,
+      "frame": 1513,
+      "count_min": 6,
+      "count_max": 6,
+      "states": [
+        1
+      ],
+      "width_min": 6.0,
+      "width_max": 6.0,
+      "x_min": -263.0,
+      "x_max": 236.0,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 87.0,
+      "end_max": 120.0
+    },
+    {
+      "rank": 0,
+      "frame": 1729,
+      "count_min": 2,
+      "count_max": 2,
+      "states": [
+        2
+      ],
+      "width_min": 6.0,
+      "width_max": 6.0,
+      "x_min": -54.0,
+      "x_max": 27.0,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 94.0,
+      "end_max": 108.0
+    },
+    {
+      "rank": 0,
+      "frame": 1735,
+      "count_min": 0,
+      "count_max": 0
+    },
+    {
+      "rank": 0,
+      "frame": 1800,
+      "count_min": 0,
+      "count_max": 0
+    },
+    {
+      "rank": 1,
+      "frame": 90,
+      "count_min": 0,
+      "count_max": 0
+    },
+    {
+      "rank": 1,
+      "frame": 95,
+      "count_min": 2,
+      "count_max": 2,
+      "states": [
+        0
+      ],
+      "width_min": 8.0,
+      "width_max": 8.0,
+      "x_min": -244.0,
+      "x_max": 251.0,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 82.0,
+      "end_max": 119.0
+    },
+    {
+      "rank": 1,
+      "frame": 178,
+      "count_min": 4,
+      "count_max": 4,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 8.0,
+      "width_max": 8.0,
+      "x_min": -258.0,
+      "x_max": 241.1,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 82.0,
+      "end_max": 119.0
+    },
+    {
+      "rank": 1,
+      "frame": 170,
+      "count_min": 2,
+      "count_max": 2,
+      "states": [
+        1
+      ],
+      "width_min": 8.0,
+      "width_max": 8.0,
+      "x_min": -242.9,
+      "x_max": 249.9,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 82.0,
+      "end_max": 119.0
+    },
+    {
+      "rank": 1,
+      "frame": 210,
+      "count_min": 4,
+      "count_max": 4,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 8.0,
+      "width_max": 8.0,
+      "x_min": -258.0,
+      "x_max": 228.0,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 82.0,
+      "end_max": 119.0
+    },
+    {
+      "rank": 1,
+      "frame": 379,
+      "count_min": 8,
+      "count_max": 8,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 8.0,
+      "width_max": 8.0,
+      "x_min": -258.0,
+      "x_max": 233.0,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 81.0,
+      "end_max": 119.0
+    },
+    {
+      "rank": 1,
+      "frame": 273,
+      "count_min": 6,
+      "count_max": 6,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 8.0,
+      "width_max": 8.0,
+      "x_min": -248.0,
+      "x_max": 258.0,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 82.0,
+      "end_max": 119.0
+    },
+    {
+      "rank": 1,
+      "frame": 864,
+      "count_min": 8,
+      "count_max": 8,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 8.0,
+      "width_max": 8.0,
+      "x_min": -260.0,
+      "x_max": 258.0,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 82.0,
+      "end_max": 117.0
+    },
+    {
+      "rank": 1,
+      "frame": 1423,
+      "count_min": 8,
+      "count_max": 8,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 8.0,
+      "width_max": 8.0,
+      "x_min": -264.0,
+      "x_max": 237.0,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 87.0,
+      "end_max": 120.0
+    },
+    {
+      "rank": 1,
+      "frame": 1498,
+      "count_min": 6,
+      "count_max": 6,
+      "states": [
+        1
+      ],
+      "width_min": 8.0,
+      "width_max": 8.0,
+      "x_min": -262.9,
+      "x_max": 235.9,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 87.0,
+      "end_max": 120.0
+    },
+    {
+      "rank": 1,
+      "frame": 1714,
+      "count_min": 2,
+      "count_max": 2,
+      "states": [
+        2
+      ],
+      "width_min": 8.0,
+      "width_max": 8.0,
+      "x_min": -33.0,
+      "x_max": 6.0,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 94.0,
+      "end_max": 108.0
+    },
+    {
+      "rank": 1,
+      "frame": 1720,
+      "count_min": 0,
+      "count_max": 0
+    },
+    {
+      "rank": 1,
+      "frame": 1800,
+      "count_min": 0,
+      "count_max": 0
+    },
+    {
+      "rank": 2,
+      "frame": 90,
+      "count_min": 0,
+      "count_max": 0
+    },
+    {
+      "rank": 2,
+      "frame": 95,
+      "count_min": 2,
+      "count_max": 2,
+      "states": [
+        0
+      ],
+      "width_min": 10.0,
+      "width_max": 10.0,
+      "x_min": -244.0,
+      "x_max": 251.0,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 82.0,
+      "end_max": 119.0
+    },
+    {
+      "rank": 2,
+      "frame": 178,
+      "count_min": 4,
+      "count_max": 4,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 10.0,
+      "width_max": 10.0,
+      "x_min": -258.0,
+      "x_max": 228.0,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 82.0,
+      "end_max": 119.0
+    },
+    {
+      "rank": 2,
+      "frame": 155,
+      "count_min": 2,
+      "count_max": 2,
+      "states": [
+        1
+      ],
+      "width_min": 10.0,
+      "width_max": 10.0,
+      "x_min": -242.5,
+      "x_max": 249.5,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 82.0,
+      "end_max": 119.0
+    },
+    {
+      "rank": 2,
+      "frame": 195,
+      "count_min": 4,
+      "count_max": 4,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 10.0,
+      "width_max": 10.0,
+      "x_min": -258.0,
+      "x_max": 228.0,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 82.0,
+      "end_max": 119.0
+    },
+    {
+      "rank": 2,
+      "frame": 364,
+      "count_min": 8,
+      "count_max": 8,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 10.0,
+      "width_max": 10.0,
+      "x_min": -258.0,
+      "x_max": 233.0,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 81.0,
+      "end_max": 119.0
+    },
+    {
+      "rank": 2,
+      "frame": 258,
+      "count_min": 4,
+      "count_max": 4,
+      "states": [
+        1
+      ],
+      "width_min": 10.0,
+      "width_max": 10.0,
+      "x_min": -226.5,
+      "x_max": 196.5,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 82.0,
+      "end_max": 119.0
+    },
+    {
+      "rank": 2,
+      "frame": 849,
+      "count_min": 8,
+      "count_max": 8,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 10.0,
+      "width_max": 10.0,
+      "x_min": -260.0,
+      "x_max": 258.0,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 82.0,
+      "end_max": 117.0
+    },
+    {
+      "rank": 2,
+      "frame": 1423,
+      "count_min": 8,
+      "count_max": 8,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 10.0,
+      "width_max": 10.0,
+      "x_min": -264.0,
+      "x_max": 237.0,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 87.0,
+      "end_max": 120.0
+    },
+    {
+      "rank": 2,
+      "frame": 1483,
+      "count_min": 6,
+      "count_max": 6,
+      "states": [
+        1
+      ],
+      "width_min": 10.0,
+      "width_max": 10.0,
+      "x_min": -262.5,
+      "x_max": 235.5,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 87.0,
+      "end_max": 120.0
+    },
+    {
+      "rank": 2,
+      "frame": 1699,
+      "count_min": 2,
+      "count_max": 2,
+      "states": [
+        2
+      ],
+      "width_min": 10.0,
+      "width_max": 10.0,
+      "x_min": -79.0,
+      "x_max": 75.0,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 94.0,
+      "end_max": 108.0
+    },
+    {
+      "rank": 2,
+      "frame": 1705,
+      "count_min": 0,
+      "count_max": 0
+    },
+    {
+      "rank": 2,
+      "frame": 1800,
+      "count_min": 0,
+      "count_max": 0
+    },
+    {
+      "rank": 3,
+      "frame": 90,
+      "count_min": 0,
+      "count_max": 0
+    },
+    {
+      "rank": 3,
+      "frame": 95,
+      "count_min": 2,
+      "count_max": 2,
+      "states": [
+        0
+      ],
+      "width_min": 12.0,
+      "width_max": 12.0,
+      "x_min": -244.0,
+      "x_max": 251.0,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 82.0,
+      "end_max": 119.0
+    },
+    {
+      "rank": 3,
+      "frame": 178,
+      "count_min": 4,
+      "count_max": 4,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 12.0,
+      "width_max": 12.0,
+      "x_min": -258.0,
+      "x_max": 228.0,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 82.0,
+      "end_max": 119.0
+    },
+    {
+      "rank": 3,
+      "frame": 140,
+      "count_min": 2,
+      "count_max": 2,
+      "states": [
+        1
+      ],
+      "width_min": 12.0,
+      "width_max": 12.0,
+      "x_min": -242.0,
+      "x_max": 249.0,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 82.0,
+      "end_max": 119.0
+    },
+    {
+      "rank": 3,
+      "frame": 180,
+      "count_min": 4,
+      "count_max": 4,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 12.0,
+      "width_max": 12.0,
+      "x_min": -258.0,
+      "x_max": 228.0,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 82.0,
+      "end_max": 119.0
+    },
+    {
+      "rank": 3,
+      "frame": 349,
+      "count_min": 8,
+      "count_max": 8,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 12.0,
+      "width_max": 12.0,
+      "x_min": -258.0,
+      "x_max": 233.0,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 81.0,
+      "end_max": 119.0
+    },
+    {
+      "rank": 3,
+      "frame": 243,
+      "count_min": 4,
+      "count_max": 4,
+      "states": [
+        1
+      ],
+      "width_min": 12.0,
+      "width_max": 12.0,
+      "x_min": -216.0,
+      "x_max": 186.0,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 82.0,
+      "end_max": 119.0
+    },
+    {
+      "rank": 3,
+      "frame": 834,
+      "count_min": 6,
+      "count_max": 6,
+      "states": [
+        1
+      ],
+      "width_min": 12.0,
+      "width_max": 12.0,
+      "x_min": -183.0,
+      "x_max": 187.0,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 82.0,
+      "end_max": 117.0
+    },
+    {
+      "rank": 3,
+      "frame": 1423,
+      "count_min": 8,
+      "count_max": 8,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 12.0,
+      "width_max": 12.0,
+      "x_min": -264.0,
+      "x_max": 237.0,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 87.0,
+      "end_max": 120.0
+    },
+    {
+      "rank": 3,
+      "frame": 1468,
+      "count_min": 6,
+      "count_max": 6,
+      "states": [
+        1
+      ],
+      "width_min": 12.0,
+      "width_max": 12.0,
+      "x_min": -262.0,
+      "x_max": 235.0,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 87.0,
+      "end_max": 120.0
+    },
+    {
+      "rank": 3,
+      "frame": 1684,
+      "count_min": 2,
+      "count_max": 2,
+      "states": [
+        2
+      ],
+      "width_min": 12.0,
+      "width_max": 12.0,
+      "x_min": -184.0,
+      "x_max": 180.0,
+      "y_min": 0.0,
+      "y_max": 448.0,
+      "angle_min": 0,
+      "angle_max": 180,
+      "start_min": 0.0,
+      "start_max": 0.0,
+      "end_min": 94.0,
+      "end_max": 108.0
+    },
+    {
+      "rank": 3,
+      "frame": 1690,
+      "count_min": 0,
+      "count_max": 0
+    },
+    {
+      "rank": 3,
+      "frame": 1800,
+      "count_min": 0,
+      "count_max": 0
+    }
+  ]
+}

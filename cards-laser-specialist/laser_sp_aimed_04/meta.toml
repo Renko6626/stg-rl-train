@@ -1,0 +1,13 @@
+title = "上侧三原点错峰出生瞄准"
+source = "synthetic"
+data_kind = "synthetic"
+synthetic_kind = "laser_specialist"
+generation_mode = "standalone"
+family = "aimed"
+layout_id = "laser_sp_aimed_04"
+split = "held-out"
+contract_version = 1
+ranks = [0, 3]
+marks = [0]
+time_limit = 1800
+tags = ["laser", "specialist"]

@@ -1871,10 +1871,18 @@ best 按全部 13 张卡平均挑选，不能代表激光最佳点。这个现�
 
 **2026-09-28 提交前核验**：本机已用 T2 规范配置编译196张卡、得到183个训练起点和13张留出卡，留出无泄漏；T1/T2 规范配置只有 `cards_dir` 差别。第二批与旧卡的最终机器验收为30/30 PASS，全仓 pytest 为430 passed。另以 32 env、1 update、缩短的 300 帧局和单评测组跑过 T2 卡池的 CPU 训练冒烟：训练、评测、checkpoint 全部完成；这是入口验证，不是 T2 研究结果。Magnus 当前集群读数为1张空闲A100、`cpu_free=28`、空闲内存约4.3GB，不满足原32核/64GB请求，提交后须按 B2 排队并复查实时状态。此处记录的是当时提交前状态；之后 T2 Job `1d8caeac01582527` 已完成，结果见上文，仓库本地改动仍未提交或推送。
 
-## T3：按卡 metadata 调整激光训练意图（2026-09-29，待训练）
+## T3：按卡 metadata 调整激光训练意图（2026-09-29，已完成，分析待补）
 
 T3 固定 T2-30 的卡池、模型、reward、课程采样器和 3500-update 预算，只对带有 `laser_intent_mix` 的 38 张激光卡改变训练意图分布：`follow/anchor/free = 0.3/0.3/0.4`；普通卡继续使用全局 `0.6/0.3/0.1`。metadata 只影响训练环境起点重置时的意图抽样，不进入观测，也不改变 reward；评测在 `eval_cfg` 中显式关闭该覆盖，主判据仍是固定评测口径的激光留出卡撑过率。
 
 实现还增加了 `stg_rl 0.4.1` 的只读 `VecEnv.current_start_indices()`，用于在自动重开局后把新起点与对应 metadata 对齐。引擎接口、训练代码和 Magnus vendored wheel 已同步；wheel 尚未发布到公共仓库。T3 配置为 `configs/exp-t3-laser-intentmix.toml`。
 
-已完成验证：训练仓全套 **448 passed, 1 skipped**；Magnus 的旧 torch CPU 栈相关测试 **67 passed, 1 intentional skip**；CPU 训练冒烟完成并写出 checkpoint，且覆盖自动 reset / 评测隔离 / 采样分布的专项测试通过。尚未做 CUDA 图验证，也尚未提交或启动 T3 Magnus 训练，因此目前不能声称胜率已经改善；需要与 T2 在同一评测划分下比较各 checkpoint 曲线。
+已完成验证：训练仓全套 **448 passed, 1 skipped**；Magnus 的旧 torch CPU 栈相关测试 **67 passed, 1 intentional skip**；CPU 训练冒烟完成并写出 checkpoint，且覆盖自动 reset / 评测隔离 / 采样分布的专项测试通过。上述为提交前验证记录。随后 T3 Job `5cec3ef127c88288` 已完成 3500 updates；成功训练不等于完成独立 CUDA 数值对拍。结果包取回失败，日志初读不支持胜率改善，完整统计仍待补。
+
+## T4 与后续讨论的事实订正（2026-09-29）
+
+T4 Job `5de98f4c35007fcd`（commit `e6a8fdf`）已完成 3500 updates。实际改动为两组权重归一化和课程更新间隔 20→250，未实现最初提出的贪心评测权重与独立最低配额；不能视为只改记录频率或只改激光组内部均衡的受控对照。关于结果包状态、未完成的统计和 `s4_b12` 几何描述的纠错，统一见 [激光训练事实与未决问题](practice-cards/2026-09-29-facts-and-open-questions.md)。当前只整理事实，不确定下一轮实验方案。
+
+## T5：原创激光专项卡混合训练（2026-10-01，提交准备）
+
+用户选择混合训练以检验迁移收益。以T2设置和3500-update预算加入12张专项训练候选，5张专项留出另测，3张隔离卡不加载；暂不改编码器。原13卡best口径保持，checkpoint每250updates保存以保留末四次模型。配置、评测、证据边界和提交步骤见[T5实验准备](practice-cards/2026-10-01-t5-experiment.md)。尚未提交或推送本轮改动，尚未提交Job。

@@ -1,0 +1,27 @@
+# T5 专项留出；不参与训练，不参与原 13 卡 best checkpoint 选择。
+# 逐卡评测 rank0..3；与原作对比时单列 rank2/3。
+
+[[eval]]
+card = "laser_sp_aimed_04"
+ranks = [0, 1, 2, 3]
+episodes = 32
+
+[[eval]]
+card = "laser_sp_bars_04"
+ranks = [0, 1, 2, 3]
+episodes = 32
+
+[[eval]]
+card = "laser_sp_corridor_04"
+ranks = [0, 1, 2, 3]
+episodes = 32
+
+[[eval]]
+card = "laser_sp_stagger_04"
+ranks = [0, 1, 2, 3]
+episodes = 32
+
+[[eval]]
+card = "laser_sp_sweep_04"
+ranks = [0, 1, 2, 3]
+episodes = 32

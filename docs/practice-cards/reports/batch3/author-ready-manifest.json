@@ -1,0 +1,206 @@
+{
+  "ready": [
+    {
+      "card": "laser_sp_stagger_01",
+      "path": "/tmp/sunyunbo/stg-laser-batch3/laser_sp_stagger_01",
+      "author_report": "docs/practice-cards/reports/batch3/stagger-0102-author.md",
+      "file_sha256": {
+        "main.ecl": "022f16b4e0eab4b8fac3185ffadf0b0fd1c199d3934d87f5266e2aae207d8039",
+        "meta.toml": "4e9917b5b0b08456daa77e0afa9eab270cf708ec29201e0c7fb4b251d9c4ba4e",
+        "TASK.md": "9dcd19649c2f284f79480320500dc55abc44f9daeb02ce8de7967d8ea7621ab2",
+        "machine-spec.json": "46e860d1a79b635f56973c4b4441060a5f719da848b938a0e85d661895f704e1"
+      }
+    },
+    {
+      "card": "laser_sp_stagger_02",
+      "path": "/tmp/sunyunbo/stg-laser-batch3/laser_sp_stagger_02",
+      "author_report": "docs/practice-cards/reports/batch3/stagger-0102-author.md",
+      "file_sha256": {
+        "main.ecl": "253445e0a839739b3fed63b86cae8f9e1d98fed77cc4ef2346e5e520a2b02bbc",
+        "meta.toml": "17f7b1694535793fd653cabc45a9cfad04ca64a9c555bdcd5a9e3209a3f48948",
+        "TASK.md": "c7179aa316e00ef0000737ceffd20b10c7e4f65a33df08a6d8b808e33444603a",
+        "machine-spec.json": "07b66cc96d492a388d36099a8b4d62b1b9d0fa934443153d25f526ec69256ba5"
+      }
+    },
+    {
+      "card": "laser_sp_stagger_03",
+      "path": "/tmp/sunyunbo/stg-laser-batch3/laser_sp_stagger_03",
+      "author_report": "docs/practice-cards/reports/batch3/stagger-03-author.md",
+      "file_sha256": {
+        "main.ecl": "738c7fcf2f5434229363fb67596b11da50c473f73021d1152eb4acfa40076c8c",
+        "meta.toml": "9feee67b761abb3e48653bbb6b48fdf8365c2c5d25a775b791b439789a318f2e",
+        "TASK.md": "9c7927b36d2cf12c1d6be7f4096048ad52e280bdd64c70bf79948bb5788329f4",
+        "machine-spec.json": "fca3873924935837dbbb56a00154a19e42b33e530518912618d9a05e65afc9e9"
+      }
+    },
+    {
+      "card": "laser_sp_stagger_04",
+      "path": "/tmp/sunyunbo/stg-laser-batch3/laser_sp_stagger_04",
+      "author_report": "docs/practice-cards/reports/batch3/stagger-04-author.md",
+      "file_sha256": {
+        "main.ecl": "6a144f035ffd0a2f25bafc0bff60637136de8f323252c5b67ffeed3461b38937",
+        "meta.toml": "40538c594942073f32839d6d4ea2c3ef7a3532122549b2a798d88a2d920d4b10",
+        "TASK.md": "1db2a4067890d5e6a19a1a8dafec74f3086b29bbcc769e7766e4bb98b4b7d13a",
+        "machine-spec.json": "0536a7e5b767d30ccf26369b62f66faba34671384e004e73e1deffee812deca6"
+      }
+    },
+    {
+      "card": "laser_sp_corridor_03",
+      "path": "/tmp/sunyunbo/stg-laser-batch3/laser_sp_corridor_03",
+      "author_report": "docs/practice-cards/reports/batch3/corridor-03-author.md",
+      "file_sha256": {
+        "main.ecl": "0bb5dbd2697b9bc271420a80178d0547e64e343f14afd8471a3b8bdfabd44a66",
+        "meta.toml": "9edc3ebd6a18f0b0c8245b1bbae34e6fe616c8f3e3e5ab3d97acaa6baa659f59",
+        "TASK.md": "57dd0ad6dd3af88dbf0d429dcb8cf422c3c7a7c21388151c50ce6244b7a9ec75",
+        "machine-spec.json": "7d5e1b1e58d258ebd41595b0ebeb8f7291f0dce357eb2e9bb4140152c2a79931"
+      }
+    },
+    {
+      "card": "laser_sp_corridor_04",
+      "path": "/tmp/sunyunbo/stg-laser-batch3/laser_sp_corridor_04",
+      "author_report": "docs/practice-cards/reports/batch3/corridor-04-author.md",
+      "file_sha256": {
+        "main.ecl": "962ce277cee16c66bd4bac128487ba29a8e74f1d4fcbb5aa8ed805b7d2b715dc",
+        "meta.toml": "eba3687b90de76c7447c1056d013a1d317d84761d4f0861fdde902edaec4a1db",
+        "TASK.md": "b3d88c406e52b77577d825127f55c37d8b73e73db481faf57877ec1fce07908a",
+        "machine-spec.json": "992dff02242efb744a7fd67fc6036d7fce494a5864ac3f8fe73c495eb2a00c82"
+      }
+    },
+    {
+      "card": "laser_sp_sweep_01",
+      "path": "/tmp/sunyunbo/stg-laser-batch3/laser_sp_sweep_01",
+      "author_report": "docs/practice-cards/reports/batch3/sweep-0102-author.md",
+      "file_sha256": {
+        "main.ecl": "f27ce7192b398c681845d888b5ac7e4757cfbe00d68dc5659069b1a710b39fee",
+        "meta.toml": "0a984142ede50eda6e4f879df038306f15979bca6aded0035d659b3168feb9ef",
+        "TASK.md": "27d80ec75eeeb9e4c47381d3015b764ee272177f653f3958acf41c8734108247",
+        "machine-spec.json": "cf24afb5f5abc54991320f90fad55ee945a8eb9b4dff207c120a216088d3b9a9"
+      }
+    },
+    {
+      "card": "laser_sp_sweep_02",
+      "path": "/tmp/sunyunbo/stg-laser-batch3/laser_sp_sweep_02",
+      "author_report": "docs/practice-cards/reports/batch3/sweep-0102-author.md",
+      "file_sha256": {
+        "main.ecl": "8f43bb5837e51b8b915c57af310e28d800a35171a437ed7b8ab74d874d5de1e2",
+        "meta.toml": "d1af770e2843037420b5b0e14ecea82ccd3febfc49d18741687f4e5a8535b141",
+        "TASK.md": "e9acc7566beb95c968e105c77134c6bfa3dbea8a9704ef1a40b82368110e124b",
+        "machine-spec.json": "ea75eba097d5095bdb7f389c2a2b21bf583f9621d17c47ef2057ebc8da13366c"
+      }
+    },
+    {
+      "card": "laser_sp_sweep_03",
+      "path": "/tmp/sunyunbo/stg-laser-batch3/laser_sp_sweep_03",
+      "author_report": "docs/practice-cards/reports/batch3/sweep-03-author.md",
+      "file_sha256": {
+        "main.ecl": "da34d47f01f40d933c7d23b7f9fb9d307ebca7555bcda7ae22c2c8fe88c2a995",
+        "meta.toml": "14c97048d361f54bcb622c3e4c455da8b6a99dc97fa69d942441cfdd90ec1327",
+        "TASK.md": "da91f58ed270a2b22fc3e5be9b4dc1bab7c460d0cd01d68746b0ce8651bbf545",
+        "machine-spec.json": "b6767fa4a30196d9419bef8601c53ad893848b5d8e9ddefee494dde2ea287874"
+      }
+    },
+    {
+      "card": "laser_sp_sweep_04",
+      "path": "/tmp/sunyunbo/stg-laser-batch3/laser_sp_sweep_04",
+      "author_report": "docs/practice-cards/reports/batch3/sweep-04-author.md",
+      "file_sha256": {
+        "main.ecl": "b537d82e9d0b748b4fd23e897cb0e4e1f645ac32353f472a61cbd4693863d4a7",
+        "meta.toml": "4383090e06848fd16a6c80e64eb303016f0d27e0ee2995999757e4a5d1cdc277",
+        "TASK.md": "3b2a46b153ddd10de38271ae04dce2665592a7d3d099546f3116c29b8ffaa3e2",
+        "machine-spec.json": "d04ecc339c20f0c21486ffb9c8489df79ac3a3500a6d56e2df79120ef93dd794"
+      }
+    },
+    {
+      "card": "laser_sp_aimed_01",
+      "path": "/tmp/sunyunbo/stg-laser-batch3/laser_sp_aimed_01",
+      "author_report": "docs/practice-cards/reports/batch3/aimed-0102-author.md",
+      "file_sha256": {
+        "main.ecl": "091da87f6cad007d1fbfc76ee42da1532a6cb02af0a2186123ce1dc6df17720a",
+        "meta.toml": "6c7ce0c9fdf632aedea54b2fd6b2419a1a324e66ed9a7f2c3d650184dd014723",
+        "TASK.md": "c18fa7de874154ed2d190b358d60fed5e11804192596fcc85543e1b82011bddd",
+        "machine-spec.json": "7ae8592af14d2d90bebf49d50ec1c6514509122639785dc25cdf6fc74218ba2e"
+      }
+    },
+    {
+      "card": "laser_sp_aimed_02",
+      "path": "/tmp/sunyunbo/stg-laser-batch3/laser_sp_aimed_02",
+      "author_report": "docs/practice-cards/reports/batch3/aimed-0102-author.md",
+      "file_sha256": {
+        "main.ecl": "96ca865537bdc09085df50ca29fc4aafa133f14c9c8a22b769b77cba9592b423",
+        "meta.toml": "5167f9832cbb11d642a657994a35551aa44f5f6aed80afd7df122c13ed91fb3c",
+        "TASK.md": "31fa2e0a1ddef0ce9ff104c9451cb6d207f5e7164d3d7742f28be190d41676dc",
+        "machine-spec.json": "d39a2d27ad2a3c0a185100c672d022ac9548eb06950438060e3bffeb572688d0"
+      }
+    },
+    {
+      "card": "laser_sp_aimed_03",
+      "path": "/tmp/sunyunbo/stg-laser-batch3/laser_sp_aimed_03",
+      "author_report": "docs/practice-cards/reports/batch3/aimed-03-author.md",
+      "file_sha256": {
+        "main.ecl": "353496f9017b69bdfddf49d4101cb366016259806440fe24761c01137658fcba",
+        "meta.toml": "a7009547a41fe41b7a0c9064d7675ff2cdb1f79b2fce9108877d575705033c5e",
+        "TASK.md": "a0f8de8fba326fe8b1948485c16ae71aee233d08a6f943e7a3b90ca5586debb4",
+        "machine-spec.json": "99c6eb2525d2006d3cd0a75facc5717bb889dc6edf9b23eabddb839a324e50b1"
+      }
+    },
+    {
+      "card": "laser_sp_aimed_04",
+      "path": "/tmp/sunyunbo/stg-laser-batch3/laser_sp_aimed_04",
+      "author_report": "docs/practice-cards/reports/batch3/aimed-04-author.md",
+      "file_sha256": {
+        "main.ecl": "c466b5f6d096b3e04dfa852aa8bb8ad964bb686983fbc3fbb125d27e595124b7",
+        "meta.toml": "b4bd074c8f84f8432d1577984f68c9233a1817cb6149d5179d650c442751cf29",
+        "TASK.md": "895ffd605ccd37ed4d048d81782bb856a34b38bb0869b7245638359b208175cb",
+        "machine-spec.json": "82885da7f6ccd12600c16dfc47152e5cff663ec3699f02971ca30b9ab1c7ea9c"
+      }
+    },
+    {
+      "card": "laser_sp_bars_01",
+      "path": "/tmp/sunyunbo/stg-laser-batch3/laser_sp_bars_01",
+      "author_report": "docs/practice-cards/reports/batch3/bars-0102-author.md",
+      "file_sha256": {
+        "main.ecl": "70ddc49ce48a183403a274636addb51cc119f985ed89d794fc0f6459898017ca",
+        "meta.toml": "81f70a504d000e7515c88513c980e50d9f2d59eddfb82754722e7b85db01a58b",
+        "TASK.md": "7741f46827e0a5055fee600ed90d9c0076f9deb1167d3b7fca331602d90618bc",
+        "machine-spec.json": "a3e4c360d46f74f539869dd2faf04bb01561d37312973e6a5684ffbb44aead64"
+      }
+    },
+    {
+      "card": "laser_sp_bars_02",
+      "path": "/tmp/sunyunbo/stg-laser-batch3/laser_sp_bars_02",
+      "author_report": "docs/practice-cards/reports/batch3/bars-0102-author.md",
+      "file_sha256": {
+        "main.ecl": "3a5e41944bbd13992d00b37553e30a00c2f38f69d32fdde2244f7cddd635ee90",
+        "meta.toml": "d27e673d16fdb6eb99d5627e9d890d913dc0040af0a3ef8658bbdef9a7951d59",
+        "TASK.md": "79baa5137c4eaa7eb1b6afea17178fc7e97d6fd658f4ff88ca18404755c74ae0",
+        "machine-spec.json": "0c84b34439b2ea49d83deea9094894dfda2b49f51e41be94f18b93435e085982"
+      }
+    },
+    {
+      "card": "laser_sp_bars_03",
+      "path": "/tmp/sunyunbo/stg-laser-batch3/laser_sp_bars_03",
+      "author_report": "docs/practice-cards/reports/batch3/bars-03-author.md",
+      "file_sha256": {
+        "main.ecl": "7edf9fcc1a3f4c6ce8f6b88c421c94ae6e1891ede7f8f6ab045ab142949ea6a1",
+        "meta.toml": "562093f086ed4b808d729a576ed012f33cf7ac51011d67b6e7f9872d7176e805",
+        "TASK.md": "65f95368dda92e1ee814049fc454930d4fc7367e4ed181aa9e40de3edd729e96",
+        "machine-spec.json": "adaff06080dc76fe3d7582224f7e376ae8973d6c05387a6a125bd3882bb89051"
+      }
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "path": "/tmp/sunyunbo/stg-laser-batch3/laser_sp_bars_04",
+      "author_report": "docs/practice-cards/reports/batch3/bars-04-author.md",
+      "file_sha256": {
+        "main.ecl": "263f3f80a4b5488d8d7ed00c05ff454b89867b292a5366b01ef2fd285bc65804",
+        "meta.toml": "1414ab1f9dd7e462d25934da226a4555a29069b50099358e707aff015eff195b",
+        "TASK.md": "c44908d01f3265931d74294b4d03a77b32403a69e861f46c12238083a4eb2436",
+        "machine-spec.json": "a4d280f7128291914315089aef81dd5197f634ca79af7181ceec1ec182a2fd95"
+      }
+    }
+  ],
+  "pending_author": [
+    "laser_sp_corridor_01",
+    "laser_sp_corridor_02"
+  ]
+}

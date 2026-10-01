@@ -92,3 +92,81 @@ def test_synthetic_shared_source_is_filtered_without_changing_original_pool(tmp_
              'base': Card('base', tmp_path, {'source': 'th06', 'source_ref': 'f:20-30'}),
              'variant': Card('variant', tmp_path, {'source': 'synthetic', 'base_card': 'base', 'source_ref': 'f:20-30'})}
     assert [s.image for s in train_starts(cards, {'held'}, [2])] == ['base']
+
+
+def test_standalone_specialist_metadata_exception_is_strict_and_heldout_is_always_excluded(tmp_path):
+    from stgtrain.cards import card_manifest
+
+    root = tmp_path / 'cards'
+    good = root / 'specialist_held'
+    good.mkdir(parents=True)
+    (good / 'main.ecl').write_text('sub main() {}')
+    (good / 'meta.toml').write_text('''
+title = "Held specialist"
+source = "synthetic"
+data_kind = "synthetic"
+synthetic_kind = "laser_specialist"
+generation_mode = "standalone"
+family = "sweep"
+layout_id = "specialist_held"
+split = "held-out"
+contract_version = 1
+ranks = [0, 3]
+marks = [0]
+time_limit = 1800
+tags = ["laser", "specialist"]
+''')
+    train = root / 'specialist_train'
+    train.mkdir()
+    (train / 'main.ecl').write_text('sub main() {}')
+    (train / 'meta.toml').write_text((good / 'meta.toml').read_text().replace('held-out', 'train').replace('specialist_held', 'specialist_train'))
+
+    cards = discover(root)
+    assert [start.image for start in train_starts(cards, set(), [0, 3])] == ['specialist_train', 'specialist_train']
+    assert card_manifest(cards)['specialist_held']['synthetic_kind'] == 'laser_specialist'
+
+
+@pytest.mark.parametrize('field,value,message', [
+    ('family', '"unknown"', 'family'),
+    ('split', '"dev"', 'split'),
+    ('contract_version', '2', 'contract_version'),
+    ('ranks', '[0, 4]', 'ranks'),
+    ('base_card', '"invented"', 'base_card'),
+    ('source_ref', '"fake:1-2"', 'source_ref'),
+    ('generation_mode', '"overlay"', 'generation_mode'),
+])
+def test_standalone_specialist_rejects_invalid_or_forged_metadata(tmp_path, field, value, message):
+    root = tmp_path / 'cards'
+    card = root / 'bad'
+    card.mkdir(parents=True)
+    (card / 'main.ecl').write_text('sub main() {}')
+    metadata = '''
+title = "Specialist"
+source = "synthetic"
+data_kind = "synthetic"
+synthetic_kind = "laser_specialist"
+generation_mode = "standalone"
+family = "stagger"
+layout_id = "bad"
+split = "train"
+contract_version = 1
+ranks = [0, 3]
+marks = [0]
+time_limit = 1800
+tags = ["laser", "specialist"]
+'''
+    lines = metadata.splitlines()
+    line = next((line for line in lines if line.startswith(field + ' =')), None)
+    result = metadata.replace(line, f'{field} = {value}') if line else metadata + f'\n{field} = {value}\n'
+    (card / 'meta.toml').write_text(result)
+    with pytest.raises(ValueError, match=message):
+        discover(root)
+
+
+def test_ordinary_synthetic_still_requires_base_card(tmp_path):
+    card = tmp_path / 'synthetic'
+    card.mkdir()
+    (card / 'main.ecl').write_text('sub main() {}')
+    (card / 'meta.toml').write_text('source="synthetic"\ndata_kind="synthetic"')
+    with pytest.raises(ValueError, match='base_card'):
+        discover(tmp_path)

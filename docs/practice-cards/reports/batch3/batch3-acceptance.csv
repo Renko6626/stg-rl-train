@@ -1,0 +1,21 @@
+card,family,split,status,path,heuristic_success,heuristic_trials,stationary_qualified_success,stationary_trials,motion_witnessed_ranks,motion_not_proven_ranks,supplementary_motion_success
+laser_sp_aimed_01,aimed,train,FINITE_SAMPLE_QUALIFIED,cards-laser-specialist/laser_sp_aimed_01,4,8,0,80,"[0, 1, 2]",[3],0
+laser_sp_aimed_02,aimed,train,FINITE_SAMPLE_QUALIFIED,cards-laser-specialist/laser_sp_aimed_02,4,8,0,80,"[0, 1]","[2, 3]",0
+laser_sp_aimed_03,aimed,train,FINITE_SAMPLE_QUALIFIED,cards-laser-specialist/laser_sp_aimed_03,3,8,0,80,"[0, 1]","[2, 3]",0
+laser_sp_aimed_04,aimed,held-out,FINITE_SAMPLE_QUALIFIED,cards-laser-specialist/laser_sp_aimed_04,2,8,0,80,[0],"[1, 2, 3]",0
+laser_sp_bars_01,bars,train,FINITE_SAMPLE_QUALIFIED,cards-laser-specialist/laser_sp_bars_01,6,8,0,80,"[0, 1, 3]",[2],0
+laser_sp_bars_02,bars,train,FINITE_SAMPLE_QUALIFIED,cards-laser-specialist/laser_sp_bars_02,7,8,17,80,"[0, 1, 2, 3]",[],0
+laser_sp_bars_03,bars,train,FINITE_SAMPLE_QUALIFIED,cards-laser-specialist/laser_sp_bars_03,8,8,39,80,"[0, 1, 2, 3]",[],0
+laser_sp_bars_04,bars,held-out,FINITE_SAMPLE_QUALIFIED,cards-laser-specialist/laser_sp_bars_04,7,8,18,80,"[0, 1, 2, 3]",[],0
+laser_sp_corridor_01,corridor,train,NOT_PROVEN_QUARANTINED,cards-laser-specialist-quarantine/laser_sp_corridor_01,0,8,0,80,[],"[0, 1, 2, 3]",0
+laser_sp_corridor_02,corridor,train,FINITE_SAMPLE_QUALIFIED,cards-laser-specialist/laser_sp_corridor_02,0,8,0,80,"[0, 1]","[2, 3]",4
+laser_sp_corridor_03,corridor,train,NOT_PROVEN_QUARANTINED,cards-laser-specialist-quarantine/laser_sp_corridor_03,0,8,0,80,[],"[0, 1, 2, 3]",0
+laser_sp_corridor_04,corridor,held-out,FINITE_SAMPLE_QUALIFIED,cards-laser-specialist/laser_sp_corridor_04,8,8,3,80,"[0, 1, 2, 3]",[],0
+laser_sp_stagger_01,stagger,train,FINITE_SAMPLE_QUALIFIED,cards-laser-specialist/laser_sp_stagger_01,7,8,15,80,"[0, 1, 2, 3]",[],0
+laser_sp_stagger_02,stagger,train,FINITE_SAMPLE_QUALIFIED,cards-laser-specialist/laser_sp_stagger_02,7,8,8,80,"[0, 1, 2, 3]",[],0
+laser_sp_stagger_03,stagger,train,FINITE_SAMPLE_QUALIFIED,cards-laser-specialist/laser_sp_stagger_03,6,8,0,80,"[0, 1, 2, 3]",[],0
+laser_sp_stagger_04,stagger,held-out,FINITE_SAMPLE_QUALIFIED,cards-laser-specialist/laser_sp_stagger_04,8,8,34,80,"[0, 1, 2, 3]",[],0
+laser_sp_sweep_01,sweep,train,FINITE_SAMPLE_QUALIFIED,cards-laser-specialist/laser_sp_sweep_01,2,8,0,80,[3],"[0, 1, 2]",0
+laser_sp_sweep_02,sweep,train,NOT_PROVEN_QUARANTINED,cards-laser-specialist-quarantine/laser_sp_sweep_02,0,8,0,80,[],"[0, 1, 2, 3]",0
+laser_sp_sweep_03,sweep,train,FINITE_SAMPLE_QUALIFIED,cards-laser-specialist/laser_sp_sweep_03,7,8,2,80,"[0, 1, 2, 3]",[],0
+laser_sp_sweep_04,sweep,held-out,FINITE_SAMPLE_QUALIFIED,cards-laser-specialist/laser_sp_sweep_04,8,8,17,80,"[0, 1, 2, 3]",[],0

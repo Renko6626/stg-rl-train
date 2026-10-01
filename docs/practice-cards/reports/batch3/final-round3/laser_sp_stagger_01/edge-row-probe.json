@@ -1,0 +1,338 @@
+{
+  "schema_version": 1,
+  "checker": "targeted row diagnostic; fast approach when farther than60px then slow approach then requeststop; actual motor applied",
+  "card_file_sha256": {
+    "TASK.md": "767c900202c5ca49c85d954237027d127935cc9acc4be951f34c56ca72d44c53",
+    "machine-spec.json": "f57ad85404b8a12c8b094e20c0cb30cb983781b6dd1b711bb92f5843666bf852",
+    "main.ecl": "250efd7ef10003fb4ef232b6c15df9d9b55520784460e4359455ed8dab8ffc90",
+    "meta.toml": "4e9917b5b0b08456daa77e0afa9eab270cf708ec29201e0c7fb4b251d9c4ba4e"
+  },
+  "driver_sha256": "69e70a70b8b50631812bf1b2c6586920efe37490c30eae42bdd434adc4f1fbfb",
+  "canonical_module_sha256": "02afa09a64d91a94eecee9b61d7deeb28aac81e4d489d713accb58622cd60681",
+  "stg_rl_build_info": {
+    "version": "0.4.1",
+    "engine_ver": "24",
+    "git_sha": "5dfc08d-dirty",
+    "tables_hash": "37a7ff12fe40e24e"
+  },
+  "config": {
+    "hit_extra": [
+      2,
+      2
+    ],
+    "motor": {
+      "hold": [
+        2,
+        6
+      ],
+      "delay": [
+        0,
+        2
+      ],
+      "slow": true
+    },
+    "frame_skip": 1,
+    "threads": 1,
+    "mirror": false,
+    "max_frames": 3600,
+    "targets": [
+      [
+        0,
+        10
+      ],
+      [
+        0,
+        438
+      ]
+    ],
+    "rank": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "seeds": [
+      1,
+      7
+    ]
+  },
+  "runs": [
+    {
+      "rank": 0,
+      "seed": 1,
+      "target": [
+        0.0,
+        10.0
+      ],
+      "status": "DEATH",
+      "done": 1,
+      "steps": 294,
+      "arrival_step": 128,
+      "stationary_frames_max": 0,
+      "max_target_drift": 5.28253173828125,
+      "stationary_qualified": false,
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_stagger_01/round3/edge-row-probe/r0-s1-y10.jsonl",
+      "trajectory_sha256": "f9d266dcd9e76804435953f16237c732207b61db950dc6b0129fbaf73e13a5f4"
+    },
+    {
+      "rank": 0,
+      "seed": 1,
+      "target": [
+        0.0,
+        438.0
+      ],
+      "status": "DEATH",
+      "done": 1,
+      "steps": 406,
+      "arrival_step": 21,
+      "stationary_frames_max": 0,
+      "max_target_drift": 5.326484775199937,
+      "stationary_qualified": false,
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_stagger_01/round3/edge-row-probe/r0-s1-y438.jsonl",
+      "trajectory_sha256": "e0c5deaaef0c65049ce7c65cbf513931df5bd817fda8bf953c6c6aeb59fa1098"
+    },
+    {
+      "rank": 0,
+      "seed": 7,
+      "target": [
+        0.0,
+        10.0
+      ],
+      "status": "DEATH",
+      "done": 1,
+      "steps": 360,
+      "arrival_step": 124,
+      "stationary_frames_max": 234,
+      "max_target_drift": 2.614229826444296,
+      "stationary_qualified": true,
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_stagger_01/round3/edge-row-probe/r0-s7-y10.jsonl",
+      "trajectory_sha256": "dd9a9dcdb573390a670aec2c803c7689b15d1b4c4942f902ff553d45453ac4bd"
+    },
+    {
+      "rank": 0,
+      "seed": 7,
+      "target": [
+        0.0,
+        438.0
+      ],
+      "status": "SUCCESS",
+      "done": 2,
+      "steps": 1747,
+      "arrival_step": 8,
+      "stationary_frames_max": 1738,
+      "max_target_drift": 3.9605037003274677,
+      "stationary_qualified": true,
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_stagger_01/round3/edge-row-probe/r0-s7-y438.jsonl",
+      "trajectory_sha256": "f457d6beb9e28213c02bb5e5b24b356ba4497af06fd3eed0d077a53d91c0d092"
+    },
+    {
+      "rank": 1,
+      "seed": 1,
+      "target": [
+        0.0,
+        10.0
+      ],
+      "status": "DEATH",
+      "done": 1,
+      "steps": 271,
+      "arrival_step": 128,
+      "stationary_frames_max": 0,
+      "max_target_drift": 5.28253173828125,
+      "stationary_qualified": false,
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_stagger_01/round3/edge-row-probe/r1-s1-y10.jsonl",
+      "trajectory_sha256": "2a50536df84e8554b7c995dacab326083617f52bb236ddd2304287f8f3165b44"
+    },
+    {
+      "rank": 1,
+      "seed": 1,
+      "target": [
+        0.0,
+        438.0
+      ],
+      "status": "SUCCESS",
+      "done": 2,
+      "steps": 1793,
+      "arrival_step": 21,
+      "stationary_frames_max": 0,
+      "max_target_drift": 5.326484775199937,
+      "stationary_qualified": false,
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_stagger_01/round3/edge-row-probe/r1-s1-y438.jsonl",
+      "trajectory_sha256": "9dde26546a53e7e6997b5851037d14b80218313ddd12105e86fd3ba36db0d45d"
+    },
+    {
+      "rank": 1,
+      "seed": 7,
+      "target": [
+        0.0,
+        10.0
+      ],
+      "status": "DEATH",
+      "done": 1,
+      "steps": 225,
+      "arrival_step": 124,
+      "stationary_frames_max": 99,
+      "max_target_drift": 2.614229826444296,
+      "stationary_qualified": false,
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_stagger_01/round3/edge-row-probe/r1-s7-y10.jsonl",
+      "trajectory_sha256": "09aa0dd60c020fe06593e1a9d71073cbcfaac24465d866f2d2ba568cf932c416"
+    },
+    {
+      "rank": 1,
+      "seed": 7,
+      "target": [
+        0.0,
+        438.0
+      ],
+      "status": "DEATH",
+      "done": 1,
+      "steps": 1473,
+      "arrival_step": 8,
+      "stationary_frames_max": 1464,
+      "max_target_drift": 3.9605037003274677,
+      "stationary_qualified": true,
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_stagger_01/round3/edge-row-probe/r1-s7-y438.jsonl",
+      "trajectory_sha256": "9098dae6677dc07d54c065932424e0bd973def5f85997b4a397ec60d28c9dd1e"
+    },
+    {
+      "rank": 2,
+      "seed": 1,
+      "target": [
+        0.0,
+        10.0
+      ],
+      "status": "DEATH",
+      "done": 1,
+      "steps": 242,
+      "arrival_step": 128,
+      "stationary_frames_max": 0,
+      "max_target_drift": 5.28253173828125,
+      "stationary_qualified": false,
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_stagger_01/round3/edge-row-probe/r2-s1-y10.jsonl",
+      "trajectory_sha256": "b8fde67f36096225677668bf2aae41d514bcf324373611c5bd7354e071a3b501"
+    },
+    {
+      "rank": 2,
+      "seed": 1,
+      "target": [
+        0.0,
+        438.0
+      ],
+      "status": "DEATH",
+      "done": 1,
+      "steps": 962,
+      "arrival_step": 21,
+      "stationary_frames_max": 0,
+      "max_target_drift": 5.326484775199937,
+      "stationary_qualified": false,
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_stagger_01/round3/edge-row-probe/r2-s1-y438.jsonl",
+      "trajectory_sha256": "8ca48033cc1f1ae7b1cc28d6d999533c034d4a77ae4afb30d7ab5ab48f28fbc6"
+    },
+    {
+      "rank": 2,
+      "seed": 7,
+      "target": [
+        0.0,
+        10.0
+      ],
+      "status": "DEATH",
+      "done": 1,
+      "steps": 196,
+      "arrival_step": 124,
+      "stationary_frames_max": 70,
+      "max_target_drift": 2.614229826444296,
+      "stationary_qualified": false,
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_stagger_01/round3/edge-row-probe/r2-s7-y10.jsonl",
+      "trajectory_sha256": "a7e9dd6360782554c64854496c2b12f57c26dfa75781e5dcf38f1fd1ca35a8d9"
+    },
+    {
+      "rank": 2,
+      "seed": 7,
+      "target": [
+        0.0,
+        438.0
+      ],
+      "status": "SUCCESS",
+      "done": 2,
+      "steps": 1747,
+      "arrival_step": 8,
+      "stationary_frames_max": 1738,
+      "max_target_drift": 3.9605037003274677,
+      "stationary_qualified": true,
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_stagger_01/round3/edge-row-probe/r2-s7-y438.jsonl",
+      "trajectory_sha256": "f457d6beb9e28213c02bb5e5b24b356ba4497af06fd3eed0d077a53d91c0d092"
+    },
+    {
+      "rank": 3,
+      "seed": 1,
+      "target": [
+        0.0,
+        10.0
+      ],
+      "status": "DEATH",
+      "done": 1,
+      "steps": 218,
+      "arrival_step": 128,
+      "stationary_frames_max": 0,
+      "max_target_drift": 5.28253173828125,
+      "stationary_qualified": false,
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_stagger_01/round3/edge-row-probe/r3-s1-y10.jsonl",
+      "trajectory_sha256": "68cad8819516bf9e742f513395cda48bcbb52b4f2b47270f4db99c35f4f58c05"
+    },
+    {
+      "rank": 3,
+      "seed": 1,
+      "target": [
+        0.0,
+        438.0
+      ],
+      "status": "DEATH",
+      "done": 1,
+      "steps": 137,
+      "arrival_step": 21,
+      "stationary_frames_max": 0,
+      "max_target_drift": 5.326484775199937,
+      "stationary_qualified": false,
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_stagger_01/round3/edge-row-probe/r3-s1-y438.jsonl",
+      "trajectory_sha256": "2ac707963a82e2dc1980b74b8c45563116c6b31a278fa305b5e70b6b1a0727c5"
+    },
+    {
+      "rank": 3,
+      "seed": 7,
+      "target": [
+        0.0,
+        10.0
+      ],
+      "status": "DEATH",
+      "done": 1,
+      "steps": 103,
+      "arrival_step": null,
+      "stationary_frames_max": 0,
+      "max_target_drift": 0,
+      "stationary_qualified": false,
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_stagger_01/round3/edge-row-probe/r3-s7-y10.jsonl",
+      "trajectory_sha256": "f0b6055f41e12613c71c13df62279bd9d960a4c9ea97fc2937f49f04438933db"
+    },
+    {
+      "rank": 3,
+      "seed": 7,
+      "target": [
+        0.0,
+        438.0
+      ],
+      "status": "DEATH",
+      "done": 1,
+      "steps": 577,
+      "arrival_step": 8,
+      "stationary_frames_max": 568,
+      "max_target_drift": 3.9605037003274677,
+      "stationary_qualified": true,
+      "trajectory": "/data/sunyunbo/www/stg-rl-train/runs/laser-specialist-batch3-validation/laser_sp_stagger_01/round3/edge-row-probe/r3-s7-y438.jsonl",
+      "trajectory_sha256": "ff3083a3b0254c6bf5572ad0c18752c1a2270f96621b358db060a45c6d73b0b4"
+    }
+  ],
+  "reproduction": ".venv/bin/python /tmp/sunyunbo/stg-laser-batch3/check_stagger_rows.py",
+  "limitations": [
+    "A missed target is not proof it is unsafe",
+    "Finite samples, no universal solvability/pressure claim"
+  ]
+}

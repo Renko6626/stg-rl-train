@@ -1,0 +1,9 @@
+[package]
+name = "laser-trace"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+stg-core = { path = "../../../stg-engine/crates/stg-core" }
+stg-ecl-compiler = { path = "../../../stg-engine/crates/stg-ecl-compiler" }

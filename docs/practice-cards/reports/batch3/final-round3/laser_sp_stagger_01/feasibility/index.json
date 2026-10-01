@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "tool_sha256": "02afa09a64d91a94eecee9b61d7deeb28aac81e4d489d713accb58622cd60681",
+  "reports": [
+    {
+      "card": "laser_sp_stagger_01",
+      "report": "docs/practice-cards/reports/batch3/final-round3/laser_sp_stagger_01/feasibility/laser_sp_stagger_01.json",
+      "runs": 88,
+      "report_sha256": "a5f65b7e1a51c2f3d47cbc64f41e2764b008ece29a7f23a777c0c167804b9315"
+    }
+  ]
+}

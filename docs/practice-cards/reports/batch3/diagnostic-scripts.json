@@ -1,0 +1,32 @@
+[
+  {
+    "script": "tools/batch3_diagnostics/check_corridor_horizon.py",
+    "sha256": "8e4eaccdb8a709be8ec030804c2f24679f21e61dc7f06a1cd025f21646cb601a",
+    "original_path": "/tmp/sunyunbo/stg-laser-batch3/check_corridor_horizon.py"
+  },
+  {
+    "script": "tools/batch3_diagnostics/check_stagger_rows.py",
+    "sha256": "69e70a70b8b50631812bf1b2c6586920efe37490c30eae42bdd434adc4f1fbfb",
+    "original_path": "/tmp/sunyunbo/stg-laser-batch3/check_stagger_rows.py"
+  },
+  {
+    "script": "tools/batch3_diagnostics/run_feasibility_batch.py",
+    "sha256": "16811dfe9131d5df575a6c7d80a05c1ffe676b5d2261b35b96dc37d7a2d87e10",
+    "original_path": "/tmp/sunyunbo/stg-laser-batch3/run_feasibility_batch.py"
+  },
+  {
+    "script": "tools/batch3_diagnostics/run_machine_batch.py",
+    "sha256": "8c8d39b2d3721f201f9ef0053e21e82f12425fb2d8df53796052aa70ef5aeab9",
+    "original_path": "/tmp/sunyunbo/stg-laser-batch3/run_machine_batch.py"
+  },
+  {
+    "script": "tools/batch3_diagnostics/run_final_batch.py",
+    "sha256": "88631262ef14e6fc4cf396bf138e9a46b840825f0772ba6c02efe28f02c134bd",
+    "original_path": "/tmp/sunyunbo/stg-laser-batch3/run_final_batch.py"
+  },
+  {
+    "script": "tools/batch3_diagnostics/run_horizon_diagnostics.py",
+    "sha256": "1529c2d128e191b9670354ae42314f366eebbbd6ecb87df60a14bff461ad6567",
+    "original_path": "/tmp/sunyunbo/stg-laser-batch3/run_horizon_diagnostics.py"
+  }
+]

@@ -1,0 +1,48 @@
+{
+  "card": "laser_sp_bars_03",
+  "ok": false,
+  "errors": [
+    "r0关键帧缺少自然回收后的零激光快照",
+    "r1关键帧缺少自然回收后的零激光快照",
+    "r2关键帧缺少自然回收后的零激光快照",
+    "r3关键帧缺少自然回收后的零激光快照"
+  ],
+  "runs": [],
+  "measurements": [],
+  "key_frames": [],
+  "seeds": [
+    1,
+    7
+  ],
+  "file_sha256": {
+    "meta.toml": "562093f086ed4b808d729a576ed012f33cf7ac51011d67b6e7f9872d7176e805",
+    "TASK.md": "65f95368dda92e1ee814049fc454930d4fc7367e4ed181aa9e40de3edd729e96",
+    "machine-spec.json": "adaff06080dc76fe3d7582224f7e376ae8973d6c05387a6a125bd3882bb89051",
+    "main.ecl": "7edf9fcc1a3f4c6ce8f6b88c421c94ae6e1891ede7f8f6ab045ab142949ea6a1"
+  },
+  "harness_sha256": "01ea4b6cc8f1248e67eb9e09e291f8484a7eff551b2e962c7dc2719792de7730",
+  "validator": {
+    "version": "laser-specialist-v1-mechanical-trace",
+    "sha256": "0bf52940255c0c4f8d08896adbc42ac6e4b39ce229ad37e1bed4f778c283e909"
+  },
+  "python_version": "3.12.13",
+  "stg_rl": {
+    "version": "0.4.1",
+    "engine_ver": "24",
+    "tables_hash": "37a7ff12fe40e24e",
+    "git_sha": "5dfc08d-dirty"
+  },
+  "seed_matrix": {
+    "required": [
+      1,
+      7
+    ],
+    "provided": [
+      1,
+      7
+    ],
+    "errors": []
+  },
+  "independent_semantic_review": "pending",
+  "keyframe_geometry_tightness": "engine/contract-domain bounds are machine checked; support over the declared random domain requires non-author review"
+}

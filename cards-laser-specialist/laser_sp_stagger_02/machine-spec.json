@@ -1,0 +1,662 @@
+{
+  "schema_version": 1,
+  "max_visible_lasers": 16,
+  "max_live_lasers": 20,
+  "first_spawn_frame": 94,
+  "last_spawn_frame": 1471,
+  "last_expiry_frame": 1750,
+  "max_idle_gap": 90,
+  "key_frames": [
+    {
+      "rank": 0,
+      "frame": 94,
+      "count_min": 3,
+      "count_max": 3,
+      "states": [
+        0
+      ],
+      "width_min": 6,
+      "width_max": 6,
+      "x_min": -192,
+      "x_max": 192,
+      "y_min": -96,
+      "y_max": -96,
+      "angle_min": 90,
+      "angle_max": 90,
+      "start_min": 0,
+      "start_max": 0,
+      "end_min": 640,
+      "end_max": 640
+    },
+    {
+      "rank": 0,
+      "frame": 184,
+      "count_min": 3,
+      "count_max": 3,
+      "states": [
+        1
+      ],
+      "width_min": 6,
+      "width_max": 6,
+      "x_min": -192,
+      "x_max": 192,
+      "y_min": -96,
+      "y_max": -96,
+      "angle_min": 90,
+      "angle_max": 90,
+      "start_min": 0,
+      "start_max": 0,
+      "end_min": 640,
+      "end_max": 640
+    },
+    {
+      "rank": 0,
+      "frame": 206,
+      "count_min": 6,
+      "count_max": 6,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 6,
+      "width_max": 6,
+      "x_min": -192,
+      "x_max": 192,
+      "y_min": -96,
+      "y_max": -96,
+      "angle_min": 90,
+      "angle_max": 90,
+      "start_min": 0,
+      "start_max": 0,
+      "end_min": 640,
+      "end_max": 640
+    },
+    {
+      "rank": 0,
+      "frame": 318,
+      "count_min": 9,
+      "count_max": 9,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 6,
+      "width_max": 6,
+      "x_min": -192,
+      "x_max": 192,
+      "y_min": -96,
+      "y_max": -96,
+      "angle_min": 90,
+      "angle_max": 90,
+      "start_min": 0,
+      "start_max": 0,
+      "end_min": 640,
+      "end_max": 640
+    },
+    {
+      "rank": 0,
+      "frame": 900,
+      "count_min": 9,
+      "count_max": 9,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 6,
+      "width_max": 6,
+      "x_min": -192,
+      "x_max": 213,
+      "y_min": -96,
+      "y_max": -96,
+      "angle_min": 90,
+      "angle_max": 90,
+      "start_min": 0,
+      "start_max": 0,
+      "end_min": 640,
+      "end_max": 640
+    },
+    {
+      "rank": 0,
+      "frame": 1438,
+      "count_min": 9,
+      "count_max": 9,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 6,
+      "width_max": 6,
+      "x_min": -192,
+      "x_max": 192,
+      "y_min": -96,
+      "y_max": -96,
+      "angle_min": 90,
+      "angle_max": 90,
+      "start_min": 0,
+      "start_max": 0,
+      "end_min": 640,
+      "end_max": 640
+    },
+    {
+      "rank": 0,
+      "frame": 1749,
+      "count_min": 3,
+      "count_max": 3,
+      "states": [
+        2
+      ],
+      "width_min": 6,
+      "width_max": 6,
+      "x_min": -84,
+      "x_max": 192,
+      "y_min": -96,
+      "y_max": -96,
+      "angle_min": 90,
+      "angle_max": 90,
+      "start_min": 0,
+      "start_max": 0,
+      "end_min": 640,
+      "end_max": 640
+    },
+    {
+      "rank": 0,
+      "frame": 1750,
+      "count_min": 0,
+      "count_max": 0
+    },
+    {
+      "rank": 0,
+      "frame": 1800,
+      "count_min": 0,
+      "count_max": 0
+    },
+    {
+      "rank": 1,
+      "frame": 94,
+      "count_min": 3,
+      "count_max": 3,
+      "states": [
+        0
+      ],
+      "width_min": 8,
+      "width_max": 8,
+      "x_min": -192,
+      "x_max": 192,
+      "y_min": -96,
+      "y_max": -96,
+      "angle_min": 90,
+      "angle_max": 90,
+      "start_min": 0,
+      "start_max": 0,
+      "end_min": 640,
+      "end_max": 640
+    },
+    {
+      "rank": 1,
+      "frame": 169,
+      "count_min": 3,
+      "count_max": 3,
+      "states": [
+        1
+      ],
+      "width_min": 8,
+      "width_max": 8,
+      "x_min": -192,
+      "x_max": 192,
+      "y_min": -96,
+      "y_max": -96,
+      "angle_min": 90,
+      "angle_max": 90,
+      "start_min": 0,
+      "start_max": 0,
+      "end_min": 640,
+      "end_max": 640
+    },
+    {
+      "rank": 1,
+      "frame": 198,
+      "count_min": 6,
+      "count_max": 6,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 8,
+      "width_max": 8,
+      "x_min": -192,
+      "x_max": 192,
+      "y_min": -96,
+      "y_max": -96,
+      "angle_min": 90,
+      "angle_max": 90,
+      "start_min": 0,
+      "start_max": 0,
+      "end_min": 640,
+      "end_max": 640
+    },
+    {
+      "rank": 1,
+      "frame": 302,
+      "count_min": 9,
+      "count_max": 9,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 8,
+      "width_max": 8,
+      "x_min": -192,
+      "x_max": 192,
+      "y_min": -96,
+      "y_max": -96,
+      "angle_min": 90,
+      "angle_max": 90,
+      "start_min": 0,
+      "start_max": 0,
+      "end_min": 640,
+      "end_max": 640
+    },
+    {
+      "rank": 1,
+      "frame": 900,
+      "count_min": 9,
+      "count_max": 9,
+      "states": [
+        1,
+        2
+      ],
+      "width_min": 8,
+      "width_max": 8,
+      "x_min": -192,
+      "x_max": 197,
+      "y_min": -96,
+      "y_max": -96,
+      "angle_min": 90,
+      "angle_max": 90,
+      "start_min": 0,
+      "start_max": 0,
+      "end_min": 640,
+      "end_max": 640
+    },
+    {
+      "rank": 1,
+      "frame": 1446,
+      "count_min": 9,
+      "count_max": 9,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 8,
+      "width_max": 8,
+      "x_min": -192,
+      "x_max": 192,
+      "y_min": -96,
+      "y_max": -96,
+      "angle_min": 90,
+      "angle_max": 90,
+      "start_min": 0,
+      "start_max": 0,
+      "end_min": 640,
+      "end_max": 640
+    },
+    {
+      "rank": 1,
+      "frame": 1742,
+      "count_min": 3,
+      "count_max": 3,
+      "states": [
+        2
+      ],
+      "width_min": 8,
+      "width_max": 8,
+      "x_min": -192,
+      "x_max": 181,
+      "y_min": -96,
+      "y_max": -96,
+      "angle_min": 90,
+      "angle_max": 90,
+      "start_min": 0,
+      "start_max": 0,
+      "end_min": 640,
+      "end_max": 640
+    },
+    {
+      "rank": 1,
+      "frame": 1743,
+      "count_min": 0,
+      "count_max": 0
+    },
+    {
+      "rank": 1,
+      "frame": 1800,
+      "count_min": 0,
+      "count_max": 0
+    },
+    {
+      "rank": 2,
+      "frame": 94,
+      "count_min": 3,
+      "count_max": 3,
+      "states": [
+        0
+      ],
+      "width_min": 10,
+      "width_max": 10,
+      "x_min": -192,
+      "x_max": 192,
+      "y_min": -96,
+      "y_max": -96,
+      "angle_min": 90,
+      "angle_max": 90,
+      "start_min": 0,
+      "start_max": 0,
+      "end_min": 640,
+      "end_max": 640
+    },
+    {
+      "rank": 2,
+      "frame": 154,
+      "count_min": 3,
+      "count_max": 3,
+      "states": [
+        1
+      ],
+      "width_min": 10,
+      "width_max": 10,
+      "x_min": -192,
+      "x_max": 192,
+      "y_min": -96,
+      "y_max": -96,
+      "angle_min": 90,
+      "angle_max": 90,
+      "start_min": 0,
+      "start_max": 0,
+      "end_min": 640,
+      "end_max": 640
+    },
+    {
+      "rank": 2,
+      "frame": 184,
+      "count_min": 6,
+      "count_max": 6,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 10,
+      "width_max": 10,
+      "x_min": -192,
+      "x_max": 192,
+      "y_min": -96,
+      "y_max": -96,
+      "angle_min": 90,
+      "angle_max": 90,
+      "start_min": 0,
+      "start_max": 0,
+      "end_min": 640,
+      "end_max": 640
+    },
+    {
+      "rank": 2,
+      "frame": 274,
+      "count_min": 9,
+      "count_max": 9,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 10,
+      "width_max": 10,
+      "x_min": -192,
+      "x_max": 192,
+      "y_min": -96,
+      "y_max": -96,
+      "angle_min": 90,
+      "angle_max": 90,
+      "start_min": 0,
+      "start_max": 0,
+      "end_min": 640,
+      "end_max": 640
+    },
+    {
+      "rank": 2,
+      "frame": 900,
+      "count_min": 9,
+      "count_max": 9,
+      "states": [
+        1
+      ],
+      "width_min": 10,
+      "width_max": 10,
+      "x_min": -192,
+      "x_max": 207,
+      "y_min": -96,
+      "y_max": -96,
+      "angle_min": 90,
+      "angle_max": 90,
+      "start_min": 0,
+      "start_max": 0,
+      "end_min": 640,
+      "end_max": 640
+    },
+    {
+      "rank": 2,
+      "frame": 1444,
+      "count_min": 12,
+      "count_max": 12,
+      "states": [
+        0,
+        1,
+        2
+      ],
+      "width_min": 10,
+      "width_max": 10,
+      "x_min": -192,
+      "x_max": 192,
+      "y_min": -96,
+      "y_max": -96,
+      "angle_min": 90,
+      "angle_max": 90,
+      "start_min": 0,
+      "start_max": 0,
+      "end_min": 640,
+      "end_max": 640
+    },
+    {
+      "rank": 2,
+      "frame": 1725,
+      "count_min": 3,
+      "count_max": 3,
+      "states": [
+        2
+      ],
+      "width_min": 10,
+      "width_max": 10,
+      "x_min": -192,
+      "x_max": 95,
+      "y_min": -96,
+      "y_max": -96,
+      "angle_min": 90,
+      "angle_max": 90,
+      "start_min": 0,
+      "start_max": 0,
+      "end_min": 640,
+      "end_max": 640
+    },
+    {
+      "rank": 2,
+      "frame": 1726,
+      "count_min": 0,
+      "count_max": 0
+    },
+    {
+      "rank": 2,
+      "frame": 1800,
+      "count_min": 0,
+      "count_max": 0
+    },
+    {
+      "rank": 3,
+      "frame": 94,
+      "count_min": 3,
+      "count_max": 3,
+      "states": [
+        0
+      ],
+      "width_min": 12,
+      "width_max": 12,
+      "x_min": -192,
+      "x_max": 192,
+      "y_min": -96,
+      "y_max": -96,
+      "angle_min": 90,
+      "angle_max": 90,
+      "start_min": 0,
+      "start_max": 0,
+      "end_min": 640,
+      "end_max": 640
+    },
+    {
+      "rank": 3,
+      "frame": 139,
+      "count_min": 3,
+      "count_max": 3,
+      "states": [
+        1
+      ],
+      "width_min": 12,
+      "width_max": 12,
+      "x_min": -192,
+      "x_max": 192,
+      "y_min": -96,
+      "y_max": -96,
+      "angle_min": 90,
+      "angle_max": 90,
+      "start_min": 0,
+      "start_max": 0,
+      "end_min": 640,
+      "end_max": 640
+    },
+    {
+      "rank": 3,
+      "frame": 175,
+      "count_min": 6,
+      "count_max": 6,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 12,
+      "width_max": 12,
+      "x_min": -192,
+      "x_max": 192,
+      "y_min": -96,
+      "y_max": -96,
+      "angle_min": 90,
+      "angle_max": 90,
+      "start_min": 0,
+      "start_max": 0,
+      "end_min": 640,
+      "end_max": 640
+    },
+    {
+      "rank": 3,
+      "frame": 256,
+      "count_min": 9,
+      "count_max": 9,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 12,
+      "width_max": 12,
+      "x_min": -192,
+      "x_max": 192,
+      "y_min": -96,
+      "y_max": -96,
+      "angle_min": 90,
+      "angle_max": 90,
+      "start_min": 0,
+      "start_max": 0,
+      "end_min": 640,
+      "end_max": 640
+    },
+    {
+      "rank": 3,
+      "frame": 900,
+      "count_min": 9,
+      "count_max": 9,
+      "states": [
+        1
+      ],
+      "width_min": 12,
+      "width_max": 12,
+      "x_min": -192,
+      "x_max": 192,
+      "y_min": -96,
+      "y_max": -96,
+      "angle_min": 90,
+      "angle_max": 90,
+      "start_min": 0,
+      "start_max": 0,
+      "end_min": 640,
+      "end_max": 640
+    },
+    {
+      "rank": 3,
+      "frame": 1471,
+      "count_min": 12,
+      "count_max": 12,
+      "states": [
+        0,
+        1
+      ],
+      "width_min": 12,
+      "width_max": 12,
+      "x_min": -192,
+      "x_max": 192,
+      "y_min": -96,
+      "y_max": -96,
+      "angle_min": 90,
+      "angle_max": 90,
+      "start_min": 0,
+      "start_max": 0,
+      "end_min": 640,
+      "end_max": 640
+    },
+    {
+      "rank": 3,
+      "frame": 1737,
+      "count_min": 3,
+      "count_max": 3,
+      "states": [
+        2
+      ],
+      "width_min": 12,
+      "width_max": 12,
+      "x_min": -192,
+      "x_max": 9,
+      "y_min": -96,
+      "y_max": -96,
+      "angle_min": 90,
+      "angle_max": 90,
+      "start_min": 0,
+      "start_max": 0,
+      "end_min": 640,
+      "end_max": 640
+    },
+    {
+      "rank": 3,
+      "frame": 1738,
+      "count_min": 0,
+      "count_max": 0
+    },
+    {
+      "rank": 3,
+      "frame": 1800,
+      "count_min": 0,
+      "count_max": 0
+    }
+  ]
+}

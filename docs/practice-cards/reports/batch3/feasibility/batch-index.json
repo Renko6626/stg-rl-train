@@ -1,0 +1,222 @@
+{
+  "completed": [
+    {
+      "card": "laser_sp_sweep_01",
+      "exit": 0,
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/feasibility/laser_sp_sweep_01/f27ce7192b39/laser_sp_sweep_01.json",
+      "log": "/tmp/sunyunbo/stg-laser-batch3/feasibility-logs/laser_sp_sweep_01-f27ce7192b39.log",
+      "heuristic_success": 2,
+      "heuristic_trials": 8,
+      "stationary_successes": 3,
+      "tool_sha256": "02afa09a64d91a94eecee9b61d7deeb28aac81e4d489d713accb58622cd60681",
+      "main_sha256": "f27ce7192b398c681845d888b5ac7e4757cfbe00d68dc5659069b1a710b39fee"
+    },
+    {
+      "card": "laser_sp_corridor_04",
+      "exit": 0,
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/feasibility/laser_sp_corridor_04/962ce277cee1/laser_sp_corridor_04.json",
+      "log": "/tmp/sunyunbo/stg-laser-batch3/feasibility-logs/laser_sp_corridor_04-962ce277cee1.log",
+      "heuristic_success": 8,
+      "heuristic_trials": 8,
+      "stationary_successes": 3,
+      "tool_sha256": "02afa09a64d91a94eecee9b61d7deeb28aac81e4d489d713accb58622cd60681",
+      "main_sha256": "962ce277cee16c66bd4bac128487ba29a8e74f1d4fcbb5aa8ed805b7d2b715dc"
+    },
+    {
+      "card": "laser_sp_sweep_02",
+      "exit": 0,
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/feasibility/laser_sp_sweep_02/8f43bb5837e5/laser_sp_sweep_02.json",
+      "log": "/tmp/sunyunbo/stg-laser-batch3/feasibility-logs/laser_sp_sweep_02-8f43bb5837e5.log",
+      "heuristic_success": 3,
+      "heuristic_trials": 8,
+      "stationary_successes": 2,
+      "tool_sha256": "02afa09a64d91a94eecee9b61d7deeb28aac81e4d489d713accb58622cd60681",
+      "main_sha256": "8f43bb5837e51b8b915c57af310e28d800a35171a437ed7b8ab74d874d5de1e2"
+    },
+    {
+      "card": "laser_sp_corridor_02",
+      "exit": 0,
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/feasibility/laser_sp_corridor_02/e01c9095098b/laser_sp_corridor_02.json",
+      "log": "/tmp/sunyunbo/stg-laser-batch3/feasibility-logs/laser_sp_corridor_02-e01c9095098b.log",
+      "heuristic_success": 2,
+      "heuristic_trials": 8,
+      "stationary_successes": 22,
+      "tool_sha256": "02afa09a64d91a94eecee9b61d7deeb28aac81e4d489d713accb58622cd60681",
+      "main_sha256": "e01c9095098b41c623d5cd393d1c977b72a09066932cdb2bf69b64a5e0c4947e"
+    },
+    {
+      "card": "laser_sp_stagger_03",
+      "exit": 0,
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/feasibility/laser_sp_stagger_03/738c7fcf2f54/laser_sp_stagger_03.json",
+      "log": "/tmp/sunyunbo/stg-laser-batch3/feasibility-logs/laser_sp_stagger_03-738c7fcf2f54.log",
+      "heuristic_success": 6,
+      "heuristic_trials": 8,
+      "stationary_successes": 0,
+      "tool_sha256": "02afa09a64d91a94eecee9b61d7deeb28aac81e4d489d713accb58622cd60681",
+      "main_sha256": "738c7fcf2f5434229363fb67596b11da50c473f73021d1152eb4acfa40076c8c"
+    },
+    {
+      "card": "laser_sp_stagger_04",
+      "exit": 0,
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/feasibility/laser_sp_stagger_04/6a144f035ffd/laser_sp_stagger_04.json",
+      "log": "/tmp/sunyunbo/stg-laser-batch3/feasibility-logs/laser_sp_stagger_04-6a144f035ffd.log",
+      "heuristic_success": 7,
+      "heuristic_trials": 8,
+      "stationary_successes": 20,
+      "tool_sha256": "02afa09a64d91a94eecee9b61d7deeb28aac81e4d489d713accb58622cd60681",
+      "main_sha256": "6a144f035ffd0a2f25bafc0bff60637136de8f323252c5b67ffeed3461b38937"
+    },
+    {
+      "card": "laser_sp_corridor_01",
+      "exit": 0,
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/feasibility/laser_sp_corridor_01/3fc00e45706f/laser_sp_corridor_01.json",
+      "log": "/tmp/sunyunbo/stg-laser-batch3/feasibility-logs/laser_sp_corridor_01-3fc00e45706f.log",
+      "heuristic_success": 4,
+      "heuristic_trials": 8,
+      "stationary_successes": 25,
+      "tool_sha256": "02afa09a64d91a94eecee9b61d7deeb28aac81e4d489d713accb58622cd60681",
+      "main_sha256": "3fc00e45706ffa839d31261efb36c1dc1231b4986ec5aa87b9b1b7a83c918039"
+    },
+    {
+      "card": "laser_sp_corridor_03",
+      "exit": 0,
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/feasibility/laser_sp_corridor_03/0bb5dbd2697b/laser_sp_corridor_03.json",
+      "log": "/tmp/sunyunbo/stg-laser-batch3/feasibility-logs/laser_sp_corridor_03-0bb5dbd2697b.log",
+      "heuristic_success": 0,
+      "heuristic_trials": 8,
+      "stationary_successes": 0,
+      "tool_sha256": "02afa09a64d91a94eecee9b61d7deeb28aac81e4d489d713accb58622cd60681",
+      "main_sha256": "0bb5dbd2697b9bc271420a80178d0547e64e343f14afd8471a3b8bdfabd44a66"
+    },
+    {
+      "card": "laser_sp_aimed_01",
+      "exit": 0,
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/feasibility/laser_sp_aimed_01/091da87f6cad/laser_sp_aimed_01.json",
+      "log": "/tmp/sunyunbo/stg-laser-batch3/feasibility-logs/laser_sp_aimed_01-091da87f6cad.log",
+      "heuristic_success": 2,
+      "heuristic_trials": 8,
+      "stationary_successes": 0,
+      "tool_sha256": "02afa09a64d91a94eecee9b61d7deeb28aac81e4d489d713accb58622cd60681",
+      "main_sha256": "091da87f6cad007d1fbfc76ee42da1532a6cb02af0a2186123ce1dc6df17720a"
+    },
+    {
+      "card": "laser_sp_aimed_02",
+      "exit": 0,
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/feasibility/laser_sp_aimed_02/96ca865537bd/laser_sp_aimed_02.json",
+      "log": "/tmp/sunyunbo/stg-laser-batch3/feasibility-logs/laser_sp_aimed_02-96ca865537bd.log",
+      "heuristic_success": 2,
+      "heuristic_trials": 8,
+      "stationary_successes": 0,
+      "tool_sha256": "02afa09a64d91a94eecee9b61d7deeb28aac81e4d489d713accb58622cd60681",
+      "main_sha256": "96ca865537bdc09085df50ca29fc4aafa133f14c9c8a22b769b77cba9592b423"
+    },
+    {
+      "card": "laser_sp_aimed_04",
+      "exit": 0,
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/feasibility/laser_sp_aimed_04/c466b5f6d096/laser_sp_aimed_04.json",
+      "log": "/tmp/sunyunbo/stg-laser-batch3/feasibility-logs/laser_sp_aimed_04-c466b5f6d096.log",
+      "heuristic_success": 2,
+      "heuristic_trials": 8,
+      "stationary_successes": 0,
+      "tool_sha256": "02afa09a64d91a94eecee9b61d7deeb28aac81e4d489d713accb58622cd60681",
+      "main_sha256": "c466b5f6d096b3e04dfa852aa8bb8ad964bb686983fbc3fbb125d27e595124b7"
+    },
+    {
+      "card": "laser_sp_sweep_03",
+      "exit": 0,
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/feasibility/laser_sp_sweep_03/da34d47f01f4/laser_sp_sweep_03.json",
+      "log": "/tmp/sunyunbo/stg-laser-batch3/feasibility-logs/laser_sp_sweep_03-da34d47f01f4.log",
+      "heuristic_success": 7,
+      "heuristic_trials": 8,
+      "stationary_successes": 2,
+      "tool_sha256": "02afa09a64d91a94eecee9b61d7deeb28aac81e4d489d713accb58622cd60681",
+      "main_sha256": "da34d47f01f40d933c7d23b7f9fb9d307ebca7555bcda7ae22c2c8fe88c2a995"
+    },
+    {
+      "card": "laser_sp_aimed_03",
+      "exit": 0,
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/feasibility/laser_sp_aimed_03/353496f9017b/laser_sp_aimed_03.json",
+      "log": "/tmp/sunyunbo/stg-laser-batch3/feasibility-logs/laser_sp_aimed_03-353496f9017b.log",
+      "heuristic_success": 3,
+      "heuristic_trials": 8,
+      "stationary_successes": 0,
+      "tool_sha256": "02afa09a64d91a94eecee9b61d7deeb28aac81e4d489d713accb58622cd60681",
+      "main_sha256": "353496f9017b69bdfddf49d4101cb366016259806440fe24761c01137658fcba"
+    },
+    {
+      "card": "laser_sp_sweep_04",
+      "exit": 0,
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/feasibility/laser_sp_sweep_04/b537d82e9d0b/laser_sp_sweep_04.json",
+      "log": "/tmp/sunyunbo/stg-laser-batch3/feasibility-logs/laser_sp_sweep_04-b537d82e9d0b.log",
+      "heuristic_success": 8,
+      "heuristic_trials": 8,
+      "stationary_successes": 17,
+      "tool_sha256": "02afa09a64d91a94eecee9b61d7deeb28aac81e4d489d713accb58622cd60681",
+      "main_sha256": "b537d82e9d0b748b4fd23e897cb0e4e1f645ac32353f472a61cbd4693863d4a7"
+    },
+    {
+      "card": "laser_sp_bars_03",
+      "exit": 0,
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/feasibility/laser_sp_bars_03/7edf9fcc1a3f/laser_sp_bars_03.json",
+      "log": "/tmp/sunyunbo/stg-laser-batch3/feasibility-logs/laser_sp_bars_03-7edf9fcc1a3f.log",
+      "heuristic_success": 8,
+      "heuristic_trials": 8,
+      "stationary_successes": 22,
+      "tool_sha256": "02afa09a64d91a94eecee9b61d7deeb28aac81e4d489d713accb58622cd60681",
+      "main_sha256": "7edf9fcc1a3f4c6ce8f6b88c421c94ae6e1891ede7f8f6ab045ab142949ea6a1"
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "exit": 0,
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/feasibility/laser_sp_bars_04/263f3f80a4b5/laser_sp_bars_04.json",
+      "log": "/tmp/sunyunbo/stg-laser-batch3/feasibility-logs/laser_sp_bars_04-263f3f80a4b5.log",
+      "heuristic_success": 8,
+      "heuristic_trials": 8,
+      "stationary_successes": 23,
+      "tool_sha256": "02afa09a64d91a94eecee9b61d7deeb28aac81e4d489d713accb58622cd60681",
+      "main_sha256": "263f3f80a4b5488d8d7ed00c05ff454b89867b292a5366b01ef2fd285bc65804"
+    },
+    {
+      "card": "laser_sp_bars_02",
+      "exit": 0,
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/feasibility/laser_sp_bars_02/3a5e41944bbd/laser_sp_bars_02.json",
+      "log": "/tmp/sunyunbo/stg-laser-batch3/feasibility-logs/laser_sp_bars_02-3a5e41944bbd.log",
+      "heuristic_success": 7,
+      "heuristic_trials": 8,
+      "stationary_successes": 17,
+      "tool_sha256": "02afa09a64d91a94eecee9b61d7deeb28aac81e4d489d713accb58622cd60681",
+      "main_sha256": "3a5e41944bbd13992d00b37553e30a00c2f38f69d32fdde2244f7cddd635ee90"
+    },
+    {
+      "card": "laser_sp_bars_01",
+      "exit": 0,
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/feasibility/laser_sp_bars_01/70ddc49ce48a/laser_sp_bars_01.json",
+      "log": "/tmp/sunyunbo/stg-laser-batch3/feasibility-logs/laser_sp_bars_01-70ddc49ce48a.log",
+      "heuristic_success": 8,
+      "heuristic_trials": 8,
+      "stationary_successes": 39,
+      "tool_sha256": "02afa09a64d91a94eecee9b61d7deeb28aac81e4d489d713accb58622cd60681",
+      "main_sha256": "70ddc49ce48a183403a274636addb51cc119f985ed89d794fc0f6459898017ca"
+    }
+  ],
+  "expected_cards": [
+    "laser_sp_stagger_03",
+    "laser_sp_stagger_04",
+    "laser_sp_corridor_01",
+    "laser_sp_corridor_02",
+    "laser_sp_corridor_03",
+    "laser_sp_corridor_04",
+    "laser_sp_sweep_01",
+    "laser_sp_sweep_02",
+    "laser_sp_sweep_03",
+    "laser_sp_sweep_04",
+    "laser_sp_aimed_01",
+    "laser_sp_aimed_02",
+    "laser_sp_aimed_03",
+    "laser_sp_aimed_04",
+    "laser_sp_bars_01",
+    "laser_sp_bars_02",
+    "laser_sp_bars_03",
+    "laser_sp_bars_04"
+  ]
+}

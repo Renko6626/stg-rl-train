@@ -1,0 +1,13 @@
+title = "平移横廊 · 纵向交接"
+source = "synthetic"
+data_kind = "synthetic"
+synthetic_kind = "laser_specialist"
+generation_mode = "standalone"
+family = "corridor"
+layout_id = "laser_sp_corridor_02"
+split = "train"
+contract_version = 1
+ranks = [0, 3]
+marks = [0]
+time_limit = 1800
+tags = ["laser", "specialist"]

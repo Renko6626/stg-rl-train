@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "tool_sha256": "02afa09a64d91a94eecee9b61d7deeb28aac81e4d489d713accb58622cd60681",
+  "reports": [
+    {
+      "card": "laser_sp_bars_03",
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/feasibility/laser_sp_bars_03/7edf9fcc1a3f/laser_sp_bars_03.json",
+      "runs": 88,
+      "report_sha256": "69f1866a7e9ba578041653c27aa72bc635da1f1e053a789ba88e30459a5d3ab1"
+    }
+  ]
+}

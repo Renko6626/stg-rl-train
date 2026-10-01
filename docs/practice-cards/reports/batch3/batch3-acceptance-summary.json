@@ -1,0 +1,787 @@
+{
+  "date": "2026-10-01",
+  "batch": "batch3",
+  "contract": "laser-specialist-contract v1",
+  "status": "complete",
+  "cards": [
+    {
+      "card": "laser_sp_aimed_01",
+      "family": "aimed",
+      "split": "train",
+      "status": "FINITE_SAMPLE_QUALIFIED",
+      "path": "cards-laser-specialist/laser_sp_aimed_01",
+      "file_sha256": {
+        "main.ecl": "790e41c56727898e475cf12380b83c3a5a493fd7463b3978309e234e9305ba8d",
+        "meta.toml": "6c7ce0c9fdf632aedea54b2fd6b2419a1a324e66ed9a7f2c3d650184dd014723",
+        "TASK.md": "d3b497088355eff009775ad8d0bde8c8cf67221c908c1d7785f2ca798d6cc742",
+        "machine-spec.json": "0cc2e36cadbd945affc44ff589cac7779b1cf0593276806e2fb5eaffe3b6e44a"
+      },
+      "source_review": "docs/practice-cards/reports/batch3/aimed-train-review.md",
+      "source_review_sha256": "17cecfd17891c9d6be13efc3795321b418b3861bad5dd4b15686b0c622449ea0",
+      "machine_report": "docs/practice-cards/reports/batch3/final/laser_sp_aimed_01/laser_sp_aimed_01.machine.json",
+      "machine_report_sha256": "2fa9651b9bc6440fb49197e17c010dfc2ad74513a86ea325ca9c2e58ce7d7ad4",
+      "machine": "PASS",
+      "player_report": "docs/practice-cards/reports/batch3/final/laser_sp_aimed_01/feasibility/laser_sp_aimed_01.json",
+      "player_report_sha256": "fbb43393bc5915f50f4a81e3272e852cdeca98b2efcf5e16260d1ec97913789b",
+      "heuristic_success": 4,
+      "heuristic_trials": 8,
+      "stationary_qualified_success": 0,
+      "stationary_trials": 80,
+      "motion_witnessed_ranks": [
+        0,
+        1,
+        2
+      ],
+      "motion_not_proven_ranks": [
+        3
+      ],
+      "supplementary_motion_success": 0,
+      "limitations": [
+        "Physical success is a finite trajectory witness; failed heuristic trials are NOT_PROVEN",
+        "Fixed-placement survival is recorded; absence of a source-universal shortcut is not a full-field/all-RNG pressure proof"
+      ]
+    },
+    {
+      "card": "laser_sp_aimed_02",
+      "family": "aimed",
+      "split": "train",
+      "status": "FINITE_SAMPLE_QUALIFIED",
+      "path": "cards-laser-specialist/laser_sp_aimed_02",
+      "file_sha256": {
+        "main.ecl": "610742bdba3e9ae4213493f343cb6f9ca330a775e4147852ae826a3d05aeaf92",
+        "meta.toml": "5167f9832cbb11d642a657994a35551aa44f5f6aed80afd7df122c13ed91fb3c",
+        "TASK.md": "e7965f054bfea806883886ccd82e901333d5890de1bc7158f6f48a4a4740f1a3",
+        "machine-spec.json": "825b62c694178b671c8ad0968f0aab887bf07c06d07c212f8838ecbf50030e0e"
+      },
+      "source_review": "docs/practice-cards/reports/batch3/aimed-train-review.md",
+      "source_review_sha256": "17cecfd17891c9d6be13efc3795321b418b3861bad5dd4b15686b0c622449ea0",
+      "machine_report": "docs/practice-cards/reports/batch3/final/laser_sp_aimed_02/laser_sp_aimed_02.machine.json",
+      "machine_report_sha256": "9f8830b416594e9f0d9643d68b8e329d7473bf5ea17e360e894aca86451fb2e8",
+      "machine": "PASS",
+      "player_report": "docs/practice-cards/reports/batch3/final/laser_sp_aimed_02/feasibility/laser_sp_aimed_02.json",
+      "player_report_sha256": "42e7f74dc41b1714289b8d3851646d41f05dd760338ed5bfcd75b69783bc5029",
+      "heuristic_success": 4,
+      "heuristic_trials": 8,
+      "stationary_qualified_success": 0,
+      "stationary_trials": 80,
+      "motion_witnessed_ranks": [
+        0,
+        1
+      ],
+      "motion_not_proven_ranks": [
+        2,
+        3
+      ],
+      "supplementary_motion_success": 0,
+      "limitations": [
+        "Physical success is a finite trajectory witness; failed heuristic trials are NOT_PROVEN",
+        "Fixed-placement survival is recorded; absence of a source-universal shortcut is not a full-field/all-RNG pressure proof"
+      ]
+    },
+    {
+      "card": "laser_sp_aimed_03",
+      "family": "aimed",
+      "split": "train",
+      "status": "FINITE_SAMPLE_QUALIFIED",
+      "path": "cards-laser-specialist/laser_sp_aimed_03",
+      "file_sha256": {
+        "main.ecl": "353496f9017b69bdfddf49d4101cb366016259806440fe24761c01137658fcba",
+        "meta.toml": "a7009547a41fe41b7a0c9064d7675ff2cdb1f79b2fce9108877d575705033c5e",
+        "TASK.md": "a0f8de8fba326fe8b1948485c16ae71aee233d08a6f943e7a3b90ca5586debb4",
+        "machine-spec.json": "09751ff733ac8d17d855897d83e108b9bdf2c7bc957ed141d7f3f06bb4e557ac"
+      },
+      "source_review": "docs/practice-cards/reports/batch3/aimed-train-review.md",
+      "source_review_sha256": "17cecfd17891c9d6be13efc3795321b418b3861bad5dd4b15686b0c622449ea0",
+      "machine_report": "docs/practice-cards/reports/batch3/final/laser_sp_aimed_03/laser_sp_aimed_03.machine.json",
+      "machine_report_sha256": "21fa3db562149a807bc06c1eefd21b448908310f5c2ef1bd389b92c319ace6ba",
+      "machine": "PASS",
+      "player_report": "docs/practice-cards/reports/batch3/final/laser_sp_aimed_03/feasibility/laser_sp_aimed_03.json",
+      "player_report_sha256": "0b1a76411ee20ef4f43dacb83fa0e9abee7f8cd7c679777b9dbbdaa853aa9e7c",
+      "heuristic_success": 3,
+      "heuristic_trials": 8,
+      "stationary_qualified_success": 0,
+      "stationary_trials": 80,
+      "motion_witnessed_ranks": [
+        0,
+        1
+      ],
+      "motion_not_proven_ranks": [
+        2,
+        3
+      ],
+      "supplementary_motion_success": 0,
+      "limitations": [
+        "Physical success is a finite trajectory witness; failed heuristic trials are NOT_PROVEN",
+        "Fixed-placement survival is recorded; absence of a source-universal shortcut is not a full-field/all-RNG pressure proof"
+      ]
+    },
+    {
+      "card": "laser_sp_aimed_04",
+      "family": "aimed",
+      "split": "held-out",
+      "status": "FINITE_SAMPLE_QUALIFIED",
+      "path": "cards-laser-specialist/laser_sp_aimed_04",
+      "file_sha256": {
+        "main.ecl": "c466b5f6d096b3e04dfa852aa8bb8ad964bb686983fbc3fbb125d27e595124b7",
+        "meta.toml": "b4bd074c8f84f8432d1577984f68c9233a1817cb6149d5179d650c442751cf29",
+        "TASK.md": "0168cf6664eaf862ce25eacdfef0188307a288b670afe37d0d97733b31506bad",
+        "machine-spec.json": "b24744cd2b2b612c3776d278b159c01e3a3f8574855b1762e00fda8d423a02b9"
+      },
+      "source_review": "docs/practice-cards/reports/batch3/heldout-review.md",
+      "source_review_sha256": "54b5f26190843df298b62eb1b552fe0839d2e5193543fd5e30d938c2aec35fd5",
+      "machine_report": "docs/practice-cards/reports/batch3/final/laser_sp_aimed_04/laser_sp_aimed_04.machine.json",
+      "machine_report_sha256": "4ff9b5faee770a9d28e4cccbcfc4ee1047d827b7d275a317d98b669d265fa9e2",
+      "machine": "PASS",
+      "player_report": "docs/practice-cards/reports/batch3/final/laser_sp_aimed_04/feasibility/laser_sp_aimed_04.json",
+      "player_report_sha256": "76cc7650846c5eedf91f17b98285201c082014e7ddb104e55431a8c7a75e2b31",
+      "heuristic_success": 2,
+      "heuristic_trials": 8,
+      "stationary_qualified_success": 0,
+      "stationary_trials": 80,
+      "motion_witnessed_ranks": [
+        0
+      ],
+      "motion_not_proven_ranks": [
+        1,
+        2,
+        3
+      ],
+      "supplementary_motion_success": 0,
+      "limitations": [
+        "Physical success is a finite trajectory witness; failed heuristic trials are NOT_PROVEN",
+        "Fixed-placement survival is recorded; absence of a source-universal shortcut is not a full-field/all-RNG pressure proof"
+      ]
+    },
+    {
+      "card": "laser_sp_bars_01",
+      "family": "bars",
+      "split": "train",
+      "status": "FINITE_SAMPLE_QUALIFIED",
+      "path": "cards-laser-specialist/laser_sp_bars_01",
+      "file_sha256": {
+        "main.ecl": "39e458a758e74583b82a1a4ec797f3db11bbb6c5ed19e8cc590f1f7d44445754",
+        "meta.toml": "81f70a504d000e7515c88513c980e50d9f2d59eddfb82754722e7b85db01a58b",
+        "TASK.md": "17c78b801294d42d256c1f38d413ae1a070bd9047775cb7084915c181d278b7a",
+        "machine-spec.json": "6af2cc438adccb872362ae04035e83989f0d8e6f838b63ebf7ee6a9c5bc2549b"
+      },
+      "source_review": "docs/practice-cards/reports/batch3/bars-train-review.md",
+      "source_review_sha256": "3fbe9ca30f8bbb19c572f6e708a0db747ea9c04e4d2a781c43d81ab268278028",
+      "machine_report": "docs/practice-cards/reports/batch3/final/laser_sp_bars_01/laser_sp_bars_01.machine.json",
+      "machine_report_sha256": "eded749099ede5b6eb132b4b1a162da215f40efcf5eed4708d210fd1a357822d",
+      "machine": "PASS",
+      "player_report": "docs/practice-cards/reports/batch3/final/laser_sp_bars_01/feasibility/laser_sp_bars_01.json",
+      "player_report_sha256": "fcd3cd2905b6dbb60fd35c2235401ac205e1d6c14e15cdfc4159234d08764409",
+      "heuristic_success": 6,
+      "heuristic_trials": 8,
+      "stationary_qualified_success": 0,
+      "stationary_trials": 80,
+      "motion_witnessed_ranks": [
+        0,
+        1,
+        3
+      ],
+      "motion_not_proven_ranks": [
+        2
+      ],
+      "supplementary_motion_success": 0,
+      "limitations": [
+        "Physical success is a finite trajectory witness; failed heuristic trials are NOT_PROVEN",
+        "Fixed-placement survival is recorded; absence of a source-universal shortcut is not a full-field/all-RNG pressure proof"
+      ]
+    },
+    {
+      "card": "laser_sp_bars_02",
+      "family": "bars",
+      "split": "train",
+      "status": "FINITE_SAMPLE_QUALIFIED",
+      "path": "cards-laser-specialist/laser_sp_bars_02",
+      "file_sha256": {
+        "main.ecl": "3a5e41944bbd13992d00b37553e30a00c2f38f69d32fdde2244f7cddd635ee90",
+        "meta.toml": "d27e673d16fdb6eb99d5627e9d890d913dc0040af0a3ef8658bbdef9a7951d59",
+        "TASK.md": "79baa5137c4eaa7eb1b6afea17178fc7e97d6fd658f4ff88ca18404755c74ae0",
+        "machine-spec.json": "0c84b34439b2ea49d83deea9094894dfda2b49f51e41be94f18b93435e085982"
+      },
+      "source_review": "docs/practice-cards/reports/batch3/bars-train-review.md",
+      "source_review_sha256": "3fbe9ca30f8bbb19c572f6e708a0db747ea9c04e4d2a781c43d81ab268278028",
+      "machine_report": "docs/practice-cards/reports/batch3/final/laser_sp_bars_02/laser_sp_bars_02.machine.json",
+      "machine_report_sha256": "c762cbfc90c16beb8f14ef9b0c3836563ecf9977a9d8f9a883f0a3dbfb9c4ede",
+      "machine": "PASS",
+      "player_report": "docs/practice-cards/reports/batch3/final/laser_sp_bars_02/feasibility/laser_sp_bars_02.json",
+      "player_report_sha256": "efd1c5e11cc3070796bf1afdb4dc18ee17fb25a84f1384bb70029775a9ca6f53",
+      "heuristic_success": 7,
+      "heuristic_trials": 8,
+      "stationary_qualified_success": 17,
+      "stationary_trials": 80,
+      "motion_witnessed_ranks": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "motion_not_proven_ranks": [],
+      "supplementary_motion_success": 0,
+      "limitations": [
+        "Physical success is a finite trajectory witness; failed heuristic trials are NOT_PROVEN",
+        "Fixed-placement survival is recorded; absence of a source-universal shortcut is not a full-field/all-RNG pressure proof"
+      ]
+    },
+    {
+      "card": "laser_sp_bars_03",
+      "family": "bars",
+      "split": "train",
+      "status": "FINITE_SAMPLE_QUALIFIED",
+      "path": "cards-laser-specialist/laser_sp_bars_03",
+      "file_sha256": {
+        "main.ecl": "d4bd04fcdf5e4454a74fa7b11a8ff2e9e61d934db19959458dcec3101ebcf94f",
+        "meta.toml": "562093f086ed4b808d729a576ed012f33cf7ac51011d67b6e7f9872d7176e805",
+        "TASK.md": "537a3c968e6a05ad56b7efbf7e93d04e39187654129d6dafcc0fad51a47c8e7c",
+        "machine-spec.json": "8012636eff19d8b86f0930b5f0987848fda95b8fde4c8fa94a6b2f88a113bfb2"
+      },
+      "source_review": "docs/practice-cards/reports/batch3/bars-train-review.md",
+      "source_review_sha256": "3fbe9ca30f8bbb19c572f6e708a0db747ea9c04e4d2a781c43d81ab268278028",
+      "machine_report": "docs/practice-cards/reports/batch3/final/laser_sp_bars_03/laser_sp_bars_03.machine.json",
+      "machine_report_sha256": "ab5aa272f7d4208e21ad77f343841706c0413326c2f6ac36cbd22d5ede695861",
+      "machine": "PASS",
+      "player_report": "docs/practice-cards/reports/batch3/final/laser_sp_bars_03/feasibility/laser_sp_bars_03.json",
+      "player_report_sha256": "cc2711250843153aaf0e549e7e0ae5cfa34d5cbd13d196e88210b6a823ea0b4e",
+      "heuristic_success": 8,
+      "heuristic_trials": 8,
+      "stationary_qualified_success": 39,
+      "stationary_trials": 80,
+      "motion_witnessed_ranks": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "motion_not_proven_ranks": [],
+      "supplementary_motion_success": 0,
+      "limitations": [
+        "Physical success is a finite trajectory witness; failed heuristic trials are NOT_PROVEN",
+        "Fixed-placement survival is recorded; absence of a source-universal shortcut is not a full-field/all-RNG pressure proof"
+      ]
+    },
+    {
+      "card": "laser_sp_bars_04",
+      "family": "bars",
+      "split": "held-out",
+      "status": "FINITE_SAMPLE_QUALIFIED",
+      "path": "cards-laser-specialist/laser_sp_bars_04",
+      "file_sha256": {
+        "main.ecl": "dee59177160d8e750765d8c52924ae615c8860f26e30f307833730ffeda122bf",
+        "meta.toml": "1414ab1f9dd7e462d25934da226a4555a29069b50099358e707aff015eff195b",
+        "TASK.md": "874e10ab298399c2ed940dd8937ca8ca19c6bd87e50effb61b1803081ebf177b",
+        "machine-spec.json": "eb981b8a01bc50705ba1983b357e98c30a989e5ff49e51cfb795147ed8026c88"
+      },
+      "source_review": "docs/practice-cards/reports/batch3/heldout-review.md",
+      "source_review_sha256": "54b5f26190843df298b62eb1b552fe0839d2e5193543fd5e30d938c2aec35fd5",
+      "machine_report": "docs/practice-cards/reports/batch3/final/laser_sp_bars_04/laser_sp_bars_04.machine.json",
+      "machine_report_sha256": "bae4248c14f8f95d321745df3a04f1999de83c1d57b12f00e9e907393b7ae8ea",
+      "machine": "PASS",
+      "player_report": "docs/practice-cards/reports/batch3/final/laser_sp_bars_04/feasibility/laser_sp_bars_04.json",
+      "player_report_sha256": "5aeffe4c73c32b0f6fe41452b019c83ef20df62e94695a5ac000bc66ebf4f7ce",
+      "heuristic_success": 7,
+      "heuristic_trials": 8,
+      "stationary_qualified_success": 18,
+      "stationary_trials": 80,
+      "motion_witnessed_ranks": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "motion_not_proven_ranks": [],
+      "supplementary_motion_success": 0,
+      "limitations": [
+        "Physical success is a finite trajectory witness; failed heuristic trials are NOT_PROVEN",
+        "Fixed-placement survival is recorded; absence of a source-universal shortcut is not a full-field/all-RNG pressure proof"
+      ]
+    },
+    {
+      "card": "laser_sp_corridor_01",
+      "family": "corridor",
+      "split": "train",
+      "status": "NOT_PROVEN_QUARANTINED",
+      "path": "cards-laser-specialist-quarantine/laser_sp_corridor_01",
+      "file_sha256": {
+        "main.ecl": "2a06fc8d99f64c3329eb00936343beb0fb5d711c20acf026bdddc69fad1799c2",
+        "meta.toml": "280d374d49c280f24d8dee35b07c9a057d4f70eccce82504ca33038b709d207c",
+        "TASK.md": "4f074081c324a28fac0da27d84fb5ff6cb66ca28d80c432f7bd253d279c95251",
+        "machine-spec.json": "8540bea6e26a75084499a3845a965c3e15b2eaf422930fb754c99545d5e80099"
+      },
+      "source_review": "docs/practice-cards/reports/batch3/corridor-train-review.md",
+      "source_review_sha256": "58d7b17a9e3cf80abf5dce98b9a8c649aeaa96133ccc324bc216257bafe4bf29",
+      "machine_report": "docs/practice-cards/reports/batch3/final/laser_sp_corridor_01/laser_sp_corridor_01.machine.json",
+      "machine_report_sha256": "e4cf62997bb9a385500e43e0078dee5f0b53e967c6ce0a4b9d7e3f4f60dbf3a7",
+      "machine": "PASS",
+      "player_report": "docs/practice-cards/reports/batch3/final/laser_sp_corridor_01/feasibility/laser_sp_corridor_01.json",
+      "player_report_sha256": "ff5f7247d39af57a93be628cc5d197373a999ea1050573b35a2ff3eadf3daefa",
+      "heuristic_success": 0,
+      "heuristic_trials": 8,
+      "stationary_qualified_success": 0,
+      "stationary_trials": 80,
+      "motion_witnessed_ranks": [],
+      "motion_not_proven_ranks": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "supplementary_motion_success": 0,
+      "limitations": [
+        "Physical success is a finite trajectory witness; failed heuristic trials are NOT_PROVEN",
+        "Fixed-placement survival is recorded; absence of a source-universal shortcut is not a full-field/all-RNG pressure proof"
+      ],
+      "quarantine_reason": "No completed causal-motion trajectory found in canonical18f and supplemental45f/90f; corridor cards also checked with a visible-cell controller. This is NOT an unsolvability proof."
+    },
+    {
+      "card": "laser_sp_corridor_02",
+      "family": "corridor",
+      "split": "train",
+      "status": "FINITE_SAMPLE_QUALIFIED",
+      "path": "cards-laser-specialist/laser_sp_corridor_02",
+      "file_sha256": {
+        "main.ecl": "6933461772b57146dcda295946ead8683b0f80f6f44f7cd8968f5440a4c1448b",
+        "meta.toml": "ba0b492eaae3766d92253d461a72eff5ade589fe1fe52228b743b74ae46c9cf5",
+        "TASK.md": "bbfcd143c05b53b8e81161c9b90c5db0217c8eb017628ad7322ce71f4ed4e10b",
+        "machine-spec.json": "f15ef0b2ed11951dd7b2ae64d9aef29f4a43a599681a0178f132ef5db0572a0b"
+      },
+      "source_review": "docs/practice-cards/reports/batch3/corridor-train-review.md",
+      "source_review_sha256": "58d7b17a9e3cf80abf5dce98b9a8c649aeaa96133ccc324bc216257bafe4bf29",
+      "machine_report": "docs/practice-cards/reports/batch3/final/laser_sp_corridor_02/laser_sp_corridor_02.machine.json",
+      "machine_report_sha256": "28f95e5c025ac4657bebc32392b8f655f36d1f40ed28a22160efaec8dcfb4c93",
+      "machine": "PASS",
+      "player_report": "docs/practice-cards/reports/batch3/final/laser_sp_corridor_02/feasibility/laser_sp_corridor_02.json",
+      "player_report_sha256": "2373dfcaf829ea9ca79c88da00607f5a347f6580542593ad51d1151a00e0f7d1",
+      "heuristic_success": 0,
+      "heuristic_trials": 8,
+      "stationary_qualified_success": 0,
+      "stationary_trials": 80,
+      "motion_witnessed_ranks": [
+        0,
+        1
+      ],
+      "motion_not_proven_ranks": [
+        2,
+        3
+      ],
+      "supplementary_motion_success": 4,
+      "limitations": [
+        "Physical success is a finite trajectory witness; failed heuristic trials are NOT_PROVEN",
+        "Fixed-placement survival is recorded; absence of a source-universal shortcut is not a full-field/all-RNG pressure proof"
+      ],
+      "supplementary_report": "docs/practice-cards/reports/batch3/corridor-cell-probe.json",
+      "supplementary_report_sha256": "fc990c4aa31fde0819afc3f0a3a5e287ad8bce8768093ae35e16a0811987865f",
+      "supplementary_review": "docs/practice-cards/reports/batch3/corridor-cell-probe-review.md",
+      "supplementary_review_sha256": "18e52e5935c1f4f14dce426e35c67ba8e1063d34db1c6b64be3c990058bc3ac7"
+    },
+    {
+      "card": "laser_sp_corridor_03",
+      "family": "corridor",
+      "split": "train",
+      "status": "NOT_PROVEN_QUARANTINED",
+      "path": "cards-laser-specialist-quarantine/laser_sp_corridor_03",
+      "file_sha256": {
+        "main.ecl": "0bb5dbd2697b9bc271420a80178d0547e64e343f14afd8471a3b8bdfabd44a66",
+        "meta.toml": "9edc3ebd6a18f0b0c8245b1bbae34e6fe616c8f3e3e5ab3d97acaa6baa659f59",
+        "TASK.md": "6e938e665186a7af0aba01b06d2fe2df588d6c59cffa15022482f9cc9afb43d6",
+        "machine-spec.json": "4fdad8aa85befa55a5270bb5a72079180faeac6b17c7ea965f987e44c66d017d"
+      },
+      "source_review": "docs/practice-cards/reports/batch3/corridor-train-review.md",
+      "source_review_sha256": "58d7b17a9e3cf80abf5dce98b9a8c649aeaa96133ccc324bc216257bafe4bf29",
+      "machine_report": "docs/practice-cards/reports/batch3/final/laser_sp_corridor_03/laser_sp_corridor_03.machine.json",
+      "machine_report_sha256": "c6484b6999cfcbb6b264925ecba8cda0cc8770cb188eed9af1b79bb1a4f33e61",
+      "machine": "PASS",
+      "player_report": "docs/practice-cards/reports/batch3/final/laser_sp_corridor_03/feasibility/laser_sp_corridor_03.json",
+      "player_report_sha256": "61b4d3c9150dc24c407f7450f527b9744c4f4df3df00107f59d05748403d3f7e",
+      "heuristic_success": 0,
+      "heuristic_trials": 8,
+      "stationary_qualified_success": 0,
+      "stationary_trials": 80,
+      "motion_witnessed_ranks": [],
+      "motion_not_proven_ranks": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "supplementary_motion_success": 0,
+      "limitations": [
+        "Physical success is a finite trajectory witness; failed heuristic trials are NOT_PROVEN",
+        "Fixed-placement survival is recorded; absence of a source-universal shortcut is not a full-field/all-RNG pressure proof"
+      ],
+      "quarantine_reason": "No completed causal-motion trajectory found in canonical18f and supplemental45f/90f; corridor cards also checked with a visible-cell controller. This is NOT an unsolvability proof."
+    },
+    {
+      "card": "laser_sp_corridor_04",
+      "family": "corridor",
+      "split": "held-out",
+      "status": "FINITE_SAMPLE_QUALIFIED",
+      "path": "cards-laser-specialist/laser_sp_corridor_04",
+      "file_sha256": {
+        "main.ecl": "962ce277cee16c66bd4bac128487ba29a8e74f1d4fcbb5aa8ed805b7d2b715dc",
+        "meta.toml": "eba3687b90de76c7447c1056d013a1d317d84761d4f0861fdde902edaec4a1db",
+        "TASK.md": "b3d88c406e52b77577d825127f55c37d8b73e73db481faf57877ec1fce07908a",
+        "machine-spec.json": "c06818521bf9e7948275e8be0c53b39a8fa9761b08db7fa0d8dfdd825b69f652"
+      },
+      "source_review": "docs/practice-cards/reports/batch3/heldout-review.md",
+      "source_review_sha256": "54b5f26190843df298b62eb1b552fe0839d2e5193543fd5e30d938c2aec35fd5",
+      "machine_report": "docs/practice-cards/reports/batch3/final/laser_sp_corridor_04/laser_sp_corridor_04.machine.json",
+      "machine_report_sha256": "ec0d5d88ca7a02e93869b834cc1ad928767924ae9567017cef527d317b5336d1",
+      "machine": "PASS",
+      "player_report": "docs/practice-cards/reports/batch3/final/laser_sp_corridor_04/feasibility/laser_sp_corridor_04.json",
+      "player_report_sha256": "a850f9206685ba0c7eca3e1edf55192dd72389e401b87e6967dc0e8a0b5c0167",
+      "heuristic_success": 8,
+      "heuristic_trials": 8,
+      "stationary_qualified_success": 3,
+      "stationary_trials": 80,
+      "motion_witnessed_ranks": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "motion_not_proven_ranks": [],
+      "supplementary_motion_success": 0,
+      "limitations": [
+        "Physical success is a finite trajectory witness; failed heuristic trials are NOT_PROVEN",
+        "Fixed-placement survival is recorded; absence of a source-universal shortcut is not a full-field/all-RNG pressure proof"
+      ]
+    },
+    {
+      "card": "laser_sp_stagger_01",
+      "family": "stagger",
+      "split": "train",
+      "status": "FINITE_SAMPLE_QUALIFIED",
+      "path": "cards-laser-specialist/laser_sp_stagger_01",
+      "file_sha256": {
+        "main.ecl": "250efd7ef10003fb4ef232b6c15df9d9b55520784460e4359455ed8dab8ffc90",
+        "meta.toml": "4e9917b5b0b08456daa77e0afa9eab270cf708ec29201e0c7fb4b251d9c4ba4e",
+        "TASK.md": "767c900202c5ca49c85d954237027d127935cc9acc4be951f34c56ca72d44c53",
+        "machine-spec.json": "f57ad85404b8a12c8b094e20c0cb30cb983781b6dd1b711bb92f5843666bf852"
+      },
+      "source_review": "docs/practice-cards/reports/batch3/stagger-train-review.md",
+      "source_review_sha256": "02d70d7a9297437e66471a4fbc35ad27802e95385fb41b15d132044628426c11",
+      "machine_report": "docs/practice-cards/reports/batch3/final-round3/laser_sp_stagger_01/laser_sp_stagger_01.machine.json",
+      "machine_report_sha256": "b0188f6b6e9b44ef1f929e7410182a344fc966a12df778b9ad4586141257981d",
+      "machine": "PASS",
+      "player_report": "docs/practice-cards/reports/batch3/final-round3/laser_sp_stagger_01/feasibility/laser_sp_stagger_01.json",
+      "player_report_sha256": "a5f65b7e1a51c2f3d47cbc64f41e2764b008ece29a7f23a777c0c167804b9315",
+      "heuristic_success": 7,
+      "heuristic_trials": 8,
+      "stationary_qualified_success": 15,
+      "stationary_trials": 80,
+      "motion_witnessed_ranks": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "motion_not_proven_ranks": [],
+      "supplementary_motion_success": 0,
+      "limitations": [
+        "Physical success is a finite trajectory witness; failed heuristic trials are NOT_PROVEN",
+        "Fixed-placement survival is recorded; absence of a source-universal shortcut is not a full-field/all-RNG pressure proof"
+      ]
+    },
+    {
+      "card": "laser_sp_stagger_02",
+      "family": "stagger",
+      "split": "train",
+      "status": "FINITE_SAMPLE_QUALIFIED",
+      "path": "cards-laser-specialist/laser_sp_stagger_02",
+      "file_sha256": {
+        "main.ecl": "b07234ecc57b0865790d6780f8a051794b193874ba76c185d965d6b50f714710",
+        "meta.toml": "17f7b1694535793fd653cabc45a9cfad04ca64a9c555bdcd5a9e3209a3f48948",
+        "TASK.md": "4d1abd5618471d1ba83e3de9fd17a529e24d704a8a814c603c7f208da1319ebf",
+        "machine-spec.json": "5f2a17d3049aa9081ab5d0f1fc8280224ee7398f1d423cccdfc761fea4d67dd7"
+      },
+      "source_review": "docs/practice-cards/reports/batch3/stagger-train-review.md",
+      "source_review_sha256": "02d70d7a9297437e66471a4fbc35ad27802e95385fb41b15d132044628426c11",
+      "machine_report": "docs/practice-cards/reports/batch3/final/laser_sp_stagger_02/laser_sp_stagger_02.machine.json",
+      "machine_report_sha256": "737643c58da67027ae228d0bb07ea57cf6d8b35b7c764497eee70e435aee7334",
+      "machine": "PASS",
+      "player_report": "docs/practice-cards/reports/batch3/final/laser_sp_stagger_02/feasibility/laser_sp_stagger_02.json",
+      "player_report_sha256": "9037d63ba5631ff64c71501c66df5b0327e5f830494ddec25c9cc8204f16bd18",
+      "heuristic_success": 7,
+      "heuristic_trials": 8,
+      "stationary_qualified_success": 8,
+      "stationary_trials": 80,
+      "motion_witnessed_ranks": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "motion_not_proven_ranks": [],
+      "supplementary_motion_success": 0,
+      "limitations": [
+        "Physical success is a finite trajectory witness; failed heuristic trials are NOT_PROVEN",
+        "Fixed-placement survival is recorded; absence of a source-universal shortcut is not a full-field/all-RNG pressure proof"
+      ]
+    },
+    {
+      "card": "laser_sp_stagger_03",
+      "family": "stagger",
+      "split": "train",
+      "status": "FINITE_SAMPLE_QUALIFIED",
+      "path": "cards-laser-specialist/laser_sp_stagger_03",
+      "file_sha256": {
+        "main.ecl": "738c7fcf2f5434229363fb67596b11da50c473f73021d1152eb4acfa40076c8c",
+        "meta.toml": "9feee67b761abb3e48653bbb6b48fdf8365c2c5d25a775b791b439789a318f2e",
+        "TASK.md": "9c7927b36d2cf12c1d6be7f4096048ad52e280bdd64c70bf79948bb5788329f4",
+        "machine-spec.json": "fca3873924935837dbbb56a00154a19e42b33e530518912618d9a05e65afc9e9"
+      },
+      "source_review": "docs/practice-cards/reports/batch3/stagger-train-review.md",
+      "source_review_sha256": "02d70d7a9297437e66471a4fbc35ad27802e95385fb41b15d132044628426c11",
+      "machine_report": "docs/practice-cards/reports/batch3/final/laser_sp_stagger_03/laser_sp_stagger_03.machine.json",
+      "machine_report_sha256": "d82146634708d5d0dde413a4cf404dc7ffa77fb5a7a0230f44c909f87b4237c5",
+      "machine": "PASS",
+      "player_report": "docs/practice-cards/reports/batch3/final/laser_sp_stagger_03/feasibility/laser_sp_stagger_03.json",
+      "player_report_sha256": "7737c0a0b1381fe0edda1c6358d63448e1224dbffe91aeba4a2a2c6ce455c5de",
+      "heuristic_success": 6,
+      "heuristic_trials": 8,
+      "stationary_qualified_success": 0,
+      "stationary_trials": 80,
+      "motion_witnessed_ranks": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "motion_not_proven_ranks": [],
+      "supplementary_motion_success": 0,
+      "limitations": [
+        "Physical success is a finite trajectory witness; failed heuristic trials are NOT_PROVEN",
+        "Fixed-placement survival is recorded; absence of a source-universal shortcut is not a full-field/all-RNG pressure proof"
+      ]
+    },
+    {
+      "card": "laser_sp_stagger_04",
+      "family": "stagger",
+      "split": "held-out",
+      "status": "FINITE_SAMPLE_QUALIFIED",
+      "path": "cards-laser-specialist/laser_sp_stagger_04",
+      "file_sha256": {
+        "main.ecl": "86251ae78bba2e3ab7ed72e6c94930d1024a62e3017678b64c985c7ca09d8129",
+        "meta.toml": "40538c594942073f32839d6d4ea2c3ef7a3532122549b2a798d88a2d920d4b10",
+        "TASK.md": "54bede6f08f25727128502ed4ea77ab7b1bb15e3d2432ae446c90c448df792d5",
+        "machine-spec.json": "2206f524e24d1786935215b0432e3eade116f25e12396b7d1d61c577fbef30c4"
+      },
+      "source_review": "docs/practice-cards/reports/batch3/heldout-review.md",
+      "source_review_sha256": "54b5f26190843df298b62eb1b552fe0839d2e5193543fd5e30d938c2aec35fd5",
+      "machine_report": "docs/practice-cards/reports/batch3/final/laser_sp_stagger_04/laser_sp_stagger_04.machine.json",
+      "machine_report_sha256": "e4d5485fb8b1233a3562e623acdb798fa0bd8bc9019a873090bea90bc00fd3c2",
+      "machine": "PASS",
+      "player_report": "docs/practice-cards/reports/batch3/final/laser_sp_stagger_04/feasibility/laser_sp_stagger_04.json",
+      "player_report_sha256": "b7db92876522b562d611695dc96faa01190265fa421de040b21d2095a89ce0c1",
+      "heuristic_success": 8,
+      "heuristic_trials": 8,
+      "stationary_qualified_success": 34,
+      "stationary_trials": 80,
+      "motion_witnessed_ranks": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "motion_not_proven_ranks": [],
+      "supplementary_motion_success": 0,
+      "limitations": [
+        "Physical success is a finite trajectory witness; failed heuristic trials are NOT_PROVEN",
+        "Fixed-placement survival is recorded; absence of a source-universal shortcut is not a full-field/all-RNG pressure proof"
+      ]
+    },
+    {
+      "card": "laser_sp_sweep_01",
+      "family": "sweep",
+      "split": "train",
+      "status": "FINITE_SAMPLE_QUALIFIED",
+      "path": "cards-laser-specialist/laser_sp_sweep_01",
+      "file_sha256": {
+        "main.ecl": "b00ad03e6261076e201c80d287abefd639aacc68c905b6e656d81ae9ad762af0",
+        "meta.toml": "0a984142ede50eda6e4f879df038306f15979bca6aded0035d659b3168feb9ef",
+        "TASK.md": "aa252a3d0ed11ea6c70fd144b5473e33392fb618e38310d5bab52a3ee87aa2dd",
+        "machine-spec.json": "90c3da8062e924571b96d075234ccbe71f41983b7ceeb9a3470ef04d0d07134a"
+      },
+      "source_review": "docs/practice-cards/reports/batch3/sweep-train-review.md",
+      "source_review_sha256": "3b2f7057a27db7d94628454e74f8fd3163b43959c06cf842548dee3c02c13d1b",
+      "machine_report": "docs/practice-cards/reports/batch3/final/laser_sp_sweep_01/laser_sp_sweep_01.machine.json",
+      "machine_report_sha256": "bcb0fd97d367f2629fd57823fe06331ad27afe04493daf5fe45eb0faee5e25c9",
+      "machine": "PASS",
+      "player_report": "docs/practice-cards/reports/batch3/final/laser_sp_sweep_01/feasibility/laser_sp_sweep_01.json",
+      "player_report_sha256": "6d80af4458d25bfa52c4001f0799e0f5b6317a3a3f9c6ea0a85f09668ea691b0",
+      "heuristic_success": 2,
+      "heuristic_trials": 8,
+      "stationary_qualified_success": 0,
+      "stationary_trials": 80,
+      "motion_witnessed_ranks": [
+        3
+      ],
+      "motion_not_proven_ranks": [
+        0,
+        1,
+        2
+      ],
+      "supplementary_motion_success": 0,
+      "limitations": [
+        "Physical success is a finite trajectory witness; failed heuristic trials are NOT_PROVEN",
+        "Fixed-placement survival is recorded; absence of a source-universal shortcut is not a full-field/all-RNG pressure proof"
+      ]
+    },
+    {
+      "card": "laser_sp_sweep_02",
+      "family": "sweep",
+      "split": "train",
+      "status": "NOT_PROVEN_QUARANTINED",
+      "path": "cards-laser-specialist-quarantine/laser_sp_sweep_02",
+      "file_sha256": {
+        "main.ecl": "5905e8cd75cef0038471681050fb18986d531ce4014de09623ccb1826416be98",
+        "meta.toml": "d1af770e2843037420b5b0e14ecea82ccd3febfc49d18741687f4e5a8535b141",
+        "TASK.md": "da5c82b555ee336f57b8f3f3a5805c2feb7cda5eea30d320fc37bb64be3b53dc",
+        "machine-spec.json": "956bf5bce941797df037fa5496c2669727c2e8659cd18ef3f2cd4aab51bf6688"
+      },
+      "source_review": "docs/practice-cards/reports/batch3/sweep-train-review.md",
+      "source_review_sha256": "3b2f7057a27db7d94628454e74f8fd3163b43959c06cf842548dee3c02c13d1b",
+      "machine_report": "docs/practice-cards/reports/batch3/final/laser_sp_sweep_02/laser_sp_sweep_02.machine.json",
+      "machine_report_sha256": "0706de130fc28e2299cede89a665f5458944de1bf1ae5c9eae7eb54681b8e32f",
+      "machine": "PASS",
+      "player_report": "docs/practice-cards/reports/batch3/final/laser_sp_sweep_02/feasibility/laser_sp_sweep_02.json",
+      "player_report_sha256": "7957fdb6dffe48f10917f82539a8b2367e6f80132756f744c6334af8fe51f5c5",
+      "heuristic_success": 0,
+      "heuristic_trials": 8,
+      "stationary_qualified_success": 0,
+      "stationary_trials": 80,
+      "motion_witnessed_ranks": [],
+      "motion_not_proven_ranks": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "supplementary_motion_success": 0,
+      "limitations": [
+        "Physical success is a finite trajectory witness; failed heuristic trials are NOT_PROVEN",
+        "Fixed-placement survival is recorded; absence of a source-universal shortcut is not a full-field/all-RNG pressure proof"
+      ],
+      "quarantine_reason": "No completed causal-motion trajectory found in canonical18f and supplemental45f/90f; corridor cards also checked with a visible-cell controller. This is NOT an unsolvability proof."
+    },
+    {
+      "card": "laser_sp_sweep_03",
+      "family": "sweep",
+      "split": "train",
+      "status": "FINITE_SAMPLE_QUALIFIED",
+      "path": "cards-laser-specialist/laser_sp_sweep_03",
+      "file_sha256": {
+        "main.ecl": "da34d47f01f40d933c7d23b7f9fb9d307ebca7555bcda7ae22c2c8fe88c2a995",
+        "meta.toml": "14c97048d361f54bcb622c3e4c455da8b6a99dc97fa69d942441cfdd90ec1327",
+        "TASK.md": "77bc69dd32ec4c74b24516962479d876ea80d963d33171119df2b95d0259078a",
+        "machine-spec.json": "6081ea3653e91fb7459f53459089dabbcb72e777dcab24e8a2d066dfb513c7b1"
+      },
+      "source_review": "docs/practice-cards/reports/batch3/sweep-train-review.md",
+      "source_review_sha256": "3b2f7057a27db7d94628454e74f8fd3163b43959c06cf842548dee3c02c13d1b",
+      "machine_report": "docs/practice-cards/reports/batch3/final-docfix/laser_sp_sweep_03/laser_sp_sweep_03.machine.json",
+      "machine_report_sha256": "549eb72e2bb6a94cce22b56ce7ab31725259a96ec0dc245f356c527ee3b21eac",
+      "machine": "PASS",
+      "player_report": "docs/practice-cards/reports/batch3/final-docfix/laser_sp_sweep_03/feasibility/laser_sp_sweep_03.json",
+      "player_report_sha256": "53394c1512f5288f0898dd79fe1b32c73b8e5b0ad2ad6a1335707f891a324738",
+      "heuristic_success": 7,
+      "heuristic_trials": 8,
+      "stationary_qualified_success": 2,
+      "stationary_trials": 80,
+      "motion_witnessed_ranks": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "motion_not_proven_ranks": [],
+      "supplementary_motion_success": 0,
+      "limitations": [
+        "Physical success is a finite trajectory witness; failed heuristic trials are NOT_PROVEN",
+        "Fixed-placement survival is recorded; absence of a source-universal shortcut is not a full-field/all-RNG pressure proof"
+      ]
+    },
+    {
+      "card": "laser_sp_sweep_04",
+      "family": "sweep",
+      "split": "held-out",
+      "status": "FINITE_SAMPLE_QUALIFIED",
+      "path": "cards-laser-specialist/laser_sp_sweep_04",
+      "file_sha256": {
+        "main.ecl": "b537d82e9d0b748b4fd23e897cb0e4e1f645ac32353f472a61cbd4693863d4a7",
+        "meta.toml": "4383090e06848fd16a6c80e64eb303016f0d27e0ee2995999757e4a5d1cdc277",
+        "TASK.md": "3d785f4a7758af19ddb7819ab5199675586c4a88321d9344388a0c3d10ff7896",
+        "machine-spec.json": "3e09d23424d32b81656dd8ad8811c086ac2d3a33ae271a2aa66422e46d57f303"
+      },
+      "source_review": "docs/practice-cards/reports/batch3/heldout-review.md",
+      "source_review_sha256": "54b5f26190843df298b62eb1b552fe0839d2e5193543fd5e30d938c2aec35fd5",
+      "machine_report": "docs/practice-cards/reports/batch3/final/laser_sp_sweep_04/laser_sp_sweep_04.machine.json",
+      "machine_report_sha256": "27545eafd160be92686064ab6a08ba50616e1ae9cf1056aa99801ac3d850fdbf",
+      "machine": "PASS",
+      "player_report": "docs/practice-cards/reports/batch3/final/laser_sp_sweep_04/feasibility/laser_sp_sweep_04.json",
+      "player_report_sha256": "a69dadf16cd11b1bd6685322c83b246c59fc9664fa77010caaf0cc9aa1cade14",
+      "heuristic_success": 8,
+      "heuristic_trials": 8,
+      "stationary_qualified_success": 17,
+      "stationary_trials": 80,
+      "motion_witnessed_ranks": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "motion_not_proven_ranks": [],
+      "supplementary_motion_success": 0,
+      "limitations": [
+        "Physical success is a finite trajectory witness; failed heuristic trials are NOT_PROVEN",
+        "Fixed-placement survival is recorded; absence of a source-universal shortcut is not a full-field/all-RNG pressure proof"
+      ]
+    }
+  ],
+  "scope": "finite-sample qualified candidates; no all-rank/all-RNG solvability or training benefit guarantee",
+  "counts": {
+    "generated": 20,
+    "mechanical_pass": 20,
+    "finite_sample_qualified": 17,
+    "qualified_train": 12,
+    "qualified_held_out": 5,
+    "quarantined": 3
+  },
+  "tests": {
+    "full_suite": "490 passed,1 skipped,4 CUDA/tensordict warnings",
+    "command": ".venv/bin/pytest -q"
+  },
+  "physics": {
+    "hit_extra": [
+      2,
+      2
+    ],
+    "motor": {
+      "hold": [
+        2,
+        6
+      ],
+      "delay": [
+        0,
+        2
+      ],
+      "slow": true
+    },
+    "frame_skip": 1,
+    "ranks": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "seeds": [
+      1,
+      7
+    ]
+  },
+  "policy_or_reward_changed": false,
+  "training_started": false,
+  "committed": false,
+  "pushed": false
+}

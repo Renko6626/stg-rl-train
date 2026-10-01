@@ -1,0 +1,51 @@
+# T5（2026-10-01）：T2 设置 + 12 张原创激光专项训练候选。
+# 原 13 卡评测与 best 选择口径保持；5 张专项 held-out 另行评测。
+# 每 250 updates 保存 checkpoint，确保末四次评测都有模型可复查。
+# 单臂固定 seed/预算，检验迁移收益；不改模型、reward、意图或课程。
+# 3 张 NOT_PROVEN 隔离卡不加载；候选资格不代表每 rank 可躲已证明。
+[run]
+total_updates = 3500
+ckpt_every = 250
+eval_every = 250
+
+[env]
+cards_dir = ["cards", "cards-synthetic", "cards-laser-specialist"]
+eval_splits = "eval/splits-laser.toml"
+num_envs = 4096
+hit_extra = [0.0, 2.0]
+threads = 0
+
+[intent]
+name = "mixed_v1"
+
+[featurize]
+name = "danger_topk_v7"
+frame = "static"
+dt = false
+k_lasers = 16
+laser_local = false
+
+[motor]
+enabled = true
+hold = [2, 6]
+delay = [0, 2]
+slow = true
+
+[reward.terms]
+death = 10.0
+follow_shaping = 1.0
+hold = 0.01
+segment_survived = 0.0
+key_press = -0.003
+quick_change = -0.01
+shift_toggle = 0.0
+edge_hug = -0.02
+
+[model]
+name = "set_attn_v2"
+sa_layers = 1
+laser_sa_layers = 0
+density_fp32 = true
+
+[ppo]
+amp = "bf16"

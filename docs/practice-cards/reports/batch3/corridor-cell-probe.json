@@ -1,0 +1,479 @@
+{
+  "schema_version": 1,
+  "classification": "finite witness probe; failures are NOT_PROVEN",
+  "controller": "visible-geometry projected cell-following plus existing current-observation fallback",
+  "different_from_canonical_h18": true,
+  "uses_future_ecl_timing_rng_or_expiry": false,
+  "canonical_h18_comparison": {
+    "module_sha256": "02afa09a64d91a94eecee9b61d7deeb28aac81e4d489d713accb58622cd60681"
+  },
+  "driver_sha256": "c556ff8cf851689a86626faa9348329bcf0ee0a8742fa4df488dc815c72a53d9",
+  "stg_rl_build": {
+    "tables_hash": "37a7ff12fe40e24e",
+    "version": "0.4.1",
+    "git_sha": "5dfc08d-dirty",
+    "engine_ver": "24"
+  },
+  "config": {
+    "device": "cpu",
+    "threads": 1,
+    "num_envs": 1,
+    "frame_skip": 1,
+    "hit_extra": [
+      2,
+      2
+    ],
+    "motor": {
+      "enabled": true,
+      "hold": [
+        2,
+        6
+      ],
+      "delay": [
+        0,
+        2
+      ],
+      "slow": true
+    },
+    "max_frames": 3600,
+    "ranks": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "seeds": [
+      1,
+      7
+    ]
+  },
+  "cards": {
+    "/tmp/sunyunbo/stg-laser-batch3/laser_sp_corridor_01": {
+      "main.ecl": "2a06fc8d99f64c3329eb00936343beb0fb5d711c20acf026bdddc69fad1799c2",
+      "meta.toml": "280d374d49c280f24d8dee35b07c9a057d4f70eccce82504ca33038b709d207c",
+      "TASK.md": "4f074081c324a28fac0da27d84fb5ff6cb66ca28d80c432f7bd253d279c95251",
+      "machine-spec.json": "8540bea6e26a75084499a3845a965c3e15b2eaf422930fb754c99545d5e80099"
+    },
+    "/tmp/sunyunbo/stg-laser-batch3/laser_sp_corridor_02": {
+      "main.ecl": "6933461772b57146dcda295946ead8683b0f80f6f44f7cd8968f5440a4c1448b",
+      "meta.toml": "ba0b492eaae3766d92253d461a72eff5ade589fe1fe52228b743b74ae46c9cf5",
+      "TASK.md": "bbfcd143c05b53b8e81161c9b90c5db0217c8eb017628ad7322ce71f4ed4e10b",
+      "machine-spec.json": "f15ef0b2ed11951dd7b2ae64d9aef29f4a43a599681a0178f132ef5db0572a0b"
+    },
+    "/tmp/sunyunbo/stg-laser-batch3/laser_sp_corridor_03": {
+      "main.ecl": "0bb5dbd2697b9bc271420a80178d0547e64e343f14afd8471a3b8bdfabd44a66",
+      "meta.toml": "9edc3ebd6a18f0b0c8245b1bbae34e6fe616c8f3e3e5ab3d97acaa6baa659f59",
+      "TASK.md": "6e938e665186a7af0aba01b06d2fe2df588d6c59cffa15022482f9cc9afb43d6",
+      "machine-spec.json": "4fdad8aa85befa55a5270bb5a72079180faeac6b17c7ea965f987e44c66d017d"
+    }
+  },
+  "runs": [
+    {
+      "card": "laser_sp_corridor_01",
+      "rank": 0,
+      "seed": 1,
+      "done": 1,
+      "status": "DEATH",
+      "steps": 698,
+      "start_xy": [
+        -31.8198,
+        415.8198
+      ],
+      "actual_hit_r": 2.5,
+      "fallback_frames": 83,
+      "trajectory": "/tmp/sunyunbo/stg-laser-batch3/cell-probe/logs/trajectories/laser_sp_corridor_01_r0_s1.jsonl",
+      "trajectory_sha256": "75ea290e6515c81c31856028e2be870cc013be6ff3b4807fc1e0e1a0e847f18f"
+    },
+    {
+      "card": "laser_sp_corridor_01",
+      "rank": 0,
+      "seed": 7,
+      "done": 1,
+      "status": "DEATH",
+      "steps": 386,
+      "start_xy": [
+        -13.8587,
+        448.0
+      ],
+      "actual_hit_r": 2.5,
+      "fallback_frames": 37,
+      "trajectory": "/tmp/sunyunbo/stg-laser-batch3/cell-probe/logs/trajectories/laser_sp_corridor_01_r0_s7.jsonl",
+      "trajectory_sha256": "0747538d6e11d2d7be54444cf4b5cdb5f7535ae07f2ea9148abea5c66117aa38"
+    },
+    {
+      "card": "laser_sp_corridor_01",
+      "rank": 1,
+      "seed": 1,
+      "done": 1,
+      "status": "DEATH",
+      "steps": 685,
+      "start_xy": [
+        -31.8198,
+        415.8198
+      ],
+      "actual_hit_r": 2.5,
+      "fallback_frames": 83,
+      "trajectory": "/tmp/sunyunbo/stg-laser-batch3/cell-probe/logs/trajectories/laser_sp_corridor_01_r1_s1.jsonl",
+      "trajectory_sha256": "141b5463300ca5812c553bc1adfa053168e913cf2ef79ad8855c05b1c34a8f15"
+    },
+    {
+      "card": "laser_sp_corridor_01",
+      "rank": 1,
+      "seed": 7,
+      "done": 1,
+      "status": "DEATH",
+      "steps": 371,
+      "start_xy": [
+        -13.8587,
+        448.0
+      ],
+      "actual_hit_r": 2.5,
+      "fallback_frames": 37,
+      "trajectory": "/tmp/sunyunbo/stg-laser-batch3/cell-probe/logs/trajectories/laser_sp_corridor_01_r1_s7.jsonl",
+      "trajectory_sha256": "0fb1937b869fec721285c64d9bda421b7bdd40b2bee9b1e900cbb0396af88e70"
+    },
+    {
+      "card": "laser_sp_corridor_01",
+      "rank": 2,
+      "seed": 1,
+      "done": 1,
+      "status": "DEATH",
+      "steps": 315,
+      "start_xy": [
+        -31.8198,
+        415.8198
+      ],
+      "actual_hit_r": 2.5,
+      "fallback_frames": 83,
+      "trajectory": "/tmp/sunyunbo/stg-laser-batch3/cell-probe/logs/trajectories/laser_sp_corridor_01_r2_s1.jsonl",
+      "trajectory_sha256": "2b942b27d748ce2898d97b1dcfd447626fb7dbcbc8b0911acd52bbdc8f5ab6b7"
+    },
+    {
+      "card": "laser_sp_corridor_01",
+      "rank": 2,
+      "seed": 7,
+      "done": 1,
+      "status": "DEATH",
+      "steps": 272,
+      "start_xy": [
+        -13.8587,
+        448.0
+      ],
+      "actual_hit_r": 2.5,
+      "fallback_frames": 37,
+      "trajectory": "/tmp/sunyunbo/stg-laser-batch3/cell-probe/logs/trajectories/laser_sp_corridor_01_r2_s7.jsonl",
+      "trajectory_sha256": "c3044832931bd92fc5e8edd0266823482e280a24716b9eaf72c5d007be596dc5"
+    },
+    {
+      "card": "laser_sp_corridor_01",
+      "rank": 3,
+      "seed": 1,
+      "done": 1,
+      "status": "DEATH",
+      "steps": 299,
+      "start_xy": [
+        -31.8198,
+        415.8198
+      ],
+      "actual_hit_r": 2.5,
+      "fallback_frames": 83,
+      "trajectory": "/tmp/sunyunbo/stg-laser-batch3/cell-probe/logs/trajectories/laser_sp_corridor_01_r3_s1.jsonl",
+      "trajectory_sha256": "41fa062a0019f613d4da532fce16381d5ea165738d5ccfdb1dab25f7dd64242e"
+    },
+    {
+      "card": "laser_sp_corridor_01",
+      "rank": 3,
+      "seed": 7,
+      "done": 1,
+      "status": "DEATH",
+      "steps": 258,
+      "start_xy": [
+        -13.8587,
+        448.0
+      ],
+      "actual_hit_r": 2.5,
+      "fallback_frames": 37,
+      "trajectory": "/tmp/sunyunbo/stg-laser-batch3/cell-probe/logs/trajectories/laser_sp_corridor_01_r3_s7.jsonl",
+      "trajectory_sha256": "5378b9a741b54b80902c01078f71dd78972e6953e87cefbcd6e7f47c14237efd"
+    },
+    {
+      "card": "laser_sp_corridor_02",
+      "rank": 0,
+      "seed": 1,
+      "done": 2,
+      "status": "SUCCESS",
+      "steps": 1793,
+      "start_xy": [
+        -31.8198,
+        415.8198
+      ],
+      "actual_hit_r": 2.5,
+      "fallback_frames": 139,
+      "trajectory": "/tmp/sunyunbo/stg-laser-batch3/cell-probe/logs/trajectories/laser_sp_corridor_02_r0_s1.jsonl",
+      "trajectory_sha256": "f439bc17446ae7ad45afe65122870831e260290af88025714b44362cc1bcf1ae"
+    },
+    {
+      "card": "laser_sp_corridor_02",
+      "rank": 0,
+      "seed": 7,
+      "done": 2,
+      "status": "SUCCESS",
+      "steps": 1747,
+      "start_xy": [
+        -13.8587,
+        448.0
+      ],
+      "actual_hit_r": 2.5,
+      "fallback_frames": 93,
+      "trajectory": "/tmp/sunyunbo/stg-laser-batch3/cell-probe/logs/trajectories/laser_sp_corridor_02_r0_s7.jsonl",
+      "trajectory_sha256": "224d7578a8452ab9267fc69195e0f0440e0abff5c777c4ec7546d9250eefebaf"
+    },
+    {
+      "card": "laser_sp_corridor_02",
+      "rank": 1,
+      "seed": 1,
+      "done": 2,
+      "status": "SUCCESS",
+      "steps": 1793,
+      "start_xy": [
+        -31.8198,
+        415.8198
+      ],
+      "actual_hit_r": 2.5,
+      "fallback_frames": 152,
+      "trajectory": "/tmp/sunyunbo/stg-laser-batch3/cell-probe/logs/trajectories/laser_sp_corridor_02_r1_s1.jsonl",
+      "trajectory_sha256": "170b00497953e446c6eacce3fab51818887d9d0ec7aaa2a1a55a97685c16a863"
+    },
+    {
+      "card": "laser_sp_corridor_02",
+      "rank": 1,
+      "seed": 7,
+      "done": 2,
+      "status": "SUCCESS",
+      "steps": 1747,
+      "start_xy": [
+        -13.8587,
+        448.0
+      ],
+      "actual_hit_r": 2.5,
+      "fallback_frames": 106,
+      "trajectory": "/tmp/sunyunbo/stg-laser-batch3/cell-probe/logs/trajectories/laser_sp_corridor_02_r1_s7.jsonl",
+      "trajectory_sha256": "1bae175536f02bea157d347d364895228dbf7790916acebb1e913008a2165f13"
+    },
+    {
+      "card": "laser_sp_corridor_02",
+      "rank": 2,
+      "seed": 1,
+      "done": 1,
+      "status": "DEATH",
+      "steps": 1667,
+      "start_xy": [
+        -31.8198,
+        415.8198
+      ],
+      "actual_hit_r": 2.5,
+      "fallback_frames": 83,
+      "trajectory": "/tmp/sunyunbo/stg-laser-batch3/cell-probe/logs/trajectories/laser_sp_corridor_02_r2_s1.jsonl",
+      "trajectory_sha256": "d2c65cf09a96582427af450a54b56d3e5b11d24198bd6bc3332056fb3828d78b"
+    },
+    {
+      "card": "laser_sp_corridor_02",
+      "rank": 2,
+      "seed": 7,
+      "done": 1,
+      "status": "DEATH",
+      "steps": 1621,
+      "start_xy": [
+        -13.8587,
+        448.0
+      ],
+      "actual_hit_r": 2.5,
+      "fallback_frames": 37,
+      "trajectory": "/tmp/sunyunbo/stg-laser-batch3/cell-probe/logs/trajectories/laser_sp_corridor_02_r2_s7.jsonl",
+      "trajectory_sha256": "be9e2109ec75544bd435da7e0b93cf39d76b5e99f2c76f6c3266a835ab94e0db"
+    },
+    {
+      "card": "laser_sp_corridor_02",
+      "rank": 3,
+      "seed": 1,
+      "done": 1,
+      "status": "DEATH",
+      "steps": 321,
+      "start_xy": [
+        -31.8198,
+        415.8198
+      ],
+      "actual_hit_r": 2.5,
+      "fallback_frames": 83,
+      "trajectory": "/tmp/sunyunbo/stg-laser-batch3/cell-probe/logs/trajectories/laser_sp_corridor_02_r3_s1.jsonl",
+      "trajectory_sha256": "f84a9e196b3cf244a88e6af47afc547c8d29087aa7fe78c5fd360e199500fab7"
+    },
+    {
+      "card": "laser_sp_corridor_02",
+      "rank": 3,
+      "seed": 7,
+      "done": 1,
+      "status": "DEATH",
+      "steps": 280,
+      "start_xy": [
+        -13.8587,
+        448.0
+      ],
+      "actual_hit_r": 2.5,
+      "fallback_frames": 37,
+      "trajectory": "/tmp/sunyunbo/stg-laser-batch3/cell-probe/logs/trajectories/laser_sp_corridor_02_r3_s7.jsonl",
+      "trajectory_sha256": "2e76ea7c6b67aee70b5bf00febbe5718ef6101e7c9bac9eac7431f164902d3ed"
+    },
+    {
+      "card": "laser_sp_corridor_03",
+      "rank": 0,
+      "seed": 1,
+      "done": 1,
+      "status": "DEATH",
+      "steps": 1417,
+      "start_xy": [
+        -31.8198,
+        415.8198
+      ],
+      "actual_hit_r": 2.5,
+      "fallback_frames": 85,
+      "trajectory": "/tmp/sunyunbo/stg-laser-batch3/cell-probe/logs/trajectories/laser_sp_corridor_03_r0_s1.jsonl",
+      "trajectory_sha256": "db0e98d45c04e387d5e3d0b943654a0427b15c759a0107d9df0e93f60f724dc4"
+    },
+    {
+      "card": "laser_sp_corridor_03",
+      "rank": 0,
+      "seed": 7,
+      "done": 1,
+      "status": "DEATH",
+      "steps": 1385,
+      "start_xy": [
+        -13.8587,
+        448.0
+      ],
+      "actual_hit_r": 2.5,
+      "fallback_frames": 39,
+      "trajectory": "/tmp/sunyunbo/stg-laser-batch3/cell-probe/logs/trajectories/laser_sp_corridor_03_r0_s7.jsonl",
+      "trajectory_sha256": "6b4eb3579750073408b99bf99e117ac0c52aa97239047b1d5aa329360bdbe39b"
+    },
+    {
+      "card": "laser_sp_corridor_03",
+      "rank": 1,
+      "seed": 1,
+      "done": 1,
+      "status": "DEATH",
+      "steps": 1321,
+      "start_xy": [
+        -31.8198,
+        415.8198
+      ],
+      "actual_hit_r": 2.5,
+      "fallback_frames": 85,
+      "trajectory": "/tmp/sunyunbo/stg-laser-batch3/cell-probe/logs/trajectories/laser_sp_corridor_03_r1_s1.jsonl",
+      "trajectory_sha256": "b8a32989fc4ad269319fecc7548439a63608d5d3e6a05045a2b65de66056d9c5"
+    },
+    {
+      "card": "laser_sp_corridor_03",
+      "rank": 1,
+      "seed": 7,
+      "done": 1,
+      "status": "DEATH",
+      "steps": 1281,
+      "start_xy": [
+        -13.8587,
+        448.0
+      ],
+      "actual_hit_r": 2.5,
+      "fallback_frames": 39,
+      "trajectory": "/tmp/sunyunbo/stg-laser-batch3/cell-probe/logs/trajectories/laser_sp_corridor_03_r1_s7.jsonl",
+      "trajectory_sha256": "0a82da60e15b9243adba0b7870c8f492085b4064139abab74a660882fa68d675"
+    },
+    {
+      "card": "laser_sp_corridor_03",
+      "rank": 2,
+      "seed": 1,
+      "done": 1,
+      "status": "DEATH",
+      "steps": 1366,
+      "start_xy": [
+        -31.8198,
+        415.8198
+      ],
+      "actual_hit_r": 2.5,
+      "fallback_frames": 85,
+      "trajectory": "/tmp/sunyunbo/stg-laser-batch3/cell-probe/logs/trajectories/laser_sp_corridor_03_r2_s1.jsonl",
+      "trajectory_sha256": "a03895f27364fe9b5e90200ffd48359f77f09a47a96d41dc8e7104fd3236f53f"
+    },
+    {
+      "card": "laser_sp_corridor_03",
+      "rank": 2,
+      "seed": 7,
+      "done": 1,
+      "status": "DEATH",
+      "steps": 1308,
+      "start_xy": [
+        -13.8587,
+        448.0
+      ],
+      "actual_hit_r": 2.5,
+      "fallback_frames": 39,
+      "trajectory": "/tmp/sunyunbo/stg-laser-batch3/cell-probe/logs/trajectories/laser_sp_corridor_03_r2_s7.jsonl",
+      "trajectory_sha256": "f39af97f976bc28aacf739905b723be705babe439a6c1dfb543797934c0097af"
+    },
+    {
+      "card": "laser_sp_corridor_03",
+      "rank": 3,
+      "seed": 1,
+      "done": 1,
+      "status": "DEATH",
+      "steps": 1255,
+      "start_xy": [
+        -31.8198,
+        415.8198
+      ],
+      "actual_hit_r": 2.5,
+      "fallback_frames": 85,
+      "trajectory": "/tmp/sunyunbo/stg-laser-batch3/cell-probe/logs/trajectories/laser_sp_corridor_03_r3_s1.jsonl",
+      "trajectory_sha256": "e3224fffac1e1059d1e9fa177761cb5261c60ab6b6410867cc972219e3ff4e5e"
+    },
+    {
+      "card": "laser_sp_corridor_03",
+      "rank": 3,
+      "seed": 7,
+      "done": 1,
+      "status": "DEATH",
+      "steps": 1200,
+      "start_xy": [
+        -13.8587,
+        448.0
+      ],
+      "actual_hit_r": 2.5,
+      "fallback_frames": 39,
+      "trajectory": "/tmp/sunyunbo/stg-laser-batch3/cell-probe/logs/trajectories/laser_sp_corridor_03_r3_s7.jsonl",
+      "trajectory_sha256": "d81daec96cc8b269e7f1d1848fccbda9ba1fbff3e609d909b4fdd921e1a50d47"
+    }
+  ],
+  "cards_unchanged": true,
+  "card_sha256_after": {
+    "/tmp/sunyunbo/stg-laser-batch3/laser_sp_corridor_01": {
+      "main.ecl": "2a06fc8d99f64c3329eb00936343beb0fb5d711c20acf026bdddc69fad1799c2",
+      "meta.toml": "280d374d49c280f24d8dee35b07c9a057d4f70eccce82504ca33038b709d207c",
+      "TASK.md": "4f074081c324a28fac0da27d84fb5ff6cb66ca28d80c432f7bd253d279c95251",
+      "machine-spec.json": "8540bea6e26a75084499a3845a965c3e15b2eaf422930fb754c99545d5e80099"
+    },
+    "/tmp/sunyunbo/stg-laser-batch3/laser_sp_corridor_02": {
+      "main.ecl": "6933461772b57146dcda295946ead8683b0f80f6f44f7cd8968f5440a4c1448b",
+      "meta.toml": "ba0b492eaae3766d92253d461a72eff5ade589fe1fe52228b743b74ae46c9cf5",
+      "TASK.md": "bbfcd143c05b53b8e81161c9b90c5db0217c8eb017628ad7322ce71f4ed4e10b",
+      "machine-spec.json": "f15ef0b2ed11951dd7b2ae64d9aef29f4a43a599681a0178f132ef5db0572a0b"
+    },
+    "/tmp/sunyunbo/stg-laser-batch3/laser_sp_corridor_03": {
+      "main.ecl": "0bb5dbd2697b9bc271420a80178d0547e64e343f14afd8471a3b8bdfabd44a66",
+      "meta.toml": "9edc3ebd6a18f0b0c8245b1bbae34e6fe616c8f3e3e5ab3d97acaa6baa659f59",
+      "TASK.md": "6e938e665186a7af0aba01b06d2fe2df588d6c59cffa15022482f9cc9afb43d6",
+      "machine-spec.json": "4fdad8aa85befa55a5270bb5a72079180faeac6b17c7ea965f987e44c66d017d"
+    }
+  },
+  "status": "WITNESS_FOUND",
+  "reproducible_command": ".venv/bin/python tools/corridor_motion_probe.py"
+}

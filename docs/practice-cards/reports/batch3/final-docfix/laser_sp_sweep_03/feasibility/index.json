@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "tool_sha256": "02afa09a64d91a94eecee9b61d7deeb28aac81e4d489d713accb58622cd60681",
+  "reports": [
+    {
+      "card": "laser_sp_sweep_03",
+      "report": "docs/practice-cards/reports/batch3/final-docfix/laser_sp_sweep_03/feasibility/laser_sp_sweep_03.json",
+      "runs": 88,
+      "report_sha256": "53394c1512f5288f0898dd79fe1b32c73b8e5b0ad2ad6a1335707f891a324738"
+    }
+  ]
+}

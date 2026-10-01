@@ -1,12 +1,20 @@
 # 激光变异试产
 
-2026-09-27 试产 10 张、2026-09-28 第二批新增 20 张，合计 30 张合成激光变异。原作 `cards/` 与默认配置不变；显式选 `configs/exp-t2-laser-pilot.toml` 会合并当前整个 `cards-synthetic/`（现为 30 张）。两批只验收，均未启动训练。机械/独立规格审查合格不代表已证明训练收益或可躲性。
+2026-09-27 试产 10 张、2026-09-28 第二批新增 20 张，合计 30 张合成激光变异。原作 `cards/` 与默认配置不变；显式选 `configs/exp-t2-laser-pilot.toml` 会合并当前整个 `cards-synthetic/`（现为 30 张）。两批制作阶段只做验收；随后已用于 T2/T3/T4 训练。机械/独立规格审查合格不代表已证明训练收益或可躲性。
+
+当前事实与纠错见 [2026-09-29 事实和未决问题](2026-09-29-facts-and-open-questions.md)，包括生成约束来源、激光真实机制及 T4 的实验混杂。
+
+2026-09-30 用户认可增加以激光为绝对主体的专项加强练习，见 [激光专项设计方向](2026-09-30-laser-specialist-design.md)。该文记录持续压力、候选机制家族、观测预算及验证构思；尚未生产专项卡，具体卡数、参数与下一轮训练配置未定。下文的底子/overlay 规则描述既有两批混合卡，不直接作为专项卡契约。
+
+2026-10-01 专项批次已完成：20张原创纯激光卡，20/20机器门通过，17张有限样本候选（12 train、5 held-out），3张NOT_PROVEN隔离。见[结果与限制](2026-10-01-batch3-results.md)及[逐卡最终汇总](reports/batch3/batch3-acceptance-summary.json)。从零卡的加载兼容、独立机器/真实玩家工具已实现并审查；[派发模板](laser-specialist-dispatch-prompts.md)包含执行后经验。制作阶段未启动训练或提交；用户随后授权启动[T5专项混合训练](2026-10-01-t5-experiment.md)。候选目录独立于前两批，旧配置不自动扩池。
 
 ## 来源标签
 
-原作source='th06'兼容加载为Card.data_kind='original'；未知/example来源保持unknown。合成卡显式source='synthetic'、data_kind='synthetic'、base_card、mutation_id及provenance原文件SHA。标签不进入策略输入；新训练run env.json.cards提供card_id→来源/底子映射，starts旧格式保持。
+原作source='th06'兼容加载为Card.data_kind='original'；未知/example来源保持unknown。前两批变异卡显式source='synthetic'、data_kind='synthetic'、base_card、mutation_id及provenance原文件SHA。标签不进入策略输入；新训练run env.json.cards提供card_id→来源/底子映射，starts旧格式保持。
 
-合成卡复制底子，main仅新增标记spawn行，overlay.ecl包含新逻辑；删除入口行可逐字恢复底子。根伴生任务不新增敌人，不抢boss_or_free目标。合成卡的底子source_ref不能与激光留出任意源区间重叠；原作历史划分保持153个rank2训练起点（166卡减13留出）。
+前两批变异卡复制底子，main仅新增标记spawn行，overlay.ecl包含新逻辑；删除入口行可逐字恢复底子。根伴生任务不新增敌人，不抢boss_or_free目标。变异卡的底子source_ref不能与激光留出任意源区间重叠；原作历史划分保持153个rank2训练起点（166卡减13留出）。
+
+第三批从零卡使用 `synthetic_kind='laser_specialist'`、`generation_mode='standalone'`，按[专项契约](laser-specialist-contract.md)校验，无原作底子或伪造血缘字段；来源标签仍不进入策略输入。`cards-laser-specialist/`只含有限样本候选，`cards-laser-specialist-quarantine/`另存未找到真实完成轨迹的三个版本。
 
 ## 第一批试产清单（2026-09-27）
 

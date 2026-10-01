@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "tool_sha256": "02afa09a64d91a94eecee9b61d7deeb28aac81e4d489d713accb58622cd60681",
+  "reports": [
+    {
+      "card": "laser_sp_sweep_01",
+      "report": "/data/sunyunbo/www/stg-rl-train/docs/practice-cards/reports/batch3/feasibility/laser_sp_sweep_01/f27ce7192b39/laser_sp_sweep_01.json",
+      "runs": 88,
+      "report_sha256": "502ba15c3cf152b6919063c269f61cc09e2900424099a185a5ac3248b0d7f30f"
+    }
+  ]
+}
