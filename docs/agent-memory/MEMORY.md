@@ -17,7 +17,8 @@
 - [激光专项练习方向（2026-09-30）](../practice-cards/2026-09-30-laser-specialist-design.md) — 用户认可激光成为绝对主体、持续提供避让练习；已落档设计，尚未制卡或训练，具体参数与采样待定
 - [专项卡派发模板（2026-10-01）](../practice-cards/laser-specialist-dispatch-prompts.md) — 从零专项卡的冻结任务单和写审/返工 prompt；执行后补骨架、单卡自检和源码安全带检查要求
 - [第三批专项卡结果（2026-10-01）](../practice-cards/2026-10-01-batch3-results.md) — 20张生成、机器20/20、17有限样本候选（12训练/5留出）、3 NOT_PROVEN隔离；部分rank未获完成轨迹，不代表训练收益，未训练/提交
-- [T5专项混合训练准备（2026-10-01）](../practice-cards/2026-10-01-t5-experiment.md) — 用户选混合训练；T2设置加12张专项，5张另测，3500updates；本地/旧栈检查与CPU冒烟通过；用户授权提交推送并启动，快照889a9d3，Job4aba4850f7ba4dff，结果需实查
+- [T5专项混合训练（2026-10-01）](../practice-cards/2026-10-01-t5-experiment.md) — 快照889a9d3，Job4aba4850f7ba4dff已完成3500updates并取回；12张专项训练、5张另测
+- [T5阶段性结果与结构实验交接（2026-10-01）](../practice-cards/2026-10-01-t5-results.md) — 主激光评测小幅改善、专项泛化未学稳；用户怀疑模型结构，下一会话做结构实验，具体方案未定；取回码数字长度不可写死
 - [后台任务要确认真在跑](verify-background-launch.md) — env 变量写在 taskset 前；ps 看 python 进程；监视要盯提前退出
 - [stg_rl 升版两边同步](stg-rl-wheel-sync.md) — pyproject/uv.lock 与 magnus/wheels+SHA256SUMS 必须同一版
 - [转写 worker 可换 Sonnet](transcribe-claude-worker-fallback.md) — DeepSeek 没余额就 STG_DSH_BIN=claude-worker；并发 4；dsh 审核必须配 opus 抽检

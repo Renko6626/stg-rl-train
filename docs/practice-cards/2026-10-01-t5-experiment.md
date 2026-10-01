@@ -1,5 +1,7 @@
 # T5：激光专项卡混合训练
 
+2026-10-01：训练已完成并取回，见[阶段性结果与下一会话交接](2026-10-01-t5-results.md)。下文保留准备和启动时的记录。
+
 2026-10-01：用户要求准备提交一次实验，并选择「混合训练，检验迁移收益」。用户随后明确授权「提交和推送，然后直接开始训练」。当前进入提交与启动阶段，Job状态以之后的实查记录为准。
 
 ## 实验处理
@@ -50,7 +52,7 @@ magnus job submit \
 
 旧torch CPU栈（torch2.5.1+cpu / tensordict0.6.2）同组测试为59 passed、1 skipped。正式卡池与原13卡划分的CPU冒烟完成1次PPO更新、26个卡/rank组评测及u1/latest/best checkpoint保存，产物为`runs/t5-preflight/20261001-123512-t5-full-split-smoke/`。冒烟使用32env、每组1局、300帧上限，关闭compile/CUDA图/AMP，不能用于衡量学习收益。
 
-随后旧torch栈运行专项评测脚本，五张held-out×rank0..3×每组1局，在u1和best跟点、best自由/锚点/boss_or_free16共生成5份逐局JSON。脚本入口、卡池隔离和模型加载已验证；本次不是正式32局/完整时长评测，实际CUDA图仍需GPU验证。shell语法、Python编译、wheel SHA和diff空白检查通过。
+随后旧torch栈运行专项评测脚本，五张held-out×rank0..3×每组1局，在u1和best跟点、best自由/锚点/boss_or_free16共生成5份逐卡/逐rank汇总JSON。脚本入口、卡池隔离和模型加载已验证；本次不是正式32局/完整时长评测，实际CUDA图仍需GPU验证。shell语法、Python编译、wheel SHA和diff空白检查通过。
 
 ## 2026-10-01 启动记录
 
