@@ -35,7 +35,7 @@
 magnus job submit \
   --task-name stg-rl-train-t5-specialist \
   --namespace Renko6626 --repo-name stg-rl-train \
-  --branch main --commit-sha <推送后的完整SHA> \
+  --branch main --commit-sha 889a9d343af45ab4f5b30ee157ee40820fc0dea3 \
   --gpu-type a100 --gpu-count 1 --cpu-count 32 --memory-demand 64G \
   --ephemeral-storage 20G --job-type B2 \
   --container-image docker://pytorch/pytorch:2.5.1-cuda12.4-cudnn9-devel \
@@ -51,3 +51,9 @@ magnus job submit \
 旧torch CPU栈（torch2.5.1+cpu / tensordict0.6.2）同组测试为59 passed、1 skipped。正式卡池与原13卡划分的CPU冒烟完成1次PPO更新、26个卡/rank组评测及u1/latest/best checkpoint保存，产物为`runs/t5-preflight/20261001-123512-t5-full-split-smoke/`。冒烟使用32env、每组1局、300帧上限，关闭compile/CUDA图/AMP，不能用于衡量学习收益。
 
 随后旧torch栈运行专项评测脚本，五张held-out×rank0..3×每组1局，在u1和best跟点、best自由/锚点/boss_or_free16共生成5份逐局JSON。脚本入口、卡池隔离和模型加载已验证；本次不是正式32局/完整时长评测，实际CUDA图仍需GPU验证。shell语法、Python编译、wheel SHA和diff空白检查通过。
+
+## 2026-10-01 启动记录
+
+用户明确授权提交、推送和直接训练。训练快照`889a9d343af45ab4f5b30ee157ee40820fc0dea3`已推送到origin/main；Job [`4aba4850f7ba4dff`](http://162.105.151.134:3011/jobs/4aba4850f7ba4dff) 于12:45北京时间提交，B2，1×A100、32核、64G。日志确认A100 80GB、Python3.11.10/torch2.5.1+cu124/CUDA12.4和项目wheel校验通过。12:48:36训练入口输出正式CUDA训练开始，实际213张卡、195个训练起点、26个原作卡/rank评测组，4096env，目标u1→3500。
+
+提交前全仓测试490 passed、1 skipped；独立T5入口审查无阻塞问题。主机后台取回器在`runs/t5-monitor/`运行，每60秒查询状态，终态时尝试立即取回结果到`runs/job-4aba4850f7ba4dff.tar.gz`，检查u3500、最终评测和8份专项JSON。取回器已通过进程及日志确认在运行；这不是平台持久调度保证，若本机会话环境被关闭仍需人工复查。
