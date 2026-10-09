@@ -58,6 +58,9 @@ class StepInfo:
     overridden: Tensor | None = None    # 本步运动层是否替策略做了主（执行的方向 != 想按的方向）；没开运动层为全 False
     start_index: Tensor | None = None   # 本步所属那一局的起点下标（done≠0 时是**刚结束**那局的，env 在 reset 前取）
     intent_mode: Tensor | None = None   # 混合意图的模式（0 跟点 / 1 锚点 / 2 自由），无混合时 None
+    request_buttons: Tensor | None = None       # 奖励专用：本步原始请求，按本局镜像转换到按钮坐标系
+    prev_request_buttons: Tensor | None = None  # 奖励专用：上一步请求按钮，首局为0
+    request_dir_hold: Tensor | None = None      # 奖励专用：改变请求前，上段请求方向持续的帧数
 
 
 # 激光行（stg_rl 0.3.0 起 Tier 0 的 lasers 表，引擎按「离自机最近」排好、至多 LASERS_CAP 条）解码后的列。
@@ -398,6 +401,10 @@ class EnvWrapper:
         self._arange_l = torch.arange(stg_rl.LASERS_CAP, device=device)
         self.dir_hold = torch.full((self.n,), DIR_HOLD_NEVER, dtype=torch.int64, device=device)
         self.slow_held = torch.full((self.n,), DIR_HOLD_NEVER, dtype=torch.int64, device=device)
+        self.request_reward = cfg["reward"].get("action_source", "executed") == "request"
+        if self.request_reward:
+            self.prev_request_buttons = torch.zeros_like(self.prev_buttons)
+            self.request_dir_hold = torch.full_like(self.dir_hold, DIR_HOLD_NEVER)
         env_ids = torch.arange(self.n, device=device) % self._group_k if self._group_k else None
         self.motor = MotorLayer(cfg, self.n, device, seed, env_ids=env_ids) if cfg["motor"]["enabled"] else None
         # 判定点随机增大（实验 S）：每局每 env 一个 m ~ U[lo, hi] px，对模型不可见；引擎按放大的判定真判死。
@@ -444,6 +451,9 @@ class EnvWrapper:
         self.prev_action = torch.zeros(self.n, dtype=torch.int64, device=self.device)
         self.dir_hold = torch.full((self.n,), DIR_HOLD_NEVER, dtype=torch.int64, device=self.device)
         self.slow_held = torch.full((self.n,), DIR_HOLD_NEVER, dtype=torch.int64, device=self.device)
+        if self.request_reward:
+            self.prev_request_buttons = torch.zeros_like(self.prev_buttons)
+            self.request_dir_hold = torch.full_like(self.dir_hold, DIR_HOLD_NEVER)
         if self.motor is not None:
             self.motor.reset_all()
         return self._decode()
@@ -454,9 +464,17 @@ class EnvWrapper:
         self.intent.use_start_indices(indices)
 
     def step(self, action_ids: Tensor, timer=None) -> tuple[RawObs, StepInfo]:
-        # 运动层：策略给的是「想按的」，从这里往下（镜像、env、上一步动作、按键统计、reward）全按**实际执行的**算。
+        # 运动层：物理执行、RawObs和操作统计按实际动作；request模式的动作奖励单独读下面的请求快照。
         # dir_hold 在变向那步清零、之后每步 +1，所以「当前方向已执行帧数」= dir_hold + 1。
         want = action_ids
+        request_buttons = prev_request_buttons = request_hold = None
+        if self.request_reward:
+            request_ids = torch.where(self.mirrored, self._mirror[want], want)
+            request_buttons = self._buttons[request_ids]
+            prev_request_buttons = self.prev_request_buttons
+            request_hold = (self.request_dir_hold + 1).clamp_max(DIR_HOLD_NEVER)
+            request_changed = actions.direction_changed(prev_request_buttons, request_buttons)
+            self.request_dir_hold = torch.where(request_changed, torch.zeros_like(request_hold), request_hold)
         if self.motor is not None:
             action_ids = self.motor.apply(want, self.prev_action, self.dir_hold + 1, self.slow_held).to(want.dtype)
         overridden = action_ids != want          # 方向或低速位，任一路被运动层否决都算
@@ -499,7 +517,13 @@ class EnvWrapper:
                                 buttons=buttons, prev_buttons=self.prev_buttons,
                                 dir_hold=hold_now, overridden=overridden,
                                 start_index=raw["start_index"].to(torch.int64),
-                                intent_mode=mode)
+                                intent_mode=mode, request_buttons=request_buttons,
+                                prev_request_buttons=prev_request_buttons, request_dir_hold=request_hold)
+                if self.request_reward:
+                    # StepInfo保留旧局快照；这里只替换状态，不能原地清空终止帧的数据。
+                    self.prev_request_buttons = torch.where(ended, torch.zeros_like(request_buttons), request_buttons)
+                    self.request_dir_hold = torch.where(ended, torch.full_like(request_hold, DIR_HOLD_NEVER),
+                                                        self.request_dir_hold)
                 self.prev_buttons = torch.where(ended, torch.zeros_like(buttons), buttons)
                 self.dir_hold = torch.where(ended, torch.full_like(self.dir_hold, DIR_HOLD_NEVER), self.dir_hold)
                 self.slow_held = torch.where(ended, torch.full_like(self.slow_held, DIR_HOLD_NEVER), self.slow_held)

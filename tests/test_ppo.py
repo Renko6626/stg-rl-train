@@ -81,6 +81,25 @@ def test_rollout_and_train_step_on_cpu():
         assert torch.equal(a.data, b.data)
 
 
+def test_density_disabled_rollout_does_not_cache_grid_and_can_update():
+    cfg = small_cfg(env={"cards_dir": str(FIXTURES / "laser_cards")},
+                    featurize={"name": "danger_topk_v8", "frame": "static", "dt": False, "k_lasers": 8},
+                    model={"name": "set_attn_v3", "joint_sa_layers": 1, "density_enabled": False},
+                    ppo={"num_steps": 4, "amp": "bf16"})
+    images = compile_cards(discover(cfg["env"]["cards_dir"]))
+    envw = EnvWrapper(cfg, images, [stg_rl.Start(next(iter(images)), 0, 2)], CPU, seed=4)
+    feat = FEATURIZERS.get("danger_topk_v8")(cfg)
+    ppo = PPO(cfg, lambda: MODELS.get("set_attn_v3")(cfg, feat.spec()), CPU)
+    rf = RewardFn(cfg)
+    tr = EpisodeTracker(envw.n, CPU, list(rf.terms), 24.0, 16.0, 1, 300)
+    obs, container, nv = ppo.rollout(envw, feat, rf, tr, None, envw.reset())
+    assert "density" not in container["feats"]
+    before = ppo.agent.model.actor.weight.detach().clone()
+    stats = ppo.train_step(container, nv, iteration=1, num_iterations=2)
+    assert stats["pg_loss"] == stats["pg_loss"]
+    assert not torch.equal(before, ppo.agent.model.actor.weight)
+
+
 def test_rollout_reports_reward_and_episode_stat_costs_separately():
     cfg, envw, feat, ppo, rf, tr = setup(num_steps=2)
     timer = PhaseTimer(sync_every=1, device=CPU)

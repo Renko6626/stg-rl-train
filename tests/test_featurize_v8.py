@@ -91,3 +91,15 @@ def test_start_len_is_required_and_aligned():
     o.laser_start_len = torch.zeros(1, 2)
     with pytest.raises(ValueError, match="同行"):
         f(o)
+
+
+def test_disabled_density_leaves_other_features_unchanged():
+    cfg = small_cfg(featurize={"name": "danger_topk_v8", "frame": "static", "dt": False, "k_lasers": 8},
+                    model={"name": "set_attn_v3", "density_enabled": False})
+    disabled = FEATURIZERS.get("danger_topk_v8")(cfg)
+    o = obs()
+    actual, reference = disabled(o), feats()(o)
+    assert torch.count_nonzero(reference["density"]) > 0
+    assert torch.count_nonzero(actual["density"]) == 0
+    for key in reference.keys() - {"density"}:
+        torch.testing.assert_close(actual[key], reference[key], atol=0, rtol=0)

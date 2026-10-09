@@ -124,3 +124,72 @@ def test_quick_change_only_punishes_sub_human_reversals():
     bare = step_info(n=4, prev_buttons=[C.BTN_LEFT] * 4, buttons=[C.BTN_RIGHT] * 4)
     bare.dir_hold = None
     assert term("quick_change", o, o, bare).tolist() == [0.0] * 4
+
+
+@pytest.mark.parametrize("mirror", [False, True])
+def test_request_penalties_count_reversals_filtered_by_motor(mirror):
+    import stg_rl
+    from conftest import FIXTURES
+    from stgtrain.cards import compile_cards, discover
+    from stgtrain.envwrap import EnvWrapper
+    from stgtrain.registry import FEATURIZERS
+
+    images = compile_cards(discover(FIXTURES / "cards"))
+    base = dict(env={"mirror": mirror, "warmup_max": 0},
+                featurize={"name": "danger_topk_v5"},
+                motor={"enabled": True, "hold": [4, 4], "delay": [0, 0], "slow": True})
+    ac = small_cfg(**base)
+    bc = small_cfg(**base, reward={"action_source": "request"})
+    a = EnvWrapper(ac, images, [stg_rl.Start("example_ring", 0, 2)], torch.device("cpu"), seed=5)
+    b = EnvWrapper(bc, images, [stg_rl.Start("example_ring", 0, 2)], torch.device("cpu"), seed=5)
+    ao, bo = a.reset(), b.reset()
+    af, bf = RewardFn(ac), RewardFn(bc)
+    feat = FEATURIZERS.get("danger_topk_v5")(ac)
+    ap, aq, bp, bq, executed = [], [], [], [], []
+    for want in [6, 14, 6, 14, 14]:
+        act = torch.full((a.n,), want, dtype=torch.int64)
+        an, ai = a.step(act)
+        bn, bi = b.step(act)
+        _, ar = af(ao, an, ai)
+        _, br = bf(bo, bn, bi)
+        ap.append(ar["key_press"][0].item())
+        aq.append(ar["quick_change"][0].item())
+        bp.append(br["key_press"][0].item())
+        bq.append(br["quick_change"][0].item())
+        executed.append(int(bn.prev_action[0]))
+        assert torch.equal(ai.buttons, bi.buttons)
+        for key, value in feat(an).items():
+            assert torch.equal(value, feat(bn)[key]), key
+        ao, bo = an, bn
+    assert executed == [6, 6, 6, 6, 14]
+    assert ap == [2, 0, 0, 0, 1] and aq == [0, 0, 0, 0, 0]
+    assert bp == [2, 1, 1, 1, 0] and bq == [0, 1, 1, 1, 0]
+
+
+def test_request_terminal_reward_survives_reset_and_next_step():
+    import stg_rl
+    from conftest import FIXTURES
+    from stgtrain.cards import compile_cards, discover
+    from stgtrain.envwrap import EnvWrapper
+
+    cfg = small_cfg(env={"mirror": False, "warmup_max": 0, "max_frames": 2},
+                    reward={"action_source": "request"},
+                    motor={"enabled": True, "hold": [4, 4], "delay": [0, 0]})
+    images = compile_cards(discover(FIXTURES / "cards"))
+    w = EnvWrapper(cfg, images, [stg_rl.Start("example_calm", 0, 2)], torch.device("cpu"), seed=1)
+    fn = RewardFn(cfg)
+    w.reset()
+    prev, _ = w.step(torch.full((w.n,), 6))
+    cur, terminal = w.step(torch.full((w.n,), 14))
+    assert terminal.done.ne(0).all()
+    _, raw = fn(prev, cur, terminal)
+    assert raw["key_press"].eq(1).all() and raw["quick_change"].eq(1).all()
+    nxt, first = w.step(torch.full((w.n,), 6))
+    _, first_raw = fn(cur, nxt, first)
+    assert first_raw["key_press"].eq(2).all() and first_raw["quick_change"].eq(0).all()
+    _, saved_raw = fn(prev, cur, terminal)
+    assert torch.equal(saved_raw["key_press"], raw["key_press"])
+    assert torch.equal(saved_raw["quick_change"], raw["quick_change"])
+    w.reset()
+    reset_obs, reset_info = w.step(torch.full((w.n,), 14))
+    assert fn(cur, reset_obs, reset_info)[1]["quick_change"].eq(0).all()

@@ -14,10 +14,12 @@ def test_eval_ckpt_splits_and_all_cards(tmp_path, capsys):
     capsys.readouterr()
 
     out1 = tmp_path / "splits.json"
-    assert main([str(ck), "--device", "cpu", "--episodes", "2", "--out", str(out1)]) == 0
+    assert main([str(ck), "--device", "cpu", "--episodes", "2", "--eval-seed", "23456",
+                 "--records", "--splits", cfg["env"]["eval_splits"], "--out", str(out1)]) == 0
     res = json.loads(out1.read_text(encoding="utf-8"))
     assert list(res["cards"]) == ["example_calm"] and res["overall"]["episodes"] == 2
     assert "dir_changes_in_r_per_s" in res["overall"] and res["checkpoint"]["update"] == 1
+    assert len(res["records"]) == 2 and all(r["eval_seed"] == 23456 for r in res["records"])
     assert "评测 @ u1" in capsys.readouterr().out
 
     out2 = tmp_path / "all.json"
@@ -28,3 +30,12 @@ def test_eval_ckpt_splits_and_all_cards(tmp_path, capsys):
     groups = {c: sorted(per) for c, per in res["cards"].items()}
     assert groups == {"example_calm": ["r2"], "example_ring": ["r2", "r3"]}
     assert res["overall"]["episodes"] == 3 * 2
+
+    splits = tmp_path / "rank-splits.toml"
+    splits.write_text('[[eval]]\ncard = "example_ring"\nranks = [2, 3]\nepisodes = 2\n')
+    out3 = tmp_path / "rank3.json"
+    assert main([str(ck), "--device", "cpu", "--splits", str(splits), "--ranks", "3",
+                 "--records", "--out", str(out3)]) == 0
+    res = json.loads(out3.read_text())
+    assert list(res["cards"]["example_ring"]) == ["r3"]
+    assert len(res["records"]) == 2 and all(r["rank"] == 3 for r in res["records"])

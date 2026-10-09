@@ -43,6 +43,8 @@ class DangerTopKV1:
         self.horizon = float(f["horizon"])
         self.d_max = float(f["d_max"])
         self.hold_r = float(cfg["reward"]["hold_radius"])
+        self.density_enabled = not (cfg["model"]["name"] == "set_attn_v3"
+                                   and cfg["model"].get("density_enabled", True) is False)
 
     def spec(self) -> dict[str, tuple[int, ...]]:
         return {
@@ -91,28 +93,8 @@ class DangerTopKV1:
             ], dim=-1) * esel.unsqueeze(-1)
 
         with maybe_phase(timer, "feat_density"):
-            valid = obs.bullets_mask.to(torch.float32)
-            u = (obs.bullets[..., 0] + 192.0) / CELL
-            col = u.floor().clamp(0, GRID_W - 1).long()
-            row = (obs.bullets[..., 1] / CELL).floor().clamp(0, GRID_H - 1).long()
-            # 内部格线上左右各半，保证 density(mirror(obs)) == density(obs).flip(-1)。
-            edge = (u == u.floor()) & (u > 0.0) & (u < float(GRID_W))
-            w_right = torch.where(edge, 0.5, 1.0)
-            w_left = torch.where(edge, 0.5, 0.0)
-            col_left = (col - 1).clamp_min(0)
-            cells = GRID_H * GRID_W
-            base = torch.arange(n, device=dev)[:, None] * cells + row * GRID_W
-            flat_right = (base + col).reshape(-1)
-            flat_left = (base + col_left).reshape(-1)
-            unit = pb / pb.norm(dim=-1, keepdim=True).clamp_min(1e-6)
-            approach = (-(unit * obs.bullets[..., 2:4]).sum(-1)).clamp_min(0.0) / 8.0
-            count = torch.zeros(n * cells, device=dev).scatter_add_(
-                0, flat_right, (valid * w_right).reshape(-1)
-            ).scatter_add_(0, flat_left, (valid * w_left).reshape(-1))
-            appr = torch.zeros(n * cells, device=dev).scatter_add_(
-                0, flat_right, (approach * valid * w_right).reshape(-1)
-            ).scatter_add_(0, flat_left, (approach * valid * w_left).reshape(-1))
-            density = torch.stack([count.view(n, GRID_H, GRID_W), appr.view(n, GRID_H, GRID_W)], dim=1)
+            density = self._density(obs, pb, n, dev) if self.density_enabled else torch.zeros(
+                n, 2, GRID_H, GRID_W, device=dev)
 
         with maybe_phase(timer, "feat_player_cond"):
             player = torch.stack([obs.player_xy[:, 0] / 192.0, obs.player_xy[:, 1] / 192.0,
@@ -122,3 +104,28 @@ class DangerTopKV1:
             cond = torch.stack([d[:, 0] / 192.0, d[:, 1] / 192.0, dn / 448.0, (dn < self.hold_r).to(torch.float32)], dim=-1)
         return {"bullets": bullets, "bullets_mask": bsel, "enemies": enemies, "enemies_mask": esel,
                 "density": density, "player": player, "cond": cond}
+
+    @staticmethod
+    def _density(obs: RawObs, pb: Tensor, n: int, dev) -> Tensor:
+        valid = obs.bullets_mask.to(torch.float32)
+        u = (obs.bullets[..., 0] + 192.0) / CELL
+        col = u.floor().clamp(0, GRID_W - 1).long()
+        row = (obs.bullets[..., 1] / CELL).floor().clamp(0, GRID_H - 1).long()
+        # 内部格线上左右各半，保证 density(mirror(obs)) == density(obs).flip(-1)。
+        edge = (u == u.floor()) & (u > 0.0) & (u < float(GRID_W))
+        w_right = torch.where(edge, 0.5, 1.0)
+        w_left = torch.where(edge, 0.5, 0.0)
+        col_left = (col - 1).clamp_min(0)
+        cells = GRID_H * GRID_W
+        base = torch.arange(n, device=dev)[:, None] * cells + row * GRID_W
+        flat_right = (base + col).reshape(-1)
+        flat_left = (base + col_left).reshape(-1)
+        unit = pb / pb.norm(dim=-1, keepdim=True).clamp_min(1e-6)
+        approach = (-(unit * obs.bullets[..., 2:4]).sum(-1)).clamp_min(0.0) / 8.0
+        count = torch.zeros(n * cells, device=dev).scatter_add_(
+            0, flat_right, (valid * w_right).reshape(-1)
+        ).scatter_add_(0, flat_left, (valid * w_left).reshape(-1))
+        appr = torch.zeros(n * cells, device=dev).scatter_add_(
+            0, flat_right, (approach * valid * w_right).reshape(-1)
+        ).scatter_add_(0, flat_left, (approach * valid * w_left).reshape(-1))
+        return torch.stack([count.view(n, GRID_H, GRID_W), appr.view(n, GRID_H, GRID_W)], dim=1)

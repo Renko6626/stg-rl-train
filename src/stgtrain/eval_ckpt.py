@@ -61,8 +61,11 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--device", default="auto", choices=("auto", "cpu", "cuda"))
     ap.add_argument("--cards-dir", default=None, help="覆盖配置里的 env.cards_dir")
     ap.add_argument("--all-cards", action="store_true", help="评卡池里所有卡（含训练卡），不用评测划分")
-    ap.add_argument("--ranks", default="2", help="--all-cards 时评哪些档，逗号分隔（默认 2）")
+    ap.add_argument("--ranks", default=None, help="限制难度，逗号分隔；全卡默认2，划分默认不筛选")
     ap.add_argument("--episodes", type=int, default=None, help="每组局数（默认取配置 eval.episodes / 划分文件）")
+    ap.add_argument("--eval-seed", type=int, default=None, help="覆盖固定评测环境/意图seed")
+    ap.add_argument("--records", action="store_true", help="保存首局逐局记录以便配对分析")
+    ap.add_argument("--splits", default=None, help="覆盖评测划分，不用于选择训练卡")
     ap.add_argument("--intent", default=None,
                     help="覆盖意图生成器（如 follow_player_v1 = 目标点锁自机的自由躲弹诊断）")
     ap.add_argument("--motor", default="train",
@@ -76,6 +79,10 @@ def main(argv: list[str] | None = None) -> int:
     over: dict = {"run": {"device": a.device}}
     if a.cards_dir:
         over["env"] = {"cards_dir": a.cards_dir}
+    if a.splits:
+        over.setdefault("env", {})["eval_splits"] = a.splits
+    if a.eval_seed is not None:
+        over.setdefault("eval", {})["seed"] = a.eval_seed
     if a.intent:
         over["eval"] = {**over.get("eval", {}), "intent": a.intent}
     over = deep_merge(over, parse_motor(a.motor))
@@ -85,12 +92,16 @@ def main(argv: list[str] | None = None) -> int:
     images, _starts, specs, featurizer, factory = build_components(cfg, device)
 
     if a.all_cards:
-        want = [int(r) for r in a.ranks.split(",")]
+        want = [int(r) for r in (a.ranks or "2").split(",")]
         n = a.episodes or int(cfg["eval"]["episodes"])
         specs = [EvalSpec(card=c.id, ranks=tuple(r), episodes=n)
                  for c in discover(cfg["env"]["cards_dir"]).values() if (r := allowed_ranks(c, want))]
     elif a.episodes:
         specs = [EvalSpec(s.card, s.ranks, a.episodes) for s in specs]
+    if a.ranks and not a.all_cards:
+        want = {int(r) for r in a.ranks.split(",")}
+        specs = [EvalSpec(s.card, tuple(r for r in s.ranks if r in want), s.episodes)
+                 for s in specs if any(r in want for r in s.ranks)]
     if not specs:
         raise SystemExit("没有可评的 (卡, 档)")
 
@@ -99,9 +110,14 @@ def main(argv: list[str] | None = None) -> int:
     ppo = PPO(cfg, factory, device)
     ppo.load_state_dict(ck["state"])
     t0 = time.perf_counter()
-    res = evaluate(cfg, ppo, featurizer, images, specs, device, hysteresis=a.hysteresis)
+    res = evaluate(cfg, ppo, featurizer, images, specs, device, hysteresis=a.hysteresis,
+                   include_records=a.records)
     res["checkpoint"] = {"path": str(a.checkpoint), "update": int(ck["update"]), "env_steps": int(ck["env_steps"]),
                          "hysteresis": a.hysteresis, "motor": dict(cfg["motor"]), "motor_arg": a.motor}
+    res["checkpoint"]["eval_seed"] = int(cfg["eval"]["seed"])
+    res["checkpoint"]["eval_splits"] = cfg["env"]["eval_splits"]
+    res["checkpoint"]["train_seed"] = int(cfg["run"]["seed"])
+    res["checkpoint"]["density_enabled"] = cfg["model"].get("density_enabled", True)
     print(console.eval_block(int(ck["update"]), res, False, time.perf_counter() - t0), flush=True)
 
     ckp = Path(a.checkpoint)

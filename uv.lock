@@ -752,13 +752,13 @@ wheels = [
 
 [[package]]
 name = "stg-rl"
-version = "0.4.1"
-source = { path = "magnus/wheels/stg_rl-0.4.1-cp310-abi3-manylinux_2_34_x86_64.whl" }
+version = "0.4.2"
+source = { path = "magnus/wheels/stg_rl-0.4.2-cp310-abi3-manylinux_2_34_x86_64.whl" }
 dependencies = [
     { name = "numpy" },
 ]
 wheels = [
-    { filename = "stg_rl-0.4.1-cp310-abi3-manylinux_2_34_x86_64.whl", hash = "sha256:2257fcbdbd1edb0630a1e6a2e21f4ab0dd7b1f0eb8408d6df819d0f464898a81" },
+    { filename = "stg_rl-0.4.2-cp310-abi3-manylinux_2_34_x86_64.whl", hash = "sha256:f446933d1ec21f909a7ae11c435761a206852c30f8a5ddcafaa4c58acd904a03" },
 ]
 
 [package.metadata]
@@ -807,7 +807,7 @@ requires-dist = [
     { name = "numpy" },
     { name = "nvidia-ml-py" },
     { name = "psutil" },
-    { name = "stg-rl", path = "magnus/wheels/stg_rl-0.4.1-cp310-abi3-manylinux_2_34_x86_64.whl" },
+    { name = "stg-rl", path = "magnus/wheels/stg_rl-0.4.2-cp310-abi3-manylinux_2_34_x86_64.whl" },
     { name = "stgagent", git = "https://github.com/Renko6626/stg-agent-proto?rev=v0.1.0" },
     { name = "tensorboard" },
     { name = "tensordict", specifier = "==0.14.2" },

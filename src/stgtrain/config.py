@@ -26,7 +26,7 @@ DEFAULTS: dict = {
     "motor": {"enabled": False, "hold": [2, 6], "delay": [0, 0], "slow": False},   # slow：低速键也过运动层（N3）
     "featurize": {"name": "danger_topk_v3", "k_bullets": 64, "k_enemies": 8, "horizon": 60, "d_max": 128.0},
     "model": {"name": "set_attn_v1", "d": 64, "heads": 4, "trunk": 256},
-    "reward": {"hold_radius": 24.0, "edge_margin": 16.0, "quick_frames": 3,
+    "reward": {"hold_radius": 24.0, "edge_margin": 16.0, "quick_frames": 3, "action_source": "executed",
                "terms": {"death": 10.0, "follow_shaping": 1.0, "hold": 0.01, "segment_survived": 0.0,
                          "key_press": 0.0, "quick_change": 0.0, "shift_toggle": 0.0, "edge_hug": 0.0}},
     "ppo": {"num_steps": 64, "gamma": 0.995, "gae_lambda": 0.95, "num_minibatches": 8, "update_epochs": 4,
@@ -75,10 +75,17 @@ def _check_keys(cfg: dict, ref: dict, path: tuple[str, ...] = ()) -> None:
 def validate(cfg: dict) -> None:
     _check_keys(cfg, DEFAULTS)
     run, env, ppo, feat, intent = cfg["run"], cfg["env"], cfg["ppo"], cfg["featurize"], cfg["intent"]
+    if "density_enabled" in cfg["model"]:
+        if cfg["model"]["name"] != "set_attn_v3" or not isinstance(cfg["model"]["density_enabled"], bool):
+            raise ValueError("model.density_enabled只支持set_attn_v3的布尔开关")
     if run["device"] not in ("auto", "cuda", "cpu"):
         raise ValueError(f"run.device 须为 auto/cuda/cpu，得 {run['device']!r}")
     if env["num_envs"] < 1 or env["frame_skip"] < 1 or env["max_frames"] < 1:
         raise ValueError("env.num_envs / frame_skip / max_frames 须 ≥ 1")
+    if cfg["reward"]["action_source"] not in ("executed", "request"):
+        raise ValueError("reward.action_source 须为 executed/request")
+    if cfg["reward"]["action_source"] == "request" and env["frame_skip"] != 1:
+        raise ValueError("request 动作奖励目前要求 env.frame_skip=1")
     if not 1 <= env["bullets_cap"] <= 8192:
         raise ValueError(f"env.bullets_cap 须在 1..=8192，得 {env['bullets_cap']}")
     if not env["ranks"] or any(not 0 <= r <= 4 for r in env["ranks"]):

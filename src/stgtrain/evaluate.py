@@ -142,7 +142,8 @@ def run_groups(cfg: dict, ppo, featurizer, groups: list[tuple], episodes: int, d
     return out
 
 
-def evaluate(cfg: dict, ppo, featurizer, images: dict, specs: list[EvalSpec], device, hysteresis: float = 0.0) -> dict:
+def evaluate(cfg: dict, ppo, featurizer, images: dict, specs: list[EvalSpec], device, hysteresis: float = 0.0,
+             *, include_records: bool = False) -> dict:
     result: dict = {"cards": {}, "overall": {}, "by_rank": {}}
     everything: list[dict] = []
     by_rank: dict[int, list[dict]] = {}
@@ -171,4 +172,7 @@ def evaluate(cfg: dict, ppo, featurizer, images: dict, specs: list[EvalSpec], de
     result["overall"] = summarize_eval(everything)
     # 分档聚合：评测集加档之后 `overall` 换了口径，`by_rank.r2` 保持与历史实验同口径可比。
     result["by_rank"] = {f"r{r}": summarize_eval(recs) for r, recs in sorted(by_rank.items())}
+    if include_records:
+        result["records"] = [{**r, "card": card, "rank": rank, "eval_seed": int(cfg["eval"]["seed"])}
+                             for (card, rank), recs in records.items() for r in recs]
     return result

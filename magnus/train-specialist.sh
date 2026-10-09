@@ -61,4 +61,9 @@ if [[ -n "${PROBES-$DEFAULT_PROBES}" && -n "$run_dir" && -f "$run_dir/checkpoint
 fi
 
 # A missing checkpoint or failed specialist probe fails the Job; EXIT still saves artifacts.
-python -u tools/eval_specialist_checkpoints.py "${run_dir%/}" --device cuda 2>&1 | tee "$out_dir/specialist-eval.log"
+specialist_update_args=()
+if [[ -n "${SPECIALIST_UPDATES:-}" ]]; then
+    read -ra specialist_updates <<< "$SPECIALIST_UPDATES"
+    specialist_update_args=(--updates "${specialist_updates[@]}")
+fi
+python -u tools/eval_specialist_checkpoints.py "${run_dir%/}" --device cuda "${specialist_update_args[@]}" 2>&1 | tee "$out_dir/specialist-eval.log"

@@ -125,6 +125,7 @@ class PPO:
         self.num_steps = int(self.p["num_steps"])
         amp_device = device.type if self.p["amp"] == "bf16" else None
         self.agent = Agent(model_factory(), amp_device).to(device)
+        self.feature_keys = tuple(self.agent.model.requires())
         # 底本：推理用一份共享参数数据、但不带梯度的副本。tensordict 0.14 的 to_module 默认
         # preserve_module_state=True，会保留参数原有的 requires_grad=True，于是 rollout 的
         # vals/logprobs 会带上 rollout 图，第二次 minibatch backward 就报「图已释放」；显式关掉。
@@ -207,7 +208,7 @@ class PPO:
         ts = []
         for _ in range(self.num_steps):
             with maybe_phase(timer, "featurize"):
-                feats = TensorDict(fns.featurize(obs, timer), batch_size=[n])
+                feats = TensorDict(fns.featurize(obs, timer), batch_size=[n]).select(*self.feature_keys)
             with maybe_phase(timer, "policy"):
                 torch.compiler.cudagraph_mark_step_begin()
                 action, logprob, _, value = self.policy(feats)
@@ -221,7 +222,7 @@ class PPO:
             obs = next_obs
         container = torch.stack(ts, 0)
         with maybe_phase(timer, "featurize"):
-            next_feats = TensorDict(fns.featurize(obs, timer), batch_size=[n])
+            next_feats = TensorDict(fns.featurize(obs, timer), batch_size=[n]).select(*self.feature_keys)
         with torch.no_grad():
             next_value = self.agent_inference.get_value(next_feats)
         return obs, container, next_value
@@ -270,8 +271,14 @@ class PPO:
     def state_dict(self) -> dict:
         return {"agent": self.agent.state_dict(), "optimizer": self.optimizer.state_dict()}
 
+    def load_agent_state_dict(self, sd: dict) -> None:
+        """只载入模型权重，保留新运行的 optimizer 与学习率。"""
+        self.agent.load_state_dict(sd, strict=True)
+        from_module(self.agent).data.to_module(self.agent_inference)
+        self.agent_inference.requires_grad_(False)
+
     def load_state_dict(self, sd: dict) -> None:
-        self.agent.load_state_dict(sd["agent"])
+        self.load_agent_state_dict(sd["agent"])
         # Optimizer.load_state_dict 会深拷贝 param_groups，换掉 lr 张量对象；CUDA 图在捕获时
         # 已引用原张量，train_step 的 lr.copy_() 退火会作用在旧张量上而静默失效。
         # 先留原张量引用，载入后把值搬回来并装回 param_group，保住身份。
@@ -279,5 +286,3 @@ class PPO:
         self.optimizer.load_state_dict(sd["optimizer"])
         lr_t.copy_(torch.as_tensor(self.optimizer.param_groups[0]["lr"], device=lr_t.device))
         self.optimizer.param_groups[0]["lr"] = lr_t
-        from_module(self.agent).data.to_module(self.agent_inference)
-        self.agent_inference.requires_grad_(False)

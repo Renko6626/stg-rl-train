@@ -1,0 +1,125 @@
+# P2：最新B/Shift K8共享权重，2000轮适应；只改变密度分支。
+[run]
+seed = 1
+device = "cuda"
+total_updates = 2000
+ckpt_every = 250
+eval_every = 250
+torch_threads = 2
+max_minutes = 0.0
+
+[env]
+cards_dir = ["cards", "cards-synthetic", "cards-laser-specialist"]
+eval_splits = "eval/splits-laser.toml"
+num_envs = 4096
+threads = 30
+frame_skip = 1
+max_frames = 3600
+warmup_max = 120
+bullets_cap = 1024
+ranks = [2]
+mirror = true
+hit_extra = [0.0, 2.0]
+
+[intent]
+name = "mixed_v1"
+margin = 16.0
+interval = [120, 300]
+card_mix_enabled = false
+
+[intent.mix]
+follow = 0.6
+anchor = 0.3
+free = 0.1
+
+[curriculum]
+enabled = true
+interval = 20
+ema_decay = 0.98
+alpha = 1.0
+fail_floor = 0.05
+fail_ceil = 0.95
+w_lo = 0.25
+w_hi = 4.0
+min_episodes = 30
+laser_stratified = false
+
+[motor]
+enabled = true
+hold = [2, 6]
+delay = [0, 2]
+slow = true
+
+[featurize]
+name = "danger_topk_v8"
+k_bullets = 64
+k_enemies = 8
+horizon = 60
+d_max = 128.0
+frame = "static"
+dt = false
+k_lasers = 8
+
+[model]
+name = "set_attn_v3"
+d = 64
+heads = 4
+trunk = 256
+sa_layers = 0
+laser_sa_layers = 0
+joint_sa_layers = 1
+action_query = false
+density_fp32 = true
+density_enabled = false
+
+[reward]
+hold_radius = 24.0
+edge_margin = 16.0
+quick_frames = 3
+action_source = "request"
+
+[reward.terms]
+death = 10.0
+follow_shaping = 1.0
+hold = 0.01
+segment_survived = 0.0
+key_press = -0.001
+quick_change = -0.003
+shift_toggle = -0.003
+edge_hug = -0.02
+
+[ppo]
+num_steps = 64
+gamma = 0.995
+gae_lambda = 0.95
+num_minibatches = 8
+update_epochs = 4
+clip_coef = 0.2
+clip_vloss = true
+ent_coef = 0.01
+vf_coef = 0.5
+max_grad_norm = 0.5
+learning_rate = 0.0001
+anneal_lr = true
+norm_adv = true
+compile = true
+cudagraphs = true
+rollout_cudagraphs = true
+amp = "bf16"
+
+[eval]
+episodes = 32
+greedy = true
+seed = 12345
+intent = "lower_half_uniform_v1"
+motor = "train"
+batched = true
+
+[log]
+tensorboard = true
+perf_sync_every = 20
+sample_hz = 1.0
+
+[bench]
+seconds = 10.0
+num_envs = [512, 1024, 2048, 4096]

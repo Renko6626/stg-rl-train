@@ -84,6 +84,24 @@ def test_disabled_joint_layer_does_not_mix_types():
     torch.testing.assert_close(l, changed)
 
 
+def test_density_can_be_disabled_without_changing_checkpoint_parameters():
+    enabled, f = build()
+    disabled, _ = build(density_enabled=False)
+    disabled.load_state_dict(enabled.state_dict(), strict=True)
+    changed = dict(f, density=f["density"] + 100.0)
+    assert not torch.allclose(enabled(f)[0], enabled(changed)[0])
+    for a, b in zip(disabled(f), disabled(changed)):
+        torch.testing.assert_close(a, b, atol=0, rtol=0)
+
+
+def test_explicit_density_enabled_matches_default():
+    default, f = build()
+    explicit, _ = build(density_enabled=True)
+    explicit.load_state_dict(default.state_dict(), strict=True)
+    for a, b in zip(default(f), explicit(f)):
+        torch.testing.assert_close(a, b, atol=0, rtol=0)
+
+
 @pytest.mark.parametrize("model", [{"sa_layers": 1}, {"laser_sa_layers": 1}, {"joint_sa_layers": -1}])
 def test_invalid_layers_rejected(model):
     with pytest.raises(ValueError, match="layers"):

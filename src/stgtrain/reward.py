@@ -25,6 +25,15 @@ class RewardContext:
     hold_radius: float
     quick_frames: int
     edge_margin: float
+    action_source: str = "executed"
+
+    def action_info(self) -> tuple[Tensor, Tensor, Tensor | None]:
+        if self.action_source == "request":
+            prev, cur, held = self.info.prev_request_buttons, self.info.request_buttons, self.info.request_dir_hold
+            if prev is None or cur is None or held is None:
+                raise ValueError("request 动作奖励缺少 StepInfo 请求快照")
+            return prev, cur, held
+        return self.info.prev_buttons, self.info.buttons, self.info.dir_hold
 
     @property
     def alive(self) -> Tensor:
@@ -63,7 +72,8 @@ def segment_survived(ctx: RewardContext) -> Tensor:
 
 @REWARD_TERMS.register("key_press")
 def key_press(ctx: RewardContext) -> Tensor:
-    return actions.key_changes(ctx.info.prev_buttons, ctx.info.buttons)[0].to(torch.float32)
+    prev, cur, _ = ctx.action_info()
+    return actions.key_changes(prev, cur)[0].to(torch.float32)
 
 
 @REWARD_TERMS.register("quick_change")
@@ -74,15 +84,17 @@ def quick_change(ctx: RewardContext) -> Tensor:
     移动一起压掉。实测（评测集）F 的方向变化里有 43% 发生在上一次变向后 ≤2 步——60Hz 下
     ≤33ms，那不是反应，是振荡。本项专打这一段，`quick_frames` 之外的变向一分不扣。
     """
-    if ctx.info.dir_hold is None:
+    prev, cur, held = ctx.action_info()
+    if held is None:
         return torch.zeros_like(ctx.alive)
-    changed = actions.direction_changed(ctx.info.prev_buttons, ctx.info.buttons)
-    return (changed & (ctx.info.dir_hold <= ctx.quick_frames)).to(torch.float32)
+    changed = actions.direction_changed(prev, cur)
+    return (changed & (held <= ctx.quick_frames)).to(torch.float32)
 
 
 @REWARD_TERMS.register("shift_toggle")
 def shift_toggle(ctx: RewardContext) -> Tensor:
-    return actions.key_changes(ctx.info.prev_buttons, ctx.info.buttons)[1].to(torch.float32)
+    prev, cur, _ = ctx.action_info()
+    return actions.key_changes(prev, cur)[1].to(torch.float32)
 
 
 @REWARD_TERMS.register("edge_hug")
@@ -106,9 +118,11 @@ class RewardFn:
         self.hold_radius = float(cfg["reward"]["hold_radius"])
         self.quick_frames = int(cfg["reward"]["quick_frames"])
         self.edge_margin = float(cfg["reward"]["edge_margin"])
+        self.action_source = cfg["reward"].get("action_source", "executed")
 
     def __call__(self, prev: RawObs, cur: RawObs, info: StepInfo) -> tuple[Tensor, dict[str, Tensor]]:
-        ctx = RewardContext(prev, cur, info, self.gamma, self.hold_radius, self.quick_frames, self.edge_margin)
+        ctx = RewardContext(prev, cur, info, self.gamma, self.hold_radius, self.quick_frames, self.edge_margin,
+                            self.action_source)
         raw = {name: fn(ctx) for name, fn in self.fns.items()}
         total = torch.zeros_like(info.done, dtype=torch.float32)
         for name, value in raw.items():

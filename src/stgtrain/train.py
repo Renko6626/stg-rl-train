@@ -1,12 +1,14 @@
 """入口（spec §2.2）。
 
 python -m stgtrain.train <config> [name]            训练
+python -m stgtrain.train <config> [name] --init-from <checkpoint>  从权重开始新训练
 python -m stgtrain.train --resume <run 目录> [--total-updates N]
 python -m stgtrain.train <config> [name] --bench     测吞吐
 """
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import shutil
 import subprocess
@@ -95,7 +97,63 @@ def build_components(cfg: dict, device: torch.device):
     return images, starts, specs, featurizer, factory
 
 
-def train(cfg: dict, run_dir: Path, resume: dict | None = None, pack_result: bool = True) -> Path:
+def initialize_from_checkpoint(ppo: PPO, cfg: dict, path: str | Path) -> dict:
+    """新运行只继承兼容模型的权重，并返回可追溯的来源信息。"""
+    return _initialize_checkpoint(ppo, cfg, path, density_ablation=False)
+
+
+def initialize_density_from_checkpoint(ppo: PPO, cfg: dict, path: str | Path) -> dict:
+    """v8/v3密度消融专用：仅允许density_enabled变化，全部张量仍严格加载。"""
+    return _initialize_checkpoint(ppo, cfg, path, density_ablation=True)
+
+
+def _initialize_checkpoint(ppo: PPO, cfg: dict, path: str | Path, *, density_ablation: bool) -> dict:
+    path = Path(path).resolve()
+    ck = load_checkpoint(path, map_location=ppo.device)
+    source_cfg = from_dict(ck["cfg"])
+    if density_ablation:
+        for c in (source_cfg, cfg):
+            if c["model"]["name"] != "set_attn_v3" or c["featurize"]["name"] != "danger_topk_v8":
+                raise ValueError("密度消融初始化只支持danger_topk_v8/set_attn_v3")
+            if not isinstance(c["model"].get("density_enabled", True), bool):
+                raise ValueError("model.density_enabled须为布尔值")
+    for section in ("model", "featurize"):
+        source, target = source_cfg[section], cfg[section]
+        different = [key for key in sorted(source.keys() | target.keys())
+                     if source.get(key) != target.get(key)
+                     and not (density_ablation and section == "model" and key == "density_enabled")]
+        if different:
+            fields = ", ".join(f"{section}.{key}" for key in different)
+            raise ValueError(f"--init-from checkpoint 与新配置不兼容：{fields}")
+    try:
+        ppo.load_agent_state_dict(ck["state"]["agent"])
+    except RuntimeError as exc:
+        raise ValueError(f"--init-from checkpoint 模型权重不兼容：{path}\n{exc}") from exc
+    with path.open("rb") as f:
+        sha256 = hashlib.file_digest(f, "sha256").hexdigest()
+    provenance = {
+        "path": str(path), "sha256": sha256,
+        "source_update": int(ck["update"]), "source_env_steps": int(ck["env_steps"]),
+        "source_model": source_cfg["model"], "source_featurize": source_cfg["featurize"],
+        "source_action_table_version": ck["action_table_version"],
+    }
+    source_env = path.parent.parent / "env.json"
+    if source_env.exists():
+        provenance["source_stg_rl"] = json.loads(source_env.read_text(encoding="utf-8")).get("stg_rl")
+    if density_ablation:
+        provenance["migration"] = {
+            "kind": "density_ablation_v3",
+            "model.density_enabled": {"source": source_cfg["model"].get("density_enabled", True),
+                                      "target": cfg["model"].get("density_enabled", True)},
+            "loaded_keys": sorted(ck["state"]["agent"]), "new_keys": [], "ignored_keys": [],
+        }
+    return provenance
+
+
+def train(cfg: dict, run_dir: Path, resume: dict | None = None, pack_result: bool = True,
+          *, init_from: str | Path | None = None, init_density_from: str | Path | None = None) -> Path:
+    if sum(x is not None for x in (resume, init_from, init_density_from)) > 1:
+        raise ValueError("--init-from、--init-density-from 与 --resume 不能同时使用")
     run_dir = Path(run_dir)
     device = pick_device(cfg["run"]["device"])
     total = int(cfg["run"]["total_updates"])
@@ -108,6 +166,9 @@ def train(cfg: dict, run_dir: Path, resume: dict | None = None, pack_result: boo
     start_mixes = start_intent_mixes(discover(cfg["env"]["cards_dir"]), starts, cfg["intent"]["mix"],
                                      cfg["intent"].get("card_mix_enabled", False))
     ppo = PPO(cfg, factory, device)
+    initial_checkpoint = initialize_from_checkpoint(ppo, cfg, init_from) if init_from is not None else None
+    if init_density_from is not None:
+        initial_checkpoint = initialize_density_from_checkpoint(ppo, cfg, init_density_from)
 
     start, env_steps, best = 1, 0, None
     if resume is not None:
@@ -125,6 +186,16 @@ def train(cfg: dict, run_dir: Path, resume: dict | None = None, pack_result: boo
                          starts=[f"{s.image}:{s.mark}:{s.rank}" for s in starts],
                          cards=card_manifest(discover(cfg["env"]["cards_dir"])),
                          start_intent_mixes=start_mixes)
+    if initial_checkpoint is not None:
+        _update_env_json(run_dir, initial_checkpoint=initial_checkpoint)
+    if init_density_from is not None:
+        save_checkpoint(run_dir / "checkpoints" / "u0.pt", ppo=ppo, update=0, env_steps=0, cfg=cfg,
+                        extra={"initial_checkpoint": initial_checkpoint})
+        # u0仅诊断，不参与best选择，不恢复源optimizer/课程/计数。
+        for label, intent in (("follow", cfg["eval"]["intent"]), ("free", "follow_player_v1")):
+            evaluation_cfg = deep_merge(cfg, {"eval": {"intent": intent}})
+            res = evaluate(evaluation_cfg, ppo, featurizer, images, specs, device, include_records=True)
+            (run_dir / "eval" / f"u0-{label}.json").write_text(json.dumps(res, ensure_ascii=False, indent=2))
 
     envw = EnvWrapper(cfg, images, starts, device, seed=int(cfg["run"]["seed"]) + start - 1,
                       start_intent_mixes=start_mixes)  # Ruling 7
@@ -241,12 +312,17 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="python -m stgtrain.train")
     ap.add_argument("config", nargs="?", help="配置 TOML（--resume 时省略）")
     ap.add_argument("name", nargs="?", default="run", help="运行名，拼进结果目录名")
-    ap.add_argument("--resume", metavar="RUN_DIR", help="从 RUN_DIR/checkpoints/latest.pt 续训")
+    checkpoint_args = ap.add_mutually_exclusive_group()
+    checkpoint_args.add_argument("--resume", metavar="RUN_DIR", help="从 RUN_DIR/checkpoints/latest.pt 续训")
+    checkpoint_args.add_argument("--init-from", metavar="CHECKPOINT", help="只继承模型权重，按新配置开始训练")
+    checkpoint_args.add_argument("--init-density-from", metavar="CHECKPOINT", help="v8/v3密度消融专用严格权重初始化")
     ap.add_argument("--bench", action="store_true", help="只测吞吐（spec §7.3）")
     ap.add_argument("--runs-dir", default="runs")
     ap.add_argument("--total-updates", type=int, default=None, help="覆盖 run.total_updates（续训加长用）")
     ap.add_argument("--no-pack", action="store_true", help="不打 tar.gz")
     args = ap.parse_args(argv)
+    if (args.init_from or args.init_density_from) and args.bench:
+        ap.error("权重初始化仅用于训练，不能与 --bench 同时使用")
     overrides = {"run": {"total_updates": args.total_updates}} if args.total_updates is not None else {}
 
     if args.resume:
@@ -264,7 +340,8 @@ def main(argv: list[str] | None = None) -> int:
 
         run_bench(cfg, make_run_dir(Path(args.runs_dir), f"bench-{args.name}"))
         return 0
-    train(cfg, make_run_dir(Path(args.runs_dir), args.name), pack_result=not args.no_pack)
+    train(cfg, make_run_dir(Path(args.runs_dir), args.name), pack_result=not args.no_pack,
+          init_from=args.init_from, init_density_from=args.init_density_from)
     return 0
 
 

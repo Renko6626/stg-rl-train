@@ -6,10 +6,11 @@ import torch
 
 from conftest import small_cfg
 from stgtrain import bench, gpucheck
-from stgtrain.checkpoint import load_checkpoint
+from stgtrain.checkpoint import load_checkpoint, save_checkpoint
 from stgtrain.config import dump_toml, from_dict, load_config
 from stgtrain.metrics import read_jsonl
-from stgtrain.train import main, make_run_dir, train
+from stgtrain.ppo import PPO
+from stgtrain.train import build_components, main, make_run_dir, train
 
 REPO = Path(__file__).resolve().parents[1]
 
@@ -138,6 +139,60 @@ def test_train_with_featurizer_v2(tmp_path):
     assert (run_dir / "eval" / "1.json").exists()
 
 
+@pytest.mark.parametrize("density_enabled", [None, True, False])
+def test_train_warm_start_uses_new_config_and_fresh_counters(tmp_path, density_enabled):
+    from conftest import FIXTURES
+
+    source_cfg = small_cfg(
+        env={"cards_dir": str(FIXTURES / "laser_cards"), "eval_splits": str(FIXTURES / "laser_eval_splits.toml")},
+        featurize={"name": "danger_topk_v8", "frame": "static", "dt": False, "k_lasers": 8},
+        model={"name": "set_attn_v3", "joint_sa_layers": 1},
+    )
+    *_, factory = build_components(source_cfg, torch.device("cpu"))
+    source = PPO(source_cfg, factory, torch.device("cpu"))
+    checkpoint = tmp_path / "source.pt"
+    save_checkpoint(checkpoint, ppo=source, update=3500, env_steps=123456, cfg=source_cfg,
+                    extra={"best": [1.0, 1.0]})
+    cfg = from_dict({**source_cfg, "run": {**source_cfg["run"], "total_updates": 1},
+                     "ppo": {**source_cfg["ppo"], "learning_rate": 1e-4, "anneal_lr": False},
+                     "reward": {**source_cfg["reward"], "action_source": "request",
+                                "terms": {**source_cfg["reward"]["terms"], "shift_toggle": 0.02}}})
+    if density_enabled is not None:
+        cfg["model"]["density_enabled"] = density_enabled
+    config = tmp_path / "warm.toml"
+    dump_toml(cfg, config)
+    runs = tmp_path / "runs"
+    flag = "--init-from" if density_enabled is None else "--init-density-from"
+    assert main([str(config), "warm", flag, str(checkpoint), "--runs-dir", str(runs), "--no-pack"]) == 0
+    (run_dir,) = runs.glob("*-warm")
+    ck = load_checkpoint(run_dir / "checkpoints" / "latest.pt")
+    assert ck["cfg"] == cfg and ck["update"] == 1
+    assert ck["env_steps"] == cfg["env"]["num_envs"] * cfg["ppo"]["num_steps"]
+    assert float(ck["state"]["optimizer"]["param_groups"][0]["lr"]) == pytest.approx(1e-4)
+    rows = read_jsonl(run_dir / "metrics.jsonl")
+    assert [r["update"] for r in rows if "ppo/pg_loss" in r] == [1]
+    assert any("eval/survival" in r for r in rows)
+    assert (run_dir / "checkpoints" / "best.pt").exists()
+    env = json.loads((run_dir / "env.json").read_text())
+    assert env["initial_checkpoint"]["source_update"] == 3500
+    assert env["initial_checkpoint"]["source_env_steps"] == 123456
+    if density_enabled is not None:
+        initial = load_checkpoint(run_dir / "checkpoints" / "u0.pt")
+        assert initial["update"] == initial["env_steps"] == 0
+        assert not initial["state"]["optimizer"]["state"]
+        for key, value in source.agent.state_dict().items():
+            assert torch.equal(value, initial["state"]["agent"][key])
+        for intent in ("follow", "free"):
+            res = json.loads((run_dir / "eval" / f"u0-{intent}.json").read_text())
+            assert res["overall"]["episodes"] == len(res["records"])
+
+
+def test_init_from_and_resume_are_mutually_exclusive():
+    with pytest.raises(SystemExit) as exc:
+        main(["--init-from", "source.pt", "--resume", "runs/source"])
+    assert exc.value.code == 2
+
+
 def test_gradient_norm_tolerance_is_looser_than_the_loss_one():
     """gn 是对全部参数的平方和归约，最吃累加顺序；1e-4 相对压不住编译后的归约树变化
     （租用机实测 0.35315809 vs 0.35306996 = 2.5e-4）。这条守着它别被"顺手"调回去。"""
@@ -149,11 +204,12 @@ def test_gradient_norm_tolerance_is_looser_than_the_loss_one():
     assert not g.close_enough(0.353, 0.357, rel=g.GN_REL)
 
 
-@pytest.mark.parametrize("feat_name,model_name,layers", [
-    ("danger_topk_v7", "set_attn_v2", {"sa_layers": 1, "laser_sa_layers": 1}),
-    ("danger_topk_v8", "set_attn_v3", {"joint_sa_layers": 1}),
+@pytest.mark.parametrize("feat_name,model_name,layers,action_source", [
+    ("danger_topk_v7", "set_attn_v2", {"sa_layers": 1, "laser_sa_layers": 1}, "executed"),
+    ("danger_topk_v8", "set_attn_v3", {"joint_sa_layers": 1}, "executed"),
+    ("danger_topk_v8", "set_attn_v3", {"joint_sa_layers": 1}, "request"),
 ])
-def test_train_laser_model_end_to_end_and_export(tmp_path, feat_name, model_name, layers):
+def test_train_laser_model_end_to_end_and_export(tmp_path, feat_name, model_name, layers, action_source):
     """v7 特征化 + set_attn_v2 在激光夹具卡上：rollout → 更新 → 评测 → checkpoint → ONNX 部署包装。"""
     from conftest import FIXTURES
     from stgtrain.export_onnx import build_deploy
@@ -163,6 +219,7 @@ def test_train_laser_model_end_to_end_and_export(tmp_path, feat_name, model_name
         env={"cards_dir": str(FIXTURES / "laser_cards"), "eval_splits": str(FIXTURES / "laser_eval_splits.toml")},
         featurize={"name": feat_name, "frame": "static", "dt": False, "k_lasers": 8},
         model={"name": model_name, **layers},
+        reward={"action_source": action_source},
         ppo={"amp": "bf16" if model_name == "set_attn_v3" else "off"},
     )
     run_dir = make_run_dir(tmp_path, "laser")

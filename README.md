@@ -47,9 +47,9 @@ uv run --frozen python -m stgtrain.export_onnx runs/<run>/checkpoints/best.pt --
 仍按 id 跨帧差分自己填（含 16 px 瞬移守卫），两边口径暂不一致，图是无状态的、不要求逐位相同。
 再换特征化器要在 `EXPORT_FEATURIZERS` 加一个可导出孪生；动了图签名还要两边一起 bump `GRAPH_VERSION`。`dist/` 不入库，按 `rl-vX` wheel 的先例走 Release 分发。
 
-下一版候选为 `configs/exp-t6-laser-joint.toml`：`danger_topk_v8` 使用14维激光token（局部线段几何、有限旋转位移、伸长余量、预警），`set_attn_v3` 将子弹和激光分别投影后送入一层共享自注意力，再按类型池化。它替换旧子弹专用注意力层；主干、PPO与T5训练设置沿用。[设计与字段契约](docs/superpowers/specs/2026-10-01-laser-token-joint-attention-design.md)。
+当前激光模型路线由T6–T8验证，统一[阶段小结与后续候选](docs/practice-cards/2026-10-02-laser-stage-summary.md)：`danger_topk_v8` 使用14维激光token（局部线段几何、有限旋转位移、伸长余量、预警），`set_attn_v3` 将子弹和激光分别投影后送入一层共享自注意力，再按类型池化。它替换旧子弹专用注意力层；主干、PPO与T5训练设置沿用。[设计与字段契约](docs/superpowers/specs/2026-10-01-laser-token-joint-attention-design.md)。
 
-v8导出使用**图版本6**：在版本5的激光表／mask之后追加 `laser_start_len: float32[L]`，必须与激光行对齐，填引擎的设定棒长，不能用当前长度代替。版本2–5的输入保持不变。游戏部署调用方尚需适配版本6；训练仓ONNX对拍通过不代表游戏端已能加载。候选配置不表示训练已启动。
+v8导出使用**图版本6**：在版本5的激光表／mask之后追加 `laser_start_len: float32[L]`，必须与激光行对齐，填引擎的设定棒长，不能用当前长度代替。版本2–5的输入保持不变。TH06NC共享C部署接口已适配，T8四根激光模型与mod已[打包](docs/practice-cards/2026-10-02-t8-th06nc-package.md)；未做Windows游戏实机验收。其他部署调用方仍须按签名适配。
 
 ## 开发
 

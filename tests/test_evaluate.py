@@ -40,13 +40,18 @@ def test_evaluate_calm_card_counts_exact_episodes():
     ppo = PPO(cfg, lambda: MODELS.get("set_attn_v1")(cfg, feat.spec()), device)
     # 固定「一直按下」：测的是评测管线，不是策略（未训练的网络可能撞上 boss 本体）
     ppo.act = lambda feats, greedy: torch.full((feats["player"].shape[0],), 10, dtype=torch.int64)
-    res = evaluate(cfg, ppo, feat, images, specs, device)
+    res = evaluate(cfg, ppo, feat, images, specs, device, include_records=True)
     r2 = res["cards"]["example_calm"]["r2"]
     assert r2["episodes"] == 4 and r2["survival"] == 1.0
     # 静场卡脚本段在引擎第 303 帧结束；env 预热（warmup_max=120，且不占 ep_frames）会先吃掉最多 120 帧，
     # 所以每局 183..303 帧、均值约 222。阈值放宽到 150 仍能抓住评测管线提前截断的 bug。
     assert r2["frames_mean"] > 150
     assert res["overall"]["episodes"] == 4
+    records = res["records"]
+    assert len(records) == 4 and {r["env"] for r in records} == set(range(4))
+    assert all(r["card"] == "example_calm" and r["rank"] == 2
+               and r["eval_seed"] == cfg["eval"]["seed"] for r in records)
+    assert summarize_eval(records) == res["overall"]
 
 
 def test_summarize_pools_radius_split_rates():

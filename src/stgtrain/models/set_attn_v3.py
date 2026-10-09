@@ -21,6 +21,9 @@ class SetAttnV3(SetAttnV2):
         if layers < 0:
             raise ValueError("model.joint_sa_layers 须≥0")
         super().__init__(cfg, spec)
+        self.density_enabled = bool(m.get("density_enabled", True))
+        if not self.density_enabled:
+            self._spec.pop("density")
         d, heads = int(m["d"]), int(m["heads"])
         self.type_embedding = nn.Parameter(torch.randn(2, d) * 0.1)
         self.joint_sa = nn.ModuleList(SelfAttnBlock(d, heads, bool(m.get("ln_affine", True)))
@@ -49,7 +52,9 @@ class SetAttnV3(SetAttnV2):
         hb = self.bullets(feats["bullets"], feats["bullets_mask"], ctx, bt)
         hl = self.lasers(feats["lasers"], feats["lasers_mask"], ctx, lt)
         he = self.enemies(feats["enemies"], feats["enemies_mask"], ctx)
-        if self.density_fp32:
+        if not self.density_enabled:
+            hd = torch.zeros_like(ctx)
+        elif self.density_fp32:
             with torch.autocast(feats["density"].device.type, enabled=False):
                 hd = self.dens_proj(self.density(feats["density"].float()))
         else:

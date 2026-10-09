@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "stg-engine 躲弹小模型训练仓（PPO，LeanRL 底本）"
 requires-python = ">=3.12,<3.13"
 dependencies = [
-  "stg-rl==0.4.1",
+  "stg-rl==0.4.2",
   "stgagent @ git+https://github.com/Renko6626/stg-agent-proto@v0.1.0",
   "torch==2.14.0",
   "tensordict==0.14.2",
@@ -41,4 +41,4 @@ filterwarnings = [
 ]
 
 [tool.uv.sources]
-stg-rl = { path = "magnus/wheels/stg_rl-0.4.1-cp310-abi3-manylinux_2_34_x86_64.whl" }
+stg-rl = { path = "magnus/wheels/stg_rl-0.4.2-cp310-abi3-manylinux_2_34_x86_64.whl" }
