@@ -1,0 +1,35 @@
+{
+  "runs": {
+    "T6": {
+      "n_samples": 163,
+      "means": {
+        "perf/total_s": 4.413892634430089,
+        "perf/update_s": 2.32563030799748,
+        "perf/update_minibatches_s": 2.30998368229877,
+        "perf/policy_s": 0.2399428917175056,
+        "perf/env_step_s": 0.6114150356569904,
+        "perf/h2d_s": 0.7731768435518618,
+        "perf/featurize_s": 0.2536541838655991,
+        "perf/bullet_rows_mean": 812575.316142638
+      }
+    },
+    "T8": {
+      "n_samples": 163,
+      "means": {
+        "perf/total_s": 4.263819528675061,
+        "perf/update_s": 2.1925097716846533,
+        "perf/update_minibatches_s": 2.1787809253973096,
+        "perf/policy_s": 0.21890943235734855,
+        "perf/env_step_s": 0.5904885992933453,
+        "perf/h2d_s": 0.8008270712077983,
+        "perf/featurize_s": 0.2519347219059438,
+        "perf/bullet_rows_mean": 809464.4841832822
+      }
+    }
+  },
+  "sources": {
+    "runs/job-cec000c4981cc5af/20261001-185732-t6-laser-joint/metrics.jsonl": "09f77488b17d973484f5eb8ebc8245dfa0d2205416c6071407ebf2f5fd133e7c",
+    "runs/job-28a4532abf792cc4/20261002-103401-t8-laser-k4/metrics.jsonl": "1101fc35542b94cece9d67b9d13892c9da45a549d138ce5c9fcbe9da4a7ff82d"
+  },
+  "window": "updates>=250 and update%20==0"
+}

@@ -1,0 +1,605 @@
+{
+  "stage": "P1",
+  "device": "cpu",
+  "eval_seed": 12345,
+  "checkpoint": {
+    "path": "/data/sunyunbo/www/stg-rl-train/runs/job-b3ef72c1ca44515d/20261006-151317-request-light-shift-k8/checkpoints/best.pt",
+    "sha256": "8b3824871e18ca4a5fd052e758ef13833a0303d856513ebe58e6d604f0a19c88",
+    "update": 1000,
+    "env_steps": 262144000
+  },
+  "engine": {
+    "tables_hash": "37a7ff12fe40e24e",
+    "git_sha": "unknown",
+    "version": "0.4.2",
+    "engine_ver": "24"
+  },
+  "python": "3.11.15",
+  "torch": "2.5.1+cpu",
+  "tensordict": "0.6.2",
+  "source_hashes_unchanged": true,
+  "files": {
+    "original-follow-cnn.json": {
+      "sha256": "918771ca685e57ab5311fe9eb53017dacfd3b6499819228d0867eb032c8cfd69",
+      "episodes": 832,
+      "elapsed_s": 362.4645228087902,
+      "survived": 766
+    },
+    "original-follow-none.json": {
+      "sha256": "a20a2a190f78b85ab00176360168ff3ae4e4ead6b9c66fe3021cc7a3f5d7bc85",
+      "episodes": 832,
+      "elapsed_s": 356.2267161048949,
+      "survived": 744
+    },
+    "original-free-cnn.json": {
+      "sha256": "d481d2afba90716e57591183b73ebbb9d546f722dfd03d7380ad8132e264bb65",
+      "episodes": 832,
+      "elapsed_s": 348.3330217245966,
+      "survived": 797
+    },
+    "original-free-none.json": {
+      "sha256": "ddaa515763a2a753871daa5581b029ddcc5ee0577722e3081ea38789dce6e224",
+      "episodes": 832,
+      "elapsed_s": 338.77104737982154,
+      "survived": 785
+    },
+    "specialist-free-cnn.json": {
+      "sha256": "e9cfad9a657d32a4ff6ead63d7eb6b7e2aad876ef4209fea219b300de1e6d436",
+      "episodes": 320,
+      "elapsed_s": 86.5395560991019,
+      "survived": 168
+    },
+    "specialist-free-none.json": {
+      "sha256": "698378981e68a888caefbd7581d2afd115712c189ef0ebf3ffce25dd5d9d4131",
+      "episodes": 320,
+      "elapsed_s": 83.69535292498767,
+      "survived": 149
+    }
+  },
+  "comparisons": {
+    "original-follow": {
+      "overall": {
+        "episodes": 832,
+        "cnn_survived": 766,
+        "none_survived": 744,
+        "cnn_survival_pct": 92.0673076923077,
+        "none_survival_pct": 89.42307692307692,
+        "delta_pp": -2.644230769230769,
+        "paired_lost": 80,
+        "paired_gained": 58
+      },
+      "dense": {
+        "episodes": 256,
+        "cnn_survived": 233,
+        "none_survived": 239,
+        "cnn_survival_pct": 91.015625,
+        "none_survival_pct": 93.359375,
+        "delta_pp": 2.34375,
+        "paired_lost": 14,
+        "paired_gained": 20
+      },
+      "ordinary": {
+        "episodes": 640,
+        "cnn_survived": 594,
+        "none_survived": 578,
+        "cnn_survival_pct": 92.8125,
+        "none_survival_pct": 90.3125,
+        "delta_pp": -2.5,
+        "paired_lost": 55,
+        "paired_gained": 39
+      },
+      "laser": {
+        "episodes": 192,
+        "cnn_survived": 172,
+        "none_survived": 166,
+        "cnn_survival_pct": 89.58333333333333,
+        "none_survival_pct": 86.45833333333333,
+        "delta_pp": -3.125,
+        "paired_lost": 25,
+        "paired_gained": 19
+      },
+      "r2": {
+        "episodes": 416,
+        "cnn_survived": 384,
+        "none_survived": 384,
+        "cnn_survival_pct": 92.3076923076923,
+        "none_survival_pct": 92.3076923076923,
+        "delta_pp": 0.0,
+        "paired_lost": 30,
+        "paired_gained": 30
+      },
+      "r3": {
+        "episodes": 416,
+        "cnn_survived": 382,
+        "none_survived": 360,
+        "cnn_survival_pct": 91.82692307692308,
+        "none_survival_pct": 86.53846153846153,
+        "delta_pp": -5.288461538461538,
+        "paired_lost": 50,
+        "paired_gained": 28
+      },
+      "by_card_rank": {
+        "th06_s1_b3/r2": {
+          "episodes": 32,
+          "cnn_survived": 31,
+          "none_survived": 31,
+          "delta_survival_pp": 0.0
+        },
+        "th06_s1_b3/r3": {
+          "episodes": 32,
+          "cnn_survived": 30,
+          "none_survived": 32,
+          "delta_survival_pp": 6.25
+        },
+        "th06_s1_b4/r2": {
+          "episodes": 32,
+          "cnn_survived": 30,
+          "none_survived": 31,
+          "delta_survival_pp": 3.125
+        },
+        "th06_s1_b4/r3": {
+          "episodes": 32,
+          "cnn_survived": 32,
+          "none_survived": 30,
+          "delta_survival_pp": -6.25
+        },
+        "th06_s1_w04/r2": {
+          "episodes": 32,
+          "cnn_survived": 32,
+          "none_survived": 32,
+          "delta_survival_pp": 0.0
+        },
+        "th06_s1_w04/r3": {
+          "episodes": 32,
+          "cnn_survived": 32,
+          "none_survived": 32,
+          "delta_survival_pp": 0.0
+        },
+        "th06_s2_b6/r2": {
+          "episodes": 32,
+          "cnn_survived": 32,
+          "none_survived": 32,
+          "delta_survival_pp": 0.0
+        },
+        "th06_s2_b6/r3": {
+          "episodes": 32,
+          "cnn_survived": 31,
+          "none_survived": 32,
+          "delta_survival_pp": 3.125
+        },
+        "th06_s2_mb1/r2": {
+          "episodes": 32,
+          "cnn_survived": 29,
+          "none_survived": 28,
+          "delta_survival_pp": -3.125
+        },
+        "th06_s2_mb1/r3": {
+          "episodes": 32,
+          "cnn_survived": 26,
+          "none_survived": 18,
+          "delta_survival_pp": -25.0
+        },
+        "th06_s2_w08/r2": {
+          "episodes": 32,
+          "cnn_survived": 30,
+          "none_survived": 28,
+          "delta_survival_pp": -6.25
+        },
+        "th06_s2_w08/r3": {
+          "episodes": 32,
+          "cnn_survived": 27,
+          "none_survived": 28,
+          "delta_survival_pp": 3.125
+        },
+        "th06_s3_b5/r2": {
+          "episodes": 32,
+          "cnn_survived": 31,
+          "none_survived": 28,
+          "delta_survival_pp": -9.375
+        },
+        "th06_s3_b5/r3": {
+          "episodes": 32,
+          "cnn_survived": 27,
+          "none_survived": 22,
+          "delta_survival_pp": -15.625
+        },
+        "th06_s3_b7/r2": {
+          "episodes": 32,
+          "cnn_survived": 30,
+          "none_survived": 32,
+          "delta_survival_pp": 6.25
+        },
+        "th06_s3_b7/r3": {
+          "episodes": 32,
+          "cnn_survived": 30,
+          "none_survived": 30,
+          "delta_survival_pp": 0.0
+        },
+        "th06_s3_mb3/r2": {
+          "episodes": 32,
+          "cnn_survived": 31,
+          "none_survived": 32,
+          "delta_survival_pp": 3.125
+        },
+        "th06_s3_mb3/r3": {
+          "episodes": 32,
+          "cnn_survived": 32,
+          "none_survived": 30,
+          "delta_survival_pp": -6.25
+        },
+        "th06_s3_w02/r2": {
+          "episodes": 32,
+          "cnn_survived": 31,
+          "none_survived": 28,
+          "delta_survival_pp": -9.375
+        },
+        "th06_s3_w02/r3": {
+          "episodes": 32,
+          "cnn_survived": 30,
+          "none_survived": 27,
+          "delta_survival_pp": -9.375
+        },
+        "th06_s3_w12/r2": {
+          "episodes": 32,
+          "cnn_survived": 24,
+          "none_survived": 28,
+          "delta_survival_pp": 12.5
+        },
+        "th06_s3_w12/r3": {
+          "episodes": 32,
+          "cnn_survived": 27,
+          "none_survived": 30,
+          "delta_survival_pp": 9.375
+        },
+        "th06_s4_b12/r2": {
+          "episodes": 32,
+          "cnn_survived": 26,
+          "none_survived": 27,
+          "delta_survival_pp": 3.125
+        },
+        "th06_s4_b12/r3": {
+          "episodes": 32,
+          "cnn_survived": 29,
+          "none_survived": 21,
+          "delta_survival_pp": -25.0
+        },
+        "th06_s4_w16/r2": {
+          "episodes": 32,
+          "cnn_survived": 27,
+          "none_survived": 27,
+          "delta_survival_pp": 0.0
+        },
+        "th06_s4_w16/r3": {
+          "episodes": 32,
+          "cnn_survived": 29,
+          "none_survived": 28,
+          "delta_survival_pp": -3.125
+        }
+      }
+    },
+    "original-free": {
+      "overall": {
+        "episodes": 832,
+        "cnn_survived": 797,
+        "none_survived": 785,
+        "cnn_survival_pct": 95.79326923076923,
+        "none_survival_pct": 94.35096153846153,
+        "delta_pp": -1.4423076923076923,
+        "paired_lost": 40,
+        "paired_gained": 28
+      },
+      "dense": {
+        "episodes": 256,
+        "cnn_survived": 236,
+        "none_survived": 236,
+        "cnn_survival_pct": 92.1875,
+        "none_survival_pct": 92.1875,
+        "delta_pp": 0.0,
+        "paired_lost": 15,
+        "paired_gained": 15
+      },
+      "ordinary": {
+        "episodes": 640,
+        "cnn_survived": 613,
+        "none_survived": 605,
+        "cnn_survival_pct": 95.78125,
+        "none_survival_pct": 94.53125,
+        "delta_pp": -1.25,
+        "paired_lost": 30,
+        "paired_gained": 22
+      },
+      "laser": {
+        "episodes": 192,
+        "cnn_survived": 184,
+        "none_survived": 180,
+        "cnn_survival_pct": 95.83333333333333,
+        "none_survival_pct": 93.75,
+        "delta_pp": -2.0833333333333335,
+        "paired_lost": 10,
+        "paired_gained": 6
+      },
+      "r2": {
+        "episodes": 416,
+        "cnn_survived": 405,
+        "none_survived": 405,
+        "cnn_survival_pct": 97.35576923076923,
+        "none_survival_pct": 97.35576923076923,
+        "delta_pp": 0.0,
+        "paired_lost": 9,
+        "paired_gained": 9
+      },
+      "r3": {
+        "episodes": 416,
+        "cnn_survived": 392,
+        "none_survived": 380,
+        "cnn_survival_pct": 94.23076923076923,
+        "none_survival_pct": 91.34615384615384,
+        "delta_pp": -2.8846153846153846,
+        "paired_lost": 31,
+        "paired_gained": 19
+      },
+      "by_card_rank": {
+        "th06_s1_b3/r2": {
+          "episodes": 32,
+          "cnn_survived": 32,
+          "none_survived": 32,
+          "delta_survival_pp": 0.0
+        },
+        "th06_s1_b3/r3": {
+          "episodes": 32,
+          "cnn_survived": 32,
+          "none_survived": 32,
+          "delta_survival_pp": 0.0
+        },
+        "th06_s1_b4/r2": {
+          "episodes": 32,
+          "cnn_survived": 32,
+          "none_survived": 32,
+          "delta_survival_pp": 0.0
+        },
+        "th06_s1_b4/r3": {
+          "episodes": 32,
+          "cnn_survived": 32,
+          "none_survived": 27,
+          "delta_survival_pp": -15.625
+        },
+        "th06_s1_w04/r2": {
+          "episodes": 32,
+          "cnn_survived": 32,
+          "none_survived": 32,
+          "delta_survival_pp": 0.0
+        },
+        "th06_s1_w04/r3": {
+          "episodes": 32,
+          "cnn_survived": 32,
+          "none_survived": 32,
+          "delta_survival_pp": 0.0
+        },
+        "th06_s2_b6/r2": {
+          "episodes": 32,
+          "cnn_survived": 32,
+          "none_survived": 32,
+          "delta_survival_pp": 0.0
+        },
+        "th06_s2_b6/r3": {
+          "episodes": 32,
+          "cnn_survived": 32,
+          "none_survived": 31,
+          "delta_survival_pp": -3.125
+        },
+        "th06_s2_mb1/r2": {
+          "episodes": 32,
+          "cnn_survived": 31,
+          "none_survived": 31,
+          "delta_survival_pp": 0.0
+        },
+        "th06_s2_mb1/r3": {
+          "episodes": 32,
+          "cnn_survived": 28,
+          "none_survived": 30,
+          "delta_survival_pp": 6.25
+        },
+        "th06_s2_w08/r2": {
+          "episodes": 32,
+          "cnn_survived": 30,
+          "none_survived": 31,
+          "delta_survival_pp": 3.125
+        },
+        "th06_s2_w08/r3": {
+          "episodes": 32,
+          "cnn_survived": 30,
+          "none_survived": 29,
+          "delta_survival_pp": -3.125
+        },
+        "th06_s3_b5/r2": {
+          "episodes": 32,
+          "cnn_survived": 32,
+          "none_survived": 32,
+          "delta_survival_pp": 0.0
+        },
+        "th06_s3_b5/r3": {
+          "episodes": 32,
+          "cnn_survived": 30,
+          "none_survived": 27,
+          "delta_survival_pp": -9.375
+        },
+        "th06_s3_b7/r2": {
+          "episodes": 32,
+          "cnn_survived": 32,
+          "none_survived": 32,
+          "delta_survival_pp": 0.0
+        },
+        "th06_s3_b7/r3": {
+          "episodes": 32,
+          "cnn_survived": 31,
+          "none_survived": 27,
+          "delta_survival_pp": -12.5
+        },
+        "th06_s3_mb3/r2": {
+          "episodes": 32,
+          "cnn_survived": 32,
+          "none_survived": 32,
+          "delta_survival_pp": 0.0
+        },
+        "th06_s3_mb3/r3": {
+          "episodes": 32,
+          "cnn_survived": 32,
+          "none_survived": 32,
+          "delta_survival_pp": 0.0
+        },
+        "th06_s3_w02/r2": {
+          "episodes": 32,
+          "cnn_survived": 32,
+          "none_survived": 30,
+          "delta_survival_pp": -6.25
+        },
+        "th06_s3_w02/r3": {
+          "episodes": 32,
+          "cnn_survived": 30,
+          "none_survived": 31,
+          "delta_survival_pp": 3.125
+        },
+        "th06_s3_w12/r2": {
+          "episodes": 32,
+          "cnn_survived": 27,
+          "none_survived": 30,
+          "delta_survival_pp": 9.375
+        },
+        "th06_s3_w12/r3": {
+          "episodes": 32,
+          "cnn_survived": 24,
+          "none_survived": 25,
+          "delta_survival_pp": 3.125
+        },
+        "th06_s4_b12/r2": {
+          "episodes": 32,
+          "cnn_survived": 32,
+          "none_survived": 32,
+          "delta_survival_pp": 0.0
+        },
+        "th06_s4_b12/r3": {
+          "episodes": 32,
+          "cnn_survived": 31,
+          "none_survived": 30,
+          "delta_survival_pp": -3.125
+        },
+        "th06_s4_w16/r2": {
+          "episodes": 32,
+          "cnn_survived": 29,
+          "none_survived": 27,
+          "delta_survival_pp": -6.25
+        },
+        "th06_s4_w16/r3": {
+          "episodes": 32,
+          "cnn_survived": 28,
+          "none_survived": 27,
+          "delta_survival_pp": -3.125
+        }
+      }
+    },
+    "specialist-free": {
+      "overall": {
+        "episodes": 320,
+        "cnn_survived": 168,
+        "none_survived": 149,
+        "cnn_survival_pct": 52.5,
+        "none_survival_pct": 46.5625,
+        "delta_pp": -5.9375,
+        "paired_lost": 58,
+        "paired_gained": 39
+      },
+      "r2": {
+        "episodes": 160,
+        "cnn_survived": 93,
+        "none_survived": 89,
+        "cnn_survival_pct": 58.125,
+        "none_survival_pct": 55.625,
+        "delta_pp": -2.5,
+        "paired_lost": 26,
+        "paired_gained": 22
+      },
+      "r3": {
+        "episodes": 160,
+        "cnn_survived": 75,
+        "none_survived": 60,
+        "cnn_survival_pct": 46.875,
+        "none_survival_pct": 37.5,
+        "delta_pp": -9.375,
+        "paired_lost": 32,
+        "paired_gained": 17
+      },
+      "by_card_rank": {
+        "laser_sp_aimed_04/r2": {
+          "episodes": 32,
+          "cnn_survived": 12,
+          "none_survived": 8,
+          "delta_survival_pp": -12.5
+        },
+        "laser_sp_aimed_04/r3": {
+          "episodes": 32,
+          "cnn_survived": 7,
+          "none_survived": 2,
+          "delta_survival_pp": -15.625
+        },
+        "laser_sp_bars_04/r2": {
+          "episodes": 32,
+          "cnn_survived": 13,
+          "none_survived": 20,
+          "delta_survival_pp": 21.875
+        },
+        "laser_sp_bars_04/r3": {
+          "episodes": 32,
+          "cnn_survived": 12,
+          "none_survived": 18,
+          "delta_survival_pp": 18.75
+        },
+        "laser_sp_corridor_04/r2": {
+          "episodes": 32,
+          "cnn_survived": 32,
+          "none_survived": 28,
+          "delta_survival_pp": -12.5
+        },
+        "laser_sp_corridor_04/r3": {
+          "episodes": 32,
+          "cnn_survived": 31,
+          "none_survived": 23,
+          "delta_survival_pp": -25.0
+        },
+        "laser_sp_stagger_04/r2": {
+          "episodes": 32,
+          "cnn_survived": 26,
+          "none_survived": 26,
+          "delta_survival_pp": 0.0
+        },
+        "laser_sp_stagger_04/r3": {
+          "episodes": 32,
+          "cnn_survived": 24,
+          "none_survived": 17,
+          "delta_survival_pp": -21.875
+        },
+        "laser_sp_sweep_04/r2": {
+          "episodes": 32,
+          "cnn_survived": 10,
+          "none_survived": 7,
+          "delta_survival_pp": -9.375
+        },
+        "laser_sp_sweep_04/r3": {
+          "episodes": 32,
+          "cnn_survived": 1,
+          "none_survived": 0,
+          "delta_survival_pp": -3.125
+        }
+      }
+    }
+  },
+  "working_tree_matches_p1": false,
+  "frozen_source_snapshot": {
+    "archive_sha256": "51f3429b0d5fed63007f0bb492bd5d785fd3d03ed8854fb2761942b6a0c83a86",
+    "verified": true
+  },
+  "episodes": 3968,
+  "evaluation_wall_s": 1576.0302170421928,
+  "manifest_sha256": "ed94a1b8a27ddce8024df4295f9e8a6a3bf3d8aa3dda57cd64318921ce2a30cf",
+  "summary_sha256": "52313f4e0a3eb65719fc15b31493ef7d2e6c3cbff5596f42c5e68b8bb8a66ee7",
+  "validator_sha256": "35b53ffdd9497456c4774ee6e25fcf1d9dbf3f40a8f87c9ba9b5b3765700dbd9"
+}

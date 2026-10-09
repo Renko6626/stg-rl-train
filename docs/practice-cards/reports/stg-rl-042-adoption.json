@@ -1,0 +1,64 @@
+{
+  "base_commit": "3db7736d95b3d5ba51f5f42de1687795b5fa646a",
+  "overlay_sha256": "d3032f763f923dfa63a1249aaa5fc1e371b08cc299ae9caf4970948e6f29b742",
+  "packaging_version": "0.4.2",
+  "engine_ver": 24,
+  "wheel": "stg_rl-0.4.2-cp310-abi3-manylinux_2_34_x86_64.whl",
+  "wheel_sha256": "f446933d1ec21f909a7ae11c435761a206852c30f8a5ddcafaa4c58acd904a03",
+  "overlay_description": "Existing current_start_indices API and 0.4.1 packaging changes; snapshot packaging bumped to 0.4.2 without modifying engine worktree.",
+  "build_info_git_sha": "unknown (built from an exported source snapshot)",
+  "equivalence_replay": {
+    "envs": 4,
+    "threads": 2,
+    "steps_per_case": 600,
+    "explicit_reset_at": 333,
+    "max_frames": 200,
+    "seed": 17,
+    "actions_seed": 91,
+    "all_buffer_bytes_equal": true,
+    "cases": [
+      {
+        "density": 3,
+        "cap": 1,
+        "steps": 600,
+        "max_observed_rows": 1,
+        "sha256": "1aa942bdecf4dcfc0b91d7442f18a6673ee0e4476c4c4e5310efcffdc21be681"
+      },
+      {
+        "density": 3,
+        "cap": 64,
+        "steps": 600,
+        "max_observed_rows": 64,
+        "sha256": "2836147d196fdf48461bf14f2902234fb923fb0ed55efb35e26a22498d219434"
+      },
+      {
+        "density": 3,
+        "cap": 1024,
+        "steps": 600,
+        "max_observed_rows": 343,
+        "sha256": "1e3e2e70db5a116d8bf0f163ee02c9b1ca973f977c987147b48332956c00612e"
+      },
+      {
+        "density": 12,
+        "cap": 1,
+        "steps": 600,
+        "max_observed_rows": 1,
+        "sha256": "f7fbed2883522cf03eb18cabe00772f43c04284cf0b32c000e9c84c060a19253"
+      },
+      {
+        "density": 12,
+        "cap": 64,
+        "steps": 600,
+        "max_observed_rows": 64,
+        "sha256": "c36e51c16bdba953b9da0bb61fe3f393bac6e2db08a6373019d7dd80800dd83f"
+      },
+      {
+        "density": 12,
+        "cap": 1024,
+        "steps": 600,
+        "max_observed_rows": 1024,
+        "sha256": "d2259b19e9575e3b611372171933c633ec9368d1ca8db53c7a9d2ed6d414e1c6"
+      }
+    ]
+  }
+}

@@ -1,0 +1,809 @@
+{
+  "comparison": "T7 historical vs B; single training seed1 each; last4 checkpoints are correlated; GPU greedy probes; no pooled CPU control metrics",
+  "config_differences": [
+    [
+      "reward.action_source",
+      null,
+      "request"
+    ]
+  ],
+  "runs": {
+    "T7": {
+      "engine": {
+        "engine_ver": "24",
+        "version": "0.4.1",
+        "tables_hash": "37a7ff12fe40e24e",
+        "git_sha": "5dfc08d-dirty"
+      },
+      "starts": 195,
+      "budget_frames": 917504000,
+      "last_update": 3500,
+      "last4": {
+        "ordinary": {
+          "episodes": 2560,
+          "survived": 2352,
+          "survival": 0.91875
+        },
+        "laser": {
+          "episodes": 768,
+          "survived": 694,
+          "survival": 0.9036458333333334
+        }
+      },
+      "last4_all": {
+        "episodes": 3328,
+        "survived": 3046,
+        "survival": 0.9152644230769231
+      },
+      "by_rank": {
+        "r2": {
+          "episodes": 1664,
+          "survived": 1561,
+          "survival": 0.9381009615384616
+        },
+        "r3": {
+          "episodes": 1664,
+          "survived": 1485,
+          "survival": 0.8924278846153846
+        }
+      },
+      "per_card": {
+        "th06_s1_w04": {
+          "episodes": 256,
+          "survived": 256,
+          "survival": 1.0
+        },
+        "th06_s1_b4": {
+          "episodes": 256,
+          "survived": 250,
+          "survival": 0.9765625
+        },
+        "th06_s2_w08": {
+          "episodes": 256,
+          "survived": 231,
+          "survival": 0.90234375
+        },
+        "th06_s2_mb1": {
+          "episodes": 256,
+          "survived": 213,
+          "survival": 0.83203125
+        },
+        "th06_s2_b6": {
+          "episodes": 256,
+          "survived": 247,
+          "survival": 0.96484375
+        },
+        "th06_s3_w02": {
+          "episodes": 256,
+          "survived": 243,
+          "survival": 0.94921875
+        },
+        "th06_s3_w12": {
+          "episodes": 256,
+          "survived": 184,
+          "survival": 0.71875
+        },
+        "th06_s3_b5": {
+          "episodes": 256,
+          "survived": 229,
+          "survival": 0.89453125
+        },
+        "th06_s3_mb3": {
+          "episodes": 256,
+          "survived": 252,
+          "survival": 0.984375
+        },
+        "th06_s3_b7": {
+          "episodes": 256,
+          "survived": 247,
+          "survival": 0.96484375
+        },
+        "th06_s4_w16": {
+          "episodes": 256,
+          "survived": 225,
+          "survival": 0.87890625
+        },
+        "th06_s4_b12": {
+          "episodes": 256,
+          "survived": 225,
+          "survival": 0.87890625
+        },
+        "th06_s1_b3": {
+          "episodes": 256,
+          "survived": 244,
+          "survival": 0.953125
+        }
+      },
+      "last4_style_means": {
+        "dir_changes_per_s": 5.292835929582212,
+        "key_presses_per_s": 5.078409382648687,
+        "shift_toggles_per_s": 1.5018390499638297,
+        "seg_le2_frac": 0.047300102878981225,
+        "seg_le3_frac": 0.14599697085508404,
+        "motor_override_frac": 0.22488108314796348,
+        "in_r_frac": 0.5489081214423186
+      },
+      "probes": {
+        "follow": {
+          "all": {
+            "episodes": 832,
+            "survived": 780,
+            "survival": 0.9375
+          },
+          "ordinary": {
+            "episodes": 640,
+            "survived": 600,
+            "survival": 0.9375
+          },
+          "laser": {
+            "episodes": 192,
+            "survived": 180,
+            "survival": 0.9375
+          },
+          "overall": {
+            "episodes": 832.0,
+            "survival": 0.9375,
+            "death": 0.0625,
+            "timeout": 0.0,
+            "frames_mean": 1488.391826923077,
+            "return_mean": 10.120941152187207,
+            "in_r_frac": 0.5544638571779263,
+            "reach_frames_median": 90.875,
+            "shift_toggles_per_s": 1.4228989602318434,
+            "dir_changes_per_s": 5.171745076538949,
+            "edge_frac": 0.007931835914628767,
+            "key_presses_per_s": 4.843279331979326,
+            "graze_per_s": 2.0822852632691022,
+            "close4_frac": 0.004177203908083555,
+            "close12_frac": 0.18276791649238566,
+            "dir_changes_in_r_per_s": 3.8599598076987145,
+            "dir_changes_near_per_s": 5.525450609888912,
+            "dir_changes_far_per_s": 4.518345028538758,
+            "quick_frac": 0.04834621310551935,
+            "quick3_frac": 0.14568516248902047,
+            "quick3_per_s": 0.7633221059514956,
+            "dir_changes_out_r_per_s": 6.580253552403025,
+            "seg_le2_frac": 0.0460817792898582,
+            "seg_le3_frac": 0.14605258146826958,
+            "motor_override_frac": 0.21770794291568335
+          }
+        },
+        "boss_or_free16": {
+          "all": {
+            "episodes": 832,
+            "survived": 783,
+            "survival": 0.9411057692307693
+          },
+          "ordinary": {
+            "episodes": 640,
+            "survived": 605,
+            "survival": 0.9453125
+          },
+          "laser": {
+            "episodes": 192,
+            "survived": 178,
+            "survival": 0.9270833333333334
+          },
+          "overall": {
+            "episodes": 832.0,
+            "survival": 0.9411057692307693,
+            "death": 0.05889423076923077,
+            "timeout": 0.0,
+            "frames_mean": 1497.1274038461538,
+            "return_mean": 13.109079205359404,
+            "in_r_frac": 0.9270215605146125,
+            "reach_frames_median": 20.0,
+            "shift_toggles_per_s": 1.7113592579635224,
+            "dir_changes_per_s": 3.4601255944072125,
+            "edge_frac": 0.007132088067741756,
+            "key_presses_per_s": 3.4899666271765417,
+            "graze_per_s": 1.9451432310917434,
+            "close4_frac": 0.004657499819829879,
+            "close12_frac": 0.19069063407675127,
+            "dir_changes_in_r_per_s": 3.136376199656158,
+            "dir_changes_near_per_s": 3.315222821538022,
+            "dir_changes_far_per_s": 3.548234212303909,
+            "quick_frac": 0.048795944967126435,
+            "quick3_frac": 0.14801657863743642,
+            "quick3_per_s": 0.5234384458455921,
+            "dir_changes_out_r_per_s": 7.070246179966054,
+            "seg_le2_frac": 0.052255954748331786,
+            "seg_le3_frac": 0.16746210614697954,
+            "motor_override_frac": 0.16627850600438437
+          }
+        },
+        "free": {
+          "all": {
+            "episodes": 832,
+            "survived": 782,
+            "survival": 0.9399038461538461
+          },
+          "ordinary": {
+            "episodes": 640,
+            "survived": 603,
+            "survival": 0.9421875
+          },
+          "laser": {
+            "episodes": 192,
+            "survived": 179,
+            "survival": 0.9322916666666666
+          },
+          "overall": {
+            "episodes": 832.0,
+            "survival": 0.9399038461538461,
+            "death": 0.06009615384615385,
+            "timeout": 0.0,
+            "frames_mean": 1495.235576923077,
+            "return_mean": 12.76879615487101,
+            "in_r_frac": 0.9991413346847504,
+            "reach_frames_median": 1.0,
+            "shift_toggles_per_s": 1.5623192633479637,
+            "dir_changes_per_s": 2.11771820456173,
+            "edge_frac": 0.020301361339086228,
+            "key_presses_per_s": 2.282406517232369,
+            "graze_per_s": 1.9772547215721257,
+            "close4_frac": 0.00516480243624646,
+            "close12_frac": 0.20048108311694834,
+            "dir_changes_in_r_per_s": 1.9962773607549544,
+            "dir_changes_near_per_s": 2.641733432700981,
+            "dir_changes_far_per_s": 1.3682082986565214,
+            "quick_frac": 0.042719321892213995,
+            "quick3_frac": 0.12501841256300536,
+            "quick3_per_s": 0.27577083986597156,
+            "dir_changes_out_r_per_s": 0.0,
+            "seg_le2_frac": 0.05286138194150063,
+            "seg_le3_frac": 0.1661721068249258,
+            "motor_override_frac": 0.1177891345683654
+          }
+        },
+        "anchor": {
+          "all": {
+            "episodes": 832,
+            "survived": 788,
+            "survival": 0.9471153846153846
+          },
+          "ordinary": {
+            "episodes": 640,
+            "survived": 612,
+            "survival": 0.95625
+          },
+          "laser": {
+            "episodes": 192,
+            "survived": 176,
+            "survival": 0.9166666666666666
+          },
+          "overall": {
+            "episodes": 832.0,
+            "survival": 0.9471153846153846,
+            "death": 0.052884615384615384,
+            "timeout": 0.0,
+            "frames_mean": 1499.609375,
+            "return_mean": 12.301908864424778,
+            "in_r_frac": 0.8069855873094411,
+            "reach_frames_median": 20.0,
+            "shift_toggles_per_s": 1.514666119399087,
+            "dir_changes_per_s": 3.855782677597664,
+            "edge_frac": 0.003115048344752356,
+            "key_presses_per_s": 3.8750182010206156,
+            "graze_per_s": 1.8639904799503364,
+            "close4_frac": 0.004715348951058443,
+            "close12_frac": 0.19956794687748441,
+            "dir_changes_in_r_per_s": 2.9695193676096276,
+            "dir_changes_near_per_s": 4.004870161878654,
+            "dir_changes_far_per_s": 3.1281970234919125,
+            "quick_frac": 0.049377645824764074,
+            "quick3_frac": 0.14892837064163122,
+            "quick3_per_s": 0.5852028180248802,
+            "dir_changes_out_r_per_s": 7.0933661072179595,
+            "seg_le2_frac": 0.0497719189732488,
+            "seg_le3_frac": 0.15981134993041596,
+            "motor_override_frac": 0.1817249514598441
+          }
+        },
+        "motor_off": {
+          "all": {
+            "episodes": 832,
+            "survived": 794,
+            "survival": 0.9543269230769231
+          },
+          "ordinary": {
+            "episodes": 640,
+            "survived": 616,
+            "survival": 0.9625
+          },
+          "laser": {
+            "episodes": 192,
+            "survived": 178,
+            "survival": 0.9270833333333334
+          },
+          "overall": {
+            "episodes": 832.0,
+            "survival": 0.9543269230769231,
+            "death": 0.04567307692307692,
+            "timeout": 0.0,
+            "frames_mean": 1500.123798076923,
+            "return_mean": 6.8362246473328785,
+            "in_r_frac": 0.5514124996367668,
+            "reach_frames_median": 94.85,
+            "shift_toggles_per_s": 2.0459053140848584,
+            "dir_changes_per_s": 14.7842744797273,
+            "edge_frac": 0.01217204967018409,
+            "key_presses_per_s": 14.853376613390187,
+            "graze_per_s": 2.0534063942998393,
+            "close4_frac": 0.006419669289969515,
+            "close12_frac": 0.19026001406661958,
+            "dir_changes_in_r_per_s": 13.420849293219794,
+            "dir_changes_near_per_s": 14.506814124466517,
+            "dir_changes_far_per_s": 14.259356365011048,
+            "quick_frac": 0.7311275946823785,
+            "quick3_frac": 0.7986242702189285,
+            "quick3_per_s": 11.9267982394141,
+            "dir_changes_out_r_per_s": 15.70690210884981,
+            "seg_le2_frac": 0.760892007386782,
+            "seg_le3_frac": 0.8305029674627885,
+            "motor_override_frac": 0.0
+          }
+        }
+      },
+      "last4_specialist": {
+        "episodes": 2560,
+        "survived": 1097,
+        "survival": 0.428515625
+      },
+      "steady_sps_median": 66455.01025551133,
+      "wall_train_eval_s": 15798.88,
+      "specialist_family": {
+        "laser_sp_aimed_04": {
+          "episodes": 512,
+          "survived": 92,
+          "survival": 0.1796875
+        },
+        "laser_sp_bars_04": {
+          "episodes": 512,
+          "survived": 148,
+          "survival": 0.2890625
+        },
+        "laser_sp_corridor_04": {
+          "episodes": 512,
+          "survived": 500,
+          "survival": 0.9765625
+        },
+        "laser_sp_stagger_04": {
+          "episodes": 512,
+          "survived": 120,
+          "survival": 0.234375
+        },
+        "laser_sp_sweep_04": {
+          "episodes": 512,
+          "survived": 237,
+          "survival": 0.462890625
+        }
+      },
+      "late_training_terms_mean": {
+        "key_press": 221.25991479485864,
+        "quick_change": 30.001348443095257
+      }
+    },
+    "B": {
+      "engine": {
+        "version": "0.4.1",
+        "git_sha": "5dfc08d-dirty",
+        "tables_hash": "37a7ff12fe40e24e",
+        "engine_ver": "24"
+      },
+      "starts": 195,
+      "budget_frames": 917504000,
+      "last_update": 3500,
+      "last4": {
+        "ordinary": {
+          "episodes": 2560,
+          "survived": 2257,
+          "survival": 0.881640625
+        },
+        "laser": {
+          "episodes": 768,
+          "survived": 564,
+          "survival": 0.734375
+        }
+      },
+      "last4_all": {
+        "episodes": 3328,
+        "survived": 2821,
+        "survival": 0.84765625
+      },
+      "by_rank": {
+        "r2": {
+          "episodes": 1664,
+          "survived": 1455,
+          "survival": 0.8743990384615384
+        },
+        "r3": {
+          "episodes": 1664,
+          "survived": 1366,
+          "survival": 0.8209134615384616
+        }
+      },
+      "per_card": {
+        "th06_s1_w04": {
+          "episodes": 256,
+          "survived": 252,
+          "survival": 0.984375
+        },
+        "th06_s1_b4": {
+          "episodes": 256,
+          "survived": 246,
+          "survival": 0.9609375
+        },
+        "th06_s2_w08": {
+          "episodes": 256,
+          "survived": 204,
+          "survival": 0.796875
+        },
+        "th06_s2_mb1": {
+          "episodes": 256,
+          "survived": 180,
+          "survival": 0.703125
+        },
+        "th06_s2_b6": {
+          "episodes": 256,
+          "survived": 245,
+          "survival": 0.95703125
+        },
+        "th06_s3_w02": {
+          "episodes": 256,
+          "survived": 244,
+          "survival": 0.953125
+        },
+        "th06_s3_w12": {
+          "episodes": 256,
+          "survived": 174,
+          "survival": 0.6796875
+        },
+        "th06_s3_b5": {
+          "episodes": 256,
+          "survived": 225,
+          "survival": 0.87890625
+        },
+        "th06_s3_mb3": {
+          "episodes": 256,
+          "survived": 246,
+          "survival": 0.9609375
+        },
+        "th06_s3_b7": {
+          "episodes": 256,
+          "survived": 241,
+          "survival": 0.94140625
+        },
+        "th06_s4_w16": {
+          "episodes": 256,
+          "survived": 204,
+          "survival": 0.796875
+        },
+        "th06_s4_b12": {
+          "episodes": 256,
+          "survived": 122,
+          "survival": 0.4765625
+        },
+        "th06_s1_b3": {
+          "episodes": 256,
+          "survived": 238,
+          "survival": 0.9296875
+        }
+      },
+      "last4_style_means": {
+        "dir_changes_per_s": 2.8608959492559762,
+        "key_presses_per_s": 2.748782678558047,
+        "shift_toggles_per_s": 1.2774352929503174,
+        "seg_le2_frac": 0.013135653439563294,
+        "seg_le3_frac": 0.05520797625323852,
+        "motor_override_frac": 0.08660500369537312,
+        "in_r_frac": 0.5551582021723577
+      },
+      "probes": {
+        "follow": {
+          "all": {
+            "episodes": 832,
+            "survived": 726,
+            "survival": 0.8725961538461539
+          },
+          "ordinary": {
+            "episodes": 640,
+            "survived": 578,
+            "survival": 0.903125
+          },
+          "laser": {
+            "episodes": 192,
+            "survived": 148,
+            "survival": 0.7708333333333334
+          },
+          "overall": {
+            "episodes": 832.0,
+            "survival": 0.8725961538461539,
+            "death": 0.12740384615384615,
+            "timeout": 0.0,
+            "frames_mean": 1445.436298076923,
+            "return_mean": 9.323641134425998,
+            "in_r_frac": 0.552080709760002,
+            "reach_frames_median": 88.67613636363637,
+            "shift_toggles_per_s": 1.279053711820216,
+            "dir_changes_per_s": 2.870336231043945,
+            "edge_frac": 0.006400993706918762,
+            "key_presses_per_s": 2.7172287274737608,
+            "graze_per_s": 2.1988288754402108,
+            "close4_frac": 0.0056664420526663884,
+            "close12_frac": 0.19917891397497792,
+            "dir_changes_in_r_per_s": 1.5599912997368601,
+            "dir_changes_near_per_s": 3.7489335432721376,
+            "dir_changes_far_per_s": 2.0365953218186803,
+            "quick_frac": 0.010306854685630577,
+            "quick3_frac": 0.04272578836312147,
+            "quick3_per_s": 0.12724507260268875,
+            "dir_changes_out_r_per_s": 4.689290931565347,
+            "seg_le2_frac": 0.014007457560592679,
+            "seg_le3_frac": 0.05943970169757629,
+            "motor_override_frac": 0.0866136125613018
+          }
+        },
+        "boss_or_free16": {
+          "all": {
+            "episodes": 832,
+            "survived": 759,
+            "survival": 0.9122596153846154
+          },
+          "ordinary": {
+            "episodes": 640,
+            "survived": 605,
+            "survival": 0.9453125
+          },
+          "laser": {
+            "episodes": 192,
+            "survived": 154,
+            "survival": 0.8020833333333334
+          },
+          "overall": {
+            "episodes": 832.0,
+            "survival": 0.9122596153846154,
+            "death": 0.08774038461538461,
+            "timeout": 0.0,
+            "frames_mean": 1476.5588942307693,
+            "return_mean": 12.640882967756344,
+            "in_r_frac": 0.9208627018073419,
+            "reach_frames_median": 21.0,
+            "shift_toggles_per_s": 1.2055452023555069,
+            "dir_changes_per_s": 1.91357323506238,
+            "edge_frac": 0.008271195291491737,
+            "key_presses_per_s": 1.8275642767502767,
+            "graze_per_s": 2.1137986974839356,
+            "close4_frac": 0.005832325843663504,
+            "close12_frac": 0.2023904543784757,
+            "dir_changes_in_r_per_s": 1.5967811605100246,
+            "dir_changes_near_per_s": 2.2940997308754274,
+            "dir_changes_far_per_s": 1.5629480929165478,
+            "quick_frac": 0.011153108852073343,
+            "quick3_frac": 0.04386457226833059,
+            "quick3_per_s": 0.08845487551001481,
+            "dir_changes_out_r_per_s": 5.469333619403349,
+            "seg_le2_frac": 0.019807735300693047,
+            "seg_le3_frac": 0.07806841046277666,
+            "motor_override_frac": 0.06550067733269736
+          }
+        },
+        "free": {
+          "all": {
+            "episodes": 832,
+            "survived": 770,
+            "survival": 0.9254807692307693
+          },
+          "ordinary": {
+            "episodes": 640,
+            "survived": 600,
+            "survival": 0.9375
+          },
+          "laser": {
+            "episodes": 192,
+            "survived": 170,
+            "survival": 0.8854166666666666
+          },
+          "overall": {
+            "episodes": 832.0,
+            "survival": 0.9254807692307693,
+            "death": 0.07451923076923077,
+            "timeout": 0.0,
+            "frames_mean": 1485.373798076923,
+            "return_mean": 12.103031219594413,
+            "in_r_frac": 0.999135185254963,
+            "reach_frames_median": 1.0,
+            "shift_toggles_per_s": 0.8465784641254958,
+            "dir_changes_per_s": 1.3327573954587124,
+            "edge_frac": 0.052062411894183154,
+            "key_presses_per_s": 1.2562992075864183,
+            "graze_per_s": 2.221784556797512,
+            "close4_frac": 0.006017985534802469,
+            "close12_frac": 0.21125160986362615,
+            "dir_changes_in_r_per_s": 1.2752560933247732,
+            "dir_changes_near_per_s": 1.9516560162350673,
+            "dir_changes_far_per_s": 0.6179211492408013,
+            "quick_frac": 0.010321872069328109,
+            "quick3_frac": 0.04317530435890938,
+            "quick3_per_s": 0.06247040994297103,
+            "dir_changes_out_r_per_s": 0.0,
+            "seg_le2_frac": 0.020964510589582142,
+            "seg_le3_frac": 0.0862192329708071,
+            "motor_override_frac": 0.04676900834965996
+          }
+        },
+        "anchor": {
+          "all": {
+            "episodes": 832,
+            "survived": 761,
+            "survival": 0.9146634615384616
+          },
+          "ordinary": {
+            "episodes": 640,
+            "survived": 603,
+            "survival": 0.9421875
+          },
+          "laser": {
+            "episodes": 192,
+            "survived": 158,
+            "survival": 0.8229166666666666
+          },
+          "overall": {
+            "episodes": 832.0,
+            "survival": 0.9146634615384616,
+            "death": 0.08533653846153846,
+            "timeout": 0.0,
+            "frames_mean": 1475.4795673076924,
+            "return_mean": 11.813214536183155,
+            "in_r_frac": 0.8033115011714167,
+            "reach_frames_median": 21.0,
+            "shift_toggles_per_s": 1.139938763674057,
+            "dir_changes_per_s": 1.966923672233694,
+            "edge_frac": 0.003659617235930901,
+            "key_presses_per_s": 1.9150979345981,
+            "graze_per_s": 1.9065731984877468,
+            "close4_frac": 0.006206298441205223,
+            "close12_frac": 0.20025485587625974,
+            "dir_changes_in_r_per_s": 1.3600599475458979,
+            "dir_changes_near_per_s": 2.516929833664175,
+            "dir_changes_far_per_s": 1.193938422523498,
+            "quick_frac": 0.01072941018333722,
+            "quick3_frac": 0.04543757279888656,
+            "quick3_per_s": 0.09098185341208194,
+            "dir_changes_out_r_per_s": 4.513792862254312,
+            "seg_le2_frac": 0.017147938013379625,
+            "seg_le3_frac": 0.07329155728681513,
+            "motor_override_frac": 0.06632010999806914
+          }
+        },
+        "motor_off": {
+          "all": {
+            "episodes": 832,
+            "survived": 777,
+            "survival": 0.9338942307692307
+          },
+          "ordinary": {
+            "episodes": 640,
+            "survived": 599,
+            "survival": 0.9359375
+          },
+          "laser": {
+            "episodes": 192,
+            "survived": 178,
+            "survival": 0.9270833333333334
+          },
+          "overall": {
+            "episodes": 832.0,
+            "survival": 0.9338942307692307,
+            "death": 0.06610576923076923,
+            "timeout": 0.0,
+            "frames_mean": 1488.998798076923,
+            "return_mean": 10.308497973574468,
+            "in_r_frac": 0.5560028463294495,
+            "reach_frames_median": 86.72727272727272,
+            "shift_toggles_per_s": 1.6237042530799337,
+            "dir_changes_per_s": 3.544719700242837,
+            "edge_frac": 0.00578216472930375,
+            "key_presses_per_s": 3.348805278485707,
+            "graze_per_s": 2.2679632590077783,
+            "close4_frac": 0.010862884537928306,
+            "close12_frac": 0.2204049186680246,
+            "dir_changes_in_r_per_s": 1.898891272365641,
+            "dir_changes_near_per_s": 4.722995206117055,
+            "dir_changes_far_per_s": 2.3936661825452186,
+            "quick_frac": 0.13693558391862426,
+            "quick3_frac": 0.22258162194741354,
+            "quick3_per_s": 0.8288801195325076,
+            "dir_changes_out_r_per_s": 5.8665443543068845,
+            "seg_le2_frac": 0.1858247373720104,
+            "seg_le3_frac": 0.29913945403772724,
+            "motor_override_frac": 0.0
+          }
+        }
+      },
+      "last4_specialist": {
+        "episodes": 2560,
+        "survived": 911,
+        "survival": 0.355859375
+      },
+      "steady_sps_median": 66716.59478375722,
+      "wall_train_eval_s": 15753.148,
+      "specialist_family": {
+        "laser_sp_aimed_04": {
+          "episodes": 512,
+          "survived": 66,
+          "survival": 0.12890625
+        },
+        "laser_sp_bars_04": {
+          "episodes": 512,
+          "survived": 214,
+          "survival": 0.41796875
+        },
+        "laser_sp_corridor_04": {
+          "episodes": 512,
+          "survived": 378,
+          "survival": 0.73828125
+        },
+        "laser_sp_stagger_04": {
+          "episodes": 512,
+          "survived": 83,
+          "survival": 0.162109375
+        },
+        "laser_sp_sweep_04": {
+          "episodes": 512,
+          "survived": 170,
+          "survival": 0.33203125
+        }
+      },
+      "late_training_terms_mean": {
+        "key_press": 366.40481875989883,
+        "quick_change": 119.90553166662312
+      }
+    }
+  },
+  "sources_sha256": {
+    "runs/job-bfd1c1cd62146a55/20261002-152220-t7-laser-k8/eval/2750.json": "814a655c64ea6fd8199075964bd7b989dbb13d8beddccc7703abe1a8bc386bd3",
+    "runs/job-bfd1c1cd62146a55/20261002-152220-t7-laser-k8/eval/3000.json": "622c3a4a17dc0845900f036eadd9917f5490ff694b151887623d545730c29bdf",
+    "runs/job-bfd1c1cd62146a55/20261002-152220-t7-laser-k8/eval/3250.json": "da457b7d03328b5fefa493c1b75a9dec479be412e31f877e38e8160fdea993fa",
+    "runs/job-bfd1c1cd62146a55/20261002-152220-t7-laser-k8/eval/3500.json": "1cbe1842633191035ea425129d79e0948f9e4458d3723805621ad49a03bac3f7",
+    "runs/job-bfd1c1cd62146a55/20261002-152220-t7-laser-k8/env.json": "917330ce203c335837ec36e89c91580cfc94c006020970e56f67d09ce29cf00f",
+    "runs/job-bfd1c1cd62146a55/20261002-152220-t7-laser-k8/metrics.jsonl": "066faf1b26aba3f6cb77fb32833ddd5fb12280f6f8f6e6999435af8fe88697f5",
+    "runs/job-bfd1c1cd62146a55/20261002-152220-t7-laser-k8/specialist-eval/u2750-follow.json": "87d3ee620901a20fa46a0a0817a05a6d2f379f0375dc50bd2e156a956bae163d",
+    "runs/job-bfd1c1cd62146a55/20261002-152220-t7-laser-k8/specialist-eval/u3000-follow.json": "4f0dbd2d492e97c512af4d0f75b0bd22a51ac831fdffe9577162c8e579cebedd",
+    "runs/job-bfd1c1cd62146a55/20261002-152220-t7-laser-k8/specialist-eval/u3250-follow.json": "6bfd2c50883a48131ee71b75095ecd3e5d18f0b485ed46fb79d7c653c7f90152",
+    "runs/job-bfd1c1cd62146a55/20261002-152220-t7-laser-k8/specialist-eval/u3500-follow.json": "810ef832cca10eda069dd1167bf8509ba099380a1b38be0874664e5b4de802e1",
+    "runs/job-bfd1c1cd62146a55/20261002-152220-t7-laser-k8/probe/boss_or_free16.json": "9aa464b7f3f58e7bda6f550d814ee0edbc9c5864e9b21371257c26c45ebec57d",
+    "runs/job-bfd1c1cd62146a55/20261002-152220-t7-laser-k8/probe/free.json": "ebe0421437f20930666e339d44503d0d819e0e40142755fb2b266de04888cd29",
+    "runs/job-bfd1c1cd62146a55/20261002-152220-t7-laser-k8/probe/anchor.json": "c437fbefefaed32ad58cee5c86661bb9fbcb5d61363aef88b0d6300c24c38062",
+    "runs/job-bfd1c1cd62146a55/20261002-152220-t7-laser-k8/probe/motor_off.json": "c5398126b938c31023d575dc3b44946b8ec43f883dc7e5621f6c018eb17ad0a7",
+    "runs/job-3c0392a2052fb68e/20261004-204129-request-reward-k8/eval/2750.json": "7f816c74c981cda65e0c32737223c0e60ab08414ce098ec81dd4f6c231aa9ba0",
+    "runs/job-3c0392a2052fb68e/20261004-204129-request-reward-k8/eval/3000.json": "481fb323d00fe512be9c128e8e7324df2edbf134b86edea5d819505e10afb15b",
+    "runs/job-3c0392a2052fb68e/20261004-204129-request-reward-k8/eval/3250.json": "05a786b5b9e22ebfeb85682248422e1e33c621678afa0f84d072993213a47181",
+    "runs/job-3c0392a2052fb68e/20261004-204129-request-reward-k8/eval/3500.json": "684d8c317a65603558a32d7b564b8a1bc29b807aee6dc867dbfb779537a8dc4a",
+    "runs/job-3c0392a2052fb68e/20261004-204129-request-reward-k8/env.json": "a0e874e04aeffb044b19007933fb9fc7903958c2b52ea6e53ec7172b791f68d9",
+    "runs/job-3c0392a2052fb68e/20261004-204129-request-reward-k8/metrics.jsonl": "36f5f272915cf7e8a47d29b14fcef2cbb1283c0687a6023ceeb3b48bd22190db",
+    "runs/job-3c0392a2052fb68e/20261004-204129-request-reward-k8/specialist-eval/u2750-follow.json": "a678e7c4a3ae4e399e17c95ef1c7774bfc6290d206d2b1fa7a6ca46f1055cba0",
+    "runs/job-3c0392a2052fb68e/20261004-204129-request-reward-k8/specialist-eval/u3000-follow.json": "e4ccadcb5cb1d52f300dd71f34026945462a8f0f230d8fbbe1702a5089106fa8",
+    "runs/job-3c0392a2052fb68e/20261004-204129-request-reward-k8/specialist-eval/u3250-follow.json": "c9dd0bf02c7670fdc889997c83dfe260e48518654f90b0eed1dd4b578891c1a5",
+    "runs/job-3c0392a2052fb68e/20261004-204129-request-reward-k8/specialist-eval/u3500-follow.json": "5a0f9ce0fac6a83f4e723f5073e812f12ed71bf07a9fea0eeb6352474038ff13",
+    "runs/job-3c0392a2052fb68e/20261004-204129-request-reward-k8/probe/boss_or_free16.json": "d6b1a05404803dde7c32be828954e8cc337856905950633da83cfe2c004b61df",
+    "runs/job-3c0392a2052fb68e/20261004-204129-request-reward-k8/probe/free.json": "2cf0bff4f98411e316189517aa1781f3b4695e5c806f322da168c556234c7ed2",
+    "runs/job-3c0392a2052fb68e/20261004-204129-request-reward-k8/probe/anchor.json": "a73a04e7d71e8c8f41b23dbd6566674a3c19d17d0d87d46c8016b97cc9f7ed43",
+    "runs/job-3c0392a2052fb68e/20261004-204129-request-reward-k8/probe/motor_off.json": "dd502bb90ba5fb8c6c83161a8e30467f0be397fe05333bd7caa784f93db13ce7"
+  },
+  "validation": {
+    "engine_matches": true,
+    "training_starts_match": true,
+    "best_latest_update": 3500,
+    "gpucheck": "PASS",
+    "result_archive": {
+      "job_id": "3c0392a2052fb68e",
+      "status": "Success",
+      "archive": "runs/job-3c0392a2052fb68e.tar.gz",
+      "archive_bytes": 84769994,
+      "sha256": "ccfee1f4476ac7437ac7d8d7ee0599cd41ee06c56e2a2e25b371c0ec9e6bd3a4",
+      "specialist_json_count": 8,
+      "expected_final_artifacts_present": true
+    }
+  }
+}

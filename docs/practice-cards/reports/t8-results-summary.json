@@ -1,0 +1,3957 @@
+{
+  "runs": {
+    "T6": {
+      "engine": {
+        "engine_ver": "24",
+        "version": "0.4.1",
+        "tables_hash": "37a7ff12fe40e24e",
+        "git_sha": "5dfc08d-dirty"
+      },
+      "train_repo_sha": "unknown",
+      "updates": 3500,
+      "env_steps": 917504000,
+      "starts": 195,
+      "latest_update": 3500,
+      "best_update": 3500,
+      "wall_train_eval_s": 16111.099,
+      "steady_sps_median": 65027.70425562979,
+      "last4": {
+        "ordinary": {
+          "survived": 2264,
+          "episodes": 2560,
+          "survival": 0.884375
+        },
+        "laser": {
+          "survived": 620,
+          "episodes": 768,
+          "survival": 0.8072916666666666
+        },
+        "all": {
+          "survived": 2884,
+          "episodes": 3328,
+          "survival": 0.8665865384615384
+        }
+      },
+      "last4_by_rank": {
+        "ordinary": {
+          "r2": {
+            "survived": 1182,
+            "episodes": 1280,
+            "survival": 0.9234375
+          },
+          "r3": {
+            "survived": 1082,
+            "episodes": 1280,
+            "survival": 0.8453125
+          }
+        },
+        "laser": {
+          "r2": {
+            "survived": 317,
+            "episodes": 384,
+            "survival": 0.8255208333333334
+          },
+          "r3": {
+            "survived": 303,
+            "episodes": 384,
+            "survival": 0.7890625
+          }
+        },
+        "all": {
+          "r2": {
+            "survived": 1499,
+            "episodes": 1664,
+            "survival": 0.9008413461538461
+          },
+          "r3": {
+            "survived": 1385,
+            "episodes": 1664,
+            "survival": 0.8323317307692307
+          }
+        }
+      },
+      "last4_laser_cards": {
+        "th06_s1_b3": {
+          "survived": 251,
+          "episodes": 256,
+          "survival": 0.98046875
+        },
+        "th06_s4_b12": {
+          "survived": 151,
+          "episodes": 256,
+          "survival": 0.58984375
+        },
+        "th06_s4_w16": {
+          "survived": 218,
+          "episodes": 256,
+          "survival": 0.8515625
+        }
+      },
+      "last4_ordinary_cards": {
+        "th06_s1_b4": {
+          "survived": 250,
+          "episodes": 256,
+          "survival": 0.9765625
+        },
+        "th06_s1_w04": {
+          "survived": 256,
+          "episodes": 256,
+          "survival": 1.0
+        },
+        "th06_s2_b6": {
+          "survived": 250,
+          "episodes": 256,
+          "survival": 0.9765625
+        },
+        "th06_s2_mb1": {
+          "survived": 187,
+          "episodes": 256,
+          "survival": 0.73046875
+        },
+        "th06_s2_w08": {
+          "survived": 208,
+          "episodes": 256,
+          "survival": 0.8125
+        },
+        "th06_s3_b5": {
+          "survived": 220,
+          "episodes": 256,
+          "survival": 0.859375
+        },
+        "th06_s3_b7": {
+          "survived": 230,
+          "episodes": 256,
+          "survival": 0.8984375
+        },
+        "th06_s3_mb3": {
+          "survived": 255,
+          "episodes": 256,
+          "survival": 0.99609375
+        },
+        "th06_s3_w02": {
+          "survived": 240,
+          "episodes": 256,
+          "survival": 0.9375
+        },
+        "th06_s3_w12": {
+          "survived": 168,
+          "episodes": 256,
+          "survival": 0.65625
+        }
+      },
+      "last4_laser_cards_by_rank": {
+        "th06_s1_b3": {
+          "r2": {
+            "survived": 127,
+            "episodes": 128,
+            "survival": 0.9921875
+          },
+          "r3": {
+            "survived": 124,
+            "episodes": 128,
+            "survival": 0.96875
+          }
+        },
+        "th06_s4_b12": {
+          "r2": {
+            "survived": 74,
+            "episodes": 128,
+            "survival": 0.578125
+          },
+          "r3": {
+            "survived": 77,
+            "episodes": 128,
+            "survival": 0.6015625
+          }
+        },
+        "th06_s4_w16": {
+          "r2": {
+            "survived": 116,
+            "episodes": 128,
+            "survival": 0.90625
+          },
+          "r3": {
+            "survived": 102,
+            "episodes": 128,
+            "survival": 0.796875
+          }
+        }
+      },
+      "curve": [
+        {
+          "update": 250,
+          "laser": {
+            "survived": 65,
+            "episodes": 192,
+            "survival": 0.3385416666666667
+          },
+          "ordinary": {
+            "survived": 331,
+            "episodes": 640,
+            "survival": 0.5171875
+          }
+        },
+        {
+          "update": 500,
+          "laser": {
+            "survived": 111,
+            "episodes": 192,
+            "survival": 0.578125
+          },
+          "ordinary": {
+            "survived": 426,
+            "episodes": 640,
+            "survival": 0.665625
+          }
+        },
+        {
+          "update": 750,
+          "laser": {
+            "survived": 127,
+            "episodes": 192,
+            "survival": 0.6614583333333334
+          },
+          "ordinary": {
+            "survived": 481,
+            "episodes": 640,
+            "survival": 0.7515625
+          }
+        },
+        {
+          "update": 1000,
+          "laser": {
+            "survived": 123,
+            "episodes": 192,
+            "survival": 0.640625
+          },
+          "ordinary": {
+            "survived": 510,
+            "episodes": 640,
+            "survival": 0.796875
+          }
+        },
+        {
+          "update": 1250,
+          "laser": {
+            "survived": 116,
+            "episodes": 192,
+            "survival": 0.6041666666666666
+          },
+          "ordinary": {
+            "survived": 519,
+            "episodes": 640,
+            "survival": 0.8109375
+          }
+        },
+        {
+          "update": 1500,
+          "laser": {
+            "survived": 114,
+            "episodes": 192,
+            "survival": 0.59375
+          },
+          "ordinary": {
+            "survived": 514,
+            "episodes": 640,
+            "survival": 0.803125
+          }
+        },
+        {
+          "update": 1750,
+          "laser": {
+            "survived": 146,
+            "episodes": 192,
+            "survival": 0.7604166666666666
+          },
+          "ordinary": {
+            "survived": 503,
+            "episodes": 640,
+            "survival": 0.7859375
+          }
+        },
+        {
+          "update": 2000,
+          "laser": {
+            "survived": 146,
+            "episodes": 192,
+            "survival": 0.7604166666666666
+          },
+          "ordinary": {
+            "survived": 538,
+            "episodes": 640,
+            "survival": 0.840625
+          }
+        },
+        {
+          "update": 2250,
+          "laser": {
+            "survived": 128,
+            "episodes": 192,
+            "survival": 0.6666666666666666
+          },
+          "ordinary": {
+            "survived": 539,
+            "episodes": 640,
+            "survival": 0.8421875
+          }
+        },
+        {
+          "update": 2500,
+          "laser": {
+            "survived": 135,
+            "episodes": 192,
+            "survival": 0.703125
+          },
+          "ordinary": {
+            "survived": 558,
+            "episodes": 640,
+            "survival": 0.871875
+          }
+        },
+        {
+          "update": 2750,
+          "laser": {
+            "survived": 156,
+            "episodes": 192,
+            "survival": 0.8125
+          },
+          "ordinary": {
+            "survived": 559,
+            "episodes": 640,
+            "survival": 0.8734375
+          }
+        },
+        {
+          "update": 3000,
+          "laser": {
+            "survived": 154,
+            "episodes": 192,
+            "survival": 0.8020833333333334
+          },
+          "ordinary": {
+            "survived": 558,
+            "episodes": 640,
+            "survival": 0.871875
+          }
+        },
+        {
+          "update": 3250,
+          "laser": {
+            "survived": 153,
+            "episodes": 192,
+            "survival": 0.796875
+          },
+          "ordinary": {
+            "survived": 568,
+            "episodes": 640,
+            "survival": 0.8875
+          }
+        },
+        {
+          "update": 3500,
+          "laser": {
+            "survived": 157,
+            "episodes": 192,
+            "survival": 0.8177083333333334
+          },
+          "ordinary": {
+            "survived": 579,
+            "episodes": 640,
+            "survival": 0.9046875
+          }
+        }
+      ],
+      "probes": {
+        "anchor": {
+          "update": 3500,
+          "ordinary": {
+            "survived": 611,
+            "episodes": 640,
+            "survival": 0.9546875
+          },
+          "laser": {
+            "survived": 183,
+            "episodes": 192,
+            "survival": 0.953125
+          },
+          "all": {
+            "survived": 794,
+            "episodes": 832,
+            "survival": 0.9543269230769231
+          },
+          "laser_cards": {
+            "th06_s1_b3": {
+              "survived": 64,
+              "episodes": 64,
+              "survival": 1.0
+            },
+            "th06_s4_b12": {
+              "survived": 60,
+              "episodes": 64,
+              "survival": 0.9375
+            },
+            "th06_s4_w16": {
+              "survived": 59,
+              "episodes": 64,
+              "survival": 0.921875
+            }
+          }
+        },
+        "boss_or_free16": {
+          "update": 3500,
+          "ordinary": {
+            "survived": 605,
+            "episodes": 640,
+            "survival": 0.9453125
+          },
+          "laser": {
+            "survived": 179,
+            "episodes": 192,
+            "survival": 0.9322916666666666
+          },
+          "all": {
+            "survived": 784,
+            "episodes": 832,
+            "survival": 0.9423076923076923
+          },
+          "laser_cards": {
+            "th06_s1_b3": {
+              "survived": 64,
+              "episodes": 64,
+              "survival": 1.0
+            },
+            "th06_s4_b12": {
+              "survived": 57,
+              "episodes": 64,
+              "survival": 0.890625
+            },
+            "th06_s4_w16": {
+              "survived": 58,
+              "episodes": 64,
+              "survival": 0.90625
+            }
+          }
+        },
+        "free": {
+          "update": 3500,
+          "ordinary": {
+            "survived": 609,
+            "episodes": 640,
+            "survival": 0.9515625
+          },
+          "laser": {
+            "survived": 177,
+            "episodes": 192,
+            "survival": 0.921875
+          },
+          "all": {
+            "survived": 786,
+            "episodes": 832,
+            "survival": 0.9447115384615384
+          },
+          "laser_cards": {
+            "th06_s1_b3": {
+              "survived": 64,
+              "episodes": 64,
+              "survival": 1.0
+            },
+            "th06_s4_b12": {
+              "survived": 53,
+              "episodes": 64,
+              "survival": 0.828125
+            },
+            "th06_s4_w16": {
+              "survived": 60,
+              "episodes": 64,
+              "survival": 0.9375
+            }
+          }
+        },
+        "motor_off": {
+          "update": 3500,
+          "ordinary": {
+            "survived": 615,
+            "episodes": 640,
+            "survival": 0.9609375
+          },
+          "laser": {
+            "survived": 163,
+            "episodes": 192,
+            "survival": 0.8489583333333334
+          },
+          "all": {
+            "survived": 778,
+            "episodes": 832,
+            "survival": 0.9350961538461539
+          },
+          "laser_cards": {
+            "th06_s1_b3": {
+              "survived": 64,
+              "episodes": 64,
+              "survival": 1.0
+            },
+            "th06_s4_b12": {
+              "survived": 41,
+              "episodes": 64,
+              "survival": 0.640625
+            },
+            "th06_s4_w16": {
+              "survived": 58,
+              "episodes": 64,
+              "survival": 0.90625
+            }
+          }
+        }
+      },
+      "specialist": {
+        "probes": {
+          "best-anchor": {
+            "update": 3500,
+            "all_ranks": {
+              "survived": 392,
+              "episodes": 640,
+              "survival": 0.6125
+            },
+            "r2r3": {
+              "survived": 168,
+              "episodes": 320,
+              "survival": 0.525
+            },
+            "cards": {
+              "laser_sp_aimed_04": {
+                "survived": 74,
+                "episodes": 128,
+                "survival": 0.578125
+              },
+              "laser_sp_bars_04": {
+                "survived": 78,
+                "episodes": 128,
+                "survival": 0.609375
+              },
+              "laser_sp_corridor_04": {
+                "survived": 120,
+                "episodes": 128,
+                "survival": 0.9375
+              },
+              "laser_sp_stagger_04": {
+                "survived": 68,
+                "episodes": 128,
+                "survival": 0.53125
+              },
+              "laser_sp_sweep_04": {
+                "survived": 52,
+                "episodes": 128,
+                "survival": 0.40625
+              }
+            },
+            "cards_by_rank": {
+              "laser_sp_aimed_04": {
+                "r0": {
+                  "survived": 26,
+                  "episodes": 32,
+                  "survival": 0.8125
+                },
+                "r1": {
+                  "survived": 20,
+                  "episodes": 32,
+                  "survival": 0.625
+                },
+                "r2": {
+                  "survived": 19,
+                  "episodes": 32,
+                  "survival": 0.59375
+                },
+                "r3": {
+                  "survived": 9,
+                  "episodes": 32,
+                  "survival": 0.28125
+                }
+              },
+              "laser_sp_bars_04": {
+                "r0": {
+                  "survived": 23,
+                  "episodes": 32,
+                  "survival": 0.71875
+                },
+                "r1": {
+                  "survived": 21,
+                  "episodes": 32,
+                  "survival": 0.65625
+                },
+                "r2": {
+                  "survived": 22,
+                  "episodes": 32,
+                  "survival": 0.6875
+                },
+                "r3": {
+                  "survived": 12,
+                  "episodes": 32,
+                  "survival": 0.375
+                }
+              },
+              "laser_sp_corridor_04": {
+                "r0": {
+                  "survived": 32,
+                  "episodes": 32,
+                  "survival": 1.0
+                },
+                "r1": {
+                  "survived": 32,
+                  "episodes": 32,
+                  "survival": 1.0
+                },
+                "r2": {
+                  "survived": 31,
+                  "episodes": 32,
+                  "survival": 0.96875
+                },
+                "r3": {
+                  "survived": 25,
+                  "episodes": 32,
+                  "survival": 0.78125
+                }
+              },
+              "laser_sp_stagger_04": {
+                "r0": {
+                  "survived": 15,
+                  "episodes": 32,
+                  "survival": 0.46875
+                },
+                "r1": {
+                  "survived": 18,
+                  "episodes": 32,
+                  "survival": 0.5625
+                },
+                "r2": {
+                  "survived": 20,
+                  "episodes": 32,
+                  "survival": 0.625
+                },
+                "r3": {
+                  "survived": 15,
+                  "episodes": 32,
+                  "survival": 0.46875
+                }
+              },
+              "laser_sp_sweep_04": {
+                "r0": {
+                  "survived": 20,
+                  "episodes": 32,
+                  "survival": 0.625
+                },
+                "r1": {
+                  "survived": 17,
+                  "episodes": 32,
+                  "survival": 0.53125
+                },
+                "r2": {
+                  "survived": 15,
+                  "episodes": 32,
+                  "survival": 0.46875
+                },
+                "r3": {
+                  "survived": 0,
+                  "episodes": 32,
+                  "survival": 0.0
+                }
+              }
+            }
+          },
+          "best-boss_or_free16": {
+            "update": 3500,
+            "all_ranks": {
+              "survived": 392,
+              "episodes": 640,
+              "survival": 0.6125
+            },
+            "r2r3": {
+              "survived": 168,
+              "episodes": 320,
+              "survival": 0.525
+            },
+            "cards": {
+              "laser_sp_aimed_04": {
+                "survived": 74,
+                "episodes": 128,
+                "survival": 0.578125
+              },
+              "laser_sp_bars_04": {
+                "survived": 78,
+                "episodes": 128,
+                "survival": 0.609375
+              },
+              "laser_sp_corridor_04": {
+                "survived": 120,
+                "episodes": 128,
+                "survival": 0.9375
+              },
+              "laser_sp_stagger_04": {
+                "survived": 68,
+                "episodes": 128,
+                "survival": 0.53125
+              },
+              "laser_sp_sweep_04": {
+                "survived": 52,
+                "episodes": 128,
+                "survival": 0.40625
+              }
+            },
+            "cards_by_rank": {
+              "laser_sp_aimed_04": {
+                "r0": {
+                  "survived": 26,
+                  "episodes": 32,
+                  "survival": 0.8125
+                },
+                "r1": {
+                  "survived": 20,
+                  "episodes": 32,
+                  "survival": 0.625
+                },
+                "r2": {
+                  "survived": 19,
+                  "episodes": 32,
+                  "survival": 0.59375
+                },
+                "r3": {
+                  "survived": 9,
+                  "episodes": 32,
+                  "survival": 0.28125
+                }
+              },
+              "laser_sp_bars_04": {
+                "r0": {
+                  "survived": 23,
+                  "episodes": 32,
+                  "survival": 0.71875
+                },
+                "r1": {
+                  "survived": 21,
+                  "episodes": 32,
+                  "survival": 0.65625
+                },
+                "r2": {
+                  "survived": 22,
+                  "episodes": 32,
+                  "survival": 0.6875
+                },
+                "r3": {
+                  "survived": 12,
+                  "episodes": 32,
+                  "survival": 0.375
+                }
+              },
+              "laser_sp_corridor_04": {
+                "r0": {
+                  "survived": 32,
+                  "episodes": 32,
+                  "survival": 1.0
+                },
+                "r1": {
+                  "survived": 32,
+                  "episodes": 32,
+                  "survival": 1.0
+                },
+                "r2": {
+                  "survived": 31,
+                  "episodes": 32,
+                  "survival": 0.96875
+                },
+                "r3": {
+                  "survived": 25,
+                  "episodes": 32,
+                  "survival": 0.78125
+                }
+              },
+              "laser_sp_stagger_04": {
+                "r0": {
+                  "survived": 15,
+                  "episodes": 32,
+                  "survival": 0.46875
+                },
+                "r1": {
+                  "survived": 18,
+                  "episodes": 32,
+                  "survival": 0.5625
+                },
+                "r2": {
+                  "survived": 20,
+                  "episodes": 32,
+                  "survival": 0.625
+                },
+                "r3": {
+                  "survived": 15,
+                  "episodes": 32,
+                  "survival": 0.46875
+                }
+              },
+              "laser_sp_sweep_04": {
+                "r0": {
+                  "survived": 20,
+                  "episodes": 32,
+                  "survival": 0.625
+                },
+                "r1": {
+                  "survived": 17,
+                  "episodes": 32,
+                  "survival": 0.53125
+                },
+                "r2": {
+                  "survived": 15,
+                  "episodes": 32,
+                  "survival": 0.46875
+                },
+                "r3": {
+                  "survived": 0,
+                  "episodes": 32,
+                  "survival": 0.0
+                }
+              }
+            }
+          },
+          "best-follow": {
+            "update": 3500,
+            "all_ranks": {
+              "survived": 382,
+              "episodes": 640,
+              "survival": 0.596875
+            },
+            "r2r3": {
+              "survived": 162,
+              "episodes": 320,
+              "survival": 0.50625
+            },
+            "cards": {
+              "laser_sp_aimed_04": {
+                "survived": 55,
+                "episodes": 128,
+                "survival": 0.4296875
+              },
+              "laser_sp_bars_04": {
+                "survived": 71,
+                "episodes": 128,
+                "survival": 0.5546875
+              },
+              "laser_sp_corridor_04": {
+                "survived": 118,
+                "episodes": 128,
+                "survival": 0.921875
+              },
+              "laser_sp_stagger_04": {
+                "survived": 70,
+                "episodes": 128,
+                "survival": 0.546875
+              },
+              "laser_sp_sweep_04": {
+                "survived": 68,
+                "episodes": 128,
+                "survival": 0.53125
+              }
+            },
+            "cards_by_rank": {
+              "laser_sp_aimed_04": {
+                "r0": {
+                  "survived": 20,
+                  "episodes": 32,
+                  "survival": 0.625
+                },
+                "r1": {
+                  "survived": 15,
+                  "episodes": 32,
+                  "survival": 0.46875
+                },
+                "r2": {
+                  "survived": 12,
+                  "episodes": 32,
+                  "survival": 0.375
+                },
+                "r3": {
+                  "survived": 8,
+                  "episodes": 32,
+                  "survival": 0.25
+                }
+              },
+              "laser_sp_bars_04": {
+                "r0": {
+                  "survived": 24,
+                  "episodes": 32,
+                  "survival": 0.75
+                },
+                "r1": {
+                  "survived": 17,
+                  "episodes": 32,
+                  "survival": 0.53125
+                },
+                "r2": {
+                  "survived": 17,
+                  "episodes": 32,
+                  "survival": 0.53125
+                },
+                "r3": {
+                  "survived": 13,
+                  "episodes": 32,
+                  "survival": 0.40625
+                }
+              },
+              "laser_sp_corridor_04": {
+                "r0": {
+                  "survived": 32,
+                  "episodes": 32,
+                  "survival": 1.0
+                },
+                "r1": {
+                  "survived": 32,
+                  "episodes": 32,
+                  "survival": 1.0
+                },
+                "r2": {
+                  "survived": 29,
+                  "episodes": 32,
+                  "survival": 0.90625
+                },
+                "r3": {
+                  "survived": 25,
+                  "episodes": 32,
+                  "survival": 0.78125
+                }
+              },
+              "laser_sp_stagger_04": {
+                "r0": {
+                  "survived": 16,
+                  "episodes": 32,
+                  "survival": 0.5
+                },
+                "r1": {
+                  "survived": 16,
+                  "episodes": 32,
+                  "survival": 0.5
+                },
+                "r2": {
+                  "survived": 22,
+                  "episodes": 32,
+                  "survival": 0.6875
+                },
+                "r3": {
+                  "survived": 16,
+                  "episodes": 32,
+                  "survival": 0.5
+                }
+              },
+              "laser_sp_sweep_04": {
+                "r0": {
+                  "survived": 23,
+                  "episodes": 32,
+                  "survival": 0.71875
+                },
+                "r1": {
+                  "survived": 25,
+                  "episodes": 32,
+                  "survival": 0.78125
+                },
+                "r2": {
+                  "survived": 17,
+                  "episodes": 32,
+                  "survival": 0.53125
+                },
+                "r3": {
+                  "survived": 3,
+                  "episodes": 32,
+                  "survival": 0.09375
+                }
+              }
+            }
+          },
+          "best-free": {
+            "update": 3500,
+            "all_ranks": {
+              "survived": 343,
+              "episodes": 640,
+              "survival": 0.5359375
+            },
+            "r2r3": {
+              "survived": 141,
+              "episodes": 320,
+              "survival": 0.440625
+            },
+            "cards": {
+              "laser_sp_aimed_04": {
+                "survived": 27,
+                "episodes": 128,
+                "survival": 0.2109375
+              },
+              "laser_sp_bars_04": {
+                "survived": 71,
+                "episodes": 128,
+                "survival": 0.5546875
+              },
+              "laser_sp_corridor_04": {
+                "survived": 98,
+                "episodes": 128,
+                "survival": 0.765625
+              },
+              "laser_sp_stagger_04": {
+                "survived": 92,
+                "episodes": 128,
+                "survival": 0.71875
+              },
+              "laser_sp_sweep_04": {
+                "survived": 55,
+                "episodes": 128,
+                "survival": 0.4296875
+              }
+            },
+            "cards_by_rank": {
+              "laser_sp_aimed_04": {
+                "r0": {
+                  "survived": 15,
+                  "episodes": 32,
+                  "survival": 0.46875
+                },
+                "r1": {
+                  "survived": 6,
+                  "episodes": 32,
+                  "survival": 0.1875
+                },
+                "r2": {
+                  "survived": 5,
+                  "episodes": 32,
+                  "survival": 0.15625
+                },
+                "r3": {
+                  "survived": 1,
+                  "episodes": 32,
+                  "survival": 0.03125
+                }
+              },
+              "laser_sp_bars_04": {
+                "r0": {
+                  "survived": 18,
+                  "episodes": 32,
+                  "survival": 0.5625
+                },
+                "r1": {
+                  "survived": 17,
+                  "episodes": 32,
+                  "survival": 0.53125
+                },
+                "r2": {
+                  "survived": 21,
+                  "episodes": 32,
+                  "survival": 0.65625
+                },
+                "r3": {
+                  "survived": 15,
+                  "episodes": 32,
+                  "survival": 0.46875
+                }
+              },
+              "laser_sp_corridor_04": {
+                "r0": {
+                  "survived": 31,
+                  "episodes": 32,
+                  "survival": 0.96875
+                },
+                "r1": {
+                  "survived": 31,
+                  "episodes": 32,
+                  "survival": 0.96875
+                },
+                "r2": {
+                  "survived": 27,
+                  "episodes": 32,
+                  "survival": 0.84375
+                },
+                "r3": {
+                  "survived": 9,
+                  "episodes": 32,
+                  "survival": 0.28125
+                }
+              },
+              "laser_sp_stagger_04": {
+                "r0": {
+                  "survived": 27,
+                  "episodes": 32,
+                  "survival": 0.84375
+                },
+                "r1": {
+                  "survived": 25,
+                  "episodes": 32,
+                  "survival": 0.78125
+                },
+                "r2": {
+                  "survived": 19,
+                  "episodes": 32,
+                  "survival": 0.59375
+                },
+                "r3": {
+                  "survived": 21,
+                  "episodes": 32,
+                  "survival": 0.65625
+                }
+              },
+              "laser_sp_sweep_04": {
+                "r0": {
+                  "survived": 20,
+                  "episodes": 32,
+                  "survival": 0.625
+                },
+                "r1": {
+                  "survived": 12,
+                  "episodes": 32,
+                  "survival": 0.375
+                },
+                "r2": {
+                  "survived": 15,
+                  "episodes": 32,
+                  "survival": 0.46875
+                },
+                "r3": {
+                  "survived": 8,
+                  "episodes": 32,
+                  "survival": 0.25
+                }
+              }
+            }
+          },
+          "u2750-follow": {
+            "update": 2750,
+            "all_ranks": {
+              "survived": 311,
+              "episodes": 640,
+              "survival": 0.4859375
+            },
+            "r2r3": {
+              "survived": 115,
+              "episodes": 320,
+              "survival": 0.359375
+            },
+            "cards": {
+              "laser_sp_aimed_04": {
+                "survived": 43,
+                "episodes": 128,
+                "survival": 0.3359375
+              },
+              "laser_sp_bars_04": {
+                "survived": 64,
+                "episodes": 128,
+                "survival": 0.5
+              },
+              "laser_sp_corridor_04": {
+                "survived": 114,
+                "episodes": 128,
+                "survival": 0.890625
+              },
+              "laser_sp_stagger_04": {
+                "survived": 32,
+                "episodes": 128,
+                "survival": 0.25
+              },
+              "laser_sp_sweep_04": {
+                "survived": 58,
+                "episodes": 128,
+                "survival": 0.453125
+              }
+            },
+            "cards_by_rank": {
+              "laser_sp_aimed_04": {
+                "r0": {
+                  "survived": 16,
+                  "episodes": 32,
+                  "survival": 0.5
+                },
+                "r1": {
+                  "survived": 12,
+                  "episodes": 32,
+                  "survival": 0.375
+                },
+                "r2": {
+                  "survived": 11,
+                  "episodes": 32,
+                  "survival": 0.34375
+                },
+                "r3": {
+                  "survived": 4,
+                  "episodes": 32,
+                  "survival": 0.125
+                }
+              },
+              "laser_sp_bars_04": {
+                "r0": {
+                  "survived": 21,
+                  "episodes": 32,
+                  "survival": 0.65625
+                },
+                "r1": {
+                  "survived": 19,
+                  "episodes": 32,
+                  "survival": 0.59375
+                },
+                "r2": {
+                  "survived": 16,
+                  "episodes": 32,
+                  "survival": 0.5
+                },
+                "r3": {
+                  "survived": 8,
+                  "episodes": 32,
+                  "survival": 0.25
+                }
+              },
+              "laser_sp_corridor_04": {
+                "r0": {
+                  "survived": 32,
+                  "episodes": 32,
+                  "survival": 1.0
+                },
+                "r1": {
+                  "survived": 32,
+                  "episodes": 32,
+                  "survival": 1.0
+                },
+                "r2": {
+                  "survived": 30,
+                  "episodes": 32,
+                  "survival": 0.9375
+                },
+                "r3": {
+                  "survived": 20,
+                  "episodes": 32,
+                  "survival": 0.625
+                }
+              },
+              "laser_sp_stagger_04": {
+                "r0": {
+                  "survived": 6,
+                  "episodes": 32,
+                  "survival": 0.1875
+                },
+                "r1": {
+                  "survived": 9,
+                  "episodes": 32,
+                  "survival": 0.28125
+                },
+                "r2": {
+                  "survived": 12,
+                  "episodes": 32,
+                  "survival": 0.375
+                },
+                "r3": {
+                  "survived": 5,
+                  "episodes": 32,
+                  "survival": 0.15625
+                }
+              },
+              "laser_sp_sweep_04": {
+                "r0": {
+                  "survived": 26,
+                  "episodes": 32,
+                  "survival": 0.8125
+                },
+                "r1": {
+                  "survived": 23,
+                  "episodes": 32,
+                  "survival": 0.71875
+                },
+                "r2": {
+                  "survived": 9,
+                  "episodes": 32,
+                  "survival": 0.28125
+                },
+                "r3": {
+                  "survived": 0,
+                  "episodes": 32,
+                  "survival": 0.0
+                }
+              }
+            }
+          },
+          "u3000-follow": {
+            "update": 3000,
+            "all_ranks": {
+              "survived": 374,
+              "episodes": 640,
+              "survival": 0.584375
+            },
+            "r2r3": {
+              "survived": 164,
+              "episodes": 320,
+              "survival": 0.5125
+            },
+            "cards": {
+              "laser_sp_aimed_04": {
+                "survived": 30,
+                "episodes": 128,
+                "survival": 0.234375
+              },
+              "laser_sp_bars_04": {
+                "survived": 67,
+                "episodes": 128,
+                "survival": 0.5234375
+              },
+              "laser_sp_corridor_04": {
+                "survived": 119,
+                "episodes": 128,
+                "survival": 0.9296875
+              },
+              "laser_sp_stagger_04": {
+                "survived": 79,
+                "episodes": 128,
+                "survival": 0.6171875
+              },
+              "laser_sp_sweep_04": {
+                "survived": 79,
+                "episodes": 128,
+                "survival": 0.6171875
+              }
+            },
+            "cards_by_rank": {
+              "laser_sp_aimed_04": {
+                "r0": {
+                  "survived": 12,
+                  "episodes": 32,
+                  "survival": 0.375
+                },
+                "r1": {
+                  "survived": 6,
+                  "episodes": 32,
+                  "survival": 0.1875
+                },
+                "r2": {
+                  "survived": 9,
+                  "episodes": 32,
+                  "survival": 0.28125
+                },
+                "r3": {
+                  "survived": 3,
+                  "episodes": 32,
+                  "survival": 0.09375
+                }
+              },
+              "laser_sp_bars_04": {
+                "r0": {
+                  "survived": 22,
+                  "episodes": 32,
+                  "survival": 0.6875
+                },
+                "r1": {
+                  "survived": 17,
+                  "episodes": 32,
+                  "survival": 0.53125
+                },
+                "r2": {
+                  "survived": 15,
+                  "episodes": 32,
+                  "survival": 0.46875
+                },
+                "r3": {
+                  "survived": 13,
+                  "episodes": 32,
+                  "survival": 0.40625
+                }
+              },
+              "laser_sp_corridor_04": {
+                "r0": {
+                  "survived": 32,
+                  "episodes": 32,
+                  "survival": 1.0
+                },
+                "r1": {
+                  "survived": 32,
+                  "episodes": 32,
+                  "survival": 1.0
+                },
+                "r2": {
+                  "survived": 30,
+                  "episodes": 32,
+                  "survival": 0.9375
+                },
+                "r3": {
+                  "survived": 25,
+                  "episodes": 32,
+                  "survival": 0.78125
+                }
+              },
+              "laser_sp_stagger_04": {
+                "r0": {
+                  "survived": 20,
+                  "episodes": 32,
+                  "survival": 0.625
+                },
+                "r1": {
+                  "survived": 20,
+                  "episodes": 32,
+                  "survival": 0.625
+                },
+                "r2": {
+                  "survived": 21,
+                  "episodes": 32,
+                  "survival": 0.65625
+                },
+                "r3": {
+                  "survived": 18,
+                  "episodes": 32,
+                  "survival": 0.5625
+                }
+              },
+              "laser_sp_sweep_04": {
+                "r0": {
+                  "survived": 25,
+                  "episodes": 32,
+                  "survival": 0.78125
+                },
+                "r1": {
+                  "survived": 24,
+                  "episodes": 32,
+                  "survival": 0.75
+                },
+                "r2": {
+                  "survived": 21,
+                  "episodes": 32,
+                  "survival": 0.65625
+                },
+                "r3": {
+                  "survived": 9,
+                  "episodes": 32,
+                  "survival": 0.28125
+                }
+              }
+            }
+          },
+          "u3250-follow": {
+            "update": 3250,
+            "all_ranks": {
+              "survived": 324,
+              "episodes": 640,
+              "survival": 0.50625
+            },
+            "r2r3": {
+              "survived": 132,
+              "episodes": 320,
+              "survival": 0.4125
+            },
+            "cards": {
+              "laser_sp_aimed_04": {
+                "survived": 37,
+                "episodes": 128,
+                "survival": 0.2890625
+              },
+              "laser_sp_bars_04": {
+                "survived": 59,
+                "episodes": 128,
+                "survival": 0.4609375
+              },
+              "laser_sp_corridor_04": {
+                "survived": 114,
+                "episodes": 128,
+                "survival": 0.890625
+              },
+              "laser_sp_stagger_04": {
+                "survived": 49,
+                "episodes": 128,
+                "survival": 0.3828125
+              },
+              "laser_sp_sweep_04": {
+                "survived": 65,
+                "episodes": 128,
+                "survival": 0.5078125
+              }
+            },
+            "cards_by_rank": {
+              "laser_sp_aimed_04": {
+                "r0": {
+                  "survived": 17,
+                  "episodes": 32,
+                  "survival": 0.53125
+                },
+                "r1": {
+                  "survived": 6,
+                  "episodes": 32,
+                  "survival": 0.1875
+                },
+                "r2": {
+                  "survived": 11,
+                  "episodes": 32,
+                  "survival": 0.34375
+                },
+                "r3": {
+                  "survived": 3,
+                  "episodes": 32,
+                  "survival": 0.09375
+                }
+              },
+              "laser_sp_bars_04": {
+                "r0": {
+                  "survived": 17,
+                  "episodes": 32,
+                  "survival": 0.53125
+                },
+                "r1": {
+                  "survived": 16,
+                  "episodes": 32,
+                  "survival": 0.5
+                },
+                "r2": {
+                  "survived": 16,
+                  "episodes": 32,
+                  "survival": 0.5
+                },
+                "r3": {
+                  "survived": 10,
+                  "episodes": 32,
+                  "survival": 0.3125
+                }
+              },
+              "laser_sp_corridor_04": {
+                "r0": {
+                  "survived": 30,
+                  "episodes": 32,
+                  "survival": 0.9375
+                },
+                "r1": {
+                  "survived": 32,
+                  "episodes": 32,
+                  "survival": 1.0
+                },
+                "r2": {
+                  "survived": 27,
+                  "episodes": 32,
+                  "survival": 0.84375
+                },
+                "r3": {
+                  "survived": 25,
+                  "episodes": 32,
+                  "survival": 0.78125
+                }
+              },
+              "laser_sp_stagger_04": {
+                "r0": {
+                  "survived": 13,
+                  "episodes": 32,
+                  "survival": 0.40625
+                },
+                "r1": {
+                  "survived": 13,
+                  "episodes": 32,
+                  "survival": 0.40625
+                },
+                "r2": {
+                  "survived": 14,
+                  "episodes": 32,
+                  "survival": 0.4375
+                },
+                "r3": {
+                  "survived": 9,
+                  "episodes": 32,
+                  "survival": 0.28125
+                }
+              },
+              "laser_sp_sweep_04": {
+                "r0": {
+                  "survived": 25,
+                  "episodes": 32,
+                  "survival": 0.78125
+                },
+                "r1": {
+                  "survived": 23,
+                  "episodes": 32,
+                  "survival": 0.71875
+                },
+                "r2": {
+                  "survived": 16,
+                  "episodes": 32,
+                  "survival": 0.5
+                },
+                "r3": {
+                  "survived": 1,
+                  "episodes": 32,
+                  "survival": 0.03125
+                }
+              }
+            }
+          },
+          "u3500-follow": {
+            "update": 3500,
+            "all_ranks": {
+              "survived": 382,
+              "episodes": 640,
+              "survival": 0.596875
+            },
+            "r2r3": {
+              "survived": 162,
+              "episodes": 320,
+              "survival": 0.50625
+            },
+            "cards": {
+              "laser_sp_aimed_04": {
+                "survived": 55,
+                "episodes": 128,
+                "survival": 0.4296875
+              },
+              "laser_sp_bars_04": {
+                "survived": 71,
+                "episodes": 128,
+                "survival": 0.5546875
+              },
+              "laser_sp_corridor_04": {
+                "survived": 118,
+                "episodes": 128,
+                "survival": 0.921875
+              },
+              "laser_sp_stagger_04": {
+                "survived": 70,
+                "episodes": 128,
+                "survival": 0.546875
+              },
+              "laser_sp_sweep_04": {
+                "survived": 68,
+                "episodes": 128,
+                "survival": 0.53125
+              }
+            },
+            "cards_by_rank": {
+              "laser_sp_aimed_04": {
+                "r0": {
+                  "survived": 20,
+                  "episodes": 32,
+                  "survival": 0.625
+                },
+                "r1": {
+                  "survived": 15,
+                  "episodes": 32,
+                  "survival": 0.46875
+                },
+                "r2": {
+                  "survived": 12,
+                  "episodes": 32,
+                  "survival": 0.375
+                },
+                "r3": {
+                  "survived": 8,
+                  "episodes": 32,
+                  "survival": 0.25
+                }
+              },
+              "laser_sp_bars_04": {
+                "r0": {
+                  "survived": 24,
+                  "episodes": 32,
+                  "survival": 0.75
+                },
+                "r1": {
+                  "survived": 17,
+                  "episodes": 32,
+                  "survival": 0.53125
+                },
+                "r2": {
+                  "survived": 17,
+                  "episodes": 32,
+                  "survival": 0.53125
+                },
+                "r3": {
+                  "survived": 13,
+                  "episodes": 32,
+                  "survival": 0.40625
+                }
+              },
+              "laser_sp_corridor_04": {
+                "r0": {
+                  "survived": 32,
+                  "episodes": 32,
+                  "survival": 1.0
+                },
+                "r1": {
+                  "survived": 32,
+                  "episodes": 32,
+                  "survival": 1.0
+                },
+                "r2": {
+                  "survived": 29,
+                  "episodes": 32,
+                  "survival": 0.90625
+                },
+                "r3": {
+                  "survived": 25,
+                  "episodes": 32,
+                  "survival": 0.78125
+                }
+              },
+              "laser_sp_stagger_04": {
+                "r0": {
+                  "survived": 16,
+                  "episodes": 32,
+                  "survival": 0.5
+                },
+                "r1": {
+                  "survived": 16,
+                  "episodes": 32,
+                  "survival": 0.5
+                },
+                "r2": {
+                  "survived": 22,
+                  "episodes": 32,
+                  "survival": 0.6875
+                },
+                "r3": {
+                  "survived": 16,
+                  "episodes": 32,
+                  "survival": 0.5
+                }
+              },
+              "laser_sp_sweep_04": {
+                "r0": {
+                  "survived": 23,
+                  "episodes": 32,
+                  "survival": 0.71875
+                },
+                "r1": {
+                  "survived": 25,
+                  "episodes": 32,
+                  "survival": 0.78125
+                },
+                "r2": {
+                  "survived": 17,
+                  "episodes": 32,
+                  "survival": 0.53125
+                },
+                "r3": {
+                  "survived": 3,
+                  "episodes": 32,
+                  "survival": 0.09375
+                }
+              }
+            }
+          }
+        },
+        "last4_all_ranks": {
+          "survived": 1391,
+          "episodes": 2560,
+          "survival": 0.543359375
+        },
+        "last4_r2r3": {
+          "survived": 573,
+          "episodes": 1280,
+          "survival": 0.44765625
+        },
+        "last4_cards": {
+          "laser_sp_aimed_04": {
+            "survived": 165,
+            "episodes": 512,
+            "survival": 0.322265625
+          },
+          "laser_sp_bars_04": {
+            "survived": 261,
+            "episodes": 512,
+            "survival": 0.509765625
+          },
+          "laser_sp_corridor_04": {
+            "survived": 465,
+            "episodes": 512,
+            "survival": 0.908203125
+          },
+          "laser_sp_stagger_04": {
+            "survived": 230,
+            "episodes": 512,
+            "survival": 0.44921875
+          },
+          "laser_sp_sweep_04": {
+            "survived": 270,
+            "episodes": 512,
+            "survival": 0.52734375
+          }
+        },
+        "last4_cards_by_rank": {
+          "laser_sp_aimed_04": {
+            "r0": {
+              "survived": 65,
+              "episodes": 128,
+              "survival": 0.5078125
+            },
+            "r1": {
+              "survived": 39,
+              "episodes": 128,
+              "survival": 0.3046875
+            },
+            "r2": {
+              "survived": 43,
+              "episodes": 128,
+              "survival": 0.3359375
+            },
+            "r3": {
+              "survived": 18,
+              "episodes": 128,
+              "survival": 0.140625
+            }
+          },
+          "laser_sp_bars_04": {
+            "r0": {
+              "survived": 84,
+              "episodes": 128,
+              "survival": 0.65625
+            },
+            "r1": {
+              "survived": 69,
+              "episodes": 128,
+              "survival": 0.5390625
+            },
+            "r2": {
+              "survived": 64,
+              "episodes": 128,
+              "survival": 0.5
+            },
+            "r3": {
+              "survived": 44,
+              "episodes": 128,
+              "survival": 0.34375
+            }
+          },
+          "laser_sp_corridor_04": {
+            "r0": {
+              "survived": 126,
+              "episodes": 128,
+              "survival": 0.984375
+            },
+            "r1": {
+              "survived": 128,
+              "episodes": 128,
+              "survival": 1.0
+            },
+            "r2": {
+              "survived": 116,
+              "episodes": 128,
+              "survival": 0.90625
+            },
+            "r3": {
+              "survived": 95,
+              "episodes": 128,
+              "survival": 0.7421875
+            }
+          },
+          "laser_sp_stagger_04": {
+            "r0": {
+              "survived": 55,
+              "episodes": 128,
+              "survival": 0.4296875
+            },
+            "r1": {
+              "survived": 58,
+              "episodes": 128,
+              "survival": 0.453125
+            },
+            "r2": {
+              "survived": 69,
+              "episodes": 128,
+              "survival": 0.5390625
+            },
+            "r3": {
+              "survived": 48,
+              "episodes": 128,
+              "survival": 0.375
+            }
+          },
+          "laser_sp_sweep_04": {
+            "r0": {
+              "survived": 99,
+              "episodes": 128,
+              "survival": 0.7734375
+            },
+            "r1": {
+              "survived": 95,
+              "episodes": 128,
+              "survival": 0.7421875
+            },
+            "r2": {
+              "survived": 63,
+              "episodes": 128,
+              "survival": 0.4921875
+            },
+            "r3": {
+              "survived": 13,
+              "episodes": 128,
+              "survival": 0.1015625
+            }
+          }
+        }
+      },
+      "curriculum": {
+        "specialist_completed_episodes": 64662,
+        "specialist_probability_snapshot_mean": 0.0784073998524711,
+        "specialist_probability_final": 0.08003787104886798,
+        "per_card": {
+          "laser_sp_aimed_01": {
+            "completed_episodes": 7026,
+            "final_failure_ema": 0.4125,
+            "final_weight": 2.115
+          },
+          "laser_sp_aimed_02": {
+            "completed_episodes": 6115,
+            "final_failure_ema": 0.3466,
+            "final_weight": 1.7772
+          },
+          "laser_sp_aimed_03": {
+            "completed_episodes": 8591,
+            "final_failure_ema": 0.4207,
+            "final_weight": 2.1568
+          },
+          "laser_sp_bars_01": {
+            "completed_episodes": 6166,
+            "final_failure_ema": 0.2241,
+            "final_weight": 1.1491
+          },
+          "laser_sp_bars_02": {
+            "completed_episodes": 3654,
+            "final_failure_ema": 0.0703,
+            "final_weight": 0.3603
+          },
+          "laser_sp_bars_03": {
+            "completed_episodes": 3021,
+            "final_failure_ema": 0.1221,
+            "final_weight": 0.626
+          },
+          "laser_sp_corridor_02": {
+            "completed_episodes": 10363,
+            "final_failure_ema": 1.0,
+            "final_weight": 4.0
+          },
+          "laser_sp_stagger_01": {
+            "completed_episodes": 2880,
+            "final_failure_ema": 0.0575,
+            "final_weight": 0.2946
+          },
+          "laser_sp_stagger_02": {
+            "completed_episodes": 2919,
+            "final_failure_ema": 0.0702,
+            "final_weight": 0.3597
+          },
+          "laser_sp_stagger_03": {
+            "completed_episodes": 5295,
+            "final_failure_ema": 0.1048,
+            "final_weight": 0.5371
+          },
+          "laser_sp_sweep_01": {
+            "completed_episodes": 5335,
+            "final_failure_ema": 0.2396,
+            "final_weight": 1.2286
+          },
+          "laser_sp_sweep_03": {
+            "completed_episodes": 3297,
+            "final_failure_ema": 0.1161,
+            "final_weight": 0.5954
+          }
+        }
+      }
+    },
+    "T8": {
+      "engine": {
+        "engine_ver": "24",
+        "tables_hash": "37a7ff12fe40e24e",
+        "version": "0.4.1",
+        "git_sha": "5dfc08d-dirty"
+      },
+      "train_repo_sha": "unknown",
+      "updates": 3500,
+      "env_steps": 917504000,
+      "starts": 195,
+      "latest_update": 3500,
+      "best_update": 3500,
+      "wall_train_eval_s": 15430.896,
+      "steady_sps_median": 68163.33207630654,
+      "last4": {
+        "ordinary": {
+          "survived": 2279,
+          "episodes": 2560,
+          "survival": 0.890234375
+        },
+        "laser": {
+          "survived": 663,
+          "episodes": 768,
+          "survival": 0.86328125
+        },
+        "all": {
+          "survived": 2942,
+          "episodes": 3328,
+          "survival": 0.8840144230769231
+        }
+      },
+      "last4_by_rank": {
+        "ordinary": {
+          "r2": {
+            "survived": 1173,
+            "episodes": 1280,
+            "survival": 0.91640625
+          },
+          "r3": {
+            "survived": 1106,
+            "episodes": 1280,
+            "survival": 0.8640625
+          }
+        },
+        "laser": {
+          "r2": {
+            "survived": 341,
+            "episodes": 384,
+            "survival": 0.8880208333333334
+          },
+          "r3": {
+            "survived": 322,
+            "episodes": 384,
+            "survival": 0.8385416666666666
+          }
+        },
+        "all": {
+          "r2": {
+            "survived": 1514,
+            "episodes": 1664,
+            "survival": 0.9098557692307693
+          },
+          "r3": {
+            "survived": 1428,
+            "episodes": 1664,
+            "survival": 0.8581730769230769
+          }
+        }
+      },
+      "last4_laser_cards": {
+        "th06_s1_b3": {
+          "survived": 239,
+          "episodes": 256,
+          "survival": 0.93359375
+        },
+        "th06_s4_b12": {
+          "survived": 195,
+          "episodes": 256,
+          "survival": 0.76171875
+        },
+        "th06_s4_w16": {
+          "survived": 229,
+          "episodes": 256,
+          "survival": 0.89453125
+        }
+      },
+      "last4_ordinary_cards": {
+        "th06_s1_b4": {
+          "survived": 249,
+          "episodes": 256,
+          "survival": 0.97265625
+        },
+        "th06_s1_w04": {
+          "survived": 254,
+          "episodes": 256,
+          "survival": 0.9921875
+        },
+        "th06_s2_b6": {
+          "survived": 255,
+          "episodes": 256,
+          "survival": 0.99609375
+        },
+        "th06_s2_mb1": {
+          "survived": 192,
+          "episodes": 256,
+          "survival": 0.75
+        },
+        "th06_s2_w08": {
+          "survived": 217,
+          "episodes": 256,
+          "survival": 0.84765625
+        },
+        "th06_s3_b5": {
+          "survived": 212,
+          "episodes": 256,
+          "survival": 0.828125
+        },
+        "th06_s3_b7": {
+          "survived": 233,
+          "episodes": 256,
+          "survival": 0.91015625
+        },
+        "th06_s3_mb3": {
+          "survived": 252,
+          "episodes": 256,
+          "survival": 0.984375
+        },
+        "th06_s3_w02": {
+          "survived": 228,
+          "episodes": 256,
+          "survival": 0.890625
+        },
+        "th06_s3_w12": {
+          "survived": 187,
+          "episodes": 256,
+          "survival": 0.73046875
+        }
+      },
+      "last4_laser_cards_by_rank": {
+        "th06_s1_b3": {
+          "r2": {
+            "survived": 120,
+            "episodes": 128,
+            "survival": 0.9375
+          },
+          "r3": {
+            "survived": 119,
+            "episodes": 128,
+            "survival": 0.9296875
+          }
+        },
+        "th06_s4_b12": {
+          "r2": {
+            "survived": 99,
+            "episodes": 128,
+            "survival": 0.7734375
+          },
+          "r3": {
+            "survived": 96,
+            "episodes": 128,
+            "survival": 0.75
+          }
+        },
+        "th06_s4_w16": {
+          "r2": {
+            "survived": 122,
+            "episodes": 128,
+            "survival": 0.953125
+          },
+          "r3": {
+            "survived": 107,
+            "episodes": 128,
+            "survival": 0.8359375
+          }
+        }
+      },
+      "curve": [
+        {
+          "update": 250,
+          "laser": {
+            "survived": 120,
+            "episodes": 192,
+            "survival": 0.625
+          },
+          "ordinary": {
+            "survived": 365,
+            "episodes": 640,
+            "survival": 0.5703125
+          }
+        },
+        {
+          "update": 500,
+          "laser": {
+            "survived": 141,
+            "episodes": 192,
+            "survival": 0.734375
+          },
+          "ordinary": {
+            "survived": 408,
+            "episodes": 640,
+            "survival": 0.6375
+          }
+        },
+        {
+          "update": 750,
+          "laser": {
+            "survived": 155,
+            "episodes": 192,
+            "survival": 0.8072916666666666
+          },
+          "ordinary": {
+            "survived": 504,
+            "episodes": 640,
+            "survival": 0.7875
+          }
+        },
+        {
+          "update": 1000,
+          "laser": {
+            "survived": 142,
+            "episodes": 192,
+            "survival": 0.7395833333333334
+          },
+          "ordinary": {
+            "survived": 515,
+            "episodes": 640,
+            "survival": 0.8046875
+          }
+        },
+        {
+          "update": 1250,
+          "laser": {
+            "survived": 154,
+            "episodes": 192,
+            "survival": 0.8020833333333334
+          },
+          "ordinary": {
+            "survived": 522,
+            "episodes": 640,
+            "survival": 0.815625
+          }
+        },
+        {
+          "update": 1500,
+          "laser": {
+            "survived": 150,
+            "episodes": 192,
+            "survival": 0.78125
+          },
+          "ordinary": {
+            "survived": 540,
+            "episodes": 640,
+            "survival": 0.84375
+          }
+        },
+        {
+          "update": 1750,
+          "laser": {
+            "survived": 156,
+            "episodes": 192,
+            "survival": 0.8125
+          },
+          "ordinary": {
+            "survived": 536,
+            "episodes": 640,
+            "survival": 0.8375
+          }
+        },
+        {
+          "update": 2000,
+          "laser": {
+            "survived": 156,
+            "episodes": 192,
+            "survival": 0.8125
+          },
+          "ordinary": {
+            "survived": 541,
+            "episodes": 640,
+            "survival": 0.8453125
+          }
+        },
+        {
+          "update": 2250,
+          "laser": {
+            "survived": 161,
+            "episodes": 192,
+            "survival": 0.8385416666666666
+          },
+          "ordinary": {
+            "survived": 560,
+            "episodes": 640,
+            "survival": 0.875
+          }
+        },
+        {
+          "update": 2500,
+          "laser": {
+            "survived": 162,
+            "episodes": 192,
+            "survival": 0.84375
+          },
+          "ordinary": {
+            "survived": 559,
+            "episodes": 640,
+            "survival": 0.8734375
+          }
+        },
+        {
+          "update": 2750,
+          "laser": {
+            "survived": 160,
+            "episodes": 192,
+            "survival": 0.8333333333333334
+          },
+          "ordinary": {
+            "survived": 552,
+            "episodes": 640,
+            "survival": 0.8625
+          }
+        },
+        {
+          "update": 3000,
+          "laser": {
+            "survived": 163,
+            "episodes": 192,
+            "survival": 0.8489583333333334
+          },
+          "ordinary": {
+            "survived": 567,
+            "episodes": 640,
+            "survival": 0.8859375
+          }
+        },
+        {
+          "update": 3250,
+          "laser": {
+            "survived": 163,
+            "episodes": 192,
+            "survival": 0.8489583333333334
+          },
+          "ordinary": {
+            "survived": 568,
+            "episodes": 640,
+            "survival": 0.8875
+          }
+        },
+        {
+          "update": 3500,
+          "laser": {
+            "survived": 177,
+            "episodes": 192,
+            "survival": 0.921875
+          },
+          "ordinary": {
+            "survived": 592,
+            "episodes": 640,
+            "survival": 0.925
+          }
+        }
+      ],
+      "probes": {
+        "anchor": {
+          "update": 3500,
+          "ordinary": {
+            "survived": 609,
+            "episodes": 640,
+            "survival": 0.9515625
+          },
+          "laser": {
+            "survived": 181,
+            "episodes": 192,
+            "survival": 0.9427083333333334
+          },
+          "all": {
+            "survived": 790,
+            "episodes": 832,
+            "survival": 0.9495192307692307
+          },
+          "laser_cards": {
+            "th06_s1_b3": {
+              "survived": 61,
+              "episodes": 64,
+              "survival": 0.953125
+            },
+            "th06_s4_b12": {
+              "survived": 60,
+              "episodes": 64,
+              "survival": 0.9375
+            },
+            "th06_s4_w16": {
+              "survived": 60,
+              "episodes": 64,
+              "survival": 0.9375
+            }
+          }
+        },
+        "boss_or_free16": {
+          "update": 3500,
+          "ordinary": {
+            "survived": 601,
+            "episodes": 640,
+            "survival": 0.9390625
+          },
+          "laser": {
+            "survived": 177,
+            "episodes": 192,
+            "survival": 0.921875
+          },
+          "all": {
+            "survived": 778,
+            "episodes": 832,
+            "survival": 0.9350961538461539
+          },
+          "laser_cards": {
+            "th06_s1_b3": {
+              "survived": 63,
+              "episodes": 64,
+              "survival": 0.984375
+            },
+            "th06_s4_b12": {
+              "survived": 59,
+              "episodes": 64,
+              "survival": 0.921875
+            },
+            "th06_s4_w16": {
+              "survived": 55,
+              "episodes": 64,
+              "survival": 0.859375
+            }
+          }
+        },
+        "free": {
+          "update": 3500,
+          "ordinary": {
+            "survived": 604,
+            "episodes": 640,
+            "survival": 0.94375
+          },
+          "laser": {
+            "survived": 185,
+            "episodes": 192,
+            "survival": 0.9635416666666666
+          },
+          "all": {
+            "survived": 789,
+            "episodes": 832,
+            "survival": 0.9483173076923077
+          },
+          "laser_cards": {
+            "th06_s1_b3": {
+              "survived": 64,
+              "episodes": 64,
+              "survival": 1.0
+            },
+            "th06_s4_b12": {
+              "survived": 63,
+              "episodes": 64,
+              "survival": 0.984375
+            },
+            "th06_s4_w16": {
+              "survived": 58,
+              "episodes": 64,
+              "survival": 0.90625
+            }
+          }
+        },
+        "motor_off": {
+          "update": 3500,
+          "ordinary": {
+            "survived": 614,
+            "episodes": 640,
+            "survival": 0.959375
+          },
+          "laser": {
+            "survived": 185,
+            "episodes": 192,
+            "survival": 0.9635416666666666
+          },
+          "all": {
+            "survived": 799,
+            "episodes": 832,
+            "survival": 0.9603365384615384
+          },
+          "laser_cards": {
+            "th06_s1_b3": {
+              "survived": 63,
+              "episodes": 64,
+              "survival": 0.984375
+            },
+            "th06_s4_b12": {
+              "survived": 60,
+              "episodes": 64,
+              "survival": 0.9375
+            },
+            "th06_s4_w16": {
+              "survived": 62,
+              "episodes": 64,
+              "survival": 0.96875
+            }
+          }
+        }
+      },
+      "specialist": {
+        "probes": {
+          "best-anchor": {
+            "update": 3500,
+            "all_ranks": {
+              "survived": 365,
+              "episodes": 640,
+              "survival": 0.5703125
+            },
+            "r2r3": {
+              "survived": 168,
+              "episodes": 320,
+              "survival": 0.525
+            },
+            "cards": {
+              "laser_sp_aimed_04": {
+                "survived": 56,
+                "episodes": 128,
+                "survival": 0.4375
+              },
+              "laser_sp_bars_04": {
+                "survived": 119,
+                "episodes": 128,
+                "survival": 0.9296875
+              },
+              "laser_sp_corridor_04": {
+                "survived": 126,
+                "episodes": 128,
+                "survival": 0.984375
+              },
+              "laser_sp_stagger_04": {
+                "survived": 33,
+                "episodes": 128,
+                "survival": 0.2578125
+              },
+              "laser_sp_sweep_04": {
+                "survived": 31,
+                "episodes": 128,
+                "survival": 0.2421875
+              }
+            },
+            "cards_by_rank": {
+              "laser_sp_aimed_04": {
+                "r0": {
+                  "survived": 26,
+                  "episodes": 32,
+                  "survival": 0.8125
+                },
+                "r1": {
+                  "survived": 9,
+                  "episodes": 32,
+                  "survival": 0.28125
+                },
+                "r2": {
+                  "survived": 12,
+                  "episodes": 32,
+                  "survival": 0.375
+                },
+                "r3": {
+                  "survived": 9,
+                  "episodes": 32,
+                  "survival": 0.28125
+                }
+              },
+              "laser_sp_bars_04": {
+                "r0": {
+                  "survived": 29,
+                  "episodes": 32,
+                  "survival": 0.90625
+                },
+                "r1": {
+                  "survived": 31,
+                  "episodes": 32,
+                  "survival": 0.96875
+                },
+                "r2": {
+                  "survived": 30,
+                  "episodes": 32,
+                  "survival": 0.9375
+                },
+                "r3": {
+                  "survived": 29,
+                  "episodes": 32,
+                  "survival": 0.90625
+                }
+              },
+              "laser_sp_corridor_04": {
+                "r0": {
+                  "survived": 32,
+                  "episodes": 32,
+                  "survival": 1.0
+                },
+                "r1": {
+                  "survived": 32,
+                  "episodes": 32,
+                  "survival": 1.0
+                },
+                "r2": {
+                  "survived": 30,
+                  "episodes": 32,
+                  "survival": 0.9375
+                },
+                "r3": {
+                  "survived": 32,
+                  "episodes": 32,
+                  "survival": 1.0
+                }
+              },
+              "laser_sp_stagger_04": {
+                "r0": {
+                  "survived": 6,
+                  "episodes": 32,
+                  "survival": 0.1875
+                },
+                "r1": {
+                  "survived": 7,
+                  "episodes": 32,
+                  "survival": 0.21875
+                },
+                "r2": {
+                  "survived": 11,
+                  "episodes": 32,
+                  "survival": 0.34375
+                },
+                "r3": {
+                  "survived": 9,
+                  "episodes": 32,
+                  "survival": 0.28125
+                }
+              },
+              "laser_sp_sweep_04": {
+                "r0": {
+                  "survived": 15,
+                  "episodes": 32,
+                  "survival": 0.46875
+                },
+                "r1": {
+                  "survived": 10,
+                  "episodes": 32,
+                  "survival": 0.3125
+                },
+                "r2": {
+                  "survived": 6,
+                  "episodes": 32,
+                  "survival": 0.1875
+                },
+                "r3": {
+                  "survived": 0,
+                  "episodes": 32,
+                  "survival": 0.0
+                }
+              }
+            }
+          },
+          "best-boss_or_free16": {
+            "update": 3500,
+            "all_ranks": {
+              "survived": 365,
+              "episodes": 640,
+              "survival": 0.5703125
+            },
+            "r2r3": {
+              "survived": 168,
+              "episodes": 320,
+              "survival": 0.525
+            },
+            "cards": {
+              "laser_sp_aimed_04": {
+                "survived": 56,
+                "episodes": 128,
+                "survival": 0.4375
+              },
+              "laser_sp_bars_04": {
+                "survived": 119,
+                "episodes": 128,
+                "survival": 0.9296875
+              },
+              "laser_sp_corridor_04": {
+                "survived": 126,
+                "episodes": 128,
+                "survival": 0.984375
+              },
+              "laser_sp_stagger_04": {
+                "survived": 33,
+                "episodes": 128,
+                "survival": 0.2578125
+              },
+              "laser_sp_sweep_04": {
+                "survived": 31,
+                "episodes": 128,
+                "survival": 0.2421875
+              }
+            },
+            "cards_by_rank": {
+              "laser_sp_aimed_04": {
+                "r0": {
+                  "survived": 26,
+                  "episodes": 32,
+                  "survival": 0.8125
+                },
+                "r1": {
+                  "survived": 9,
+                  "episodes": 32,
+                  "survival": 0.28125
+                },
+                "r2": {
+                  "survived": 12,
+                  "episodes": 32,
+                  "survival": 0.375
+                },
+                "r3": {
+                  "survived": 9,
+                  "episodes": 32,
+                  "survival": 0.28125
+                }
+              },
+              "laser_sp_bars_04": {
+                "r0": {
+                  "survived": 29,
+                  "episodes": 32,
+                  "survival": 0.90625
+                },
+                "r1": {
+                  "survived": 31,
+                  "episodes": 32,
+                  "survival": 0.96875
+                },
+                "r2": {
+                  "survived": 30,
+                  "episodes": 32,
+                  "survival": 0.9375
+                },
+                "r3": {
+                  "survived": 29,
+                  "episodes": 32,
+                  "survival": 0.90625
+                }
+              },
+              "laser_sp_corridor_04": {
+                "r0": {
+                  "survived": 32,
+                  "episodes": 32,
+                  "survival": 1.0
+                },
+                "r1": {
+                  "survived": 32,
+                  "episodes": 32,
+                  "survival": 1.0
+                },
+                "r2": {
+                  "survived": 30,
+                  "episodes": 32,
+                  "survival": 0.9375
+                },
+                "r3": {
+                  "survived": 32,
+                  "episodes": 32,
+                  "survival": 1.0
+                }
+              },
+              "laser_sp_stagger_04": {
+                "r0": {
+                  "survived": 6,
+                  "episodes": 32,
+                  "survival": 0.1875
+                },
+                "r1": {
+                  "survived": 7,
+                  "episodes": 32,
+                  "survival": 0.21875
+                },
+                "r2": {
+                  "survived": 11,
+                  "episodes": 32,
+                  "survival": 0.34375
+                },
+                "r3": {
+                  "survived": 9,
+                  "episodes": 32,
+                  "survival": 0.28125
+                }
+              },
+              "laser_sp_sweep_04": {
+                "r0": {
+                  "survived": 15,
+                  "episodes": 32,
+                  "survival": 0.46875
+                },
+                "r1": {
+                  "survived": 10,
+                  "episodes": 32,
+                  "survival": 0.3125
+                },
+                "r2": {
+                  "survived": 6,
+                  "episodes": 32,
+                  "survival": 0.1875
+                },
+                "r3": {
+                  "survived": 0,
+                  "episodes": 32,
+                  "survival": 0.0
+                }
+              }
+            }
+          },
+          "best-follow": {
+            "update": 3500,
+            "all_ranks": {
+              "survived": 302,
+              "episodes": 640,
+              "survival": 0.471875
+            },
+            "r2r3": {
+              "survived": 133,
+              "episodes": 320,
+              "survival": 0.415625
+            },
+            "cards": {
+              "laser_sp_aimed_04": {
+                "survived": 18,
+                "episodes": 128,
+                "survival": 0.140625
+              },
+              "laser_sp_bars_04": {
+                "survived": 95,
+                "episodes": 128,
+                "survival": 0.7421875
+              },
+              "laser_sp_corridor_04": {
+                "survived": 103,
+                "episodes": 128,
+                "survival": 0.8046875
+              },
+              "laser_sp_stagger_04": {
+                "survived": 34,
+                "episodes": 128,
+                "survival": 0.265625
+              },
+              "laser_sp_sweep_04": {
+                "survived": 52,
+                "episodes": 128,
+                "survival": 0.40625
+              }
+            },
+            "cards_by_rank": {
+              "laser_sp_aimed_04": {
+                "r0": {
+                  "survived": 10,
+                  "episodes": 32,
+                  "survival": 0.3125
+                },
+                "r1": {
+                  "survived": 1,
+                  "episodes": 32,
+                  "survival": 0.03125
+                },
+                "r2": {
+                  "survived": 5,
+                  "episodes": 32,
+                  "survival": 0.15625
+                },
+                "r3": {
+                  "survived": 2,
+                  "episodes": 32,
+                  "survival": 0.0625
+                }
+              },
+              "laser_sp_bars_04": {
+                "r0": {
+                  "survived": 22,
+                  "episodes": 32,
+                  "survival": 0.6875
+                },
+                "r1": {
+                  "survived": 27,
+                  "episodes": 32,
+                  "survival": 0.84375
+                },
+                "r2": {
+                  "survived": 23,
+                  "episodes": 32,
+                  "survival": 0.71875
+                },
+                "r3": {
+                  "survived": 23,
+                  "episodes": 32,
+                  "survival": 0.71875
+                }
+              },
+              "laser_sp_corridor_04": {
+                "r0": {
+                  "survived": 26,
+                  "episodes": 32,
+                  "survival": 0.8125
+                },
+                "r1": {
+                  "survived": 25,
+                  "episodes": 32,
+                  "survival": 0.78125
+                },
+                "r2": {
+                  "survived": 24,
+                  "episodes": 32,
+                  "survival": 0.75
+                },
+                "r3": {
+                  "survived": 28,
+                  "episodes": 32,
+                  "survival": 0.875
+                }
+              },
+              "laser_sp_stagger_04": {
+                "r0": {
+                  "survived": 8,
+                  "episodes": 32,
+                  "survival": 0.25
+                },
+                "r1": {
+                  "survived": 8,
+                  "episodes": 32,
+                  "survival": 0.25
+                },
+                "r2": {
+                  "survived": 8,
+                  "episodes": 32,
+                  "survival": 0.25
+                },
+                "r3": {
+                  "survived": 10,
+                  "episodes": 32,
+                  "survival": 0.3125
+                }
+              },
+              "laser_sp_sweep_04": {
+                "r0": {
+                  "survived": 24,
+                  "episodes": 32,
+                  "survival": 0.75
+                },
+                "r1": {
+                  "survived": 18,
+                  "episodes": 32,
+                  "survival": 0.5625
+                },
+                "r2": {
+                  "survived": 10,
+                  "episodes": 32,
+                  "survival": 0.3125
+                },
+                "r3": {
+                  "survived": 0,
+                  "episodes": 32,
+                  "survival": 0.0
+                }
+              }
+            }
+          },
+          "best-free": {
+            "update": 3500,
+            "all_ranks": {
+              "survived": 378,
+              "episodes": 640,
+              "survival": 0.590625
+            },
+            "r2r3": {
+              "survived": 168,
+              "episodes": 320,
+              "survival": 0.525
+            },
+            "cards": {
+              "laser_sp_aimed_04": {
+                "survived": 52,
+                "episodes": 128,
+                "survival": 0.40625
+              },
+              "laser_sp_bars_04": {
+                "survived": 92,
+                "episodes": 128,
+                "survival": 0.71875
+              },
+              "laser_sp_corridor_04": {
+                "survived": 89,
+                "episodes": 128,
+                "survival": 0.6953125
+              },
+              "laser_sp_stagger_04": {
+                "survived": 90,
+                "episodes": 128,
+                "survival": 0.703125
+              },
+              "laser_sp_sweep_04": {
+                "survived": 55,
+                "episodes": 128,
+                "survival": 0.4296875
+              }
+            },
+            "cards_by_rank": {
+              "laser_sp_aimed_04": {
+                "r0": {
+                  "survived": 17,
+                  "episodes": 32,
+                  "survival": 0.53125
+                },
+                "r1": {
+                  "survived": 12,
+                  "episodes": 32,
+                  "survival": 0.375
+                },
+                "r2": {
+                  "survived": 14,
+                  "episodes": 32,
+                  "survival": 0.4375
+                },
+                "r3": {
+                  "survived": 9,
+                  "episodes": 32,
+                  "survival": 0.28125
+                }
+              },
+              "laser_sp_bars_04": {
+                "r0": {
+                  "survived": 19,
+                  "episodes": 32,
+                  "survival": 0.59375
+                },
+                "r1": {
+                  "survived": 29,
+                  "episodes": 32,
+                  "survival": 0.90625
+                },
+                "r2": {
+                  "survived": 26,
+                  "episodes": 32,
+                  "survival": 0.8125
+                },
+                "r3": {
+                  "survived": 18,
+                  "episodes": 32,
+                  "survival": 0.5625
+                }
+              },
+              "laser_sp_corridor_04": {
+                "r0": {
+                  "survived": 25,
+                  "episodes": 32,
+                  "survival": 0.78125
+                },
+                "r1": {
+                  "survived": 23,
+                  "episodes": 32,
+                  "survival": 0.71875
+                },
+                "r2": {
+                  "survived": 19,
+                  "episodes": 32,
+                  "survival": 0.59375
+                },
+                "r3": {
+                  "survived": 22,
+                  "episodes": 32,
+                  "survival": 0.6875
+                }
+              },
+              "laser_sp_stagger_04": {
+                "r0": {
+                  "survived": 20,
+                  "episodes": 32,
+                  "survival": 0.625
+                },
+                "r1": {
+                  "survived": 23,
+                  "episodes": 32,
+                  "survival": 0.71875
+                },
+                "r2": {
+                  "survived": 23,
+                  "episodes": 32,
+                  "survival": 0.71875
+                },
+                "r3": {
+                  "survived": 24,
+                  "episodes": 32,
+                  "survival": 0.75
+                }
+              },
+              "laser_sp_sweep_04": {
+                "r0": {
+                  "survived": 19,
+                  "episodes": 32,
+                  "survival": 0.59375
+                },
+                "r1": {
+                  "survived": 23,
+                  "episodes": 32,
+                  "survival": 0.71875
+                },
+                "r2": {
+                  "survived": 12,
+                  "episodes": 32,
+                  "survival": 0.375
+                },
+                "r3": {
+                  "survived": 1,
+                  "episodes": 32,
+                  "survival": 0.03125
+                }
+              }
+            }
+          },
+          "u2750-follow": {
+            "update": 2750,
+            "all_ranks": {
+              "survived": 246,
+              "episodes": 640,
+              "survival": 0.384375
+            },
+            "r2r3": {
+              "survived": 114,
+              "episodes": 320,
+              "survival": 0.35625
+            },
+            "cards": {
+              "laser_sp_aimed_04": {
+                "survived": 21,
+                "episodes": 128,
+                "survival": 0.1640625
+              },
+              "laser_sp_bars_04": {
+                "survived": 86,
+                "episodes": 128,
+                "survival": 0.671875
+              },
+              "laser_sp_corridor_04": {
+                "survived": 120,
+                "episodes": 128,
+                "survival": 0.9375
+              },
+              "laser_sp_stagger_04": {
+                "survived": 14,
+                "episodes": 128,
+                "survival": 0.109375
+              },
+              "laser_sp_sweep_04": {
+                "survived": 5,
+                "episodes": 128,
+                "survival": 0.0390625
+              }
+            },
+            "cards_by_rank": {
+              "laser_sp_aimed_04": {
+                "r0": {
+                  "survived": 11,
+                  "episodes": 32,
+                  "survival": 0.34375
+                },
+                "r1": {
+                  "survived": 3,
+                  "episodes": 32,
+                  "survival": 0.09375
+                },
+                "r2": {
+                  "survived": 5,
+                  "episodes": 32,
+                  "survival": 0.15625
+                },
+                "r3": {
+                  "survived": 2,
+                  "episodes": 32,
+                  "survival": 0.0625
+                }
+              },
+              "laser_sp_bars_04": {
+                "r0": {
+                  "survived": 22,
+                  "episodes": 32,
+                  "survival": 0.6875
+                },
+                "r1": {
+                  "survived": 22,
+                  "episodes": 32,
+                  "survival": 0.6875
+                },
+                "r2": {
+                  "survived": 17,
+                  "episodes": 32,
+                  "survival": 0.53125
+                },
+                "r3": {
+                  "survived": 25,
+                  "episodes": 32,
+                  "survival": 0.78125
+                }
+              },
+              "laser_sp_corridor_04": {
+                "r0": {
+                  "survived": 30,
+                  "episodes": 32,
+                  "survival": 0.9375
+                },
+                "r1": {
+                  "survived": 32,
+                  "episodes": 32,
+                  "survival": 1.0
+                },
+                "r2": {
+                  "survived": 31,
+                  "episodes": 32,
+                  "survival": 0.96875
+                },
+                "r3": {
+                  "survived": 27,
+                  "episodes": 32,
+                  "survival": 0.84375
+                }
+              },
+              "laser_sp_stagger_04": {
+                "r0": {
+                  "survived": 3,
+                  "episodes": 32,
+                  "survival": 0.09375
+                },
+                "r1": {
+                  "survived": 4,
+                  "episodes": 32,
+                  "survival": 0.125
+                },
+                "r2": {
+                  "survived": 2,
+                  "episodes": 32,
+                  "survival": 0.0625
+                },
+                "r3": {
+                  "survived": 5,
+                  "episodes": 32,
+                  "survival": 0.15625
+                }
+              },
+              "laser_sp_sweep_04": {
+                "r0": {
+                  "survived": 1,
+                  "episodes": 32,
+                  "survival": 0.03125
+                },
+                "r1": {
+                  "survived": 4,
+                  "episodes": 32,
+                  "survival": 0.125
+                },
+                "r2": {
+                  "survived": 0,
+                  "episodes": 32,
+                  "survival": 0.0
+                },
+                "r3": {
+                  "survived": 0,
+                  "episodes": 32,
+                  "survival": 0.0
+                }
+              }
+            }
+          },
+          "u3000-follow": {
+            "update": 3000,
+            "all_ranks": {
+              "survived": 263,
+              "episodes": 640,
+              "survival": 0.4109375
+            },
+            "r2r3": {
+              "survived": 109,
+              "episodes": 320,
+              "survival": 0.340625
+            },
+            "cards": {
+              "laser_sp_aimed_04": {
+                "survived": 18,
+                "episodes": 128,
+                "survival": 0.140625
+              },
+              "laser_sp_bars_04": {
+                "survived": 65,
+                "episodes": 128,
+                "survival": 0.5078125
+              },
+              "laser_sp_corridor_04": {
+                "survived": 120,
+                "episodes": 128,
+                "survival": 0.9375
+              },
+              "laser_sp_stagger_04": {
+                "survived": 16,
+                "episodes": 128,
+                "survival": 0.125
+              },
+              "laser_sp_sweep_04": {
+                "survived": 44,
+                "episodes": 128,
+                "survival": 0.34375
+              }
+            },
+            "cards_by_rank": {
+              "laser_sp_aimed_04": {
+                "r0": {
+                  "survived": 10,
+                  "episodes": 32,
+                  "survival": 0.3125
+                },
+                "r1": {
+                  "survived": 2,
+                  "episodes": 32,
+                  "survival": 0.0625
+                },
+                "r2": {
+                  "survived": 4,
+                  "episodes": 32,
+                  "survival": 0.125
+                },
+                "r3": {
+                  "survived": 2,
+                  "episodes": 32,
+                  "survival": 0.0625
+                }
+              },
+              "laser_sp_bars_04": {
+                "r0": {
+                  "survived": 18,
+                  "episodes": 32,
+                  "survival": 0.5625
+                },
+                "r1": {
+                  "survived": 18,
+                  "episodes": 32,
+                  "survival": 0.5625
+                },
+                "r2": {
+                  "survived": 12,
+                  "episodes": 32,
+                  "survival": 0.375
+                },
+                "r3": {
+                  "survived": 17,
+                  "episodes": 32,
+                  "survival": 0.53125
+                }
+              },
+              "laser_sp_corridor_04": {
+                "r0": {
+                  "survived": 29,
+                  "episodes": 32,
+                  "survival": 0.90625
+                },
+                "r1": {
+                  "survived": 30,
+                  "episodes": 32,
+                  "survival": 0.9375
+                },
+                "r2": {
+                  "survived": 32,
+                  "episodes": 32,
+                  "survival": 1.0
+                },
+                "r3": {
+                  "survived": 29,
+                  "episodes": 32,
+                  "survival": 0.90625
+                }
+              },
+              "laser_sp_stagger_04": {
+                "r0": {
+                  "survived": 1,
+                  "episodes": 32,
+                  "survival": 0.03125
+                },
+                "r1": {
+                  "survived": 5,
+                  "episodes": 32,
+                  "survival": 0.15625
+                },
+                "r2": {
+                  "survived": 6,
+                  "episodes": 32,
+                  "survival": 0.1875
+                },
+                "r3": {
+                  "survived": 4,
+                  "episodes": 32,
+                  "survival": 0.125
+                }
+              },
+              "laser_sp_sweep_04": {
+                "r0": {
+                  "survived": 23,
+                  "episodes": 32,
+                  "survival": 0.71875
+                },
+                "r1": {
+                  "survived": 18,
+                  "episodes": 32,
+                  "survival": 0.5625
+                },
+                "r2": {
+                  "survived": 3,
+                  "episodes": 32,
+                  "survival": 0.09375
+                },
+                "r3": {
+                  "survived": 0,
+                  "episodes": 32,
+                  "survival": 0.0
+                }
+              }
+            }
+          },
+          "u3250-follow": {
+            "update": 3250,
+            "all_ranks": {
+              "survived": 288,
+              "episodes": 640,
+              "survival": 0.45
+            },
+            "r2r3": {
+              "survived": 132,
+              "episodes": 320,
+              "survival": 0.4125
+            },
+            "cards": {
+              "laser_sp_aimed_04": {
+                "survived": 34,
+                "episodes": 128,
+                "survival": 0.265625
+              },
+              "laser_sp_bars_04": {
+                "survived": 81,
+                "episodes": 128,
+                "survival": 0.6328125
+              },
+              "laser_sp_corridor_04": {
+                "survived": 103,
+                "episodes": 128,
+                "survival": 0.8046875
+              },
+              "laser_sp_stagger_04": {
+                "survived": 21,
+                "episodes": 128,
+                "survival": 0.1640625
+              },
+              "laser_sp_sweep_04": {
+                "survived": 49,
+                "episodes": 128,
+                "survival": 0.3828125
+              }
+            },
+            "cards_by_rank": {
+              "laser_sp_aimed_04": {
+                "r0": {
+                  "survived": 14,
+                  "episodes": 32,
+                  "survival": 0.4375
+                },
+                "r1": {
+                  "survived": 4,
+                  "episodes": 32,
+                  "survival": 0.125
+                },
+                "r2": {
+                  "survived": 8,
+                  "episodes": 32,
+                  "survival": 0.25
+                },
+                "r3": {
+                  "survived": 8,
+                  "episodes": 32,
+                  "survival": 0.25
+                }
+              },
+              "laser_sp_bars_04": {
+                "r0": {
+                  "survived": 20,
+                  "episodes": 32,
+                  "survival": 0.625
+                },
+                "r1": {
+                  "survived": 20,
+                  "episodes": 32,
+                  "survival": 0.625
+                },
+                "r2": {
+                  "survived": 20,
+                  "episodes": 32,
+                  "survival": 0.625
+                },
+                "r3": {
+                  "survived": 21,
+                  "episodes": 32,
+                  "survival": 0.65625
+                }
+              },
+              "laser_sp_corridor_04": {
+                "r0": {
+                  "survived": 28,
+                  "episodes": 32,
+                  "survival": 0.875
+                },
+                "r1": {
+                  "survived": 25,
+                  "episodes": 32,
+                  "survival": 0.78125
+                },
+                "r2": {
+                  "survived": 26,
+                  "episodes": 32,
+                  "survival": 0.8125
+                },
+                "r3": {
+                  "survived": 24,
+                  "episodes": 32,
+                  "survival": 0.75
+                }
+              },
+              "laser_sp_stagger_04": {
+                "r0": {
+                  "survived": 6,
+                  "episodes": 32,
+                  "survival": 0.1875
+                },
+                "r1": {
+                  "survived": 7,
+                  "episodes": 32,
+                  "survival": 0.21875
+                },
+                "r2": {
+                  "survived": 5,
+                  "episodes": 32,
+                  "survival": 0.15625
+                },
+                "r3": {
+                  "survived": 3,
+                  "episodes": 32,
+                  "survival": 0.09375
+                }
+              },
+              "laser_sp_sweep_04": {
+                "r0": {
+                  "survived": 20,
+                  "episodes": 32,
+                  "survival": 0.625
+                },
+                "r1": {
+                  "survived": 12,
+                  "episodes": 32,
+                  "survival": 0.375
+                },
+                "r2": {
+                  "survived": 17,
+                  "episodes": 32,
+                  "survival": 0.53125
+                },
+                "r3": {
+                  "survived": 0,
+                  "episodes": 32,
+                  "survival": 0.0
+                }
+              }
+            }
+          },
+          "u3500-follow": {
+            "update": 3500,
+            "all_ranks": {
+              "survived": 302,
+              "episodes": 640,
+              "survival": 0.471875
+            },
+            "r2r3": {
+              "survived": 133,
+              "episodes": 320,
+              "survival": 0.415625
+            },
+            "cards": {
+              "laser_sp_aimed_04": {
+                "survived": 18,
+                "episodes": 128,
+                "survival": 0.140625
+              },
+              "laser_sp_bars_04": {
+                "survived": 95,
+                "episodes": 128,
+                "survival": 0.7421875
+              },
+              "laser_sp_corridor_04": {
+                "survived": 103,
+                "episodes": 128,
+                "survival": 0.8046875
+              },
+              "laser_sp_stagger_04": {
+                "survived": 34,
+                "episodes": 128,
+                "survival": 0.265625
+              },
+              "laser_sp_sweep_04": {
+                "survived": 52,
+                "episodes": 128,
+                "survival": 0.40625
+              }
+            },
+            "cards_by_rank": {
+              "laser_sp_aimed_04": {
+                "r0": {
+                  "survived": 10,
+                  "episodes": 32,
+                  "survival": 0.3125
+                },
+                "r1": {
+                  "survived": 1,
+                  "episodes": 32,
+                  "survival": 0.03125
+                },
+                "r2": {
+                  "survived": 5,
+                  "episodes": 32,
+                  "survival": 0.15625
+                },
+                "r3": {
+                  "survived": 2,
+                  "episodes": 32,
+                  "survival": 0.0625
+                }
+              },
+              "laser_sp_bars_04": {
+                "r0": {
+                  "survived": 22,
+                  "episodes": 32,
+                  "survival": 0.6875
+                },
+                "r1": {
+                  "survived": 27,
+                  "episodes": 32,
+                  "survival": 0.84375
+                },
+                "r2": {
+                  "survived": 23,
+                  "episodes": 32,
+                  "survival": 0.71875
+                },
+                "r3": {
+                  "survived": 23,
+                  "episodes": 32,
+                  "survival": 0.71875
+                }
+              },
+              "laser_sp_corridor_04": {
+                "r0": {
+                  "survived": 26,
+                  "episodes": 32,
+                  "survival": 0.8125
+                },
+                "r1": {
+                  "survived": 25,
+                  "episodes": 32,
+                  "survival": 0.78125
+                },
+                "r2": {
+                  "survived": 24,
+                  "episodes": 32,
+                  "survival": 0.75
+                },
+                "r3": {
+                  "survived": 28,
+                  "episodes": 32,
+                  "survival": 0.875
+                }
+              },
+              "laser_sp_stagger_04": {
+                "r0": {
+                  "survived": 8,
+                  "episodes": 32,
+                  "survival": 0.25
+                },
+                "r1": {
+                  "survived": 8,
+                  "episodes": 32,
+                  "survival": 0.25
+                },
+                "r2": {
+                  "survived": 8,
+                  "episodes": 32,
+                  "survival": 0.25
+                },
+                "r3": {
+                  "survived": 10,
+                  "episodes": 32,
+                  "survival": 0.3125
+                }
+              },
+              "laser_sp_sweep_04": {
+                "r0": {
+                  "survived": 24,
+                  "episodes": 32,
+                  "survival": 0.75
+                },
+                "r1": {
+                  "survived": 18,
+                  "episodes": 32,
+                  "survival": 0.5625
+                },
+                "r2": {
+                  "survived": 10,
+                  "episodes": 32,
+                  "survival": 0.3125
+                },
+                "r3": {
+                  "survived": 0,
+                  "episodes": 32,
+                  "survival": 0.0
+                }
+              }
+            }
+          }
+        },
+        "last4_all_ranks": {
+          "survived": 1099,
+          "episodes": 2560,
+          "survival": 0.429296875
+        },
+        "last4_r2r3": {
+          "survived": 488,
+          "episodes": 1280,
+          "survival": 0.38125
+        },
+        "last4_cards": {
+          "laser_sp_aimed_04": {
+            "survived": 91,
+            "episodes": 512,
+            "survival": 0.177734375
+          },
+          "laser_sp_bars_04": {
+            "survived": 327,
+            "episodes": 512,
+            "survival": 0.638671875
+          },
+          "laser_sp_corridor_04": {
+            "survived": 446,
+            "episodes": 512,
+            "survival": 0.87109375
+          },
+          "laser_sp_stagger_04": {
+            "survived": 85,
+            "episodes": 512,
+            "survival": 0.166015625
+          },
+          "laser_sp_sweep_04": {
+            "survived": 150,
+            "episodes": 512,
+            "survival": 0.29296875
+          }
+        },
+        "last4_cards_by_rank": {
+          "laser_sp_aimed_04": {
+            "r0": {
+              "survived": 45,
+              "episodes": 128,
+              "survival": 0.3515625
+            },
+            "r1": {
+              "survived": 10,
+              "episodes": 128,
+              "survival": 0.078125
+            },
+            "r2": {
+              "survived": 22,
+              "episodes": 128,
+              "survival": 0.171875
+            },
+            "r3": {
+              "survived": 14,
+              "episodes": 128,
+              "survival": 0.109375
+            }
+          },
+          "laser_sp_bars_04": {
+            "r0": {
+              "survived": 82,
+              "episodes": 128,
+              "survival": 0.640625
+            },
+            "r1": {
+              "survived": 87,
+              "episodes": 128,
+              "survival": 0.6796875
+            },
+            "r2": {
+              "survived": 72,
+              "episodes": 128,
+              "survival": 0.5625
+            },
+            "r3": {
+              "survived": 86,
+              "episodes": 128,
+              "survival": 0.671875
+            }
+          },
+          "laser_sp_corridor_04": {
+            "r0": {
+              "survived": 113,
+              "episodes": 128,
+              "survival": 0.8828125
+            },
+            "r1": {
+              "survived": 112,
+              "episodes": 128,
+              "survival": 0.875
+            },
+            "r2": {
+              "survived": 113,
+              "episodes": 128,
+              "survival": 0.8828125
+            },
+            "r3": {
+              "survived": 108,
+              "episodes": 128,
+              "survival": 0.84375
+            }
+          },
+          "laser_sp_stagger_04": {
+            "r0": {
+              "survived": 18,
+              "episodes": 128,
+              "survival": 0.140625
+            },
+            "r1": {
+              "survived": 24,
+              "episodes": 128,
+              "survival": 0.1875
+            },
+            "r2": {
+              "survived": 21,
+              "episodes": 128,
+              "survival": 0.1640625
+            },
+            "r3": {
+              "survived": 22,
+              "episodes": 128,
+              "survival": 0.171875
+            }
+          },
+          "laser_sp_sweep_04": {
+            "r0": {
+              "survived": 68,
+              "episodes": 128,
+              "survival": 0.53125
+            },
+            "r1": {
+              "survived": 52,
+              "episodes": 128,
+              "survival": 0.40625
+            },
+            "r2": {
+              "survived": 30,
+              "episodes": 128,
+              "survival": 0.234375
+            },
+            "r3": {
+              "survived": 0,
+              "episodes": 128,
+              "survival": 0.0
+            }
+          }
+        }
+      },
+      "curriculum": {
+        "specialist_completed_episodes": 65434,
+        "specialist_probability_snapshot_mean": 0.07958987895514322,
+        "specialist_probability_final": 0.08040048863193588,
+        "per_card": {
+          "laser_sp_aimed_01": {
+            "completed_episodes": 7650,
+            "final_failure_ema": 0.3973,
+            "final_weight": 2.0312
+          },
+          "laser_sp_aimed_02": {
+            "completed_episodes": 6197,
+            "final_failure_ema": 0.1984,
+            "final_weight": 1.0146
+          },
+          "laser_sp_aimed_03": {
+            "completed_episodes": 9252,
+            "final_failure_ema": 0.5642,
+            "final_weight": 2.8847
+          },
+          "laser_sp_bars_01": {
+            "completed_episodes": 6259,
+            "final_failure_ema": 0.2099,
+            "final_weight": 1.0732
+          },
+          "laser_sp_bars_02": {
+            "completed_episodes": 3453,
+            "final_failure_ema": 0.1104,
+            "final_weight": 0.5643
+          },
+          "laser_sp_bars_03": {
+            "completed_episodes": 3597,
+            "final_failure_ema": 0.1223,
+            "final_weight": 0.6253
+          },
+          "laser_sp_corridor_02": {
+            "completed_episodes": 10484,
+            "final_failure_ema": 1.0,
+            "final_weight": 4.0
+          },
+          "laser_sp_stagger_01": {
+            "completed_episodes": 2244,
+            "final_failure_ema": 0.0488,
+            "final_weight": 0.2556
+          },
+          "laser_sp_stagger_02": {
+            "completed_episodes": 2668,
+            "final_failure_ema": 0.048,
+            "final_weight": 0.2556
+          },
+          "laser_sp_stagger_03": {
+            "completed_episodes": 5250,
+            "final_failure_ema": 0.1098,
+            "final_weight": 0.5616
+          },
+          "laser_sp_sweep_01": {
+            "completed_episodes": 5293,
+            "final_failure_ema": 0.311,
+            "final_weight": 1.5901
+          },
+          "laser_sp_sweep_03": {
+            "completed_episodes": 3087,
+            "final_failure_ema": 0.0808,
+            "final_weight": 0.4133
+          }
+        }
+      }
+    }
+  },
+  "sources": {
+    "runs/job-cec000c4981cc5af/20261001-185732-t6-laser-joint/env.json": "efa5fde100f003b752ff754a664705c9bf3670b26f0ae950087c567fe818310e",
+    "runs/job-cec000c4981cc5af/20261001-185732-t6-laser-joint/eval/250.json": "9d60b2d469170e5d5c9cb5a871754dcf77b9f389c5f897c37bc157aeda7ac0d6",
+    "runs/job-cec000c4981cc5af/20261001-185732-t6-laser-joint/eval/500.json": "098759f6861a491df483031352885fe4edc0a6a4f9664d34907450c7e31057f1",
+    "runs/job-cec000c4981cc5af/20261001-185732-t6-laser-joint/eval/750.json": "3a6513cd26b72ca023961c29e62fe4be94437b0171eb857501c7c4859429c00c",
+    "runs/job-cec000c4981cc5af/20261001-185732-t6-laser-joint/eval/1000.json": "ab3d73738e9b519758605a3047a6357543a8f2a58589ec0df36c75979ffd4235",
+    "runs/job-cec000c4981cc5af/20261001-185732-t6-laser-joint/eval/1250.json": "ed9b0ac96a24a29d1d27ec89e535b254aa31aa7e402603fa1aeeafe43b0a4cc1",
+    "runs/job-cec000c4981cc5af/20261001-185732-t6-laser-joint/eval/1500.json": "554357c4d3e44f9eebbd75c28446126a69c230653dfc3ea0b07afd081f248c65",
+    "runs/job-cec000c4981cc5af/20261001-185732-t6-laser-joint/eval/1750.json": "9ed746dfce18249beeba990251efec33341600651d51181a77fda3f2bf55a1cc",
+    "runs/job-cec000c4981cc5af/20261001-185732-t6-laser-joint/eval/2000.json": "e2d0d9f5ed617150df614d2a75e4fd5691ed176055e269b4cd89f400839478d7",
+    "runs/job-cec000c4981cc5af/20261001-185732-t6-laser-joint/eval/2250.json": "8692f1330755d2a713f31fe6fdc5e6ba41c8f6db9697bc7dd779e1eb408c0f03",
+    "runs/job-cec000c4981cc5af/20261001-185732-t6-laser-joint/eval/2500.json": "dc0c38ab86008c37c2b041e890280690b5b1eaded8f1aac044f7be9ba1ed3424",
+    "runs/job-cec000c4981cc5af/20261001-185732-t6-laser-joint/eval/2750.json": "97e6973ee645eaeb06fd881585855a72ac494a1eba35ea04580cd0df14dee763",
+    "runs/job-cec000c4981cc5af/20261001-185732-t6-laser-joint/eval/3000.json": "3c25c742878d5960566e7bf780a518585e48501be6aace1a7583ff44d1dbaab6",
+    "runs/job-cec000c4981cc5af/20261001-185732-t6-laser-joint/eval/3250.json": "0f9142c804759a6e66b71757d4faedcdd1072d3e552c61936cf67e15254b8301",
+    "runs/job-cec000c4981cc5af/20261001-185732-t6-laser-joint/eval/3500.json": "2403c5d18ad5c9a10b6963b96b12e3d0c6e00686bde0d6261aa187cf9d4d8ba9",
+    "runs/job-cec000c4981cc5af/20261001-185732-t6-laser-joint/probe/anchor.json": "987017b997e31b6b3714aae2f00db3e4e91d2d398982a7db7e46a63c4efe6878",
+    "runs/job-cec000c4981cc5af/20261001-185732-t6-laser-joint/probe/boss_or_free16.json": "bebde867b10ddba20702ac0da5964069a022dca36e86d2cd8dd9b55da26bb41d",
+    "runs/job-cec000c4981cc5af/20261001-185732-t6-laser-joint/probe/free.json": "e57a6f6bddf099a128af339ec39896f5860a1d969cab042b40c9782be5971e99",
+    "runs/job-cec000c4981cc5af/20261001-185732-t6-laser-joint/probe/motor_off.json": "67ded390319dfb4ecdb1b1821fbe346367798b40fc4750b29ade02d89173e4ba",
+    "runs/job-cec000c4981cc5af/20261001-185732-t6-laser-joint/specialist-eval/best-anchor.json": "cd66838e64ed6b7ecf96d420aac6a6c3922c1c9ed8aa8cfa949882b62de89742",
+    "runs/job-cec000c4981cc5af/20261001-185732-t6-laser-joint/specialist-eval/best-boss_or_free16.json": "18c6f18f4c9e247bcc675b4f1b6fc29183eca16e9de8b3e53dc83a3c240a3c5e",
+    "runs/job-cec000c4981cc5af/20261001-185732-t6-laser-joint/specialist-eval/best-follow.json": "03cc91f8eaf4049ca67ed1e979da2ae00bc84da00ed755aef995448ce428da29",
+    "runs/job-cec000c4981cc5af/20261001-185732-t6-laser-joint/specialist-eval/best-free.json": "8ab1365270c397c691b0ea24ef80cc3f937581eae69beb42bf7909ee6a5a4b05",
+    "runs/job-cec000c4981cc5af/20261001-185732-t6-laser-joint/specialist-eval/u2750-follow.json": "59e6d34c8db6be31c338320c937346017725b94c17b13fc2244a6562d5cb116f",
+    "runs/job-cec000c4981cc5af/20261001-185732-t6-laser-joint/specialist-eval/u3000-follow.json": "34f6cc3905da28b45bfbddd666af6a4970d3ffc6adca2efe1ca8f2e401ffd83d",
+    "runs/job-cec000c4981cc5af/20261001-185732-t6-laser-joint/specialist-eval/u3250-follow.json": "d7bcfbac52869f136759fcc5e59569eee22ece2ea7b10bd914dbb31d8b21e42f",
+    "runs/job-cec000c4981cc5af/20261001-185732-t6-laser-joint/specialist-eval/u3500-follow.json": "b231a96126b7fc392b9829736844e5ba5e8b6d0dd59c4ee08426042810d77627",
+    "runs/job-cec000c4981cc5af.tar.gz": "72a6e9561b13fa3c898012a73d3a0b7cef6e5d1be208786f65df990df0860e01",
+    "runs/job-28a4532abf792cc4/20261002-103401-t8-laser-k4/env.json": "5194284ff86f27e5e6418578a0a5571dcec9e0a6c184732ec529c77a8c41cded",
+    "runs/job-28a4532abf792cc4/20261002-103401-t8-laser-k4/eval/250.json": "f5370b89fd80d555257c57b4719a43e0fc4680e6ae898ed76565e7b8f23020b2",
+    "runs/job-28a4532abf792cc4/20261002-103401-t8-laser-k4/eval/500.json": "f38a776433ca15dfc6b5be7e6395ec1b4192ab80eed2d9a9fee00c9877eddb43",
+    "runs/job-28a4532abf792cc4/20261002-103401-t8-laser-k4/eval/750.json": "058363330e5654ca105333bb2a0fdf045709f75590a7328f12e68cbf9c226d34",
+    "runs/job-28a4532abf792cc4/20261002-103401-t8-laser-k4/eval/1000.json": "b6f6ade5640ca014195797a706094a181e3b19570c0daa173fb6ccc24f8a06c8",
+    "runs/job-28a4532abf792cc4/20261002-103401-t8-laser-k4/eval/1250.json": "2394c4e3110304702955664e354c005ced1bfbb79189cebab9989de757d4c446",
+    "runs/job-28a4532abf792cc4/20261002-103401-t8-laser-k4/eval/1500.json": "34df6f3ef1801cded4143e534c4ecf4748eecb644d297f4892423faed1a76830",
+    "runs/job-28a4532abf792cc4/20261002-103401-t8-laser-k4/eval/1750.json": "4e6ea30b68672d5d34c6320de4db3a8e7aa8a32d63677280c14bb7669616a34b",
+    "runs/job-28a4532abf792cc4/20261002-103401-t8-laser-k4/eval/2000.json": "baaaf108ef52278c590fa951f7983056dee6def35fb5434f56ea88cd9c6e19dc",
+    "runs/job-28a4532abf792cc4/20261002-103401-t8-laser-k4/eval/2250.json": "d580b51a2e0daf2834d84d9a02d147debbbbd0625ceab4aae96078e03baef5e4",
+    "runs/job-28a4532abf792cc4/20261002-103401-t8-laser-k4/eval/2500.json": "01ac01ef2654e27177e26898cf2a1ee37a1d0b141cdb7f1cb611d9e79ba50c03",
+    "runs/job-28a4532abf792cc4/20261002-103401-t8-laser-k4/eval/2750.json": "5461ff12c5fd954d8847788545e05e15d097ee315967b1cce0b5257d8f5fba1c",
+    "runs/job-28a4532abf792cc4/20261002-103401-t8-laser-k4/eval/3000.json": "29b9fc6daed656b9b7b242be1b5f20af061d850495a472caf82887605c874be5",
+    "runs/job-28a4532abf792cc4/20261002-103401-t8-laser-k4/eval/3250.json": "82c8785c6e2be0b6c63078e9a35c324af22479b2332bbec8342c49a17ba033c6",
+    "runs/job-28a4532abf792cc4/20261002-103401-t8-laser-k4/eval/3500.json": "e25327119f85b386bbca5b08847907b031bb76cf407f635829ddee202da9623c",
+    "runs/job-28a4532abf792cc4/20261002-103401-t8-laser-k4/probe/anchor.json": "b9275ad7367b3d6439dafc8b00d67d9302c68479cbf206eceba5fdb67833f82d",
+    "runs/job-28a4532abf792cc4/20261002-103401-t8-laser-k4/probe/boss_or_free16.json": "c601f158a89b74ee8bdcf0f8a0de2ffcb9ee201f45a61c924aaee48e0238bf17",
+    "runs/job-28a4532abf792cc4/20261002-103401-t8-laser-k4/probe/free.json": "926afd5bcc2cc74d42c67104e80a587d769b09e1fbfb2bc60a3369c84ccde50a",
+    "runs/job-28a4532abf792cc4/20261002-103401-t8-laser-k4/probe/motor_off.json": "3fe4c874ff6839ced0db18203c51319be80e30edaacc06fdf151d865ceff1cbd",
+    "runs/job-28a4532abf792cc4/20261002-103401-t8-laser-k4/specialist-eval/best-anchor.json": "af5a35baac2fbbd226b3eec0f0f382044a2e002fac3d13d6d5e4b37e453c7f86",
+    "runs/job-28a4532abf792cc4/20261002-103401-t8-laser-k4/specialist-eval/best-boss_or_free16.json": "170eb113cd85619ad8131a5edc68a19db0b6e7192b71319389ba47bb0d6b7bb1",
+    "runs/job-28a4532abf792cc4/20261002-103401-t8-laser-k4/specialist-eval/best-follow.json": "b264e227948baae29a1bc6441029a0e4401f4554f4a3ec6e63856364ffd5fa84",
+    "runs/job-28a4532abf792cc4/20261002-103401-t8-laser-k4/specialist-eval/best-free.json": "5a0fa3b6a3a25a71f61658161db50711398ac8804336ca10ecf954a777cf73cc",
+    "runs/job-28a4532abf792cc4/20261002-103401-t8-laser-k4/specialist-eval/u2750-follow.json": "abbdee572602676c271d7d49aba321dbacb01575f62daf59e690c63ccaec1d69",
+    "runs/job-28a4532abf792cc4/20261002-103401-t8-laser-k4/specialist-eval/u3000-follow.json": "7eaf8b142ec3b58a9681043d164f07053e57c0e065dae0fab5d0788f78065133",
+    "runs/job-28a4532abf792cc4/20261002-103401-t8-laser-k4/specialist-eval/u3250-follow.json": "1fc95fd23d7d12b3128fbf0c57e054c3dfeb5e077a69f105fef54724570485eb",
+    "runs/job-28a4532abf792cc4/20261002-103401-t8-laser-k4/specialist-eval/u3500-follow.json": "048682f5f0131866798ebd77889dfb8c08b3575860494a25b9911ba38ec77647",
+    "runs/job-28a4532abf792cc4.tar.gz": "9f305e01d34fbdd493cfcff61b38f0c52aea0b1ac62afdce57b3efded9c1daec",
+    "runs/t8-monitor/download.json": "e17de1b015b00fc96689e2a1cfb2e82d0d1bc2182fc6ea510fb23b1c88a407d0",
+    "runs/t8-monitor/status.json": "bd62d9e0ba17201d28151631bf0ec3d28602615742fa3368ba8772bd70046c8e"
+  },
+  "comparison": {
+    "config_diff": {
+      "featurize.k_lasers": {
+        "T6": 16,
+        "T8": 4
+      }
+    },
+    "same_cards_starts_engine_intents": true,
+    "independent_training_seeds_per_arm": 1,
+    "raw_episode_records_saved": false,
+    "T8_job_commit": "5997cecdda500e87ff794da1e7ecd1959007e7c1",
+    "T8_GPU_check_passed": true
+  }
+}

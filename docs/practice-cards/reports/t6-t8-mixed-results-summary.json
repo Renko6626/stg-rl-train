@@ -1,0 +1,406 @@
+{
+  "protocol": {
+    "checkpoint_update": 3500,
+    "device": "cpu",
+    "seed": 12345,
+    "episodes_per_card_rank": 32,
+    "scope": "30 original-plus-laser synthetic training cards; 27 at rank2/3 plus 3 Extra-only at rank4"
+  },
+  "runs": {
+    "T6": {
+      "overall": {
+        "episodes": 1824.0,
+        "survived": 1639,
+        "survival": 0.8985745614035088
+      },
+      "by_rank": {
+        "r2": {
+          "episodes": 864.0,
+          "survived": 799,
+          "survival": 0.9247685185185185
+        },
+        "r3": {
+          "episodes": 864.0,
+          "survived": 744,
+          "survival": 0.8611111111111112
+        },
+        "r4": {
+          "episodes": 96.0,
+          "survived": 96,
+          "survival": 1.0
+        }
+      },
+      "cards": {
+        "synth_laser_s1_b1": 0.765625,
+        "synth_laser_s1_b1_v2": 0.859375,
+        "synth_laser_s1_b1_v3": 0.953125,
+        "synth_laser_s2_b1": 0.9375,
+        "synth_laser_s2_b1_v2": 0.828125,
+        "synth_laser_s2_b1_v3": 0.9375,
+        "synth_laser_s2_b3": 0.875,
+        "synth_laser_s2_b3_v2": 0.9375,
+        "synth_laser_s2_b3_v3": 0.890625,
+        "synth_laser_s3_b1": 0.875,
+        "synth_laser_s3_b1_v2": 0.859375,
+        "synth_laser_s3_b1_v3": 0.875,
+        "synth_laser_s4_b1": 0.609375,
+        "synth_laser_s4_b1_v2": 0.703125,
+        "synth_laser_s4_b1_v3": 0.828125,
+        "synth_laser_s4_w10": 1.0,
+        "synth_laser_s4_w10_v2": 1.0,
+        "synth_laser_s4_w10_v3": 1.0,
+        "synth_laser_s5_b1": 0.96875,
+        "synth_laser_s5_b1_v2": 0.875,
+        "synth_laser_s5_b1_v3": 0.921875,
+        "synth_laser_s5_w05": 0.984375,
+        "synth_laser_s5_w05_v2": 1.0,
+        "synth_laser_s5_w05_v3": 1.0,
+        "synth_laser_s6_b1": 0.984375,
+        "synth_laser_s6_b1_v2": 0.984375,
+        "synth_laser_s6_b1_v3": 0.65625,
+        "synth_laser_s7_b1": 1.0,
+        "synth_laser_s7_b1_v2": 1.0,
+        "synth_laser_s7_b1_v3": 1.0
+      },
+      "cards_by_rank": {
+        "synth_laser_s1_b1": {
+          "r2": 0.90625,
+          "r3": 0.625
+        },
+        "synth_laser_s1_b1_v2": {
+          "r2": 1.0,
+          "r3": 0.71875
+        },
+        "synth_laser_s1_b1_v3": {
+          "r2": 1.0,
+          "r3": 0.90625
+        },
+        "synth_laser_s2_b1": {
+          "r2": 0.9375,
+          "r3": 0.9375
+        },
+        "synth_laser_s2_b1_v2": {
+          "r2": 0.8125,
+          "r3": 0.84375
+        },
+        "synth_laser_s2_b1_v3": {
+          "r2": 0.96875,
+          "r3": 0.90625
+        },
+        "synth_laser_s2_b3": {
+          "r2": 0.84375,
+          "r3": 0.90625
+        },
+        "synth_laser_s2_b3_v2": {
+          "r2": 0.9375,
+          "r3": 0.9375
+        },
+        "synth_laser_s2_b3_v3": {
+          "r2": 0.875,
+          "r3": 0.90625
+        },
+        "synth_laser_s3_b1": {
+          "r2": 0.9375,
+          "r3": 0.8125
+        },
+        "synth_laser_s3_b1_v2": {
+          "r2": 0.875,
+          "r3": 0.84375
+        },
+        "synth_laser_s3_b1_v3": {
+          "r2": 0.96875,
+          "r3": 0.78125
+        },
+        "synth_laser_s4_b1": {
+          "r2": 0.75,
+          "r3": 0.46875
+        },
+        "synth_laser_s4_b1_v2": {
+          "r2": 0.6875,
+          "r3": 0.71875
+        },
+        "synth_laser_s4_b1_v3": {
+          "r2": 0.9375,
+          "r3": 0.71875
+        },
+        "synth_laser_s4_w10": {
+          "r2": 1.0,
+          "r3": 1.0
+        },
+        "synth_laser_s4_w10_v2": {
+          "r2": 1.0,
+          "r3": 1.0
+        },
+        "synth_laser_s4_w10_v3": {
+          "r2": 1.0,
+          "r3": 1.0
+        },
+        "synth_laser_s5_b1": {
+          "r2": 0.9375,
+          "r3": 1.0
+        },
+        "synth_laser_s5_b1_v2": {
+          "r2": 0.84375,
+          "r3": 0.90625
+        },
+        "synth_laser_s5_b1_v3": {
+          "r2": 0.9375,
+          "r3": 0.90625
+        },
+        "synth_laser_s5_w05": {
+          "r2": 0.96875,
+          "r3": 1.0
+        },
+        "synth_laser_s5_w05_v2": {
+          "r2": 1.0,
+          "r3": 1.0
+        },
+        "synth_laser_s5_w05_v3": {
+          "r2": 1.0,
+          "r3": 1.0
+        },
+        "synth_laser_s6_b1": {
+          "r2": 0.96875,
+          "r3": 1.0
+        },
+        "synth_laser_s6_b1_v2": {
+          "r2": 1.0,
+          "r3": 0.96875
+        },
+        "synth_laser_s6_b1_v3": {
+          "r2": 0.875,
+          "r3": 0.4375
+        },
+        "synth_laser_s7_b1": {
+          "r4": 1.0
+        },
+        "synth_laser_s7_b1_v2": {
+          "r4": 1.0
+        },
+        "synth_laser_s7_b1_v3": {
+          "r4": 1.0
+        }
+      },
+      "checkpoint_sha256": "80da1a554b25a81e8534d5dcb3c5373edd2725c4e3328a799850c514b906d74f",
+      "k_lasers": 16
+    },
+    "T8": {
+      "overall": {
+        "episodes": 1824.0,
+        "survived": 1646,
+        "survival": 0.9024122807017544
+      },
+      "by_rank": {
+        "r2": {
+          "episodes": 864.0,
+          "survived": 810,
+          "survival": 0.9375
+        },
+        "r3": {
+          "episodes": 864.0,
+          "survived": 744,
+          "survival": 0.8611111111111112
+        },
+        "r4": {
+          "episodes": 96.0,
+          "survived": 92,
+          "survival": 0.9583333333333334
+        }
+      },
+      "cards": {
+        "synth_laser_s1_b1": 0.828125,
+        "synth_laser_s1_b1_v2": 0.890625,
+        "synth_laser_s1_b1_v3": 0.9375,
+        "synth_laser_s2_b1": 0.90625,
+        "synth_laser_s2_b1_v2": 0.921875,
+        "synth_laser_s2_b1_v3": 0.890625,
+        "synth_laser_s2_b3": 0.90625,
+        "synth_laser_s2_b3_v2": 0.984375,
+        "synth_laser_s2_b3_v3": 0.890625,
+        "synth_laser_s3_b1": 0.859375,
+        "synth_laser_s3_b1_v2": 0.875,
+        "synth_laser_s3_b1_v3": 0.890625,
+        "synth_laser_s4_b1": 0.671875,
+        "synth_laser_s4_b1_v2": 0.734375,
+        "synth_laser_s4_b1_v3": 0.828125,
+        "synth_laser_s4_w10": 1.0,
+        "synth_laser_s4_w10_v2": 0.984375,
+        "synth_laser_s4_w10_v3": 1.0,
+        "synth_laser_s5_b1": 0.890625,
+        "synth_laser_s5_b1_v2": 0.9375,
+        "synth_laser_s5_b1_v3": 0.921875,
+        "synth_laser_s5_w05": 0.984375,
+        "synth_laser_s5_w05_v2": 0.921875,
+        "synth_laser_s5_w05_v3": 0.984375,
+        "synth_laser_s6_b1": 1.0,
+        "synth_laser_s6_b1_v2": 1.0,
+        "synth_laser_s6_b1_v3": 0.640625,
+        "synth_laser_s7_b1": 1.0,
+        "synth_laser_s7_b1_v2": 0.875,
+        "synth_laser_s7_b1_v3": 1.0
+      },
+      "cards_by_rank": {
+        "synth_laser_s1_b1": {
+          "r2": 0.9375,
+          "r3": 0.71875
+        },
+        "synth_laser_s1_b1_v2": {
+          "r2": 0.9375,
+          "r3": 0.84375
+        },
+        "synth_laser_s1_b1_v3": {
+          "r2": 0.96875,
+          "r3": 0.90625
+        },
+        "synth_laser_s2_b1": {
+          "r2": 1.0,
+          "r3": 0.8125
+        },
+        "synth_laser_s2_b1_v2": {
+          "r2": 0.9375,
+          "r3": 0.90625
+        },
+        "synth_laser_s2_b1_v3": {
+          "r2": 0.96875,
+          "r3": 0.8125
+        },
+        "synth_laser_s2_b3": {
+          "r2": 0.96875,
+          "r3": 0.84375
+        },
+        "synth_laser_s2_b3_v2": {
+          "r2": 0.96875,
+          "r3": 1.0
+        },
+        "synth_laser_s2_b3_v3": {
+          "r2": 0.9375,
+          "r3": 0.84375
+        },
+        "synth_laser_s3_b1": {
+          "r2": 0.875,
+          "r3": 0.84375
+        },
+        "synth_laser_s3_b1_v2": {
+          "r2": 0.96875,
+          "r3": 0.78125
+        },
+        "synth_laser_s3_b1_v3": {
+          "r2": 0.96875,
+          "r3": 0.8125
+        },
+        "synth_laser_s4_b1": {
+          "r2": 0.75,
+          "r3": 0.59375
+        },
+        "synth_laser_s4_b1_v2": {
+          "r2": 0.875,
+          "r3": 0.59375
+        },
+        "synth_laser_s4_b1_v3": {
+          "r2": 0.90625,
+          "r3": 0.75
+        },
+        "synth_laser_s4_w10": {
+          "r2": 1.0,
+          "r3": 1.0
+        },
+        "synth_laser_s4_w10_v2": {
+          "r2": 1.0,
+          "r3": 0.96875
+        },
+        "synth_laser_s4_w10_v3": {
+          "r2": 1.0,
+          "r3": 1.0
+        },
+        "synth_laser_s5_b1": {
+          "r2": 0.8125,
+          "r3": 0.96875
+        },
+        "synth_laser_s5_b1_v2": {
+          "r2": 0.9375,
+          "r3": 0.9375
+        },
+        "synth_laser_s5_b1_v3": {
+          "r2": 0.875,
+          "r3": 0.96875
+        },
+        "synth_laser_s5_w05": {
+          "r2": 0.96875,
+          "r3": 1.0
+        },
+        "synth_laser_s5_w05_v2": {
+          "r2": 0.90625,
+          "r3": 0.9375
+        },
+        "synth_laser_s5_w05_v3": {
+          "r2": 1.0,
+          "r3": 0.96875
+        },
+        "synth_laser_s6_b1": {
+          "r2": 1.0,
+          "r3": 1.0
+        },
+        "synth_laser_s6_b1_v2": {
+          "r2": 1.0,
+          "r3": 1.0
+        },
+        "synth_laser_s6_b1_v3": {
+          "r2": 0.84375,
+          "r3": 0.4375
+        },
+        "synth_laser_s7_b1": {
+          "r4": 1.0
+        },
+        "synth_laser_s7_b1_v2": {
+          "r4": 0.875
+        },
+        "synth_laser_s7_b1_v3": {
+          "r4": 1.0
+        }
+      },
+      "checkpoint_sha256": "de7871b9f64180d604960a1975459394a0c6a83842f5f1cb6b02aba37e00838d",
+      "k_lasers": 4
+    }
+  },
+  "sources": {
+    "runs/t6-t8-mixed-eval/T6.json": "ec1cf7b2b567acbc1f0c6266cda561ea348b24d6cc9dcd6003fc152e4391a683",
+    "runs/t6-t8-mixed-eval/T8.json": "1851097a48cd6327c87542e136a5a71d1790a0c55483bcc57e8af39ca57a3752"
+  },
+  "changes_pp": {
+    "synth_laser_s1_b1": 6.25,
+    "synth_laser_s1_b1_v2": 3.125,
+    "synth_laser_s1_b1_v3": -1.5625,
+    "synth_laser_s2_b1": -3.125,
+    "synth_laser_s2_b1_v2": 9.375,
+    "synth_laser_s2_b1_v3": -4.6875,
+    "synth_laser_s2_b3": 3.125,
+    "synth_laser_s2_b3_v2": 4.6875,
+    "synth_laser_s2_b3_v3": 0.0,
+    "synth_laser_s3_b1": -1.5625,
+    "synth_laser_s3_b1_v2": 1.5625,
+    "synth_laser_s3_b1_v3": 1.5625,
+    "synth_laser_s4_b1": 6.25,
+    "synth_laser_s4_b1_v2": 3.125,
+    "synth_laser_s4_b1_v3": 0.0,
+    "synth_laser_s4_w10": 0.0,
+    "synth_laser_s4_w10_v2": -1.5625,
+    "synth_laser_s4_w10_v3": 0.0,
+    "synth_laser_s5_b1": -7.8125,
+    "synth_laser_s5_b1_v2": 6.25,
+    "synth_laser_s5_b1_v3": 0.0,
+    "synth_laser_s5_w05": 0.0,
+    "synth_laser_s5_w05_v2": -7.8125,
+    "synth_laser_s5_w05_v3": -1.5625,
+    "synth_laser_s6_b1": 1.5625,
+    "synth_laser_s6_b1_v2": 1.5625,
+    "synth_laser_s6_b1_v3": -1.5625,
+    "synth_laser_s7_b1": 0.0,
+    "synth_laser_s7_b1_v2": -12.5,
+    "synth_laser_s7_b1_v3": 0.0
+  },
+  "limitations": [
+    "One training seed per arm; no statistical significance claim.",
+    "Mixed synthetic cards were in training; this measures training-card capability, not held-out generalization.",
+    "CPU u3500 protocol is distinct from original GPU last-four-checkpoint average; do not combine their denominators."
+  ]
+}

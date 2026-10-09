@@ -1,0 +1,47 @@
+{
+  "protocol": "u3500, same fixed-follow original 13-card eval; motor on vs off; greedy actions",
+  "runs": {
+    "T7": {
+      "motor_on": {
+        "survival": 0.9375,
+        "key_presses_per_s": 4.843279331979326,
+        "dir_changes_per_s": 5.171745076538949,
+        "quick_frac": 0.04834621310551935,
+        "quick3_frac": 0.14568516248902047,
+        "motor_override_frac": 0.21770794291568335
+      },
+      "motor_off": {
+        "survival": 0.9543269230769231,
+        "key_presses_per_s": 14.853376613390187,
+        "dir_changes_per_s": 14.7842744797273,
+        "quick_frac": 0.7311275946823785,
+        "quick3_frac": 0.7986242702189285,
+        "motor_override_frac": 0.0
+      }
+    },
+    "T8": {
+      "motor_on": {
+        "survival": 0.9242788461538461,
+        "key_presses_per_s": 4.658744035234601,
+        "dir_changes_per_s": 4.76471344690458,
+        "quick_frac": 0.04504753587598975,
+        "quick3_frac": 0.14302939269340828,
+        "motor_override_frac": 0.21222861214448258
+      },
+      "motor_off": {
+        "survival": 0.9603365384615384,
+        "key_presses_per_s": 12.224722714070321,
+        "dir_changes_per_s": 11.532936399344806,
+        "quick_frac": 0.6522773746586654,
+        "quick3_frac": 0.7284181634981416,
+        "motor_override_frac": 0.0
+      }
+    }
+  },
+  "sources": {
+    "runs/job-bfd1c1cd62146a55/20261002-152220-t7-laser-k8/eval/3500.json": "1cbe1842633191035ea425129d79e0948f9e4458d3723805621ad49a03bac3f7",
+    "runs/job-bfd1c1cd62146a55/20261002-152220-t7-laser-k8/probe/motor_off.json": "c5398126b938c31023d575dc3b44946b8ec43f883dc7e5621f6c018eb17ad0a7",
+    "runs/job-28a4532abf792cc4/20261002-103401-t8-laser-k4/eval/3500.json": "e25327119f85b386bbca5b08847907b031bb76cf407f635829ddee202da9623c",
+    "runs/job-28a4532abf792cc4/20261002-103401-t8-laser-k4/probe/motor_off.json": "3fe4c874ff6839ced0db18203c51319be80e30edaacc06fdf151d865ceff1cbd"
+  }
+}
