@@ -37,7 +37,7 @@
 - [TH06NC模式与手动优先（2026-10-06）](../practice-cards/2026-10-06-th06nc-modes-manual-input.md) — 用户确认AUTO默认自由躲弹、按住左键引导，BYPASS沿用旧AUTO锚点/压力；两者保留自动射击与炸弹安全网；方向键立即接管全组移动/Shift状态，历史记最终动作；renkolab源码及新B/Shift模式包已更新，三项主机测试/交叉编译/入口导出检查通过，未实机/提交/推送
 - [密度图CNN消融与Perceiver计划（2026-10-08）](../superpowers/plans/2026-10-08-density-ablation-perceiver.md) — 用户认可同权重关CNN→配对训练→8-latent远场摘要；随后授权P1，CPU3968局完成：原作自由−1.44pp、跟点−2.64pp，专项自由−5.94pp，高密度自由持平/跟点+2.34pp；空图CNN有非零常量响应，不能把即时损失全归因于远场信息，见[结果](../practice-cards/2026-10-08-density-ablation-results.md)；P2/P3未启动、预算待确认，Sparse attention暂缓
 - [密度CNN配对适应P2准备（2026-10-08）](../practice-cards/2026-10-08-density-p2-preparation.md) — 用户授权准备GPU实验；两臂seed1/1000轮、真实最新B权重严格迁移、B跳过构图/缓存、u0与u1000三eval seed逐局评测、B2/1GPU32CPU参数和647文件快照已就绪；本地/旧CPU栈及真实源权重预检通过，CUDA验收待Job启动；未上传/提交/训练/推送，Perceiver未实施
-- [CNN配对适应u2000（2026-10-09）](../practice-cards/2026-10-09-density-p2-u2000.md) — 用户确认统一2000轮慢退火、并行两个新B2任务，并明确要求阶段性提交/推送后启动；固定u2000为主比较、u1000/u1500阶段诊断；按推送commit运行，仅传初始化数据，提交和启动证据见条目
+- [CNN配对适应u2000（2026-10-09）](../practice-cards/2026-10-09-density-p2-u2000.md) — 用户确认统一2000轮慢退火并授权阶段性提交/推送后并行启动；固定推送commit 2e26b25，仅传初始化数据；CNN efee48f5a6b9127d/无CNN d0b3a240f2628dcf均B2，启动检查GPUCHECK PASS且真实PPO连续更新；u2000主比较、u1000/u1500诊断与后台取回已安排，效果结论待训练/评测完成
 - [转写 worker 可换 Sonnet](transcribe-claude-worker-fallback.md) — DeepSeek 没余额就 STG_DSH_BIN=claude-worker；并发 4；dsh 审核必须配 opus 抽检
 
 ## 迁移说明
