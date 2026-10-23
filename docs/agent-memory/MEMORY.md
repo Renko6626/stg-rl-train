@@ -40,7 +40,7 @@
 - [CNN配对适应u2000（2026-10-09）](../practice-cards/2026-10-09-density-p2-u2000.md) — 用户确认统一2000轮慢退火并授权阶段性提交/推送后并行启动；固定推送commit 2e26b25，仅传初始化数据；CNN efee48f5a6b9127d/无CNN d0b3a240f2628dcf均B2，启动检查GPUCHECK PASS且真实PPO连续更新；两臂已完整完成/取回，16512局重算通过；无CNN原作自由+0.16pp/跟点+0.36pp、专项−5.21pp（瞄准卡−29.69pp）、自由Shift频率约2.28倍；阶段专项排序反转，单train seed，见[结果](../practice-cards/2026-10-10-density-p2-u2000-results.md)
 - [转写 worker 可换 Sonnet](transcribe-claude-worker-fallback.md) — DeepSeek 没余额就 STG_DSH_BIN=claude-worker；并发 4；dsh 审核必须配 opus 抽检
 
-- [现代 ECL 独立导入原型（2026-10-23）](modern-ecl-import-prototype.md) — 独立解析器；随后用户确认可读源码、label/goto与简单if/for/while恢复，已实现并对拍；时钟用局部base降低，浮点/EX2仍有差异，未收卡或升级wheel
+- [现代 ECL 独立导入原型（2026-10-23）](modern-ecl-import-prototype.md) — 源码路径与label/goto已推送；当前仅13/798可生成、4个实质攻击，Luna/high抽查限于已声明近似，训练未就绪；已记录局限和恢复优先级，会话暂告结束
 
 ## 迁移说明
 
