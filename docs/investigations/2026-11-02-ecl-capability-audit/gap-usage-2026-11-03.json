@@ -1,0 +1,1080 @@
+{
+  "date": "2026-11-03",
+  "scope": "TH18 local v1.00a, all ranks and static paths; sites/subs are not distinct attacks or dynamic executions",
+  "files": [
+    {
+      "file": "default.ecl",
+      "sha256": "d8b28f940d6c4adb79f1e7ea2760dfff8ab1bd1489c67a939bab6563c1062d90",
+      "subs": 30
+    },
+    {
+      "file": "st01.ecl",
+      "sha256": "ce83a46483852869abcbaeca77a69ff6a60556bccfd8058b932026164bf7353f",
+      "subs": 83
+    },
+    {
+      "file": "st01bs.ecl",
+      "sha256": "34b20b4d71caa8ce5922ec82829c0db55734ff2ce1d7e8c771912f8e9bed7ecb",
+      "subs": 17
+    },
+    {
+      "file": "st01mbs.ecl",
+      "sha256": "e8697ef8e572a90e1535119d8eb905ab3b854003d2237172d4d4fc0fd7f2acf0",
+      "subs": 6
+    },
+    {
+      "file": "st02.ecl",
+      "sha256": "24c64cf3d82d781d3023c8bc3b600e8b8ae338b9fa26d5dcf52fa046f320fc04",
+      "subs": 77
+    },
+    {
+      "file": "st02bs.ecl",
+      "sha256": "a5d97329777c193f0411fdad7d07aa6fb6509e8dc893ddef7a8b60897518fa4c",
+      "subs": 22
+    },
+    {
+      "file": "st02mbs.ecl",
+      "sha256": "788278124dbc3af393f83f0d324bcd705c8d52d0d99a5313796c4ae4e2a5294a",
+      "subs": 7
+    },
+    {
+      "file": "st03.ecl",
+      "sha256": "fe0bf1c51fc1cf09d464696a8e8cd9a1f3c4cc9651fd7c27e2cb0d1696877ec4",
+      "subs": 68
+    },
+    {
+      "file": "st03bs.ecl",
+      "sha256": "19e1c78f683a1031b347ad979d85a632891236290906de5ac2f30dc5d655f53c",
+      "subs": 26
+    },
+    {
+      "file": "st03mbs.ecl",
+      "sha256": "e48197136a335b1fecd16e2ce7e1fd90870fa1541b8664a999ffadd2935ea0dd",
+      "subs": 5
+    },
+    {
+      "file": "st04.ecl",
+      "sha256": "8a0661f113c738157143d5cbcd6a59c46e6d4ced500c766dbcb069954a2231d6",
+      "subs": 41
+    },
+    {
+      "file": "st04bs.ecl",
+      "sha256": "ccfcf785754e77d3092d59c93797af4546ec539f7089d5d097fdc423ec319938",
+      "subs": 22
+    },
+    {
+      "file": "st04mbs.ecl",
+      "sha256": "d108d704e3913c0eab4dbba5c3c03f404943d7d9823a0efbc4a05b6943b9e1d3",
+      "subs": 6
+    },
+    {
+      "file": "st05.ecl",
+      "sha256": "fb68555b8195fe933231fc8c8542f1d18abb7011bb18a132a22da24868013ab4",
+      "subs": 76
+    },
+    {
+      "file": "st05bs.ecl",
+      "sha256": "d7455ad659f2456bb01934bec7bfd301a9eebb667b4189201690a394eaf598de",
+      "subs": 23
+    },
+    {
+      "file": "st05mbs.ecl",
+      "sha256": "64df8f391ebc7753d048b19d86c1c72f9fd32d6757668bf8b6c2f4c8f6fbc9fc",
+      "subs": 5
+    },
+    {
+      "file": "st06.ecl",
+      "sha256": "5ac80073b2d9f60e438a01917c8cc2e25db6a60033e6f0ae14c1a586139b615a",
+      "subs": 61
+    },
+    {
+      "file": "st06bs.ecl",
+      "sha256": "27b40f4f81e57dd1cd5e60599f6098e7b3c235e8a2082f08784c47cb8f623e48",
+      "subs": 43
+    },
+    {
+      "file": "st06mbs.ecl",
+      "sha256": "f1b2e6e207abf5a5af5d238f4ad1aca99a1e8ba718f1a52895fe42be20d49a93",
+      "subs": 5
+    },
+    {
+      "file": "st07.ecl",
+      "sha256": "0df4cd502fb14d4200cf31837a5a5393085a44b17c015b43b380fa560a8eed3b",
+      "subs": 87
+    },
+    {
+      "file": "st07bs.ecl",
+      "sha256": "5d069da9044778f236bde92c7fef10965c6bfef2d29b7fbe5e4626a22219694a",
+      "subs": 75
+    },
+    {
+      "file": "st07mbs.ecl",
+      "sha256": "4a908cbc95926dd364dd9611f0126a862db84549a5abeb9a03b7108bcfc425fc",
+      "subs": 13
+    }
+  ],
+  "file_count": 22,
+  "sub_count": 798,
+  "selected_usage": {
+    "ex_type_0x8": {
+      "sites": 80,
+      "subs": [
+        "st01bs::Boss1_at_et",
+        "st01bs::Boss2_at_et",
+        "st01bs::BossCard2_at_et",
+        "st01mbs::MBoss1_at",
+        "st02bs::Boss1_at",
+        "st02bs::Boss2_at",
+        "st02bs::BossCard1_at",
+        "st02bs::BossCard2_at",
+        "st02bs::BossCard3_at",
+        "st02mbs::MBoss1_at",
+        "st04::GirlC01_at",
+        "st04::GirlC01_at2",
+        "st04::GirlD01_at",
+        "st04::GirlD01_at2",
+        "st04::GirlD02_at",
+        "st04::GirlD02_at2",
+        "st04bs::Boss1_at",
+        "st04bs::Boss2_at",
+        "st04bs::Boss3_at",
+        "st04bs::BossCard1_at",
+        "st04bs::BossCard3_at2",
+        "st06::GirlC01_at",
+        "st07::GirlC01_at",
+        "st07::GirlD02_at",
+        "st07::GirlD02_at2",
+        "st07::GirlD03_at",
+        "st07::GirlD03_at2",
+        "st07bs::Boss2_at",
+        "st07bs::Boss3_at",
+        "st07bs::Boss4_at",
+        "st07bs::Boss5_at",
+        "st07bs::Boss6_at",
+        "st07bs::Boss7_at",
+        "st07bs::Boss8_at",
+        "st07bs::BossCard10_at2b",
+        "st07bs::BossCard10_at3b",
+        "st07bs::BossCard10_at4b",
+        "st07bs::BossCard10_at5b",
+        "st07bs::BossCard10_atb",
+        "st07bs::BossCard1_at",
+        "st07bs::BossCard3_at",
+        "st07bs::BossCard7_at",
+        "st07bs::Boss_at1"
+      ],
+      "examples": [
+        {
+          "sub": "st01bs::Boss1_at_et",
+          "opcode": 611,
+          "decoded_line": 213,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st01bs::Boss2_at_et",
+          "opcode": 611,
+          "decoded_line": 404,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st01bs::BossCard2_at_et",
+          "opcode": 611,
+          "decoded_line": 953,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st01mbs::MBoss1_at",
+          "opcode": 611,
+          "decoded_line": 119,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st02bs::Boss1_at",
+          "opcode": 611,
+          "decoded_line": 129,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st02bs::Boss2_at",
+          "opcode": 611,
+          "decoded_line": 301,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st02bs::BossCard1_at",
+          "opcode": 611,
+          "decoded_line": 591,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st02bs::BossCard2_at",
+          "opcode": 609,
+          "decoded_line": 726,
+          "dynamic_parameter_positions": []
+        }
+      ],
+      "sub_count": 43
+    },
+    "ex_dynamic_params_0x8": {
+      "sites": 65,
+      "subs": [
+        "st01bs::Boss1_at_et",
+        "st01bs::Boss2_at_et",
+        "st01bs::BossCard2_at_et",
+        "st01mbs::MBoss1_at",
+        "st02bs::Boss1_at",
+        "st02bs::Boss2_at",
+        "st02bs::BossCard1_at",
+        "st02bs::BossCard2_at",
+        "st02bs::BossCard3_at",
+        "st02mbs::MBoss1_at",
+        "st04::GirlC01_at",
+        "st04::GirlC01_at2",
+        "st04bs::BossCard3_at2",
+        "st06::GirlC01_at",
+        "st07::GirlD02_at",
+        "st07::GirlD02_at2",
+        "st07::GirlD03_at",
+        "st07::GirlD03_at2",
+        "st07bs::Boss2_at",
+        "st07bs::Boss3_at",
+        "st07bs::Boss4_at",
+        "st07bs::Boss5_at",
+        "st07bs::Boss6_at",
+        "st07bs::Boss7_at",
+        "st07bs::Boss8_at",
+        "st07bs::BossCard10_at2b",
+        "st07bs::BossCard10_at3b",
+        "st07bs::BossCard10_at4b",
+        "st07bs::BossCard10_at5b",
+        "st07bs::BossCard10_atb",
+        "st07bs::BossCard1_at",
+        "st07bs::BossCard3_at",
+        "st07bs::BossCard7_at",
+        "st07bs::Boss_at1"
+      ],
+      "examples": [
+        {
+          "sub": "st01bs::Boss1_at_et",
+          "opcode": 611,
+          "decoded_line": 213,
+          "dynamic_parameter_positions": [
+            5,
+            6
+          ]
+        },
+        {
+          "sub": "st01bs::Boss2_at_et",
+          "opcode": 611,
+          "decoded_line": 404,
+          "dynamic_parameter_positions": [
+            5,
+            6
+          ]
+        },
+        {
+          "sub": "st01bs::BossCard2_at_et",
+          "opcode": 611,
+          "decoded_line": 953,
+          "dynamic_parameter_positions": [
+            5,
+            6
+          ]
+        },
+        {
+          "sub": "st01mbs::MBoss1_at",
+          "opcode": 611,
+          "decoded_line": 119,
+          "dynamic_parameter_positions": [
+            5,
+            6
+          ]
+        },
+        {
+          "sub": "st02bs::Boss1_at",
+          "opcode": 611,
+          "decoded_line": 129,
+          "dynamic_parameter_positions": [
+            6
+          ]
+        },
+        {
+          "sub": "st02bs::Boss2_at",
+          "opcode": 611,
+          "decoded_line": 301,
+          "dynamic_parameter_positions": [
+            6
+          ]
+        },
+        {
+          "sub": "st02bs::BossCard1_at",
+          "opcode": 611,
+          "decoded_line": 591,
+          "dynamic_parameter_positions": [
+            6
+          ]
+        },
+        {
+          "sub": "st02bs::BossCard2_at",
+          "opcode": 609,
+          "decoded_line": 726,
+          "dynamic_parameter_positions": [
+            4
+          ]
+        }
+      ],
+      "sub_count": 34
+    },
+    "ex8_dynamic_accel_or_angular_velocity": {
+      "sites": 61,
+      "subs": [
+        "st01bs::Boss1_at_et",
+        "st01bs::Boss2_at_et",
+        "st01bs::BossCard2_at_et",
+        "st01mbs::MBoss1_at",
+        "st02bs::Boss1_at",
+        "st02bs::Boss2_at",
+        "st02bs::BossCard1_at",
+        "st02bs::BossCard3_at",
+        "st02mbs::MBoss1_at",
+        "st04::GirlC01_at",
+        "st04::GirlC01_at2",
+        "st04bs::BossCard3_at2",
+        "st06::GirlC01_at",
+        "st07::GirlD02_at",
+        "st07::GirlD02_at2",
+        "st07::GirlD03_at",
+        "st07::GirlD03_at2",
+        "st07bs::Boss2_at",
+        "st07bs::Boss3_at",
+        "st07bs::Boss4_at",
+        "st07bs::Boss5_at",
+        "st07bs::Boss6_at",
+        "st07bs::Boss7_at",
+        "st07bs::Boss8_at",
+        "st07bs::BossCard10_at2b",
+        "st07bs::BossCard10_at3b",
+        "st07bs::BossCard10_at4b",
+        "st07bs::BossCard10_at5b",
+        "st07bs::BossCard10_atb",
+        "st07bs::BossCard1_at",
+        "st07bs::BossCard3_at",
+        "st07bs::BossCard7_at",
+        "st07bs::Boss_at1"
+      ],
+      "examples": [
+        {
+          "sub": "st01bs::Boss1_at_et",
+          "opcode": 611,
+          "decoded_line": 213,
+          "dynamic_parameter_positions": [
+            5,
+            6
+          ]
+        },
+        {
+          "sub": "st01bs::Boss2_at_et",
+          "opcode": 611,
+          "decoded_line": 404,
+          "dynamic_parameter_positions": [
+            5,
+            6
+          ]
+        },
+        {
+          "sub": "st01bs::BossCard2_at_et",
+          "opcode": 611,
+          "decoded_line": 953,
+          "dynamic_parameter_positions": [
+            5,
+            6
+          ]
+        },
+        {
+          "sub": "st01mbs::MBoss1_at",
+          "opcode": 611,
+          "decoded_line": 119,
+          "dynamic_parameter_positions": [
+            5,
+            6
+          ]
+        },
+        {
+          "sub": "st02bs::Boss1_at",
+          "opcode": 611,
+          "decoded_line": 129,
+          "dynamic_parameter_positions": [
+            6
+          ]
+        },
+        {
+          "sub": "st02bs::Boss2_at",
+          "opcode": 611,
+          "decoded_line": 301,
+          "dynamic_parameter_positions": [
+            6
+          ]
+        },
+        {
+          "sub": "st02bs::BossCard1_at",
+          "opcode": 611,
+          "decoded_line": 591,
+          "dynamic_parameter_positions": [
+            6
+          ]
+        },
+        {
+          "sub": "st02bs::BossCard3_at",
+          "opcode": 609,
+          "decoded_line": 1015,
+          "dynamic_parameter_positions": [
+            7
+          ]
+        }
+      ],
+      "sub_count": 33
+    },
+    "ex_type_0x2": {
+      "sites": 262,
+      "subs": [
+        "default::DeadAttackEt1",
+        "default::ItemCarryLilyAt0",
+        "default::ItemCarryLilyAt1",
+        "default::ItemCarryLilyAt2",
+        "default::ItemCarryLilyAt3",
+        "default::ItemCarryLilyAt4",
+        "st01::Cir00Dead",
+        "st01::Cir00_at",
+        "st01::Cir00b_at",
+        "st01::Cir01_at",
+        "st01::Cir02_at",
+        "st01::Cir03_at",
+        "st01::GirlA01_at",
+        "st01::GirlA01_at_l",
+        "st01::GirlA02_at",
+        "st01::GirlA03_at",
+        "st01::GirlA03_at_l",
+        "st01::GirlB01_at",
+        "st01::GirlB01_at2",
+        "st01::GirlB02_at",
+        "st01::GirlC01_at",
+        "st01::GirlC02_at",
+        "st01::GirlD01_at",
+        "st01::GirlD01_at2",
+        "st01::GirlD02_at",
+        "st01::GirlD02_at2",
+        "st01::Phantom01_at",
+        "st01::Phantom02_at",
+        "st01::testFunc",
+        "st01bs::Boss1_at_et",
+        "st01bs::Boss2_at_et",
+        "st01bs::BossCard1_at",
+        "st01bs::BossCard1_at2",
+        "st01bs::BossCard2_at2",
+        "st01bs::BossCard2_at_et",
+        "st01mbs::MBoss1_at",
+        "st01mbs::MBoss1_at2",
+        "st02::Cir00_at",
+        "st02::Cir01_at",
+        "st02::GirlA01_at",
+        "st02::GirlA01_at_l",
+        "st02::GirlA02_at",
+        "st02::GirlA02_at_l",
+        "st02::GirlA03_at",
+        "st02::GirlA03_at_l",
+        "st02::GirlB01_at",
+        "st02::GirlB02_at",
+        "st02::GirlC01_at",
+        "st02::GirlD01_at",
+        "st02::GirlD02_at",
+        "st02::GirlD03_at",
+        "st02::Phantom01_at",
+        "st02::Phantom01b_at",
+        "st02::Phantom01c_at",
+        "st02::Phantom01d_at",
+        "st02::Phantom02_at",
+        "st02::Phantom02b_at",
+        "st02::testFunc",
+        "st02bs::Boss1_at",
+        "st02bs::Boss1_at2b",
+        "st02bs::Boss2_at",
+        "st02bs::Boss2_at2b",
+        "st02bs::BossCard1_at",
+        "st02bs::BossCard2_at",
+        "st02bs::BossCard2_at2b",
+        "st02bs::BossCard3_at",
+        "st02bs::BossCard3_at2b",
+        "st02mbs::MBoss1_at",
+        "st02mbs::MBoss1_at2b",
+        "st03::Cir00_at",
+        "st03::GirlA01_at",
+        "st03::GirlA01_at_l",
+        "st03::GirlA02_at",
+        "st03::GirlA02_at_l",
+        "st03::GirlA03_at",
+        "st03::GirlA03_at_l",
+        "st03::GirlB01_at",
+        "st03::GirlB02_at",
+        "st03::GirlC01_at",
+        "st03::GirlD01_at",
+        "st03::GirlD02_at",
+        "st03::Phantom01_at",
+        "st03::Phantom01c_at",
+        "st03::Phantom01d_at",
+        "st03::Phantom02_at",
+        "st03::Phantom02b_at",
+        "st03::testFunc",
+        "st03bs::Boss1_at",
+        "st03bs::Boss1_at2",
+        "st03bs::Boss2_at",
+        "st03bs::Boss2_at2",
+        "st03bs::Boss3_at",
+        "st03bs::Boss3_at2",
+        "st03bs::BossCard1_at",
+        "st03bs::BossCard2_at2a",
+        "st03bs::BossCard2_at2b",
+        "st03bs::BossCard3_at",
+        "st03bs::BossCard3_at2b",
+        "st03bs::BossPhantom01DeadAt_at",
+        "st03bs::BossPhantom01_at",
+        "st03mbs::MBoss1_at",
+        "st04::Cir00_at",
+        "st04::Cir01_at",
+        "st04::Cir02_at",
+        "st04::Cir03_at",
+        "st04::GirlC01_at",
+        "st04::GirlC01_at2",
+        "st04::GirlD01_at",
+        "st04::GirlD01_at2",
+        "st04::GirlD02_at",
+        "st04::GirlD02_at2",
+        "st04::Phantom01_at",
+        "st04::Phantom01_atb",
+        "st04::testFunc",
+        "st04bs::Boss1_at",
+        "st04bs::Boss1_at2",
+        "st04bs::Boss1_at3",
+        "st04bs::Boss2_at",
+        "st04bs::Boss2_at2",
+        "st04bs::Boss2_at3",
+        "st04bs::Boss3_at",
+        "st04bs::Boss3_at2",
+        "st04bs::Boss3_at3",
+        "st04bs::BossCard1_at",
+        "st04bs::BossCard2_at",
+        "st04bs::BossCard3_at",
+        "st04bs::BossCard3_at2",
+        "st04mbs::MBoss1_at",
+        "st04mbs::MBoss1_at2",
+        "st05::Cir00_at",
+        "st05::Cir01_at",
+        "st05::GirlA01_at",
+        "st05::GirlA01_at_l",
+        "st05::GirlA02_at",
+        "st05::GirlA03_at",
+        "st05::GirlB01_at",
+        "st05::GirlB02_at",
+        "st05::GirlC01_at",
+        "st05::GirlD01_at",
+        "st05::GirlD01_at2",
+        "st05::GirlD02_at",
+        "st05::GirlD03_at",
+        "st05::GirlD03_at2",
+        "st05::Phantom01_at",
+        "st05::Phantom01b_at",
+        "st05::Phantom01c_at",
+        "st05::Phantom01d_at",
+        "st05::Phantom02_at",
+        "st05::Phantom02b_at",
+        "st05::Phantom03_at",
+        "st05::testFunc",
+        "st05bs::Boss1_at",
+        "st05bs::Boss2_at",
+        "st05bs::BossCard1_at",
+        "st05bs::BossCard4_at2",
+        "st05mbs::MBoss1_at",
+        "st06::ECir00DeadAttackEt1",
+        "st06::ECir00_at",
+        "st06::ECir01DeadAttackEt1",
+        "st06::ECir01_at",
+        "st06::ECir02DeadAttackEt1",
+        "st06::ECir02_at",
+        "st06::GirlA01_at",
+        "st06::GirlA02_at",
+        "st06::GirlA03_at",
+        "st06::GirlA04_at",
+        "st06::GirlA05_at",
+        "st06::GirlA06_at",
+        "st06::GirlB01_at",
+        "st06::GirlC01_at",
+        "st06::GirlD01_at2",
+        "st06::Phantom01_at",
+        "st06::Phantom02_at",
+        "st06::testFunc",
+        "st06bs::Boss1Card_at",
+        "st06bs::Boss1Card_at2",
+        "st06bs::Boss1_at",
+        "st06bs::BossCard2_at",
+        "st06bs::BossCard2_at2",
+        "st06bs::BossCard3_at",
+        "st06bs::BossCard3_at2",
+        "st06bs::BossCard4_at",
+        "st06bs::BossCard5_at",
+        "st06bs::BossCard6_at",
+        "st06bs::BossCard6_at_b",
+        "st06bs::BossCard6_at_c",
+        "st06bs::BossCard6_at_d",
+        "st06mbs::MBoss1_at",
+        "st07::Cir00_at",
+        "st07::Cir01_at",
+        "st07::Cir02_at",
+        "st07::Cir03_at",
+        "st07::Cir04_at",
+        "st07::GirlA01_at",
+        "st07::GirlA02_at",
+        "st07::GirlA02_at_l",
+        "st07::GirlA03_at",
+        "st07::GirlA03_at_l",
+        "st07::GirlB01_at",
+        "st07::GirlB02_at",
+        "st07::GirlC01_at",
+        "st07::GirlD01_at",
+        "st07::GirlD01_at2",
+        "st07::GirlD02_at",
+        "st07::GirlD02_at2",
+        "st07::GirlD03_at",
+        "st07::GirlD03_at2",
+        "st07::Phantom01_at",
+        "st07::Phantom01c_at",
+        "st07::Phantom01d_at",
+        "st07::Phantom02_at",
+        "st07::Phantom02b_at",
+        "st07::Phantom03_at",
+        "st07::testFunc",
+        "st07bs::Boss1_at",
+        "st07bs::Boss2_at",
+        "st07bs::Boss3_at",
+        "st07bs::Boss4_at",
+        "st07bs::Boss5_at",
+        "st07bs::Boss6_at",
+        "st07bs::Boss7_at",
+        "st07bs::Boss8_at",
+        "st07bs::BossCard10_at2b",
+        "st07bs::BossCard10_at3b",
+        "st07bs::BossCard10_at4b",
+        "st07bs::BossCard10_at5b",
+        "st07bs::BossCard10_atb",
+        "st07bs::BossCard1_at",
+        "st07bs::BossCard2_at",
+        "st07bs::BossCard3_at2",
+        "st07bs::BossCard4_at",
+        "st07bs::BossCard5_at",
+        "st07bs::BossCard6_at2",
+        "st07bs::BossCard7_at",
+        "st07bs::BossCard8_et",
+        "st07bs::BossCard9_at",
+        "st07bs::BossCard9_at2",
+        "st07bs::Boss_at1",
+        "st07mbs::MBoss1_at",
+        "st07mbs::MBossCard3_at"
+      ],
+      "examples": [
+        {
+          "sub": "default::DeadAttackEt1",
+          "opcode": 609,
+          "decoded_line": 108,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "default::ItemCarryLilyAt0",
+          "opcode": 609,
+          "decoded_line": 449,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "default::ItemCarryLilyAt1",
+          "opcode": 609,
+          "decoded_line": 473,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "default::ItemCarryLilyAt2",
+          "opcode": 609,
+          "decoded_line": 497,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "default::ItemCarryLilyAt3",
+          "opcode": 609,
+          "decoded_line": 521,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "default::ItemCarryLilyAt4",
+          "opcode": 609,
+          "decoded_line": 545,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st01::Cir00Dead",
+          "opcode": 611,
+          "decoded_line": 14,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st01::Cir00_at",
+          "opcode": 611,
+          "decoded_line": 62,
+          "dynamic_parameter_positions": []
+        }
+      ],
+      "sub_count": 240
+    },
+    "ex_type_0x400000": {
+      "sites": 14,
+      "subs": [
+        "st02bs::BossCard3_at2b",
+        "st03bs::BossCard3_at2b",
+        "st07bs::BossCard5_et",
+        "st07bs::BossCard6_et",
+        "st07bs::BossCard6_et2",
+        "st07bs::BossCard9_at2",
+        "st07mbs::MBossCard3_at"
+      ],
+      "examples": [
+        {
+          "sub": "st02bs::BossCard3_at2b",
+          "opcode": 611,
+          "decoded_line": 1073,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st02bs::BossCard3_at2b",
+          "opcode": 611,
+          "decoded_line": 1084,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st03bs::BossCard3_at2b",
+          "opcode": 611,
+          "decoded_line": 1258,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st03bs::BossCard3_at2b",
+          "opcode": 611,
+          "decoded_line": 1269,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st07bs::BossCard5_et",
+          "opcode": 611,
+          "decoded_line": 2334,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st07bs::BossCard5_et",
+          "opcode": 611,
+          "decoded_line": 2335,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st07bs::BossCard5_et",
+          "opcode": 611,
+          "decoded_line": 2359,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st07bs::BossCard6_et",
+          "opcode": 611,
+          "decoded_line": 2675,
+          "dynamic_parameter_positions": []
+        }
+      ],
+      "sub_count": 7
+    },
+    "opcode_700": {
+      "sites": 10,
+      "subs": [
+        "st03bs::BossCard2_at2b",
+        "st05bs::BossCard2_at",
+        "st05bs::BossCard4_at",
+        "st07bs::BossCard3_at",
+        "st07bs::BossCard6_at",
+        "st07bs::BossCard6_at3",
+        "st07bs::BossCard7_at",
+        "st07mbs::MBossCard2_at2"
+      ],
+      "examples": [
+        {
+          "sub": "st03bs::BossCard2_at2b",
+          "opcode": 700,
+          "decoded_line": 1009,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st05bs::BossCard2_at",
+          "opcode": 700,
+          "decoded_line": 1046,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st05bs::BossCard4_at",
+          "opcode": 700,
+          "decoded_line": 1441,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st07bs::BossCard3_at",
+          "opcode": 700,
+          "decoded_line": 1884,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st07bs::BossCard6_at",
+          "opcode": 700,
+          "decoded_line": 2488,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st07bs::BossCard6_at3",
+          "opcode": 700,
+          "decoded_line": 2632,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st07bs::BossCard7_at",
+          "opcode": 700,
+          "decoded_line": 2859,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st07bs::BossCard7_at",
+          "opcode": 700,
+          "decoded_line": 2899,
+          "dynamic_parameter_positions": []
+        }
+      ],
+      "sub_count": 8
+    },
+    "opcode_701": {
+      "sites": 7,
+      "subs": [
+        "st05bs::BossCard2_at",
+        "st05bs::BossCard4_at",
+        "st07bs::BossCard3_at",
+        "st07bs::BossCard6_at",
+        "st07bs::BossCard7_at"
+      ],
+      "examples": [
+        {
+          "sub": "st05bs::BossCard2_at",
+          "opcode": 701,
+          "decoded_line": 1056,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st05bs::BossCard4_at",
+          "opcode": 701,
+          "decoded_line": 1442,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st07bs::BossCard3_at",
+          "opcode": 701,
+          "decoded_line": 1885,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st07bs::BossCard6_at",
+          "opcode": 701,
+          "decoded_line": 2489,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st07bs::BossCard7_at",
+          "opcode": 701,
+          "decoded_line": 2860,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st07bs::BossCard7_at",
+          "opcode": 701,
+          "decoded_line": 2900,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st07bs::BossCard7_at",
+          "opcode": 701,
+          "decoded_line": 2940,
+          "dynamic_parameter_positions": []
+        }
+      ],
+      "sub_count": 5
+    },
+    "opcode_702": {
+      "sites": 3,
+      "subs": [
+        "st03bs::BossCard2_at2b",
+        "st07bs::BossCard6_at3",
+        "st07mbs::MBossCard2_at2"
+      ],
+      "examples": [
+        {
+          "sub": "st03bs::BossCard2_at2b",
+          "opcode": 702,
+          "decoded_line": 1033,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st07bs::BossCard6_at3",
+          "opcode": 702,
+          "decoded_line": 2655,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st07mbs::MBossCard2_at2",
+          "opcode": 702,
+          "decoded_line": 376,
+          "dynamic_parameter_positions": []
+        }
+      ],
+      "sub_count": 3
+    },
+    "opcode_703": {
+      "sites": 7,
+      "subs": [
+        "st05bs::BossCard2_at",
+        "st05bs::BossCard4_at",
+        "st07bs::BossCard6_at"
+      ],
+      "examples": [
+        {
+          "sub": "st05bs::BossCard2_at",
+          "opcode": 703,
+          "decoded_line": 1058,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st05bs::BossCard4_at",
+          "opcode": 703,
+          "decoded_line": 1444,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st07bs::BossCard6_at",
+          "opcode": 703,
+          "decoded_line": 2502,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st07bs::BossCard6_at",
+          "opcode": 703,
+          "decoded_line": 2511,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st07bs::BossCard6_at",
+          "opcode": 703,
+          "decoded_line": 2520,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st07bs::BossCard6_at",
+          "opcode": 703,
+          "decoded_line": 2529,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st07bs::BossCard6_at",
+          "opcode": 703,
+          "decoded_line": 2538,
+          "dynamic_parameter_positions": []
+        }
+      ],
+      "sub_count": 3
+    },
+    "opcode_711": {
+      "sites": 2,
+      "subs": [
+        "st07bs::BossCard3_at",
+        "st07bs::BossCard7_at"
+      ],
+      "examples": [
+        {
+          "sub": "st07bs::BossCard3_at",
+          "opcode": 711,
+          "decoded_line": 1936,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st07bs::BossCard7_at",
+          "opcode": 711,
+          "decoded_line": 3021,
+          "dynamic_parameter_positions": []
+        }
+      ],
+      "sub_count": 2
+    },
+    "opcode_547": {
+      "sites": 2,
+      "subs": [
+        "st07bs::BossDead"
+      ],
+      "examples": [
+        {
+          "sub": "st07bs::BossDead",
+          "opcode": 547,
+          "decoded_line": 3496,
+          "dynamic_parameter_positions": []
+        },
+        {
+          "sub": "st07bs::BossDead",
+          "opcode": 547,
+          "decoded_line": 3498,
+          "dynamic_parameter_positions": []
+        }
+      ],
+      "sub_count": 1
+    }
+  },
+  "absent_opcodes_in_scan": [
+    24,
+    707
+  ],
+  "limits": [
+    "Static all-rank/source-path counts, not independent attacks or dynamic calls.",
+    "A referenced operand may still be constant after caller analysis.",
+    "No bullet-task peak count or native equivalence run."
+  ],
+  "evidence_inputs": [
+    {
+      "path": "/data/sunyunbo/www/stg-rl-train/tools/th18-import-prototype/parser.py",
+      "sha256": "9d7dd2d35f817bb1d676a0ddc596c8acd89b9bf292f8c010606e1b2f3a1db1f5"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-rl-train/tools/th18-import-prototype/compile.py",
+      "sha256": "901cf03cf8445c721ddde9e5378dd246b705482b9d2e7e024d059a2d0e90cae9"
+    },
+    {
+      "path": "/tmp/sunyunbo/ecl-gap-usage-20261103.py",
+      "sha256": "1a4412fa60bb8f797312e3647c4a80e417dc58a2116d018f36d573a8da064f89"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/task.rs",
+      "sha256": "2c1b74caf6b8c8ce2ecbe80897afe042935a7dca65ae485d367fe1ced6c9998e"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/bullet.rs",
+      "sha256": "71c52c48f5a10cce5e4833fa19bbcfffded23eb91d394e6f46e6ee250ac2d764"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-ecl-compiler/src/lang/codegen.rs",
+      "sha256": "c717fa34a6be6707eb5803d19e63ee449091998dfa5d65ba7c94eb3dcd23571a"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/lasers.rs",
+      "sha256": "2af01b1003a891440b1cf35de38d90636c30e4bed00f344f16abf8c27a6de268"
+    }
+  ]
+}

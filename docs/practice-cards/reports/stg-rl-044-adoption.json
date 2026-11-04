@@ -1,0 +1,177 @@
+{
+  "source_base_commit": "07058f3086811a8326307cad2e9423024adc531d",
+  "source_archive_sha256": "4511c282c336e1d021548001d6739dc8553d49f4adfa934d3f84d640ec6ba580",
+  "source_patch_sha256": "d1bcbae87e51bd0878b50f145f4f3bb3510492c4372dd0cc0c6571d7e259f41b",
+  "source_patch_scope": "git diff --binary 07058f3086811a8326307cad2e9423024adc531d 2f24d8628231126b01f3025b065117c9013a4934 -- crates; identical to reviewed source patch used for wheel build",
+  "packaging_version": "0.4.4",
+  "engine_ver": 30,
+  "packaging_changes": "Snapshot-only stg-py Cargo.toml and pyproject.toml version 0.4.1 -> 0.4.4; generated Cargo.lock follows packaging version.",
+  "date": "2026-11-04",
+  "wheel": "stg_rl-0.4.4-cp310-abi3-manylinux_2_34_x86_64.whl",
+  "wheel_sha256": "86d661e6c1f5158afce6691adfe4108c3288d89ef7d222f499d20bb81d1fe631",
+  "build_info": {
+    "tables_hash": "37a7ff12fe40e24e",
+    "version": "0.4.4",
+    "git_sha": "unknown",
+    "engine_ver": "30"
+  },
+  "build_info_note": "git_sha unknown because exported source snapshot has no Git metadata; exact base+patch identity recorded above",
+  "local_python": "3.12.13",
+  "staged_rand_probe": {
+    "build_info": {
+      "tables_hash": "37a7ff12fe40e24e",
+      "engine_ver": "30",
+      "git_sha": "unknown",
+      "version": "0.4.4"
+    },
+    "normal_rand_reference_raw_speeds": [
+      65536,
+      65536,
+      327680,
+      131072,
+      262144
+    ],
+    "staged_rand_raw_speeds": {
+      "binding": [
+        65536,
+        65536
+      ],
+      "spawn": [
+        65536,
+        327680
+      ],
+      "effect": [
+        131072,
+        262144
+      ]
+    },
+    "all_stage_values_match_normal_script_rng": true
+  },
+  "equivalence_replay": {
+    "baseline_version": "0.4.3",
+    "new_version": "0.4.4",
+    "envs": 4,
+    "threads": 2,
+    "steps_per_case": 600,
+    "explicit_reset_at": 333,
+    "max_frames": 200,
+    "seed": 17,
+    "actions_seed": 91,
+    "all_buffer_bytes_and_start_indices_equal": true,
+    "cases": [
+      {
+        "density": 3,
+        "cap": 1,
+        "steps": 600,
+        "max_observed_rows": 1,
+        "sha256": "1aa942bdecf4dcfc0b91d7442f18a6673ee0e4476c4c4e5310efcffdc21be681"
+      },
+      {
+        "density": 3,
+        "cap": 64,
+        "steps": 600,
+        "max_observed_rows": 64,
+        "sha256": "2836147d196fdf48461bf14f2902234fb923fb0ed55efb35e26a22498d219434"
+      },
+      {
+        "density": 3,
+        "cap": 1024,
+        "steps": 600,
+        "max_observed_rows": 343,
+        "sha256": "1e3e2e70db5a116d8bf0f163ee02c9b1ca973f977c987147b48332956c00612e"
+      },
+      {
+        "density": 12,
+        "cap": 1,
+        "steps": 600,
+        "max_observed_rows": 1,
+        "sha256": "f7fbed2883522cf03eb18cabe00772f43c04284cf0b32c000e9c84c060a19253"
+      },
+      {
+        "density": 12,
+        "cap": 64,
+        "steps": 600,
+        "max_observed_rows": 64,
+        "sha256": "c36e51c16bdba953b9da0bb61fe3f393bac6e2db08a6373019d7dd80800dd83f"
+      },
+      {
+        "density": 12,
+        "cap": 1024,
+        "steps": 600,
+        "max_observed_rows": 1024,
+        "sha256": "d2259b19e9575e3b611372171933c633ec9368d1ca8db53c7a9d2ed6d414e1c6"
+      }
+    ],
+    "scope": "Two existing dense workloads x three bullet caps; not an exhaustive original-card comparison"
+  },
+  "golden": {
+    "command": "target/release/stg-harness golden --out <file>, before and after implementation",
+    "three_scenes_byte_equal": true,
+    "sha256": "24d2e24f67c5f01e55029586fef81951ed6faee807b83889ce9a0831f16a3529"
+  },
+  "validation": [
+    {
+      "command": "cargo test -p stg-ecl-compiler xform_rand -- --nocapture",
+      "result": "RED: three programs rejected before implementation; GREEN: all three pass"
+    },
+    {
+      "command": "cargo test -p stg-core -p stg-ecl-compiler -p stg-harness -p stg-rl",
+      "result": "all test groups and doctests passed; includes existing LOOP test extended for RNG cadence"
+    },
+    {
+      "command": "cargo fmt --all -- --check",
+      "result": "passed"
+    },
+    {
+      "command": "cargo clippy -p stg-core -p stg-ecl-compiler -p stg-harness -p stg-rl --all-targets -- -D warnings",
+      "result": "passed"
+    },
+    {
+      "command": "target/release/stg-harness verify-tables",
+      "result": "all baked tables match committed bytes"
+    },
+    {
+      "command": "CARGO_NET_OFFLINE=true maturin build --release -m <snapshot>/crates/stg-py/Cargo.toml --out <wheels> --interpreter <training-python>",
+      "result": "built abi3 Python>=3.10 manylinux_2_34 x86_64 wheel"
+    },
+    {
+      "command": "uv lock --offline; uv sync --frozen --offline",
+      "result": "passed; four consumer files synchronized"
+    },
+    {
+      "command": ".venv/bin/python -m pytest -q tests/transcribe tests/test_cards.py tests/test_envwrap.py tests/test_envwrap_lasers.py tests/test_reward.py",
+      "result": "158 passed in 23.98s"
+    },
+    {
+      "command": "<training-python> -m pytest -q -p no:cacheprovider <stg-engine>/crates/stg-py/tests/test_smoke.py",
+      "result": "15 passed in 47.00s"
+    },
+    {
+      "command": "<training-python> /tmp/sunyunbo/stg-xform-rand-20261104/wheel_probe.py; <Python3.11-old-CPU-venv>/bin/python <same probe>",
+      "result": "both passed; binding/spawn/effect values match ordinary script rand calls"
+    },
+    {
+      "command": "sha256sum -c SHA256SUMS (cwd=magnus/wheels)",
+      "result": "both wheels OK; lock path/hash cross-check passed"
+    }
+  ],
+  "review": {
+    "scope": "engine source, tests, author docs, version anchor and approved semantics",
+    "result": "independent read-only review found no critical/important/minor issues; reviewer reran staged-rand and LOOP tests"
+  },
+  "derived_inputs_refreshed": 176,
+  "not_validated": [
+    "cross-platform execution",
+    "GPU/CUDA graph training",
+    "original-game dynamic equivalence",
+    "new performance benchmarks"
+  ],
+  "not_performed": [
+    "card migration",
+    "transcription-worker dispatch",
+    "training job submission",
+    "upstream release"
+  ],
+  "source_commit": "2f24d8628231126b01f3025b065117c9013a4934",
+  "delivery_note": "User subsequently authorized stage commit and push on main; final delivery identities are recorded in Git history."
+}

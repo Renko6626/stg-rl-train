@@ -3,6 +3,12 @@
 > 2026-09-16 brainstorming 拍板。读者：实施本流水线的会话、之后编排批量任务的会话。
 > 关联：卡池写作约束 stg-engine `docs/rl-card-pool.md`；训练仓设计 `docs/2026-09-15-stg-rl-train-design.md`；
 > 我方 ECL 手册 stg-engine `docs/ecl-lang.md`（索引）+ `docs/ecl-lang/`。
+>
+> **当前执行入口（2026-11-03）**：本文保留最初设计与历史实测，“本轮”“目前”等状态描述以当时日期为准。
+> 批量执行以 [`transcribe/README.md`](../transcribe/README.md)、[编排 skill](../.claude/skills/th06-transcribe/SKILL.md)、
+> `transcribe/contracts/` 和 [mapping](../transcribe/th06/mapping.md) 为准。激光已可转；训练已接入0.4.4/ENGINE_VER30，xform体内rand按三阶段抽样。
+> 动态 xform 按值绑定与三阶段取值见 mapping §5，旧“只收常量/统一占 locals”不再代表所有路径。
+> dsh 审核后的 Opus 抽检按现行契约保留；§13.1 的暂停是历史状态。派发前还需刷新目标单元的派生资料，见 skill。
 
 ## 1. 目标与范围
 
@@ -71,10 +77,11 @@
 
 ### 3.5 编译器版本一致性
 
-`git diff rl-v0.1.0..HEAD -- crates/stg-ecl-compiler crates/stg-core crates/stg-rl` 为空：
+初始交付时（2026-09-16），`git diff rl-v0.1.0..HEAD -- crates/stg-ecl-compiler crates/stg-core crates/stg-rl` 为空：
 worker 用 stg-engine HEAD 的 harness 自检，与训练仓 wheel（`rl-v0.1.0`）的编译结果一致。
 `stg-harness check` 与 `stg_rl.compile_dir` 报同一套错误（`文件:行:列: 消息` + 源行 + `^`，一次报出全部错误）。
-引擎升级 wheel 时重核这一条（§12）。
+这不是当前版本相同的证明。引擎升级 wheel 时核对已安装 `stg_rl.build_info()`、构建 harness 的来源和编译结果，
+并按 [wheel 同步约定](agent-memory/stg-rl-wheel-sync.md) 更新四处依赖。
 
 ## 4. 目录布局
 
@@ -152,8 +159,8 @@ stg-rl-train/
 - 驱动**逐个**调用 `~/.local/bin/dsh-flash --cwd <单元目录> --timeout 1800 --log <log>`
   （不用 `--batch`：它所有任务共用一个 cwd）。
 - 契约正文在 `transcribe/contracts/*.md`，brief 只含单元参数 + 契约与资料的**绝对路径**。
-- worker 必读我方 ECL 资料（绝对路径，不拷副本）：stg-engine `docs/ecl-lang.md`、`docs/ecl-lang/7-reference.md`、
-  `.claude/skills/writing-danmaku-ecl/SKILL.md`（静默坑段）。
+- worker 先读契约、`mapping-excerpt.md` 和生成的 `builtins.md`。引擎手册与写作 skill 通过绝对路径按需检索，
+  不整篇加载；动态 xform 的短例子与求值表直接随 mapping §5 进入摘录。以现行 worker 契约的阅读顺序为准。
 - 环境：`PYTHONDONTWRITEBYTECODE=1`；harness 用 release 二进制绝对路径；python 用训练仓 `.venv/bin/python`。
 - 一次性 worker 无会话记忆：重派时带上 brief + 上一轮产出 + 失败 / 发现清单。
 
@@ -362,8 +369,8 @@ CI 上没有 ZUN 数据，分三类：
 
 - **角度常量翻倍**：主会话手算把 π/12…π/48 等常量都算成两倍（π/32 写成 2048，应为 1024），
   由摘录器注释的单测对拍发现。对照表 §1 加换算速查，契约要求照抄 `source.txt` 注释；摘录器对变量赋值里的非整 BAM 小数也标注。
-- **locals 上限**：一个 sub 引用 4 个 xformdef（每物理槽 3 字）即超 64 → 拆并行任务；xformdef 暂存在引用它的 sub 入口，
-  `sh_xform` 与 `sh_fire` 必须同 sub。
+- **locals 上限（旧静态路径）**：一个 sub 引用 4 个 xformdef（每物理槽 3 字）即超 64 → 拆并行任务；模板暂存在引用它的 sub 入口，
+  `sh_xform` 与 `sh_fire` 必须同 sub。2026-11-03 的带参/动态路径改用按值绑定，可经同步 helper；当前约束见 mapping §2.4、§5。
 - **同 sub 变量名唯一**（平行 `for i` 也算重复）。
 - **粘滞难度前缀**：第 1 关 Sub0/Sub2 的发弹只在 Lunatic 生效。
 

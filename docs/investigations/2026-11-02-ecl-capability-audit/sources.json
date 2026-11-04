@@ -1,0 +1,565 @@
+{
+  "date": "2026-11-02",
+  "purpose": "Read-only research snapshot; byte hashes identify evidence inputs, not behavioral equivalence.",
+  "repositories": [
+    {
+      "path": "/data/sunyunbo/www/stg-rl-train",
+      "head": "f3b8815089e17a98ea493720711920fd9bf1b6b3",
+      "branch": "main",
+      "dirty_paths": [
+        "M README.md",
+        " M docs/agent-memory/MEMORY.md",
+        " M docs/agent-memory/modern-ecl-import-prototype.md",
+        " M src/stgtrain/eval_ckpt.py",
+        " M src/stgtrain/export_onnx.py",
+        " M src/stgtrain/featurize/danger_topk_v1.py",
+        " M src/stgtrain/models/set_attn_v3.py",
+        " M src/stgtrain/registry.py",
+        " M src/stgtrain/train.py",
+        " M tests/test_export_v8.py",
+        " M tools/eval_density_checkpoints.py",
+        " M transcribe/th06/mapping.md",
+        "?? :memory:.ses",
+        "?? configs/exp-density-perceiver.toml",
+        "?? docs/agent-memory/ecl-capability-audit.md",
+        "?? docs/agent-memory/far-field-coarse-summary.md",
+        "?? docs/agent-memory/th06nc-bypass-enemy-label.md",
+        "?? docs/agent-memory/th16-adaptation.md",
+        "?? docs/agent-memory/th18-adaptation.md",
+        "?? docs/agent-memory/th18-bullet-head.md",
+        "?? docs/agent-memory/th18-portable.md",
+        "?? docs/agent-memory/th18-probe.md",
+        "?? docs/investigations/2026-10-22-capacity2048/",
+        "?? docs/investigations/2026-10-22-th18-geometry/",
+        "?? docs/investigations/2026-10-23-modern-ecl-engine-capabilities.md",
+        "?? docs/investigations/2026-11-02-ecl-capability-audit/",
+        "?? docs/practice-cards/2026-10-22-capacity2048.md",
+        "?? docs/practice-cards/2026-10-22-enemy-follow.md",
+        "?? docs/practice-cards/2026-10-22-th16-adaptation-investigation.md",
+        "?? docs/practice-cards/2026-10-22-th16-implementation.md",
+        "?? docs/practice-cards/2026-10-22-th18-bullet-head-fix.md",
+        "?? docs/practice-cards/2026-10-22-th18-geometry-audit.md",
+        "?? docs/practice-cards/2026-10-22-th18-hazard-fix.md",
+        "?? docs/practice-cards/2026-10-22-th18-implementation.md",
+        "?? docs/practice-cards/2026-10-22-th18-portable.md",
+        "?? docs/practice-cards/2026-10-22-th18-probe.md",
+        "?? docs/practice-cards/2026-10-28-th06nc-clean-package.md",
+        "?? docs/superpowers/plans/2026-10-22-th16-adaptation.md",
+        "?? docs/superpowers/plans/2026-10-22-th18-adaptation.md",
+        "?? docs/superpowers/plans/2026-10-22-th18-portable.md",
+        "?? docs/superpowers/plans/2026-10-22-th18-probe.md",
+        "?? magnus/train-perceiver.sh",
+        "?? src/stgtrain/featurize/danger_topk_v9.py",
+        "?? src/stgtrain/models/far_perceiver.py",
+        "?? src/stgtrain/models/set_attn_v4.py",
+        "?? tests/test_perceiver.py",
+        "?? tools/th06nc-release/",
+        "?? tools/th18-portable/"
+      ]
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine",
+      "head": "d2bc2dab418167064de43356d4e8698e159f7ebf",
+      "branch": "codex/core-module-cleanup",
+      "dirty_paths": [
+        "?? dist/"
+      ]
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab",
+      "head": "edaf4cce38a81005d9b526879d08bdb0ae872209",
+      "branch": "feat/stg-agent-proto",
+      "dirty_paths": [
+        "M .gitignore",
+        " M engine/bullet/th06nc/01-pools-and-structs.md",
+        " M engine/enemy/th18/01-spawn-api-and-card-summons.md",
+        " M games/th06nc/INDEX.md",
+        " M local/README.md",
+        " M mods/th06nc/autoplay/README.md",
+        " M mods/th06nc/autoplay/native/extract.c",
+        " M mods/th06nc/autoplay/native/hook.c",
+        " M mods/th06nc/autoplay/native/policy.c",
+        " M mods/th06nc/autoplay/native/policy.h",
+        " M mods/th06nc/autoplay/native/policy_model.c",
+        " M mods/th06nc/autoplay/native/policy_model.h",
+        " M mods/th06nc/autoplay/native/tests/test_extract.c",
+        " M mods/th06nc/autoplay/native/tests/test_policy.c",
+        " M mods/th06nc/autoplay/native/tests/test_policy_model.c",
+        " M mods/th06nc/autoplay/native/th06nc.h",
+        " M mods/th06nc/autoplay/release.sh",
+        " M mods/th06nc/autoplay/release/README.txt",
+        " M mods/th06nc/autoplay/release/th06nc_autoplay.ini",
+        "?? games/th06nc/thprac-v1.1.0-study.md",
+        "?? mods/_shared/",
+        "?? mods/th06nc/autoplay/release/MODEL-SOURCE.txt",
+        "?? mods/th16.v1.00a/autoplay/",
+        "?? mods/th18.v1.00a/autoplay/",
+        "?? out/",
+        "?? temp/"
+      ]
+    }
+  ],
+  "downloads": [
+    {
+      "path": "/tmp/sunyunbo/priw8-ecl-ins-20261102.js",
+      "bytes": 162754,
+      "sha256": "207b59f83a33412dc52c239d5765ce82947e4ff7aa1447c06b791a4ccd87b0b5",
+      "url": "https://priw8.github.io/js/ecl/ins.js"
+    },
+    {
+      "path": "/tmp/sunyunbo/priw8-ecl-vars-20261102.js",
+      "bytes": 44632,
+      "sha256": "21da50d9e8d1f3eac7d5528edcffbf2c6408a6e5847422a4b7d30da204916891",
+      "url": "https://priw8.github.io/js/ecl/vars.js"
+    },
+    {
+      "path": "/tmp/sunyunbo/priw8-ecl-main-20261102.js",
+      "bytes": 10389,
+      "sha256": "2ebba47e4c80b161e057fcf3ff3f176d26f65fb4dce949a6c4c00795701693a3",
+      "url": "https://priw8.github.io/js/ecl/main.js"
+    },
+    {
+      "path": "/tmp/sunyunbo/priw8-ecl-map-20261102.js",
+      "bytes": 8217,
+      "sha256": "64b6e531051c4b200986b433c029df6c6a7f1c0eccabb258b51192594f823b65",
+      "url": "https://priw8.github.io/js/ecl/eclmap.js"
+    },
+    {
+      "path": "/tmp/sunyunbo/priw8-live-th16-20261102.eclm",
+      "bytes": 6101,
+      "sha256": "54c499eaab69c27ae865df1027857772d12f68949f129a063c3f340b28c74f15",
+      "url": "https://priw8.github.io/eclmap/eclmap/th16.eclm"
+    },
+    {
+      "path": "/tmp/sunyunbo/priw8-live-th18-20261102.eclm",
+      "bytes": 6407,
+      "sha256": "c81b39767f4024cbb7989dfda1a6461b0a90962e87718118da2e121df4413195",
+      "url": "https://priw8.github.io/eclmap/eclmap/th18.eclm"
+    },
+    {
+      "path": "/tmp/sunyunbo/priw8-ecl-instructions-page-20261102.md",
+      "bytes": 3264,
+      "sha256": "a7aab74ca909a1d7169c807a4703a43249c7b7f7dcdaa1196332adbb8b8824f6",
+      "url": "https://priw8.github.io/content/modding/ins.md"
+    },
+    {
+      "path": "/tmp/sunyunbo/priw8-ecl-variables-page-20261102.md",
+      "bytes": 3066,
+      "sha256": "328b19d4f9f88ba298c7bd413ed3a842bf9021961397ee1f8977076792252d87",
+      "url": "https://priw8.github.io/content/modding/vars.md"
+    }
+  ],
+  "local_evidence": [
+    {
+      "path": "/data/sunyunbo/www/renkolab/engine/_shared/math-and-prng.md",
+      "bytes": 18775,
+      "sha256": "d298b478b90074ce0d970e31de94286c0e0b2708d35c356b98fa91901702bd3c"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/engine/bullet/th06nc/01-pools-and-structs.md",
+      "bytes": 13743,
+      "sha256": "d13d78a34c6bfe424bfbd196a41f0220ea6020489bc5e2ba67010c378048c1d6"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md",
+      "bytes": 26903,
+      "sha256": "bf234797d0ba0c8187c211497cbb37f6bf6da8f2b3724385bf1a7d34e5ecce2e"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/engine/bullet/th16/02-bullet-vm-model.md",
+      "bytes": 13389,
+      "sha256": "d86413091afdd1404daf1c32b2951e9f10fdd3ab3da53c336e5d4250f0f8347c"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/engine/bullet/th16/03-lasers.md",
+      "bytes": 24740,
+      "sha256": "203bffcfa7ae00d71239c44f4a996f1cbddb12ddae5f56017bbdb05ef1fa07cb"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/engine/bullet/th16/04-cancel-to-item.md",
+      "bytes": 19266,
+      "sha256": "9cd41850871e4ebf87f911d326dda7deed8a175d6d7e6b04d01cbd16144b007f"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/engine/bullet/th16/README.md",
+      "bytes": 7765,
+      "sha256": "d9331819b37ac6b551fa07b818d5eee12d684f0f9c7298695be31b6edef0c821"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/engine/bullet/th18/01-cancel-to-item.md",
+      "bytes": 29277,
+      "sha256": "e0796cb43b2c7d1e6fa5b72415c37fcf3df6fcd36d652542517d91683477ee7b"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/engine/ecl/th06nc/01-th06-baseline-and-nc-deltas.md",
+      "bytes": 2565,
+      "sha256": "d73da4e2bf081800ada2a3eec1a14c170017ec02768cec44ddfbad82bbbf2ee2"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/engine/ecl/th06nc/02-th06-baseline-comparison.md",
+      "bytes": 7497,
+      "sha256": "c7d1a07525f83ebbea7b5121630bf6f7a37ec3916dd7c1160b46cfc4571633f3"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/engine/ecl/th06nc/03-opcode-crossmatch.md",
+      "bytes": 6832,
+      "sha256": "46a2c064d775e9a5bfe3902f1873492660d6e737734af88735802c9aa3e1dae8"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/engine/ecl/th06nc/04-enemy-struct.md",
+      "bytes": 6924,
+      "sha256": "7ec490eb4a88775fa81a796bd369ba131f0fab7af17bea8b912c1c788b5af41c"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/engine/ecl/th06nc/README.md",
+      "bytes": 1176,
+      "sha256": "6c6ad48ed1d0adbebbd482df986b792abf78e6e9c089e9254edeebc20fe9f751"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/engine/ecl/th16/01-ecl-context-and-variables.md",
+      "bytes": 7982,
+      "sha256": "f580d249b70018095e2089151360bfc1756d819af0e69a774a529d625867e4cd"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/engine/ecl/th16/02-runtime-vm.md",
+      "bytes": 12974,
+      "sha256": "836dc6fff11a5230913a8d36f008b7841af639370940a4a516e1f152e210cdf2"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/engine/ecl/th16/03-thredata-crosscheck.md",
+      "bytes": 10808,
+      "sha256": "80bad708e8c190e6730e4b9eaeb22502e655a444b4fb535cda0a0cd1beb54b1b"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/engine/ecl/th16/04-ecl-vm-interpreter.md",
+      "bytes": 13668,
+      "sha256": "84e256589cbec31c20fde95aba94ab6ce290a25b96a2cd58f265668cc3e4c126"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/engine/ecl/th16/05-fire-interface.md",
+      "bytes": 7273,
+      "sha256": "6666303c90e35fbfb12e824581dce7fce7c4138fa4d73303f61e84714555503e"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/engine/ecl/th16/06-adding-custom-instructions.md",
+      "bytes": 7309,
+      "sha256": "1181d0cdd64e631e1f1a844a875619407648e2ffd5f00c26dadc11b16068f8fe"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/engine/ecl/th16/07-vm-architecture.md",
+      "bytes": 8426,
+      "sha256": "920015568c3844af83511c279d6497abe608d1305e79760a64ec8876b97e1b63"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/engine/ecl/th16/ECL-info.md",
+      "bytes": 24443,
+      "sha256": "3da13149d4679167845bd330b2b876bcd9bd09a1439f4b4c9578b8bfa9c68ee3"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/engine/ecl/th16/README.md",
+      "bytes": 12937,
+      "sha256": "c1730d5569d687ff1fc5eaf398275e9ca44a390230ecac9c23fc1b6ce88f85b5"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/engine/ecl/th18/01-boss-interrupts-and-spellcard.md",
+      "bytes": 10056,
+      "sha256": "3bdc25280532d33a0774cf80a5f070491b23b32747e9a055684055419233c2f4"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/engine/ecl/th18/02-item-drops.md",
+      "bytes": 32138,
+      "sha256": "afac0055c3b3e0f81ae1f6fc69eedf0d4caae1d3d5a28402ad6580bb4c3f32de"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/engine/ecl/th18/05-stage1-midstage-spawns.md",
+      "bytes": 4350,
+      "sha256": "022c1aed8903f17f7950fb9b25d4b4c823f6cf8b71589e1c87c3d523e3a5f69f"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+      "bytes": 4148829,
+      "sha256": "ea63360440e9fb1878c85125e531bfabb516e858493e21fd3358b7327b373107"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/th16.exe",
+      "bytes": 683520,
+      "sha256": "c11776019f083978e66027e7394dafb1fb9543afca986f28049a49417e341929"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/local/vendor/th06-decomp/src/BulletManager.cpp",
+      "bytes": 53904,
+      "sha256": "86437f40c7c5ac2c6e548b3003f450d3824d22c2c7a52a7ffbafa3e8f8aad28b"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/local/vendor/th06-decomp/src/EclManager.cpp",
+      "bytes": 52374,
+      "sha256": "b4671d3bb277ffafafea18f58f8340f0900d61983816fca947bfc7f1d7f0a668"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/local/vendor/th06-decomp/src/EclManager.hpp",
+      "bytes": 11692,
+      "sha256": "33ce812331571a9bb819c31eb26f56e704ff9478338e0725c77234a09b1ee2be"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/local/vendor/th06-decomp/src/EnemyEclInstr.cpp",
+      "bytes": 43521,
+      "sha256": "7aa69c652861d37df44edf5e65dc137f4d6e1af8d1985c96c0c6234f8ffbc334"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/local/vendor/th06-decomp/src/EnemyManager.cpp",
+      "bytes": 30774,
+      "sha256": "39a38a22282fdee6ce1a458087541e792e50d0a1dcd1994becda6705d96d6bba"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/tooling/ghidra/scripts/apply_th16_bullet_names.py",
+      "bytes": 15929,
+      "sha256": "7f5ed4d5fab66e9ab8c173bc58ca452fba15bee27008f2adbb53e3fabde28336"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/tooling/ghidra/scripts/apply_th16_ecl_names.py",
+      "bytes": 12757,
+      "sha256": "92dac2ba4243ff5a0dc4f8c1bdd0729abe14cb7479fb71f210f8fb8042e90ec0"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/tooling/ghidra/scripts/apply_th16_math_names.py",
+      "bytes": 11767,
+      "sha256": "93e0f0021d8506cac5845538e0ac60360c77742d285ef7864e320f835eea7825"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/tooling/ghidra/scripts/apply_th16_sht_names.py",
+      "bytes": 6538,
+      "sha256": "3a64722d238cb272b66cf8cf29c09ed44df3969b55d85479ed0562ce2448eb8a"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/PROGRESS.md",
+      "bytes": 76259,
+      "sha256": "35ab4527512817be0ea2310a9bf8c660519c2243725eb7f9dc917e3a1176d40a"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/bullets.rs",
+      "bytes": 9162,
+      "sha256": "d140c7f197eb1047a036ed9baa569cb154a54ea3edf0f60c96c4241938ce8c6f"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/binding.rs",
+      "bytes": 32352,
+      "sha256": "abdbd0cd15de76e914f318b551845c1a8f03f35c52229e9d895da25429984dab"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/image.rs",
+      "bytes": 43199,
+      "sha256": "72c9dd6b7970f594ab264a70af3e0771c3fbe52c271914444dc3311143e5e297"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/interp.rs",
+      "bytes": 2422,
+      "sha256": "c9f74a5cacf433a7b1106b780edf21e6e684e63c71294b34795d1c71322c7cc9"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/mod.rs",
+      "bytes": 17903,
+      "sha256": "5218c806970638beeab36334126a8a76418862a523be195cb0df87df3b98354e"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/ops.rs",
+      "bytes": 6856,
+      "sha256": "e94d91d663105b0480bbaa77195e1ce472578ae3ec5aa0aa591eee7d57decb0c"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/shooter.rs",
+      "bytes": 5394,
+      "sha256": "17652e3e9b7f06e25bcaede94097d86a572690f3727de7549ff479fcc685b21e"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/bullet.rs",
+      "bytes": 9197,
+      "sha256": "71c52c48f5a10cce5e4833fa19bbcfffded23eb91d394e6f46e6ee250ac2d764"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/enemy.rs",
+      "bytes": 17670,
+      "sha256": "ef8c9ce4894906e6fa705bd6afddfe69d044dfb9f5d5f76328ed0ad1c674f391"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/interp.rs",
+      "bytes": 2094,
+      "sha256": "504000bfe17d923ec82f93b060431d189795c047892b27fed0c77264cf88e16c"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/laser.rs",
+      "bytes": 8335,
+      "sha256": "6d43d705a8fed6976e34d7d9d235cf6e49dc2d4d09ff3570b011aab2e9257bd4"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs",
+      "bytes": 3837,
+      "sha256": "5e55a12dd5624d321b17e7f33571d36dd4bfdd1cfa1d9a037a5bbd58d9e1856b"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs",
+      "bytes": 19178,
+      "sha256": "74a32eb044ff53e4fbfa75c64f5d6a6174d418010ca20821a8e21edbb6933027"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/spell.rs",
+      "bytes": 9070,
+      "sha256": "13556843eb1b9e7b2dbc35698d7274a706720e4dea147f73ac0e10d6afd24a42"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/stage.rs",
+      "bytes": 6870,
+      "sha256": "cc18d50ddd7f8b530947e96d294140c4217d088f7097d743004fa217ae912b52"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/tests.rs",
+      "bytes": 234521,
+      "sha256": "72a475a1498a86284bcce303d351df8224b84885de29958226afcb108243a6a0"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall.rs",
+      "bytes": 49919,
+      "sha256": "6967b9609a406a7104c6c1b01962f5052630de10073af5f42077ad92ca9b9c9d"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/task.rs",
+      "bytes": 20630,
+      "sha256": "2c1b74caf6b8c8ce2ecbe80897afe042935a7dca65ae485d367fe1ced6c9998e"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs",
+      "bytes": 94314,
+      "sha256": "c0832194e423b604292353938c604b3ce63c6317e1fd183b5527d7b1c631510f"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/field.rs",
+      "bytes": 6594,
+      "sha256": "30e6ad83898eb415795e61e8038c4d19db75f5c84b2b95b14f151028d03370f5"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/lasers.rs",
+      "bytes": 6164,
+      "sha256": "2af01b1003a891440b1cf35de38d90636c30e4bed00f344f16abf8c27a6de268"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/lib.rs",
+      "bytes": 20720,
+      "sha256": "273961007f7037155cb548689fca6173d3b4740f4bc664f85499a1798c21f081"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/math/easing.rs",
+      "bytes": 6907,
+      "sha256": "1a9539182a95e1bd8b5e3f7fdaa148775ae5c43c47abf64b987d55f98fc5925b"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/cleanup.rs",
+      "bytes": 18416,
+      "sha256": "ad9202b6d52487fb78e2ede9476f8a00f2eeefd68b4cf40255cf927b690d6aa4"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/collide.rs",
+      "bytes": 35702,
+      "sha256": "b3b7a3047730b48d3ef6e4e1fec3e3cf852d5d024671ef1b2fdf7c32eaffda0e"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/enemy_vars.rs",
+      "bytes": 1930,
+      "sha256": "c26ab9e378d45fc0dcd121f631b0e36d947d774c891ae337b86dc93f7a0bd956"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/integrate.rs",
+      "bytes": 76123,
+      "sha256": "122116d3da40b106cc7d1746ee6f50fb01f526316caac3fb334f8bad2fe49a6b"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/laser.rs",
+      "bytes": 44682,
+      "sha256": "9131d99c0821052fdbe9098c3cefbce456868db1b8e2df009ea7e3bab834360a"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/motion.rs",
+      "bytes": 42290,
+      "sha256": "7c06167eb619eddbf431d671c20ed44dee8b3603289f0540209bf915459d7624"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/player.rs",
+      "bytes": 68054,
+      "sha256": "0343e95b3057ca00aceabbab9582fcf35a7bca5599fff6d7318cc8edc933c671"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/settle.rs",
+      "bytes": 76150,
+      "sha256": "048463b2d6018d3ba50cf6ede3f0bf25812041c203c2d5f0ff5ef25c10105285"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/spell/tests.rs",
+      "bytes": 26292,
+      "sha256": "7cac395d26c11d62e47cc3a130c64807bf745b04b21cd9a27c2999b4d8512ba5"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/spell.rs",
+      "bytes": 14268,
+      "sha256": "e026e4b96e3d9ac6239da7562e0bf9b0242bcacc5fa87b9f15e299e1665acb00"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/transform.rs",
+      "bytes": 54542,
+      "sha256": "a04032e31a0519ed389da555d059bbbb2a7140f6ebd4e8ceaa195d5fabd084ae"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/view.rs",
+      "bytes": 6122,
+      "sha256": "ba6074083b07f52daae006b804447ff1bc1931dd20132ffa9a1232468cce0c4f"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world.rs",
+      "bytes": 97378,
+      "sha256": "17aba904845beca5721dda82049d92dab13e02261c1df38fa87e27416b88bb1b"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/xform.rs",
+      "bytes": 11656,
+      "sha256": "b4c537a066d38aacd2a654220a90fa69ded4e9f6e305c7e915709d254a572249"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-ecl-compiler/src/lang/builtins.rs",
+      "bytes": 80964,
+      "sha256": "50f1bf087348d067ab6c9c8a408122b8e6c0ca1e88c0954b26ffc997192ce55a"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-ecl-compiler/src/lang/codegen/builtin.rs",
+      "bytes": 7956,
+      "sha256": "85e94073180f823e773c6a56324b05134cf61f4472689296348e7f2f2f8276d9"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-rl-train/docs/investigations/2026-10-23-modern-ecl-engine-capabilities.md",
+      "bytes": 11573,
+      "sha256": "ca85211175b37e3fc3f2f1ce4d3ea4bb5ae31f8421cd0c4e44cabd57e069d40c"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-rl-train/pyproject.toml",
+      "bytes": 999,
+      "sha256": "4847798aa50911e1a4eeb9854605da633c8a0a7dcb4948fef5f1cc216595e89a"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-rl-train/tools/th18-import-prototype/README.md",
+      "bytes": 11418,
+      "sha256": "e0a4a5d75232b2629c2103d2541015381943b8c30f5da01afe5967a4562df8c2"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-rl-train/transcribe/th06/config.toml",
+      "bytes": 2172,
+      "sha256": "7ee2ab6ac9a426ba7641c979f9cd9a89ea490d2c572e6ece93680f92b2985a05"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-rl-train/transcribe/th06/mapping.md",
+      "bytes": 79938,
+      "sha256": "f46cfccd9ed464fef1251c765ecd897e4d60280d658c38dec33be90d3ff3d3c5"
+    }
+  ],
+  "notes": [
+    "The existing decompiled export was read; no Ghidra database was opened or modified.",
+    "The export is an archival evidence source. No new original-game execution or full export-to-exe provenance audit was performed.",
+    "TH16/TH18 live map instruction names matched the local maps at fetch time.",
+    "Uncommitted workspace changes are part of the inspected files; hashes bind the actual inputs."
+  ]
+}

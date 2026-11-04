@@ -1,0 +1,131 @@
+{
+  "source_commit": "07058f3086811a8326307cad2e9423024adc531d",
+  "source_archive_sha256": "4511c282c336e1d021548001d6739dc8553d49f4adfa934d3f84d640ec6ba580",
+  "engine_ver": 29,
+  "packaging_version": "0.4.3",
+  "packaging_changes": "Only crates/stg-py/{Cargo.toml,pyproject.toml} version 0.4.1 to 0.4.3 in exported snapshot; engine worktree unchanged.",
+  "date": "2026-11-03",
+  "wheel": "stg_rl-0.4.3-cp310-abi3-manylinux_2_34_x86_64.whl",
+  "wheel_sha256": "f4bfa3998026d443099b59985c125803b45c1db75881b2b3a2bafa77ebd175c1",
+  "build_info": {
+    "tables_hash": "37a7ff12fe40e24e",
+    "git_sha": "unknown",
+    "version": "0.4.3",
+    "engine_ver": "29"
+  },
+  "build_command": "CARGO_NET_OFFLINE=true maturin build --release -m crates/stg-py/Cargo.toml --out <wheel-dir> --interpreter <training-python>",
+  "build_info_git_sha_note": "unknown because built from an exported archive; exact source commit and archive SHA256 recorded above",
+  "equivalence_replay": {
+    "baseline_version": "0.4.2",
+    "new_version": "0.4.3",
+    "envs": 4,
+    "threads": 2,
+    "steps_per_case": 600,
+    "seed": 17,
+    "actions_seed": 91,
+    "explicit_reset_at": 333,
+    "max_frames": 200,
+    "all_buffer_bytes_and_current_start_indices_equal": true,
+    "cases": [
+      {
+        "density": 3,
+        "cap": 1,
+        "steps": 600,
+        "max_observed_rows": 1,
+        "sha256": "1aa942bdecf4dcfc0b91d7442f18a6673ee0e4476c4c4e5310efcffdc21be681"
+      },
+      {
+        "density": 3,
+        "cap": 64,
+        "steps": 600,
+        "max_observed_rows": 64,
+        "sha256": "2836147d196fdf48461bf14f2902234fb923fb0ed55efb35e26a22498d219434"
+      },
+      {
+        "density": 3,
+        "cap": 1024,
+        "steps": 600,
+        "max_observed_rows": 343,
+        "sha256": "1e3e2e70db5a116d8bf0f163ee02c9b1ca973f977c987147b48332956c00612e"
+      },
+      {
+        "density": 12,
+        "cap": 1,
+        "steps": 600,
+        "max_observed_rows": 1,
+        "sha256": "f7fbed2883522cf03eb18cabe00772f43c04284cf0b32c000e9c84c060a19253"
+      },
+      {
+        "density": 12,
+        "cap": 64,
+        "steps": 600,
+        "max_observed_rows": 64,
+        "sha256": "c36e51c16bdba953b9da0bb61fe3f393bac6e2db08a6373019d7dd80800dd83f"
+      },
+      {
+        "density": 12,
+        "cap": 1024,
+        "steps": 600,
+        "max_observed_rows": 1024,
+        "sha256": "d2259b19e9575e3b611372171933c633ec9368d1ca8db53c7a9d2ed6d414e1c6"
+      }
+    ],
+    "scope": "Existing dense horizontal-bullet workload at two densities and three caps; does not prove equivalence of every original card or new mechanism."
+  },
+  "dynamic_xform_probe": {
+    "build_info": {
+      "tables_hash": "37a7ff12fe40e24e",
+      "git_sha": "unknown",
+      "engine_ver": "29",
+      "version": "0.4.3"
+    },
+    "dynamic_binding_spawn_effect_speed_raw": [
+      262144,
+      327680
+    ],
+    "shared_value_survives_helper_local_overwrite_and_shooter_reset": true,
+    "six_scalar_step_operations_compile": true
+  },
+  "worker_documentation_audit": {
+    "cached_unit_excerpts": 176,
+    "cached_excerpts_with_constant_only_rule": 74,
+    "fresh_builtins_contains_at_spawn": false,
+    "fresh_builtins_contains_at_effect": false,
+    "skill_contract_mapping_and_cards_modified": false
+  },
+  "validation": {
+    "uv_lock_offline": "passed",
+    "uv_sync_frozen_offline": "passed",
+    "lock_and_magnus_sha256_match": true,
+    "engine_python_smoke": {
+      "command": "<training-python> -m pytest -q -p no:cacheprovider <stg-engine>/crates/stg-py/tests/test_smoke.py",
+      "result": "15 passed in 2.32s"
+    },
+    "training_and_transcription_tests": {
+      "command": ".venv/bin/python -m pytest -q tests/transcribe tests/test_cards.py tests/test_envwrap.py tests/test_envwrap_lasers.py tests/test_reward.py tests/test_smoke.py",
+      "result": "175 passed in 256.72s"
+    },
+    "old_cpu_stack_tests": {
+      "command": "PYTHONPATH=src <python3.11-torch2.5.1-tensordict0.6.2-venv>/bin/python -m pytest -q tests/test_envwrap.py tests/test_envwrap_lasers.py tests/test_reward.py tests/test_smoke.py",
+      "result": "57 passed in 232.65s"
+    },
+    "sha256sum": {
+      "command": "sha256sum -c SHA256SUMS (cwd=magnus/wheels)",
+      "result": "both wheels OK"
+    }
+  },
+  "not_validated": [
+    "GPU and CUDA graphs",
+    "Actual training throughput",
+    "Windows wheel",
+    "Original-game dynamic comparisons"
+  ],
+  "not_performed": [
+    "Original-card migration",
+    "Transcription-worker dispatch",
+    "Magnus job submission",
+    "Upstream release",
+    "Commit",
+    "Push"
+  ]
+}

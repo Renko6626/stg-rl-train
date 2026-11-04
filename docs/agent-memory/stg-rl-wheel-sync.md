@@ -14,3 +14,7 @@ stg_rl（stg-engine 的 `rl-v*` Release wheel）有两个消费点：本机 `pyp
 核对 uv.lock 里的 sha256 与 magnus/wheels 一致；引擎版本变了就同批重跑对照（如 r1c-e04）。见 [magnus-old-torch-stack](magnus-old-torch-stack.md)。
 
 2026-10-06：本地 `tool.uv.sources` 已直接引用 `magnus/wheels`，两端消费同一文件；当前为0.4.2，来源与验证见[接入记录](../practice-cards/2026-10-06-adapter-update-and-next-ab.md)。没有上游 Release 时可从经核对的源码快照构建，记录基准提交及补丁来源，勿将旧的 `gh release download` 当成必要发布操作。下一轮两臂同用新版；旧版结果保留原版本标识。
+
+2026-11-03：用户授权后接入0.4.3，来源为引擎main `07058f3086811a8326307cad2e9423024adc531d`、ENGINE_VER29（动态xform与单值STEP）。沿用导出源码快照构建，只在快照内将Python包装版本从0.4.1改为0.4.3，不改引擎工作区；`build_info().git_sha=unknown`，提交身份与归档哈希见[来源及验证记录](../practice-cards/reports/stg-rl-043-adoption.json)。四处已同步且本地环境安装新版，Magnus消费文件已替换但未提交Job；两密度×三cap固定动作回放的全部缓冲与起点索引和0.4.2逐字节一致。旧卡未迁移；转写skill/契约/mapping随后已按用户要求同步，并刷新本机单元输入，见[核查结论](ecl-capability-audit.md)。未发布上游Release、未提交或推送。
+
+2026-11-04：用户确认xform三阶段rand后接入0.4.4/ENGINE_VER30，基线仍为07058f3，叠加本轮已审阅的引擎源码补丁（随后提交为`2f24d8628231126b01f3025b065117c9013a4934`）；构建快照只另改包装版本。四处同步、本机安装，Python3.12/3.11真实取样检查通过，六组密度回放与0.4.3逐字节一致。精确base/patch/archive/wheel哈希及命令见[0.4.4接入记录](../practice-cards/reports/stg-rl-044-adoption.json)。用户随后授权阶段性提交并推送main；交付记录见Git历史，未发布上游Release或训练。

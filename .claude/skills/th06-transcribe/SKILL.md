@@ -14,24 +14,63 @@ description: Use when running, monitoring, or triaging the TH06 ECL → RL card 
 |---|---|
 | dsh-flash worker | 切分 / 转写 / 审核，按 `transcribe/contracts/*.md`，只写自己的 cwd |
 | `pipeline.py` | 派活、机械校验、摘录、验收、状态机 |
-| 主会话（你） | 启动命令、分诊 `blocked` / `needs_human`、opus 抽检、修对照表与契约、提交 |
+| 主会话（你） | 启动命令、分诊 `blocked` / `needs_human`、opus 抽检、修对照表与契约；提交和推送分别取得用户授权 |
 
 worker **派不了子 worker**（dsh 要写 `~/.dsh`，沙箱只读）。所有派发都走 `pipeline.py`。
 
 ## 启动前自检
 
 ```bash
+uv run --frozen python -c 'import stg_rl; print(stg_rl.build_info())'
 uv run --frozen pytest -q tests/transcribe          # 对照表覆盖率 + 片段编译 + 范例卡四层验收
-ls $STG_ENGINE_DIR/target/release/stg-harness        # 引擎改过就重编：cargo build --release -p stg-harness
 ```
 
-训练仓 wheel 升级时先核 `git diff rl-vX..HEAD -- crates/stg-ecl-compiler crates/stg-core crates/stg-rl`
-（spec §3.5）：编译器变了，harness 与 wheel 要同版本。
+用 `stgtranscribe.config.harness_bin()` 确认 release harness 路径；引擎改过就重编，不能只检查文件存在。
+2026-11-04 训练基线为 `stg-rl==0.4.4`、ENGINE_VER30，来源与哈希见
+`docs/practice-cards/reports/stg-rl-044-adoption.json`；动态 xform 从 ENGINE_VER28 起支持，模板体 rand 从30起支持。
+源码 HEAD、已构建 harness 和已安装 wheel 要分别核对。升级依赖按
+`docs/agent-memory/stg-rl-wheel-sync.md` 同步四处，不能只重编 harness；旧 spec §3.5 的版本号是历史记录。
+
+## 动态 xform 转写口径
+
+- 以 mapping §5 的求值表和完整例子为准。原 `bullet_effects` 配置点保存参数；同一配置发出的弹共享配置值，直到重配。
+- 运行期角度/速度/加速度用 `NAME(args)` 按值传入，保留随机取样位置；新卡不再因“参数非常量”改用任务、全局槽或量化。
+- 模板体允许 rand：未标记时绑定抽一次、同配置共享，`at_spawn` 每弹出生抽一次，`at_effect` 每次操作进入抽一次；STEP/等待中保持。仍按原作取样位置选择阶段，`@N` 仍是字面量后置等待。
+- 旧零形参全常量路径仍占 locals，并保留同 sub 配置/开火约束；带参/动态绑定可经同步 helper，发射器仍为任务私有。
+- 新能力不解除 8 逻辑缓存、16 物理槽、256 总任务槽等独立限制。旧卡迁移要逐卡核原文、效果时序和随机共享，文档更新不代表旧卡已还原。
+
+## 刷新已有单元输入
+
+修改 mapping 或引擎签名后，**派发前刷新本次目标单元**。`extract` 跳过已进入后续状态的单元，重跑它不会刷新这些输入。
+`builtins.md` 只收签名，动态 xform 的额外语法保留在 mapping §5，避免要求 worker 整篇读引擎手册。
+以下从仓库根目录执行，`ids` 填实际目标；仅更新两份派生文档：
+
+```bash
+uv run --frozen python - <<'PY'
+import json
+from stgtranscribe import config, mapping
+from stgtranscribe.extract import builtins_cheatsheet
+
+ids = ["th06_s4_b16"]  # 换成本次准备转写/返工/复审的单元
+text = (config.TH06_DIR / "mapping.md").read_text()
+ref = config.engine_dir() / "docs/ecl-lang/7-reference.md"
+cheat = builtins_cheatsheet(ref)
+for uid in ids:
+    d = config.WORK_DIR / "units" / uid
+    unit = json.loads((d / "unit.json").read_text())
+    (d / "mapping-excerpt.md").write_text(mapping.excerpt(text, set(unit["used_instructions"])))
+    (d / "builtins.md").write_text(cheat)
+    print(uid)
+PY
+```
+
+旧 `work/review/<id>/` 保留当时的资料与 verdict；重新 `review` 时流水线会从单元目录复制新输入。
+刷新资料不改变卡内容、状态、验收结果或抽检结论；需要返工的卡另按下文分诊，不能据此直接标记 reviewed。
 
 ## 标准顺序（一关一关推）
 
 ```bash
-P="uv run python -m stgtranscribe.pipeline"
+P="uv run --frozen python -m stgtranscribe.pipeline"
 $P split --stages 1-7          # 可以一次全关
 $P extract --stages 1-7
 $P transcribe --stage N --jobs 16
@@ -41,10 +80,11 @@ $P review --stage N
 $P status --stage N
 $P sample --stage N            # → work/sample-sN.json
 # opus 抽检（见下）
-$P collect --stage N           # 然后 git add cards/ && git commit
+$P collect --stage N           # 收卡后核对改动；仅在用户授权后提交，推送另需授权
 ```
 
-后台跑用 `run_in_background`；日志在 `transcribe/work/logs/<id>.<阶段>.<轮次>.log`。
+默认后端仍是 dsh-flash；如按已有约定切换 `transcribe/tools/claude-worker`，用 Sonnet、`--jobs 4`，不要照上例开 16 路。
+后台启动后按 `docs/agent-memory/verify-background-launch.md` 核实实际 worker 与日志；日志在 `transcribe/work/logs/`，以实际文件名为准。
 
 ## 便笺分诊（每批跑完必做）
 
@@ -55,8 +95,8 @@ $P notes            # 只列未分诊的，按影响面排序（疑似全池 →
 $P notes --mark     # 处理完把这批标记掉
 ```
 
-处置：证据成立且影响面大 → 改 `mapping.md` / 契约（改完跑 `pytest tests/transcribe`，并刷新所有单元的
-`mapping-excerpt.md`），必要时把已入库的卡打回返工；属引擎缺机制 → 记 stg-engine `docs/follow-ups.md`；
+处置：证据成立且影响面大 → 改 `mapping.md` / 契约，按改动运行相关既有检查，并按上文刷新受影响的待派发单元；
+必要时把已入库的卡打回返工。属引擎缺机制 → 先记录证据与候选处理，不自行扩展引擎功能；
 只此单元 → 确认已写进 report/verdict 即可。**1–3 关那批的三个批量扩散问题（§4.3 停火守卫、640 弹池、
 出生特效降速）都是撞了一次却影响全池，当时没有这条通道，全靠事后抽检才发现。**
 
@@ -88,8 +128,9 @@ $P usage [--stage N] [--since 2026-09-18]   # 步数 / 计费输入估算 / 推�
 
 `sample` 选出每关 pass 卡约 20%（至少 2 张）+ 全部 `needs_human`。对每张：
 
-1. Agent tool 派子代理，**显式 `model: "opus"`**，prompt：读 `transcribe/contracts/review.md` 按契约审
+1. 在提供 Opus 的 Claude 环境使用 Agent tool，**显式 `model: "opus"`**，prompt：读 `transcribe/contracts/review.md` 按契约审
    `transcribe/work/units/<id>/`（卡在 `out/`，原文 `source.txt`），结论写回复里（它不能写 cwd 以外时就写回复）。
+   当前环境没有 Opus 时保留待抽检清单并说明，不能换一个模型后宣称已完成 Opus 抽检。
 2. 对比 dsh 的 `work/review/<id>/verdict.json`：
    - opus 找到 dsh 漏掉的 **critical** → 改 `contracts/review.md` 的清单（把漏掉的那类显式写进去），这一关**全部重审**：
      把该关 `reviewed` 的单元 `record(id, "validated")` 后重跑 `review`。
@@ -101,9 +142,9 @@ $P usage [--stage N] [--since 2026-09-18]   # 步数 / 计费输入估算 / 推�
 
 - **角度心算翻倍**：π/32 = 1024bam，不是 2048。worker 被要求照抄 `source.txt` 注释；审核发现角度整体差 2 倍就是这个。
 - **粘滞难度前缀**：`!L shoot_disable();` 之后的行都是 L-only，直到下一个前缀。
-- **locals 超 64**：xformdef 按物理槽 × 3 字算进引用它的 sub；拆并行任务。
+- **locals 超 64**：先区分旧常量 xform 的 staging 与新按值绑定。旧路径按物理槽 ×3 占 locals；动态模板另核捕获/物理槽预算，不为绕过旧限制无条件拆并行任务。
 - **自动射击停火守卫用 `>`**：原作设定帧当帧就 tick，首发在第 `n−1` 帧；我方 `wait(n)` 统一晚 1 帧，`first > until` 才停（对照表 §4.3）。
-  2026-09-16 曾误改成 `>=`，审核若再提「until 帧多打一轮」，先核这条。改对照表后要**刷新所有单元的 `mapping-excerpt.md`**（`extract` 不覆盖已往下走的单元）。
+  2026-09-16 曾误改成 `>=`，审核若再提「until 帧多打一轮」，先核这条。改对照表后按上文刷新受影响的待派发单元。
 - **弹峰值超 1024**：先看是不是 TH06 的 640 弹池在压画面（我方池 8192，屏内弹数照样超）。做法见设计 §13.4 第 2 条：
   离线复现 640 池（`work/units/th06_s3_w12/pool640/poolsim.py`，要临时放开 harness `AT_DUMP_LIMIT`）→ 拟合「某类弹 `$frame ≥ N` 的轮次不发」→
   返工派 dsh 实现 → 主会话用同一脚本复核曲线误差。不要随手抽稀颗数，也不要只收窄 ranks 了事。

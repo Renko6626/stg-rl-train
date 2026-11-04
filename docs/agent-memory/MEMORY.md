@@ -40,7 +40,10 @@
 - [CNN配对适应u2000（2026-10-09）](../practice-cards/2026-10-09-density-p2-u2000.md) — 用户确认统一2000轮慢退火并授权阶段性提交/推送后并行启动；固定推送commit 2e26b25，仅传初始化数据；CNN efee48f5a6b9127d/无CNN d0b3a240f2628dcf均B2，启动检查GPUCHECK PASS且真实PPO连续更新；两臂已完整完成/取回，16512局重算通过；无CNN原作自由+0.16pp/跟点+0.36pp、专项−5.21pp（瞄准卡−29.69pp）、自由Shift频率约2.28倍；阶段专项排序反转，单train seed，见[结果](../practice-cards/2026-10-10-density-p2-u2000-results.md)
 - [转写 worker 可换 Sonnet](transcribe-claude-worker-fallback.md) — DeepSeek 没余额就 STG_DSH_BIN=claude-worker；并发 4；dsh 审核必须配 opus 抽检
 
-- [现代 ECL 独立导入原型（2026-10-23）](modern-ecl-import-prototype.md) — 源码路径与label/goto已推送；当前仅13/798可生成、4个实质攻击，Luna/high抽查限于已声明近似，训练未就绪；已记录局限和恢复优先级，会话暂告结束
+- [现代 ECL 独立导入原型（2026-10-23）](modern-ecl-import-prototype.md) — 源码路径与label/goto已推送；当前仅13/798可生成、4个实质攻击，训练未就绪；后续已核164种opcode与引擎能力；三方缓动表与30条命名曲线落地25；显式accum／accel／Hermite任务槽落地26，旧存档／golden变化，训练wheel未升级，详见条目
+- [原作ECL能力调研与动态xform交付（2026-11-02/03）](ecl-capability-audit.md) — 五类表按LLM整段转写收窄；引擎07058f3含ENGINE_VER29动态xform及单值STEP，训练已接入0.4.3 wheel；TH06转写skill/写审契约/对照表已同步，176份单元输入已刷新，旧卡未迁移
+- [原作EX效果时随机取样（2026-11-04）](ecl-capability-audit.md#2026-11-04-原作ex执行时随机取样已确认) — TH18五面Boss三处VELTIME在效果进入时逐弹抽随机方向；原生调用链已核，不能混同配置时RAND；TH16随机STEP分支支持与脚本实际使用分开判断
+- [xform三阶段rand接入（2026-11-04）](ecl-capability-audit.md#2026-11-04-xform三阶段rand已实现并接入训练) — 用户确认后ENGINE_VER30支持绑定/出生/效果时rand，沿用World RNG；训练wheel0.4.4，写审指引及176份派生资料同步，旧卡未迁移
 
 ## 迁移说明
 

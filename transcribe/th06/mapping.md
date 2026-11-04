@@ -4,6 +4,8 @@
 > `EnemyManager.cpp`）编写。**这是转写的唯一语义依据**：别凭 ZUN 指令名猜语义，也别凭对别的 ECL 版本的记忆。
 > 出处写作 `EclManager.cpp:357`（renkolab `local/vendor/th06-decomp/src/` 下的行号）。
 > 我方语言以 stg-engine `docs/ecl-lang/` 为准；本文只讲**怎么从 TH06 翻过去**。
+> 2026-11-04 更新：带参/动态 xform 需要 ENGINE_VER28；单值 STEP 扩展需要 ENGINE_VER29；模板体内 rand 需要 ENGINE_VER30。
+> 训练仓使用 `stg-rl==0.4.4`（ENGINE_VER30），启动 worker 前仍须核对本机 wheel 与 release harness。
 >
 > 本文每个 ```ecl 围栏都是完整程序，被训练仓 `tests/transcribe/test_mapping.py` 真编译。
 
@@ -407,11 +409,13 @@ sub main() {
   ⚠️ **逐颗 `fire` 一帧最多约 30 颗**（每颗带两次 `rand` 约 31 条指令；实测 32 颗 OK、36 颗 Fault）。`sh_fire` 一次算一条，不受影响。
   更多颗就拆给几个 emitter 任务各发一部分。emitter 出生当帧不跑：要么**整轮都**交给 emitter（整轮晚 1 帧，写进 report），
   要么提前一帧 spawn 好、在开火帧一起发。**别一半在本任务发、一半在 emitter 里发**，那样同一轮会被劈成两帧。
-- ⚠️ **xformdef 占 locals**：一个 sub 每引用一个 xformdef，就在**这个 sub** 的 locals 里占「物理槽数 × 3」字
+- ⚠️ **旧零形参全常量 xformdef 占 locals**：一个 sub 每引用一个，就在**这个 sub** 的 locals 里占「物理槽数 × 3」字
   （`step_speed` 占 2 槽）。4 个 `@40 step_speed; turn; set_speed` 就是 48 字，再调一个带变量的 sub 就超 64。
   超了（报「locals 总量 … 超出上限 64」）→ **按弹种拆成几个并行 `async sub`**，同帧 `spawn`、各自数帧（范例 th06_s1_b4）。
-- ⚠️ **`sh_xform` 与 `sh_fire` 写在同一个 sub 里**：xformdef 在引用它的 sub 入口暂存进该 sub 的 locals，
+- ⚠️ **旧静态 xform 的 `sh_xform` 与 `sh_fire` 写在同一个 sub 里**：模板在引用它的 sub 入口暂存进该 sub 的 locals，
   在子 sub 里 `sh_xform`、回到调用方再 `sh_fire`，那段 locals 可能已被别的子 sub 覆写，弹的变换会静默错乱。
+- **带参或动态 xform** 使用共享程序与按值绑定，不按每物理槽 3 字占调用者 locals，也不保留 helper 的 locals 引用。
+  可在同步 helper 里绑定、返回后开火。发射器仍是**任务私有**，不能据此跨 `async sub` 共用发射器。求值时点与容量见 §5。
 
 ## §3 弹型与颜色
 
@@ -630,7 +634,7 @@ async sub autoshoot(interval: int, delayed: int, until: int) {
 async sub fairy() {
     set_invuln(65535);
     spawn autoshoot(120, 1, 10000);
-    move_vel(0, 90deg, 2.0fx, 0);
+    move_vel(0, 90deg, 2.0fx, EASE_LINEAR);
     wait(300);
 }
 
@@ -662,8 +666,11 @@ rank 16 下的修正量（`Enemy.hpp` 的 `BulletRank*Inner`，C 整数除法向
 
 ## §5 弹变换：`bullet_effects` + `flags` → `xformdef`
 
+本节带参/动态写法需要 ENGINE_VER28+，模板体内 rand 需要ENGINE_VER30；当前训练基线为 `stg-rl==0.4.4`、ENGINE_VER30。
+
 `bullet_effects(i0, i1, i2, i3, f0, f1, f2, f3)` 设参数，`bullet_*` 的 `flags` 选行为（`BulletManager.cpp:316-380` 设定，
-`710-890` 逐帧）。xformdef 参数必须是编译期常量，**每组不同参数写一个 xformdef**，用 `sh_xform(k, NAME)` 挂上。
+`710-890` 逐帧）。常量序列用 `sh_xform(k, NAME)`；运行期参数用带参模板 `sh_xform(k, NAME(args))`，
+逐颗发弹时放在 `fire(..., NAME(args), none)` 的 xf 位。动态参数不再要求另写常量模板、弹任务或量化值域。
 
 | flags 位 | 行为（TH06） | xformdef |
 |---|---|---|
@@ -676,9 +683,13 @@ rank 16 下的修正量（`Enemy.hpp` 的 `BulletRank*Inner`，C 整数除法向
 | `0x400` | 碰左右上下场界反弹，速度变 `f0`（`<0` 不变），共 `i0` 次 | `bounce_arm(15, n);`（n ≤ 3） |
 | `0x800` | 同上但只左右上 | `bounce_arm(7, n);` |
 
-- 一段 xformdef 最多 16 物理槽；`step_speed` 占 2 槽，所以 `0x40` 族**最多写 3 个周期**再加收尾。超出部分做近似，写进 report。
+表中的 `@D` / `@I` 是时序示意，写源码时要替换成实际 u16 帧数字面量；动态操作参数不使 `@N` 变成表达式。
+
+- 一段 xformdef 的操作、STEP scratch 与持久捕获数据**合计 ≤16 物理槽**；每条 STEP 占 2 槽。
+  先核实际槽数；动态捕获也占段尾空间，不能沿用常量序列的周期上限。超限时写清原因再分诊，不自动删周期或改参数。
 - `0x40` 族最后一个周期结束后速度保持 `f1` 不再减速（TH06 清掉该位）——xformdef 在 `set_speed(f1)` 处自然结束。
-- `f1 < 0`（保持原速）且一次开火里各层速度不同 → 按层拆成多个发射器 / 多个 xformdef。
+- `f1 < 0`（保持原速）且各层速度不同：需要恢复初速时用 `set_speed(at_spawn($self_speed))` 保存每弹最终出生速度，
+  不要在减速完成后用 `at_effect($self_speed)` 取到 0；含其他速度效果的组合另按原作字段更新顺序核对。
 - `0x1` 与 `0x10` 叠加（如 `flags = 19`）：`0x10` 的计时也从出生算起，`@D` 写成 `@(D−16)` 接在冲刺之后：
   `add_speed(5.0fx); @16 set_accel(-0.3125fx); @(D-16) set_accel(f0); stop_fx();`（`D−16` 请算成数字）。
 - `0x1` 与 `0x20` 叠加（如 `flags = 37`）同理：`0x1` 与 `0x10/0x20` 在 `BulletManager.cpp:711-747` 是 `if … else if` 链，
@@ -686,34 +697,50 @@ rank 16 下的修正量（`Enemy.hpp` 的 `BulletRank*Inner`，C 整数除法向
   `add_speed(5.0fx); @16 set_accel(-0.3125fx); set_accel(f0); @(i0-16) set_ang_vel(f1); stop_fx();`（2026-09-25 抽检 s4_b8：卡在冲刺期就开始转，多转约 11°）。
   ⚠️ `@N` 是**后置延迟**（执行本 op 再等 N 帧），所以 `@(i0−16)` 挂在 `set_ang_vel` 上：帧 16 同时换加速度、开转，等 `i0−16` 帧后 `stop_fx`。挂在 `stop_fx` 上会在帧 16 就停，弹不转弯（范例见 th06_s4_b8 的 `CURVE_R`）。
 - 反弹后改速度、反弹 > 3 次：做不到，近似并在 report 写明。
-- **`f0` / `f1` 是运行期变量**（`%F0`、`%PLAYER_ANGLE`、循环累加量……）：TH06 在**建弹时**把值拷进每颗弹
-  （`BulletManager.cpp:345-356`），所以**同一条 `bullet_*` 的弹共享一个值**。按下面的顺序选：
-  1. 值只有少数几个离散取值（难度、循环计数）：每个值写一个 xformdef，按值分派。
-  2. 连续取值、且 `run` 实测任务峰值加上「每轮颗数 × 同时在场的轮数」≤ 192：用弹上任务，精确。
-     任务出生当帧不跑，比 xformdef 晚 1 帧起跑，等待要减 1（ecl-lang `4-bullets.md`「sh_task 与 xformdef 天生错开 1 帧」）。
-     每轮的值经全局自由段槽传给任务，前提是相邻两轮至少隔 2 帧，否则任务读到的是下一轮的值。
-  3. 否则就量化：值域均分成 N 档，**每档 ≤ 11.25°**（`[−90°, 90°)` 取 16 档），取档中心；每轮 `rand(N)` 选**一档**，全轮共享。
-     每档一个 xformdef，配一个只引用它的同步 sub：兄弟 sub 的 locals 由调用图着色复用，16 档也不超 64 字。
-     report 写明档数和最大误差（半个档宽）。
+- **运行期参数先确定取值时点**：TH06/NC 执行 `bullet_effects` 时就把当时的寄存器/表达式值存入敌人的发弹配置；
+  `bullet_*` 建弹再把这份配置复制进每弹字段（`BulletManager.cpp:316-380`）。所以应在原配置点绑定模板，
+  或先保存局部快照、开火时传入快照。配置后若改写 `%F0/%F1`，不能到开火时重新读取它们。
+- **随机的共享范围照原文**：同一份 `bullet_effects` 配置发出的弹共享配置值，直到下次配置。
+  在普通 sub 的原取样位置调用一次 `rand`，再按值传入；不要放到逐弹循环里重摇。
+  ENGINE_VER30起模板体也允许 `rand`：未标记时绑定抽一次、同配置共享；`at_spawn(rand(...))` 每弹出生抽一次，
+  `at_effect(rand(...))` 每次进入操作时抽一次。原作若在配置点抽样，仍保留配置时共享语义，不改成逐弹随机。
+
+| 写法 | 求值时点 | 适用情形 |
+|---|---|---|
+| `NAME(args)` 实参、未标记的动态操作参数 | `sh_xform` 绑定 / `fire` 单发语句执行时各算一次，self 是调用者 | 原作配置时确定的角度、速度、加速度等 |
+| `at_spawn(expr)` | 每弹最终出生状态确定后、首条效果前；self 是新弹 | 保存每弹初速，如 `set_speed(at_spawn($self_speed))` |
+| `at_effect(expr)` | 每次进入该操作时；self 是当前弹 | 原作确实在效果发生时读取的当前位置/玩家状态 |
+
+标记包住**完整操作参数**，如 `set_speed(at_effect($self_speed + extra))`；不能嵌套标记。
+STEP 的目标/时长/曲线在进入操作时确定，插值中不重采样；WAIT_SIGNAL 通道在进入时确定，等待中不重采样。
+模板只看见 const、形参和允许的引擎读口；调用者局部变量通过实参传入。模板体允许三型表达式、
+`global/sin/cos/atan2/dist/aim_player` 等读口和 `rand`，不能调用任意 sub、写其他状态或查询显式插值槽。
+随机表达式沿用 World RNG，按源码顺序独立抽样；短路跳过不抽，`rand(n)*0` 仍抽，n<=0返回0且不消耗。
+STEP/WAIT_SIGNAL进入时抽样后保持，LOOP重入才重抽；已执行的抽样不因后续操作参数非法回滚。
+
+形参、绑定采样与出生采样合计最多 **8 个逻辑缓存值**；效果表达式最多 128 条指令、临时栈 32 字。
+`@N` 仍是 **u16 字面量、后置等待**，不能写 `@duration`；STEP 虽能收动态时长，也不会替序列自动等待。
+需要有限几种等待时长时可保留常量时序模板、共用动态数值参数；确需弹任务的控制流仍核 256 总任务槽及晚起跑 1 帧的差异。
+旧卡的量化/取中值/全局槽传参是历史绕法，新转写不再因“参数非常量”沿用这些近似。
+ENGINE_VER29 另有 `step_vx/vy`、`step_ax/ay`、`step_accel`、`step_ang_vel`；都占 2 槽且非阻塞。
+仅在原行为确需对应分量/标量缓动时使用，不能把原作恒定加速度自行改成缓动加速度；具体曲线与运动模式见引擎 `4-bullets.md`“单值缓动”。
+
 - **摘录注释里 `bullet_effects` 的 `a4` / `a5` 未必是角度**：`f0` 在 0x10 下是加速度，`f1` 在 0x40 族下是速度。
   摘录器对浮点参数一律按 rad→BAM 注释，这两位**以本表为准**，别照抄注释里的 bam。
 
 ```ecl
 const RICE: int = 64;
 
-// bullet_effects(180, 1, -1, -1, %F0, 1.4f, …) + flags 0x40，%F0 每轮 set_float_rand_bound_min($F0, π, −π/2) 重摇。
-// 值域 [−90°, 90°) 分 N 档取档中心；同一轮所有弹共享一档（TH06 在弹创建时拷 exFloats，同轮共享）。
-// 每档一个 xformdef + 一个只引用它的同步 sub：兄弟 sub 的 locals 由调用图着色复用，N = 16 也不超 64 字。
-// 示例只写 4 档；实际按「每档 ≤ 11.25°」取 N（[−90°, 90°) → 16 档）。
-xformdef TQ0 { @180 step_speed(0fx, 180); turn(-12288bam); set_speed(1.4fx); }  // [−90°, −45°) → −67.5°
-xformdef TQ1 { @180 step_speed(0fx, 180); turn(-4096bam); set_speed(1.4fx); }   // [−45°, 0°)  → −22.5°
-xformdef TQ2 { @180 step_speed(0fx, 180); turn(4096bam); set_speed(1.4fx); }    // [0°, 45°)   → 22.5°
-xformdef TQ3 { @180 step_speed(0fx, 180); turn(12288bam); set_speed(1.4fx); }   // [45°, 90°)  → 67.5°
+// bullet_effects(180, 1, -1, -1, %F0, 1.4f, …) + flags 0x40。
+// 原取样位置每轮抽一个 [−90°, 90°) 角度，整轮共享，不量化成几档。
+xformdef DECEL_TURN(offset: angle, final_speed: fx) {
+    @180 step_speed(0fx, 180);
+    turn(offset);
+    set_speed(final_speed);
+}
 
-sub vol_q0() { sh_xform(0, TQ0); sh_fire(0); }
-sub vol_q1() { sh_xform(0, TQ1); sh_fire(0); }
-sub vol_q2() { sh_xform(0, TQ2); sh_fire(0); }
-sub vol_q3() { sh_xform(0, TQ3); sh_fire(0); }
+// 同步 helper 与调用者共用本任务的发射器；绑定值不引用 helper 的 locals。
+sub bind_turn(offset: angle) { sh_xform(0, DECEL_TURN(offset, 1.4fx)); }
 
 async sub pattern() {
     loop {
@@ -722,11 +749,10 @@ async sub pattern() {
         sh_ring(0, 1);
         sh_count(0, 16, 2);
         sh_speed(0, 2.0fx, -0.5fx);
-        var q: int = rand(4);            // 每轮一次，全轮共享
-        if q == 0 { vol_q0(); }
-        else if q == 1 { vol_q1(); }
-        else if q == 2 { vol_q2(); }
-        else { vol_q3(); }
+        var turn_angle: angle = (rand(32768) as angle) - 90deg;
+        bind_turn(turn_angle);           // 对应原 bullet_effects 配置点，按值保存
+        turn_angle = 0deg;               // 示意后续寄存器改写，不改变已保存配置
+        sh_fire(0);                      // 本轮 32 颗仍共享刚才的随机转角
         wait(30);
     }
 }
@@ -783,7 +809,7 @@ sub main() {
 
 → `spawn_enemy((x − 192) fx, y fx, 1, 0, 0, 0, SubX(mirror, …))`，血量 / 掉落 / 分数一律填 `1, 0, 0, 0`（小怪无敌，D8）。
 
-- **镜像只取反水平速度**：`move_velocity(a, s)` → `move_vel(0, 180deg − a, s, 0)`；`move_angular_velocity(w)` → `−w`；
+- **镜像只取反水平速度**：`move_velocity(a, s)` → `move_vel(0, 180deg − a, s, EASE_LINEAR)`；`move_angular_velocity(w)` → `−w`；
   `move_axis_velocity(vx, …)` → `−vx`。**弹的角度不镜像**，出弹口不镜像，`move_position` 绝对坐标不镜像。
   镜像敌上的 `move_*_time_*`（插值移动）在 TH06 会发散，遇到按「目标点 x 关于起点镜像」近似并写进 report。
 - timeline 在 boss 在场时不出怪（`!g_Gui.BossPresent()`），`boss_wait(n)` 让 timeline 停到 boss 离场——切分已排除，单元内不会遇到。
@@ -815,7 +841,7 @@ async sub fairy(mirror: int) {
     spawn oob_guard();
     var a: angle = 90deg;
     if mirror != 0 { a = 180deg - a; }
-    move_vel(0, a, 2.0fx, 0);
+    move_vel(0, a, 2.0fx, EASE_LINEAR);
     wait(10000);
 }
 
@@ -857,12 +883,12 @@ TH06 三种移动模式（`EclManager.cpp:933-977`）：
 
 | TH06 | 我方 |
 |---|---|
-| `move_position(x, y, _)` | `move_to(0, (x−192) fx, y fx, 0);` |
-| `move_axis_velocity(vx, vy, _)` | `move_vel_xy(0, vx, vy, 0);` |
-| `move_velocity(a, s)` | `ang = a; spd = s; move_vel(0, ang, spd, 0);` |
-| `move_speed(s)` | `spd = s; move_vel(0, ang, spd, 0);` |
+| `move_position(x, y, _)` | `move_to(0, (x−192) fx, y fx, EASE_LINEAR);` |
+| `move_axis_velocity(vx, vy, _)` | `move_vel_xy(0, vx, vy, EASE_LINEAR);` |
+| `move_velocity(a, s)` | `ang = a; spd = s; move_vel(0, ang, spd, EASE_LINEAR);` |
+| `move_speed(s)` | `spd = s; move_vel(0, ang, spd, EASE_LINEAR);` |
 | `move_angular_velocity(w)` / `move_acceleration(acc)` | 记下 `w` / `acc`，**等待期间逐帧积分**（见下） |
-| `move_at_player(off, s)` | `ang = aim_player() + off; spd = s; move_vel(0, ang, spd, 0);` |
+| `move_at_player(off, s)` | `ang = aim_player() + off; spd = s; move_vel(0, ang, spd, EASE_LINEAR);` |
 | `move_rand(lo, hi)` | `ang = lo + rand(W) as angle;`（只改角，不改模式） |
 | `move_rand_in_bounds(lo, hi)` | 同上 + 靠近边界时反射（`EclManager.cpp:626`），见 `wander` 例 |
 | `move_position_time_*(t, x, y, _)` | `move_to(t, (x−192) fx, y fx, E);` |
@@ -871,8 +897,13 @@ TH06 三种移动模式（`EclManager.cpp:933-977`）：
 | `move_bounds_set(x0, y0, x1, y1)` | 记下边界（换算 x），供 `wander` 反射与夹紧目标点。**原作是每帧把位置夹进边界**（`Enemy::ClampPos`，`EnemyManager.cpp:469-490`，每帧 `:542/:571` 调用），不只是夹目标点：`move_to` 的目标点**必须**先夹进边界（到界即停的路径差是接受的近似，写进 report）；速度模式（`move_vel`）会越界时同样要处理（逐帧检查、到界停住），不能放任走出边界 |
 | `move_bounds_disable` | 不再夹紧 |
 
-缓动 `E`（`EclManager.cpp:949-966`）：`linear` → `0`；`decelerate` → `2`（QuadOut）；
-`decelerate_fast` → `5`（CubicOut，原为四次，近似）；`accelerate` → `1`（QuadIn）；`accelerate_fast` → `4`（CubicIn，近似）。
+缓动 `E` 按曲线语义选择引擎枚举导出的名称（`EclManager.cpp:949-966`）：
+`linear` → `EASE_LINEAR`；`decelerate` → `EASE_QUAD_OUT`；
+`decelerate_fast` → `EASE_QUART_OUT`（四次减速）；
+`accelerate` → `EASE_QUAD_IN`；`accelerate_fast` → `EASE_QUART_IN`（四次加速）。
+TH06/NC 内部缓动编号、TH18 mode 与我方枚举编码不同，禁止直接搬运原生编号。
+以上名称由当前引擎源码编译器注入，四次曲线要求ENGINE_VER25。使用旧训练wheel时需先升级配套引擎。
+既有卡池尚未迁移，历史四次→三次近似记录不因本表更新而自动失效。
 
 - **`move_to` 要写在速度动词之后**，这样到点即停（与 TH06 插值结束清速一致，见 ecl-lang 3 篇「位置层与速度层」）。
 - `ang` / `spd` 请在任务里用变量**自己记住**，别读 `$self_angle`（近乎静止时不更新）。
@@ -892,16 +923,16 @@ async sub swirl_fairy(mirror: int) {
     var acc: fx = 0fx;
     var sgn: int = 1;
     if mirror != 0 { sgn = -1; ang = 180deg - ang; }
-    move_vel(0, ang, spd, 0);
+    move_vel(0, ang, spd, EASE_LINEAR);
     wait(40);
     // +40: move_angular_velocity(-0.024543693f)  ;  下一条在 +80
     w = -256bam;
     if sgn < 0 { w = 256bam; }
-    for k1 in 0..40 { ang = ang + w; spd = spd + acc; move_vel(0, ang, spd, 0); wait(1); }
+    for k1 in 0..40 { ang = ang + w; spd = spd + acc; move_vel(0, ang, spd, EASE_LINEAR); wait(1); }
     // +80: move_angular_velocity(0.019634955f)  ;  下一条在 +180
     w = 205bam;
     if sgn < 0 { w = -205bam; }
-    for k2 in 0..100 { ang = ang + w; spd = spd + acc; move_vel(0, ang, spd, 0); wait(1); }
+    for k2 in 0..100 { ang = ang + w; spd = spd + acc; move_vel(0, ang, spd, EASE_LINEAR); wait(1); }
     // +180: move_angular_velocity(0.0f)
     w = 0deg;
     wait(9820);
@@ -935,7 +966,7 @@ sub wander(spd: fx, t: int, bx0: fx, by0: fx, bx1: fx, by1: fx) {
     var ty: fx = $self_y + sin(v as angle) * d;
     if tx < bx0 { tx = bx0; } else if tx > bx1 { tx = bx1; }
     if ty < by0 { ty = by0; } else if ty > by1 { ty = by1; }
-    move_to(t, tx, ty, 2);
+    move_to(t, tx, ty, EASE_QUAD_OUT);
 }
 
 async sub boss() {
@@ -1029,7 +1060,7 @@ TH06 的段落靠回调串起来（`EnemyManager.cpp:340-447`）：
    但**不真的滑**；
 2. 窗口里每一批弹的出弹原点 = 滑行曲线上那一刻的采样点。`move_to(…, easing 2)` 是 **QuadOut**，
    即 `e(t) = 1 − (1−t)²`；第 k 批在 `t = (批间隔·k)/T`，位置 `p0 + (p1−p0)·e(t)`；
-3. 弹**直接按真速出生**（不再 0 速 + `wait_signal`），boss 用 `move_to(0, x, y, 0)` 瞬移到终点；
+3. 弹**直接按真速出生**（不再 0 速 + `wait_signal`），boss 用 `move_to(0, x, y, EASE_LINEAR)` 瞬移到终点；
 4. `ex_ins_call(4, 2)` 在窗口里调 N 次 ⇒ 每颗弹累计被改一次的概率是 `1 − (3/4)^N`，压成**一次抽签**
    （每次抽中都是均匀角，分布等价）。N=6 → `3367/4096`；N=7 → `3549/4096`。
 
@@ -1080,7 +1111,7 @@ async sub boss() {
         u = 1.0fx - t;
         spawn wave(ex + (tx - ex) * (1.0fx - u * u), ey + (ty - ey) * (1.0fx - u * u), k);
     }
-    move_to(0, tx, ty, 0);              // boss 瞬移到滑行终点
+    move_to(0, tx, ty, EASE_LINEAR);              // boss 瞬移到滑行终点
     wait(1);                            // 让各批当帧落弹
     // ── 窗口结束 ──
     loop { wait(60); }
@@ -1160,38 +1191,23 @@ decomp `EnemyEclInstr.cpp:415-461`：扫全场弹，**每颗都**把 `spriteOffs
 | 0 | `speed = 0` + 速度向量清零 —— 全场弹**原地冻住** |
 | 1 | `exFlags |= 0x10`（笛卡尔加速）、`ex4Acceleration = 随机方向 × 0.01`、计时清零、`ex5Int0 = 220`<br>—— 每颗弹**朝各自随机方向以 0.01 px/帧² 加速 220 帧** |
 
-和 §10.1 是同一套工具：**换色 + 冻住**走 xform（零任务槽），**随机方向加速**要逐颗不同的方向 ⇒ 弹挂任务。
-卡内所有会被波及的弹，出生时就要带上这段变换 / 任务。
+卡内所有会被波及的弹，出生时就要带上对应变换。ENGINE_VER30起，预知弹集合的“一次冻住、随后一次散开”
+可用信号 + 效果时 rand 表达，零弹任务；仍须核对原回调影响的弹集合、筛选与执行相位，不能据此认定任意全场回调都已精准支持。
 
 ```ecl
 const ICE: int = 32;
-const EPOCH: int = 20;
-
-xformdef FREEZE {            // param 0：等信号 → 变色 + 冻住（`set_color` 只换色轴，保住形状）
+xformdef FREEZE_SCATTER {
     wait_signal(0);
     set_color(15);
     set_speed(0fx);
-}
-
-async sub scatter() {        // param 1：等纪元 → 随机方向 0.01 加速，220 帧后停
-    var seen: int = global(EPOCH);
-    loop {
-        var now: int = global(EPOCH);
-        if now != seen {
-            seen = now;
-            var a: angle = rand(65536) as angle;
-            set_gravity(0, cos(a) * 0.01fx, sin(a) * 0.01fx);
-            wait(220);
-            stop_fx(0);
-            return;
-        }
-        wait(1);
-    }
+    wait_signal(1);
+    set_angle(at_effect(rand(65536) as angle)); // 散开时每弹各抽一次
+    @220 set_accel(0.01fx);
+    stop_fx();
 }
 
 async sub cirno() {
     set_invuln(65535);
-    set_global(EPOCH, 0);
     sh_reset(0);
     sh_sprite(0, ICE, 2);
     sh_aim(0, 0);
@@ -1199,13 +1215,12 @@ async sub cirno() {
     sh_count(0, 24, 1);
     sh_speed(0, 2.0fx, 0fx);
     sh_angle(0, 0deg, 0deg);
-    sh_xform(0, FREEZE);      // 这一波会被「冻住」波及
-    sh_task(0, scatter);      // 同一波之后还要被「散开」波及时，两个都挂
+    sh_xform(0, FREEZE_SCATTER);
     sh_fire(0);
     wait(120);
     pulse_signal(0);                          // ex_ins_call(0, 0)：冻住
     wait(120);
-    set_global(EPOCH, global(EPOCH) + 1);     // ex_ins_call(0, 1)：随机方向加速
+    pulse_signal(1);                          // ex_ins_call(0, 1)：随机方向加速
     wait(300);
 }
 
@@ -1215,7 +1230,8 @@ sub main() {
 }
 ```
 
-**注意**：① 一波弹同时要「冻」和「散」时，`sh_xform` 与 `sh_task` 都挂（变换零槽、任务一颗一槽，注意任务池 256）；② `set_gravity` 的两参是每帧加速度，原作是 `0.01`；③ **换色只有 xform 有**（`set_color` 不在弹挂任务的九个 setter 里）；反正换色是纯表现，任务分支按 §11 丢弃即可；④ 冻住后弹**仍有判定**（原作也是）。
+**注意**：本例从静止开始，角度固定后的沿向加速度给出随机方向0.01的加速，220帧后停止加速；
+若同时还有转向、其他加速度或重复冻/散，须按原作状态合成另写。冻住后弹**仍有判定**（原作也是）。
 
 ## §11 丢弃（纯表现 / 音效 / 道具）
 
@@ -1252,7 +1268,7 @@ async sub sub0(mirror: int) {
     spawn oob_guard();
     var a: angle = 90deg;
     if mirror != 0 { a = 180deg - a; }
-    move_vel(0, a, 2.0fx, 0);
+    move_vel(0, a, 2.0fx, EASE_LINEAR);
     wait(10000);
 }
 
@@ -1295,7 +1311,7 @@ const PELLET_T: int = 128;
 
 async sub pattern() {
     // 原文 Sub27：move_position_time_decelerate(120, 192.0f, 96.0f, 0.0f); +120 …
-    move_to(120, 0.0fx, 96.0fx, 2);
+    move_to(120, 0.0fx, 96.0fx, EASE_QUAD_OUT);
     wait(120);
     loop {
         // 原文 Sub28 的发弹循环翻译在这里

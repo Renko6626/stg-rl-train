@@ -1,0 +1,260 @@
+{
+  "date": "2026-11-04",
+  "method": "Static decode of original ECL plus existing native decompilation and PE disassembly; no original-game execution",
+  "games": {
+    "16": {
+      "version": "v1.00a",
+      "ecl_files": [
+        {
+          "file": "default.ecl",
+          "sha256": "78639d7de7d0fcd8a3e41fd9ac5df5492800d4b96cc9d952f41cc1acfd20bf7e"
+        },
+        {
+          "file": "st01.ecl",
+          "sha256": "94eb749e467515dec8679f231c2f3fb83a6c525f6e14a2423ab0c531b3c51496"
+        },
+        {
+          "file": "st01bs.ecl",
+          "sha256": "e70047707f78d8abc4ad6dd6aa63a9c791ad0d7e6a8c55dee1a4a585a46008f1"
+        },
+        {
+          "file": "st01mbs.ecl",
+          "sha256": "9df4c1229d32cafe9482ef03735f0b181223ca69c853e4b77b2fa11ceb0bf2d1"
+        },
+        {
+          "file": "st02.ecl",
+          "sha256": "aacd573b389b8872f062b17386d01e24e9fd5acc50c96916ed7c02b632f12317"
+        },
+        {
+          "file": "st02bs.ecl",
+          "sha256": "7f40d8674eb6909f39d99a5280169e597b697eeadf7094a6b637250ac00a36d1"
+        },
+        {
+          "file": "st02mbs.ecl",
+          "sha256": "c4eea5a5e2d7e0ee00142d991a6c29ad7053cd72caebafc3381c4826c819e5d2"
+        },
+        {
+          "file": "st03.ecl",
+          "sha256": "210e678dbb390d63f7914a042f918cf007c97284a7aea36f7846e39e1da7f426"
+        },
+        {
+          "file": "st03bs.ecl",
+          "sha256": "eb8b4edca38b4bcdda72344d7d75c0c2d8015fd2b854e5156588a9906fd30080"
+        },
+        {
+          "file": "st03mbs.ecl",
+          "sha256": "f58d0f2e72e3c89d3ab2b7247ee39df8135395c5efe97a2dc84fc920148dffe4"
+        },
+        {
+          "file": "st04.ecl",
+          "sha256": "17ed865dee60535f41b813fa842f236390d57347f2b001225e9a3b632a382f69"
+        },
+        {
+          "file": "st04bs.ecl",
+          "sha256": "925dc6fb47519e48b017cb5b5e2088f8e73b03de76d619c580257784b0f456fa"
+        },
+        {
+          "file": "st04mbs.ecl",
+          "sha256": "eb3b136fed44a31aaafe1a80c2bdf6148a6d803b09cdd06ad1301ba7573a493c"
+        },
+        {
+          "file": "st05.ecl",
+          "sha256": "6e6a662aee74457b5ff502d01b6dd453c2a7ec9e666b71e151805185bfd8cb2e"
+        },
+        {
+          "file": "st05bs.ecl",
+          "sha256": "3de2075ba42f23bf04c71a290354de3a81d838b9aebc6b647e05bfbdfd151742"
+        },
+        {
+          "file": "st05mbs.ecl",
+          "sha256": "a8ffdd6e7ecdf701673b9e916296d023fc98dfff91c4aaae9916e63f6fafacb1"
+        },
+        {
+          "file": "st06.ecl",
+          "sha256": "be3febda47f75906008c878290b5028519ea54aff47c9f9fa1dd486331b04492"
+        },
+        {
+          "file": "st06bs.ecl",
+          "sha256": "3ce28bc72e59725462cb1e313565f41d4cb37410e238bba1a6fb102e02c77a1a"
+        },
+        {
+          "file": "st07.ecl",
+          "sha256": "4d2c505dc939d8fc70ec0360b2a8cde4457c9e0dfbbe52fad3ea8e8d285e3898"
+        },
+        {
+          "file": "st07bs.ecl",
+          "sha256": "84c1da07de6ba5b6b5527b6e86b8f07214706fa3c3a59ef31408d15550aed09f"
+        },
+        {
+          "file": "st07mbs.ecl",
+          "sha256": "69221ebc9e9e465647d6f6876318721783b01829ee4cf5997c7094d9f586a550"
+        },
+        {
+          "file": "st07mbs2.ecl",
+          "sha256": "8541b8d289fc4a9098f539c39cf14806fa326b8f7cab4e1953ea7b3da31102e9"
+        }
+      ],
+      "sub_count": 788,
+      "exe_sha256": "c11776019f083978e66027e7394dafb1fb9543afca986f28049a49417e341929",
+      "literal_EX_ANGLE_c_5_6_7_sites": 0,
+      "runtime_random_angle_EX_VELTIME_sites": []
+    },
+    "18": {
+      "version": "v1.00a",
+      "ecl_files": [
+        {
+          "file": "default.ecl",
+          "sha256": "d8b28f940d6c4adb79f1e7ea2760dfff8ab1bd1489c67a939bab6563c1062d90"
+        },
+        {
+          "file": "st01.ecl",
+          "sha256": "ce83a46483852869abcbaeca77a69ff6a60556bccfd8058b932026164bf7353f"
+        },
+        {
+          "file": "st01bs.ecl",
+          "sha256": "34b20b4d71caa8ce5922ec82829c0db55734ff2ce1d7e8c771912f8e9bed7ecb"
+        },
+        {
+          "file": "st01mbs.ecl",
+          "sha256": "e8697ef8e572a90e1535119d8eb905ab3b854003d2237172d4d4fc0fd7f2acf0"
+        },
+        {
+          "file": "st02.ecl",
+          "sha256": "24c64cf3d82d781d3023c8bc3b600e8b8ae338b9fa26d5dcf52fa046f320fc04"
+        },
+        {
+          "file": "st02bs.ecl",
+          "sha256": "a5d97329777c193f0411fdad7d07aa6fb6509e8dc893ddef7a8b60897518fa4c"
+        },
+        {
+          "file": "st02mbs.ecl",
+          "sha256": "788278124dbc3af393f83f0d324bcd705c8d52d0d99a5313796c4ae4e2a5294a"
+        },
+        {
+          "file": "st03.ecl",
+          "sha256": "fe0bf1c51fc1cf09d464696a8e8cd9a1f3c4cc9651fd7c27e2cb0d1696877ec4"
+        },
+        {
+          "file": "st03bs.ecl",
+          "sha256": "19e1c78f683a1031b347ad979d85a632891236290906de5ac2f30dc5d655f53c"
+        },
+        {
+          "file": "st03mbs.ecl",
+          "sha256": "e48197136a335b1fecd16e2ce7e1fd90870fa1541b8664a999ffadd2935ea0dd"
+        },
+        {
+          "file": "st04.ecl",
+          "sha256": "8a0661f113c738157143d5cbcd6a59c46e6d4ced500c766dbcb069954a2231d6"
+        },
+        {
+          "file": "st04bs.ecl",
+          "sha256": "ccfcf785754e77d3092d59c93797af4546ec539f7089d5d097fdc423ec319938"
+        },
+        {
+          "file": "st04mbs.ecl",
+          "sha256": "d108d704e3913c0eab4dbba5c3c03f404943d7d9823a0efbc4a05b6943b9e1d3"
+        },
+        {
+          "file": "st05.ecl",
+          "sha256": "fb68555b8195fe933231fc8c8542f1d18abb7011bb18a132a22da24868013ab4"
+        },
+        {
+          "file": "st05bs.ecl",
+          "sha256": "d7455ad659f2456bb01934bec7bfd301a9eebb667b4189201690a394eaf598de"
+        },
+        {
+          "file": "st05mbs.ecl",
+          "sha256": "64df8f391ebc7753d048b19d86c1c72f9fd32d6757668bf8b6c2f4c8f6fbc9fc"
+        },
+        {
+          "file": "st06.ecl",
+          "sha256": "5ac80073b2d9f60e438a01917c8cc2e25db6a60033e6f0ae14c1a586139b615a"
+        },
+        {
+          "file": "st06bs.ecl",
+          "sha256": "27b40f4f81e57dd1cd5e60599f6098e7b3c235e8a2082f08784c47cb8f623e48"
+        },
+        {
+          "file": "st06mbs.ecl",
+          "sha256": "f1b2e6e207abf5a5af5d238f4ad1aca99a1e8ba718f1a52895fe42be20d49a93"
+        },
+        {
+          "file": "st07.ecl",
+          "sha256": "0df4cd502fb14d4200cf31837a5a5393085a44b17c015b43b380fa560a8eed3b"
+        },
+        {
+          "file": "st07bs.ecl",
+          "sha256": "5d069da9044778f236bde92c7fef10965c6bfef2d29b7fbe5e4626a22219694a"
+        },
+        {
+          "file": "st07mbs.ecl",
+          "sha256": "4a908cbc95926dd364dd9611f0126a862db84549a5abeb9a03b7108bcfc425fc"
+        }
+      ],
+      "sub_count": 798,
+      "exe_sha256": "5aeb74b19939a29a8cf06e4fe7777aaf9139e93478507e039f43318171020e9f",
+      "literal_EX_ANGLE_c_5_6_7_sites": 0,
+      "runtime_random_angle_EX_VELTIME_sites": [
+        {
+          "file": "st05bs.ecl",
+          "sub": "Boss1_at",
+          "raw_decoded_line": 187,
+          "opcode": 610,
+          "rank_mask": 255,
+          "effect_index": 15,
+          "effect": "EX_VELTIME / 0x200000",
+          "duration": 120,
+          "angle_mode": 3000000.0,
+          "amplitude_radians": 0.17453292
+        },
+        {
+          "file": "st05bs.ecl",
+          "sub": "Boss2_at",
+          "raw_decoded_line": 335,
+          "opcode": 610,
+          "rank_mask": 255,
+          "effect_index": 14,
+          "effect": "EX_VELTIME / 0x200000",
+          "duration": 120,
+          "angle_mode": 4000000.0,
+          "amplitude_radians": 6.2831855
+        },
+        {
+          "file": "st05bs.ecl",
+          "sub": "BossCard1_at",
+          "raw_decoded_line": 844,
+          "opcode": 610,
+          "rank_mask": 255,
+          "effect_index": 2,
+          "effect": "EX_VELTIME / 0x200000",
+          "duration": 120,
+          "angle_mode": 3000000.0,
+          "amplitude_radians": 0.17453292
+        }
+      ]
+    }
+  },
+  "native_evidence": {
+    "th16": {
+      "bullet_vm": "0x413860",
+      "random_modes": "EX_ANGLE c=5/6 random target angle, c=7 random target speed",
+      "real_script_scope": "No literal c=5/6/7 use found in the scanned 22 files; engine support is not claimed as actual attack usage"
+    },
+    "th18": {
+      "bullet_vm": "0x425c60",
+      "EX_VELTIME_angle_helper_call": "0x426eec -> 0x425b40",
+      "angle_helper": "0x425b40",
+      "RNG_calls": {
+        "angle_to_player_plus_random": "0x425bab -> 0x402810",
+        "current_angle_plus_random": "0x425be0 -> 0x402810"
+      },
+      "shared_rng": "0x4cf288",
+      "confirmed_PE_thresholds": [
+        2999990,
+        3999990,
+        4999990
+      ],
+      "sampling": "At EX entry; chosen direction stored in bullet +0xda4; not re-drawn each interpolation frame"
+    }
+  }
+}

@@ -22,21 +22,39 @@ src/stgtranscribe/        工具：thecl 解析 / 结构摘要 / 切分校验 / 
 - `~/.local/bin/dsh-flash`（`STG_DSH_BIN`）。
 - `uv sync --frozen`。
 
+## 当前转写口径（2026-11-04）
+
+训练仓使用 `stg-rl==0.4.4`、ENGINE_VER30。带参 xform 从 ENGINE_VER28 起支持，单值 STEP 扩展从29起支持，模板体 rand 从30起支持；
+引擎源码、release harness 和 Python wheel 是三个需分别核对的状态，升级方法见
+[`stg-rl-wheel-sync.md`](../docs/agent-memory/stg-rl-wheel-sync.md)，本次来源与验证见
+[`stg-rl-044-adoption.json`](../docs/practice-cards/reports/stg-rl-044-adoption.json)。
+
+运行期变换参数优先按 mapping §5 转成 `NAME(args)`，在原 `bullet_effects` 配置点保存值，保留随机取样位置与共享范围。
+模板体 rand 按原求值标记选择绑定、每弹出生或操作进入时抽样；配置随机仍保持共享，STEP/等待中不重抽。
+`at_spawn` 保存每弹出生状态，`at_effect` 在进入操作时读取当前状态；`@N` 仍是字面量后置等待。
+旧卡的量化/取中值/逐弹任务不会随 wheel 或文档更新自动还原。当前契约针对 TH06/NC，不能直接套到其他作品的 EX 语义。
+
+修改对照表后，派发前按 [skill 的刷新步骤](../.claude/skills/th06-transcribe/SKILL.md#刷新已有单元输入)
+更新目标单元的 `mapping-excerpt.md` / `builtins.md`；`extract` 不覆盖已进入后续状态的单元。
+速查表只含内建签名，xform 的额外语法直接查摘录 §5。旧审核目录保留原记录，新一轮审核会复制刷新后的输入。
+
 ## 跑
 
 ```bash
-uv run python -m stgtranscribe.pipeline split      --stages 1-7            # 每关一个 dsh 切分 → 机械校验
-uv run python -m stgtranscribe.pipeline extract    --stages 1-7            # 原样摘录单元
-uv run python -m stgtranscribe.pipeline transcribe --stage 1 --jobs 16     # 转写 → 自动验收（失败带报告重派 ≤2）
-uv run python -m stgtranscribe.pipeline review     --stage 1 --jobs 16     # 审核（fail 带发现返工 ≤2 轮）
-uv run python -m stgtranscribe.pipeline transcribe --stage 1               # 处理返工（state = revise）
-uv run python -m stgtranscribe.pipeline review     --stage 1
-uv run python -m stgtranscribe.pipeline sample     --stage 1               # 生成 opus 抽检清单（在 Claude 会话里做）
-uv run python -m stgtranscribe.pipeline status     --stage 1
-uv run python -m stgtranscribe.pipeline collect    --stage 1               # 收进 cards/，按提示提交
+uv run --frozen python -m stgtranscribe.pipeline split      --stages 1-7            # 每关一个 dsh 切分 → 机械校验
+uv run --frozen python -m stgtranscribe.pipeline extract    --stages 1-7            # 原样摘录单元
+uv run --frozen python -m stgtranscribe.pipeline transcribe --stage 1 --jobs 16     # 转写 → 自动验收（失败带报告重派 ≤2）
+uv run --frozen python -m stgtranscribe.pipeline review     --stage 1 --jobs 16     # 审核（fail 带发现返工 ≤2 轮）
+uv run --frozen python -m stgtranscribe.pipeline transcribe --stage 1               # 处理返工（state = revise）
+uv run --frozen python -m stgtranscribe.pipeline review     --stage 1
+uv run --frozen python -m stgtranscribe.pipeline sample     --stage 1               # 生成 opus 抽检清单（在 Claude 会话里做）
+uv run --frozen python -m stgtranscribe.pipeline status     --stage 1
+uv run --frozen python -m stgtranscribe.pipeline collect    --stage 1               # 收进 cards/；提交、推送分别需用户授权
 ```
 
 中断后重跑同一命令即续跑。编排与分诊的完整步骤见 `.claude/skills/th06-transcribe/SKILL.md`。
+默认后端为 dsh-flash；按既有约定换 Sonnet 时，在仓库根目录设置 `STG_DSH_BIN="$PWD/transcribe/tools/claude-worker"`、`STG_CLAUDE_MODEL=sonnet`，
+并将并发降为 `--jobs 4`。dsh 审核后的 Opus 抽检与逐条复核仍须完成，不能把生成抽检清单视为已抽检。
 
 ## 单元状态
 
@@ -60,9 +78,9 @@ transcribe/play.sh status | stop
 ## 出图（弹幕预览 PNG / GIF）
 
 ```bash
-uv run python -m stgtranscribe.preview                                   # cards/ 全部卡 × 卡内各档，每档一张 8 帧拼图（45 张卡约 5 秒）
-uv run python -m stgtranscribe.preview cards/th06_s3_w12 --ranks 2-3 --gif   # 指定卡 / 档，另出 GIF（20 fps，每个约 6–10 MB）
-uv run python -m stgtranscribe.preview --serve                           # 静态页 127.0.0.1:8612，远程 ssh -L 8612:localhost:8612 <机器>
+uv run --frozen python -m stgtranscribe.preview                                   # cards/ 全部卡 × 卡内各档，每档一张 8 帧拼图（45 张卡约 5 秒）
+uv run --frozen python -m stgtranscribe.preview cards/th06_s3_w12 --ranks 2-3 --gif   # 指定卡 / 档，另出 GIF（20 fps，每个约 6–10 MB）
+uv run --frozen python -m stgtranscribe.preview --serve                           # 静态页 127.0.0.1:8612，远程 ssh -L 8612:localhost:8612 <机器>
 ```
 
 产物在 `work/preview/<卡 id>/`（`sheet_r<档>.png`、`anim_r<档>.gif`）+ `work/preview/index.html`。
@@ -72,9 +90,9 @@ uv run python -m stgtranscribe.preview --serve                           # 静�
 ## 手动工具
 
 ```bash
-uv run python -m stgtranscribe.split_check <关> <split.json>     # 切分自检
-uv run python -m stgtranscribe.validate <卡目录>                 # 四层验收（目录名必须是卡 id）
-uv run pytest -q tests/transcribe                                # 对照表覆盖率 + 片段编译 + 工具测试
+uv run --frozen python -m stgtranscribe.split_check <关> <split.json>     # 切分自检
+uv run --frozen python -m stgtranscribe.validate <卡目录>                 # 四层验收（目录名必须是卡 id）
+uv run --frozen pytest -q tests/transcribe                                # 对照表覆盖率 + 片段编译 + 工具测试
 ```
 
 ## 版权

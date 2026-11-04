@@ -1,0 +1,3179 @@
+[
+  {
+    "key": "modern-noop",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      0,
+      22,
+      27,
+      30,
+      31,
+      573,
+      900,
+      901,
+      902,
+      903,
+      904
+    ],
+    "names": [
+      "nop",
+      "debug22",
+      "unknown27",
+      "unknown30",
+      "unknown31",
+      "unknown573",
+      "debug900",
+      "debug901",
+      "debug902",
+      "debug903",
+      "debug904"
+    ],
+    "behavior": "TH16正式版空操作；27被游戏分派范围闸拒绝，573/900..904落默认case。",
+    "category": 2,
+    "conditions": "只保留执行时序；不需要模拟调试菜单；转换后同帧执行量须不超现有任务/全局指令预算。",
+    "recipe": "转换时不发副作用指令，保留原指令时间/难度门。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:202"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/05-fire-interface.md:24",
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/04-ecl-vm-interpreter.md:85"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-context-end",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      1
+    ],
+    "names": [
+      "delete"
+    ],
+    "behavior": "终止当前运行上下文；若为敌主上下文，宿主使敌静默退场。",
+    "category": 1,
+    "conditions": "以spawn_enemy建立并登记main_task的敌主任务；非根binding入口；该帧无仍会运行的同敌async；不触发击破掉落。",
+    "recipe": "当前OP_END；非主任务仅结束自身。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:611"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/07-vm-architecture.md:39"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-static-call",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      10,
+      11,
+      40,
+      42,
+      43,
+      44,
+      45
+    ],
+    "names": [
+      "ret",
+      "call",
+      "stackAlloc",
+      "pushi",
+      "seti",
+      "pushf",
+      "setf"
+    ],
+    "behavior": "同步调用、返回、局部/表达式栈取写：有限静态程序可在编译时分配不同槽。",
+    "category": 2,
+    "conditions": "调用图静态且不递归；展开后的locals≤64、求值栈≤32、同步深度≤8；普通整数时钟且无跨调用活动的指令91/92；空栈ret需转END；转换后同帧执行量须不超现有任务/全局指令预算。",
+    "recipe": "为每个活跃调用点分独立locals区；调用前复制实参到被调区；ret回正确续点；caller局部不覆盖；将各sub时间门展开为相对wait，必要时把非递归调用内联。",
+    "difference": "这是编译转换配方，当前CALL只存返回PC，直接照抄原字节码不成立。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/task.rs:21",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:212",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:245"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:1040",
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/04-ecl-vm-interpreter.md:129"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-stack-dynamic",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      40,
+      41
+    ],
+    "names": [
+      "stackAlloc",
+      "native41"
+    ],
+    "behavior": "原生栈帧分配/回收与typed stack-relative引用。41只做栈回收，不执行10的PC/时间恢复。",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/task.rs:75"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/04-ecl-vm-interpreter.md:156"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "41用途与合法嵌套模式未完整核验；动态偏移、递归及负栈引用不能仅按固定locals重命名证明准确。",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-clock-control",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      12,
+      13,
+      14,
+      23
+    ],
+    "names": [
+      "jmp",
+      "jmpEq",
+      "jmpNeq",
+      "wait"
+    ],
+    "behavior": "跳转同时写脚本时间；wait通过扣减脚本时间推迟后续时间门。",
+    "category": 2,
+    "conditions": "正常dt=1、整数延迟在0..65535；静态时间标签可消除，且分支/回跳均已分析成等价wait；不含改变gameSpeed；转换后同帧执行量须不超现有任务/全局指令预算。",
+    "recipe": "把标签的time连同PC纳入转换；沿每条控制流边计算下一次到期帧，发wait差值后jmp；if非零使用两次JZ或交换分支；不能仅丢掉jmp第二时间参数。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:179",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:202"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/04-ecl-vm-interpreter.md:89"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-fractional-clock",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      24,
+      547
+    ],
+    "names": [
+      "waitf",
+      "gameSpeed"
+    ],
+    "behavior": "浮点wait和GAME_SPEED决定上下文时间增量，含不足一帧的到期相位。",
+    "category": 5,
+    "conditions": "需真实脚本时钟；浮点/定点数值差异豁免不包括把子帧等待四舍五入。",
+    "recipe": "无一般等价接口；整数dt=1子集见clock-control。",
+    "difference": "当前wait是u16帧倒数；无世界GAME_SPEED对应。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/task.rs:45",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:179"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/04-ecl-vm-interpreter.md:69",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": "仅当所选攻击内部实际使用waitf子帧相位或变GAME_SPEED时阻塞精准扩充；dt=1整数子集已有2类配方，不要求为所有固定卡实施全局变速。"
+  },
+  {
+    "key": "modern-async-spawn",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      15
+    ],
+    "names": [
+      "callAsync"
+    ],
+    "behavior": "同一敌人上创建独立上下文，继承难度掩码，参数复制且上下文挂敌人链表。",
+    "category": 3,
+    "conditions": "",
+    "recipe": "使用spawn传实参；owner维持同敌；按已知样本校正首次执行帧。",
+    "difference": "原作链表调度与当前全局池升序/出生次帧门不同；不能保证任意动态spawn同帧读写顺序。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:361",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:546"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:1053",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:1042"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-async-id-cancel",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      16,
+      17,
+      21
+    ],
+    "names": [
+      "callAsyncId",
+      "killAsync",
+      "killAllAsync"
+    ],
+    "behavior": "异步ID在同一敌人的上下文链中查找；17取先匹配项，21遍历敌人异步列表。",
+    "category": 5,
+    "conditions": "重复ID采用链表最近插入者；ID不是任务池索引；main与async取消域需区分。",
+    "recipe": "当前spawn只返池索引，kill_children只杀当前任务直系；不能替代每敌按用户ID查找和全async清理。",
+    "difference": "跨async产生的孙任务仍属于同一敌人的原作取消域。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/task.rs:57",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:433"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:1053",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:1054",
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/04-ecl-vm-interpreter.md:92"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": "仅对同一攻击内部实际使用异步ID取消来控制发射协程存活的样本，是扩充前置；若取消仅发生在整张卡结束，可使用当前卡结束边界，不要求恢复完整战斗。"
+  },
+  {
+    "key": "modern-async-unused-fields",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      18,
+      19,
+      20
+    ],
+    "names": [
+      "native18",
+      "native19",
+      "native20"
+    ],
+    "behavior": "按ID写另一异步上下文的+0x11e4位/+0x101c字段；既有原生调查未发现TH16消费者。",
+    "category": 4,
+    "conditions": "仅TH16；“未发现读取点”不是全版本无效证明。",
+    "recipe": "建议转换为无副作用操作；保留ID参数解析产生的其他求值效果。",
+    "difference": "",
+    "engine_refs": [],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/04-ecl-vm-interpreter.md:160"
+    ],
+    "evidence": "native-doc",
+    "importer_status": "未接",
+    "decision": "proposed",
+    "pending_reason": "",
+    "priority_reason": "本轮建议暂不实现，待用户确认；非标准寻址消费者仍待核实。"
+  },
+  {
+    "key": "modern-scalar-ops",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      79,
+      80,
+      83,
+      84
+    ],
+    "names": [
+      "addi",
+      "addf",
+      "subi",
+      "subf",
+      "muli",
+      "mulf",
+      "divi",
+      "divf",
+      "modi",
+      "eqi",
+      "eqf",
+      "neqi",
+      "neqf",
+      "lessi",
+      "lessf",
+      "leqi",
+      "leqf",
+      "greateri",
+      "greaterf",
+      "geqi",
+      "geqf",
+      "stackSin",
+      "stackCos",
+      "negi",
+      "negf"
+    ],
+    "behavior": "标量加减乘除余、比较、三角和取负；浮点参数改用fx，角度改BAM。",
+    "category": 1,
+    "conditions": "输入在当前数值表示有效域内；除数非0、无整数溢出；角度单位转换；本轮按约定不因数值精度降级。",
+    "recipe": "对应ADD/SUB/MUL/DIV/MOD、MULF/DIVF、EQ..GE、SINB/COSB、NEG。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/ops.rs:21",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:270"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/04-ecl-vm-interpreter.md:105"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-boolean-dec",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      71,
+      72,
+      73,
+      74,
+      78
+    ],
+    "names": [
+      "noti",
+      "notf",
+      "or",
+      "and",
+      "deci"
+    ],
+    "behavior": "逻辑取反/或/与与先取旧值再自减。",
+    "category": 2,
+    "conditions": "操作数先全部按原顺序求值，不能新增短路而漏RNG等副作用；转换后同帧执行量须不超现有任务/全局指令预算。",
+    "recipe": "not: v==0；or: (a!=0)+(b!=0)>0；and:两布尔相乘；dec:先存旧值再v=v-1并返回旧值。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/ops.rs:21",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:245"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/04-ecl-vm-interpreter.md:107"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-bitwise",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      75,
+      76,
+      77
+    ],
+    "names": [
+      "xor",
+      "bit_or",
+      "bit_and"
+    ],
+    "behavior": "整数逐位异或/或/与的单比特子集。",
+    "category": 2,
+    "conditions": "两个已求值操作数均在{0,1}并存于locals；结果存入locals；该调用点本帧的任务与全局预算均至少剩6条VM指令。",
+    "recipe": "xor: a!=b；or: a+b>0；and: a*b。or可降为PUSHL(a)、PUSHL(b)、ADD、PUSHI(0)、GT、POPL(out)，共6条；xor/and各4条。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/ops.rs:21",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:270"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/04-ecl-vm-interpreter.md:109"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-bitwise-general",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      75,
+      76,
+      77
+    ],
+    "names": [
+      "xor",
+      "bit_or",
+      "bit_and"
+    ],
+    "behavior": "一般32位整数逐位异或/或/与。",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/ops.rs:21",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:270"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/04-ecl-vm-interpreter.md:109"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "算术分解32个位是候选方案；尚未落地并核算完整求值、符号位、循环与写回指令数，不能确认在现有1024条单任务预算内同帧完成；不据此宣称一般32位为2类。",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-geometry",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      81,
+      82,
+      85,
+      86,
+      87,
+      89,
+      90
+    ],
+    "names": [
+      "circlePos",
+      "validRad",
+      "squareSum",
+      "squareSumRoot",
+      "getAngle",
+      "linearFunc",
+      "pointRotate"
+    ],
+    "behavior": "圆坐标、角度规范化、平方和、向量长度、两点角、角差及点旋转。89原生是角差并作一次±2π调整，非社区继承描述的乘法。",
+    "category": 2,
+    "conditions": "89输入为规范化角；单位/值域可表示；两输出先算完再赋值以免引用别名破坏；转换后同帧执行量须不超现有任务/全局指令预算。",
+    "recipe": "81=(r*cos(a),r*sin(a))；82转BAM规范化；85=x*x+y*y；86=dist(x,y)；87=atan2(y2-y1,x2-x1)；89=b-a后按原判据±整圈；90=(x*cos(a)-y*sin(a),y*cos(a)+x*sin(a))。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:61",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall.rs:730",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/ops.rs:30"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:1041"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-sqrt",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      88
+    ],
+    "names": [
+      "stackSqrt"
+    ],
+    "behavior": "浮点栈元素开方。",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:61"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:1041"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "现有dist为sqrt(x*x+y*y)，不是通用sqrt(x)接口；本轮未确认表层可操作等价降低及负输入规则。",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-variable-interp",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      91,
+      92
+    ],
+    "names": [
+      "floatTime",
+      "math92"
+    ],
+    "behavior": "每运行上下文8个浮点插值器，启动即写初值，循环末推进并写回指定变量。92另带两附加参数。",
+    "category": 3,
+    "conditions": "91常规曲线可手算；92附加参方向/曲线需按TH16补核。",
+    "recipe": "保留每槽目标和值，以ease/Hermite读值后显式写回；每帧执行一次，并为共享变量安排单一写者。",
+    "difference": "当前三类各4槽为每任务私有值槽，执行前tick；没有8个任意左值写回器。wait期间写回、同帧其他async读取相位及容量均不同。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/task.rs:114",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:551",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/interp.rs:4"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/04-ecl-vm-interpreter.md:138",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:1041"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-random-point",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      93
+    ],
+    "names": [
+      "math93"
+    ],
+    "behavior": "原生取两次signed随机浮点，一次定角，一次线性定有符号半径，再转平面点；不能改成面积均匀圆盘。",
+    "category": 3,
+    "conditions": "",
+    "recipe": "以rand构造两次有符号取值，角乘π，半径按原式r=signed*(max-min)+min，再cos/sin。",
+    "difference": "现有RNG族/取样格点与原生流未逐项对齐；随机分布与抽取顺序不列入浮点豁免。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:75"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:1041"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-create",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      300,
+      301,
+      304,
+      305,
+      309,
+      310,
+      311,
+      312,
+      321
+    ],
+    "names": [
+      "enmCreate",
+      "enmCreateA",
+      "enmCreateM",
+      "enmCreateAM",
+      "enmCreateF",
+      "enmCreateAF",
+      "enmCreateMF",
+      "enmCreateAMF",
+      "enmMapleEnemy"
+    ],
+    "behavior": "分配新敌并按名起主sub；相对/绝对坐标和镜像变体；F族在boss0存在时不创建；复制父敌12数值槽及父ID等参数。",
+    "category": 3,
+    "conditions": "",
+    "recipe": "spawn_enemy传坐标/生命/掉落和子主任务；相对坐标显式加self位置；镜像显式改x和方向；F条件由场景已知boss生命周期约束；12值以实参带入子任务初始化。",
+    "difference": "新敌槽当前全零；需显式复制且出生当帧不能保证原生调度/外部观察一致；现有固定池容量和原生可调上限不同。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/enemy.rs:180",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/enemy.rs:263"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/05-fire-interface.md:68",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:356"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": "道中子机、Boss派生敌和继承参数是扩样的共同路径。"
+  },
+  {
+    "key": "modern-anm",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      302,
+      303,
+      306,
+      307,
+      308,
+      313,
+      314,
+      315,
+      316,
+      317,
+      318,
+      319,
+      320,
+      323,
+      325,
+      326,
+      327,
+      328,
+      329,
+      330,
+      331,
+      332,
+      333,
+      334,
+      335,
+      336,
+      337,
+      338,
+      339
+    ],
+    "names": [
+      "anmSelect",
+      "anmSetSprite",
+      "anmSetMain",
+      "anmPlay",
+      "anmPlayAbs",
+      "anmSelectedPlay",
+      "anmPlayHigh",
+      "anmPlayRotate",
+      "anm316",
+      "anmSwitch",
+      "anmReset",
+      "anmRotate",
+      "anmMove",
+      "deathAnm",
+      "anmColor",
+      "anmColorTime",
+      "anmAlpha",
+      "anmAlphaTime",
+      "anmScale",
+      "anmScaleTime",
+      "anmAlpha2",
+      "anmAlpha2Time",
+      "anm333",
+      "anm334",
+      "anmScale2",
+      "anmLayer",
+      "anmBlendMode",
+      "anmPlayPos",
+      "anm339"
+    ],
+    "behavior": "选择/加载/独立播放ANM，修改附着位置、颜色、alpha、scale、层和混合；317向动画树发中断。",
+    "category": 4,
+    "conditions": "仅在逐样本证实这些指令不影响碰撞框、位置、回调、存活/脚本分支时；303/306可缓存动画尺寸，-9961可读ANM状态，不能无条件删。",
+    "recipe": "建议对纯外观子集省略；若样本读取ANM状态或借尺寸设判定，先提取语义，不能以set_anm_state冒充完整ANM VM。",
+    "difference": "当前仅sprite+anm_state公告板，不是原作动画VM。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/enemy.rs:405"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "proposed",
+    "pending_reason": "",
+    "priority_reason": "本轮建议待用户确认；没有在本报告宣布全ANM已舍弃。"
+  },
+  {
+    "key": "modern-enemy-id-query",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      324,
+      555,
+      801
+    ],
+    "names": [
+      "enm324",
+      "enmAlive",
+      "enmPos"
+    ],
+    "behavior": "按原生enemy_id查询存活/坐标；324查不到时退回调用者坐标，801缺失目标没有该兜底。",
+    "category": 2,
+    "conditions": "导入器持有原生ID到当前打包句柄的映射，目标有效；555含dying时刻须按样本核对，仅一般存活子集；转换后同帧执行量须不超现有任务/全局指令预算。",
+    "recipe": "spawn_enemy返回句柄后保存到get_var/set_var的静态ID对应槽；801=enemy_x/y；324在enemy_alive为0时返回self_x/y。",
+    "difference": "不得把原生ID整数直接作为当前含generation的句柄。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/enemy.rs:19",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/enemy.rs:50",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/enemy.rs:83",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/stage.rs:58"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-delete-target",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      340
+    ],
+    "names": [
+      "enmDelete"
+    ],
+    "behavior": "按原生ID将目标敌标为退场。",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:432",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/enemy.rs:150"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "当前没有公开按任意句柄静默删除单敌的接口；kill_self只终止当前任务，kill_all范围过大；本轮未把缺该接口直接判数据扩充关键。",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-linear-movement",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      400,
+      401,
+      402,
+      403,
+      404,
+      405,
+      406,
+      407,
+      418,
+      419,
+      424,
+      427,
+      428,
+      429,
+      430,
+      431,
+      436,
+      437,
+      440,
+      441,
+      442,
+      443,
+      444,
+      445,
+      446,
+      447,
+      558
+    ],
+    "names": [
+      "movePos",
+      "movePosTime",
+      "movePosRel",
+      "movePosRelTime",
+      "moveVel",
+      "moveVelTime",
+      "moveVelRel",
+      "moveVelRelTime",
+      "moveAdd",
+      "move419",
+      "moveSetMirror",
+      "moveReset",
+      "moveVelNM",
+      "moveVelNMTime",
+      "moveVelNMRel",
+      "moveVelNMRelTime",
+      "moveAddTime",
+      "moveAddRelTime",
+      "moveAngle",
+      "moveAngleTime",
+      "moveAngleRel",
+      "moveAngleRelTime",
+      "moveSpeed",
+      "moveSpeedTime",
+      "moveSpeedRel",
+      "moveSpeedRelTime",
+      "flagMirror"
+    ],
+    "behavior": "原生各有绝对/相对PosVel运动层；位置/速度/朝向/速率的立即和定时写入、增量/非镜像和镜像开关。",
+    "category": 3,
+    "conditions": "",
+    "recipe": "单层非镜像用move_to/move_vel/move_angle/move_speed；双层手存两层状态后按帧合成位置，镜像在写坐标/角度处显式处理。",
+    "difference": "当前一份位置和速度，位置插值接管而非两PosVel相加；move_to(0)清速度和在飞插值，原生400/402写位置并更新最终位置不能据此宣称硬停等价；转角最短弧及帧相位需逐样本核。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/enemy.rs:302",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world.rs:641",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/integrate.rs:130",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/motion.rs:408"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355",
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/01-ecl-context-and-variables.md:33"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": "发射位置和自机狙依赖移动层合成结果，不能只匹配视觉轨迹。"
+  },
+  {
+    "key": "modern-nonlinear-movement",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      408,
+      409,
+      410,
+      411,
+      412,
+      413,
+      414,
+      415,
+      416,
+      417,
+      420,
+      421,
+      422,
+      423,
+      425,
+      426,
+      432,
+      433,
+      434,
+      435,
+      438,
+      439
+    ],
+    "names": [
+      "moveCircle",
+      "moveCircleTime",
+      "moveCircleRel",
+      "moveCircleRelTime",
+      "moveRand",
+      "moveRandRel",
+      "moveBoss",
+      "moveBossRel",
+      "movePos3d",
+      "movePos3dRel",
+      "moveEllipse",
+      "moveEllipseTime",
+      "moveEllipseRel",
+      "moveEllipseRelTime",
+      "moveBezier",
+      "moveBezierRel",
+      "moveEnm",
+      "moveEnmRel",
+      "moveCurve",
+      "moveCurveRel",
+      "moveCurveAdd",
+      "moveCurveAddRel"
+    ],
+    "behavior": "圆/椭圆、Bezier/曲线、随机Boss移动、3D及依敌位置等现代运动变体。",
+    "category": 3,
+    "conditions": "曲线/圆周可逐帧计算二维轨迹；随机Boss分支和依敌目标需保留原生条件；3D深度只可投影近似。",
+    "recipe": "用sin/cos/ease/Hermite计算每帧位置后move_to(0,x,y,linear)；跨层状态分别保留，不用单个插值槽覆盖两层。",
+    "difference": "坐标能拟合不等于速度/角度/半径读值、镜像和发射相位都一致；原生moveRand按位置边界和自机侧多次抽样，不可改均匀选点。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/enemy.rs:302",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world.rs:641",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/interp.rs:4"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": "复杂轨迹本身有可用近似；精确性待真实样本逐模式核对。"
+  },
+  {
+    "key": "modern-boxes",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      500,
+      501,
+      563,
+      564
+    ],
+    "names": [
+      "setHurtbox",
+      "setHitbox",
+      "unknown563",
+      "hitboxRotate"
+    ],
+    "behavior": "分别写受击框/接触框宽高；563切矩形/椭圆模式，564写框旋转角。",
+    "category": 5,
+    "conditions": "正圆子集可用现有半径；宽高不等及旋转矩形不能一个r准确表达。",
+    "recipe": "圆形子集分别set_hurtbox/set_hitbox；一般宽高框无现有精确接口。",
+    "difference": "引擎敌池/碰撞接口只有两个圆半径，形状/旋转缺失；外接圆会改变可穿空隙。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/enemy.rs:101",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world.rs:542",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/collide.rs:754"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": "只对攻击中真实需要玩家接触避让的非圆敌框阻塞准确几何；若样本已明确关闭敌接触框，无敌受击框形状不阻塞该躲弹卡。"
+  },
+  {
+    "key": "modern-flags",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      502,
+      503
+    ],
+    "names": [
+      "flagSet",
+      "flagClear"
+    ],
+    "behavior": "置/清敌状态位；部分标志同时影响动画。",
+    "category": 3,
+    "conditions": "仅映射已知NO_BODY/KILLALL_EXEMPT位，其余位不能原样传递。",
+    "recipe": "原生位翻译到本引擎SETTABLE掩码再调用set_enemy_flag。",
+    "difference": "当前公开可写仅两位，原生位域含镜像/无敌/矩形/敌生命周期等，不能整体等同。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/enemy.rs:115"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-move-limits",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      504,
+      505
+    ],
+    "names": [
+      "moveLimit",
+      "moveLimitReset"
+    ],
+    "behavior": "设置/取消位置约束区域，含原生flag开关。",
+    "category": 3,
+    "conditions": "",
+    "recipe": "脚本按帧将拟定坐标clamp到边界后move_to。",
+    "difference": "当前无每敌常驻移动约束；与速度层/发射同帧的执行相位须由脚本近似，碰边时速度语义未证等价。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/enemy.rs:302"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-dropclear",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      506
+    ],
+    "names": [
+      "dropClear"
+    ],
+    "behavior": "清空待掉落配置中的额外项，原生保留特定主项。",
+    "category": 3,
+    "conditions": "",
+    "recipe": "drop_clear后重加应保留的主掉落。",
+    "difference": "当前清空全部计数，且主项/季节项布局和数量上限不同。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/enemy.rs:129",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world.rs:680"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-drops",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      507,
+      508,
+      509,
+      510,
+      562,
+      1000,
+      1001
+    ],
+    "names": [
+      "dropExtra",
+      "dropArea",
+      "dropItems",
+      "dropMain",
+      "dropItemsSp",
+      "dropSeason",
+      "seasonItemDamage"
+    ],
+    "behavior": "配置/生成道具及散布；1000随击破时间衰减季节点数，1001按累计伤害生成季节点。",
+    "category": 3,
+    "conditions": "",
+    "recipe": "用drop_add/drop_items/drop_item表达已有道具类型；脚本记录出生帧并按伤害/时间估计掉落数量。",
+    "difference": "原生季节点、奖励衰减、伤害累计触发和spell practice门不同；当前计数增量钳u8，无TH16季节资源系统。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/enemy.rs:135",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/stage.rs:110"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-hp-set",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      511,
+      572
+    ],
+    "names": [
+      "lifeSet",
+      "lifeNow"
+    ],
+    "behavior": "511同步写current/max/段生命等，572仅写当前HP及其7倍缓存。",
+    "category": null,
+    "conditions": "适用目标：恢复完整战斗或全关卡；当前固定rank、单段、敌无敌的躲弹卡不被此项阻塞。创建时hp可给定；运行中改生命及分段阈值需真实语义。",
+    "recipe": "spawn_enemy只覆盖初始化；无一般运行中lifeSet/lifeNow公开写口。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/enemy.rs:180",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/enemy.rs:38"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "原生行为及当前缺少通用对应机制的能力事实已核；尚无证据证明它是当前扩充固定rank单段无敌躲弹卡的关键前置，因此重要性待用户目标/样本确认，暂不列5类必做建议。",
+    "priority_reason": "后续恢复完整战斗、允许炸弹/击破或由HP/超时触发跨段/死亡发射时再评估；固定rank可由转换输入给定，单段结束可由卡的时长定义。本轮不提议实施完整原作战斗系统。"
+  },
+  {
+    "key": "modern-boss",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      512
+    ],
+    "names": [
+      "setBoss"
+    ],
+    "behavior": "设置/取消boss编号并登记到敌管理器boss表。",
+    "category": 3,
+    "conditions": "",
+    "recipe": "boss_set填写公告板槽；配现有spell_begin建立攻击任务。",
+    "difference": "当前UI槽/符卡绑定不是原生boss_id表，原生变量boss0、802广播与Boss等待不能仅靠UI登记推出。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/spell.rs:34"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-interrupts",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      513,
+      514,
+      521,
+      556,
+      566,
+      800,
+      802
+    ],
+    "names": [
+      "timerReset",
+      "setInterrupt",
+      "setTimeout",
+      "setDeath",
+      "unknown566",
+      "enmCall",
+      "broadcastInterrupt"
+    ],
+    "behavior": "敌脚本计时重置；HP/超时中断；设置death sub；566执行死亡逻辑；800按敌ID清async并重置/加载主sub；802遍历boss0..2，排除调用者boss槽并触发有效中断。",
+    "category": null,
+    "conditions": "适用目标：恢复完整战斗或全关卡；当前固定rank、单段、敌无敌的躲弹卡不被此项阻塞。中断覆盖主+全部async，保留敌对象共享状态；TH16 802不包含自身boss槽。",
+    "recipe": "现有spell_begin/end只能组织自己的符卡任务，不能替代任意敌重入/HP阈值/timeout/death回调。",
+    "difference": "当前death_script字段仅记录进死亡事件，未见启动执行；按句柄重置某敌上下文及8槽阈值无公开实现。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/spell.rs:85",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/settle.rs:107",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:433"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "原生行为及当前缺少通用对应机制的能力事实已核；尚无证据证明它是当前扩充固定rank单段无敌躲弹卡的关键前置，因此重要性待用户目标/样本确认，暂不列5类必做建议。",
+    "priority_reason": "后续恢复完整战斗、允许炸弹/击破或由HP/超时触发跨段/死亡发射时再评估；固定rank可由转换输入给定，单段结束可由卡的时长定义。本轮不提议实施完整原作战斗系统。"
+  },
+  {
+    "key": "modern-invuln",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      515
+    ],
+    "names": [
+      "setInvuln"
+    ],
+    "behavior": "写受击无敌倒计时。",
+    "category": 3,
+    "conditions": "非负u16帧、正常速度；仅对应受击门，不代替541接触框禁用。",
+    "recipe": "set_invuln(frames)。",
+    "difference": "无敌计时写入接口存在；原生Enemy tick内受伤结算与当前相位2写/相位5减/后续碰撞的边界未逐帧核对，先保留可能一帧边界差。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/enemy.rs:89",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/integrate.rs:192"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-body-disable",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      541
+    ],
+    "names": [
+      "noHitboxDur"
+    ],
+    "behavior": "写no-hitbox计时器，临时禁用接触判定。",
+    "category": 2,
+    "conditions": "只使用明确接触NO_BODY位，原位已设状态由脚本保存；frames正常整数；独立协程不同时覆盖此位；转换后同帧执行量须不超现有任务/全局指令预算。",
+    "recipe": "set_enemy_flag(NO_BODY,1)，等待n帧后恢复原位；不使用set_invuln代替。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/enemy.rs:115"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-presentation",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      516,
+      517,
+      527,
+      540,
+      552,
+      553,
+      554,
+      557,
+      561
+    ],
+    "names": [
+      "playSound",
+      "setScreenShake",
+      "lifeMarker",
+      "stars",
+      "zIndex",
+      "hitSound",
+      "stageLogo",
+      "fogTime",
+      "die"
+    ],
+    "behavior": "音效/震屏/血条标记/星标/层号/Logo/雾；TH16 561仅执行死亡音效和ANM路径，实际Enemy__die在566。",
+    "category": 4,
+    "conditions": "只有纯表现与UI子集；出现脚本回读或影响判定时需另审。",
+    "recipe": "建议训练侧省略对应外观；561不能译成当前die()，否则提前结束敌并产生掉落。",
+    "difference": "外观系统未完整复刻。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/stage.rs:148",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/enemy.rs:169"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "proposed",
+    "pending_reason": "",
+    "priority_reason": "本轮新建议待用户确认；561错译会改变核心生命周期。"
+  },
+  {
+    "key": "modern-dialog",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      518,
+      519,
+      520
+    ],
+    "names": [
+      "dialogRead",
+      "dialogWait",
+      "bossWait"
+    ],
+    "behavior": "启动对话并清场；等待对话/等待boss消失门。",
+    "category": 3,
+    "conditions": "",
+    "recipe": "独立攻击片段可将入口前清场/等待裁切成明确起点；完整关卡可由stage脚本轮询已知boss句柄。",
+    "difference": "原生518还调用清弹与kill_all；对话不是纯表现nop；没有原生GUI门或boss0..2表的通用对应。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/enemy.rs:150",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/enemy.rs:83"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-spell-family",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      522,
+      523,
+      528,
+      537,
+      538,
+      539,
+      542,
+      543,
+      567,
+      568
+    ],
+    "names": [
+      "spellEx",
+      "spellEnd",
+      "spellUnused",
+      "spell",
+      "spell2",
+      "spell3",
+      "spellTimeout",
+      "unknown543",
+      "unknown567",
+      "spellMode"
+    ],
+    "behavior": "符卡宣言/结束、耐久和奖励/伤害状态。原生多个宣言号共case，含随难度调整卡号。",
+    "category": 3,
+    "conditions": "",
+    "recipe": "spell_begin/spell_end表达当前符卡；难度卡号在转换时计算；耐久以时间限制和现有胜负系统组织。",
+    "difference": "原生Spellcard奖励/档案/伤害减免与敌中断互相独立；当前统一符卡任务生命周期不等同所有状态位。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/spell.rs:85",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/spell.rs:191"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-rank-select",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      529,
+      530,
+      531,
+      532,
+      533,
+      534
+    ],
+    "names": [
+      "rankF3",
+      "rankF5",
+      "rankF2",
+      "rankI3",
+      "rankI5",
+      "rankI2"
+    ],
+    "behavior": "按动态RANK离散选值或连续插值，RANK与Easy/Normal/Hard/Lunatic不是同一量。",
+    "category": null,
+    "conditions": "适用目标：恢复完整战斗或全关卡；当前固定rank、单段、敌无敌的躲弹卡不被此项阻塞。可离线固定RANK只覆盖单一rank切片。",
+    "recipe": "已知固定RANK可编译常量；一般运行时动态rank缺少世界状态来源。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall.rs:703"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355",
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/01-ecl-context-and-variables.md:65"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "原生行为及当前缺少通用对应机制的能力事实已核；尚无证据证明它是当前扩充固定rank单段无敌躲弹卡的关键前置，因此重要性待用户目标/样本确认，暂不列5类必做建议。",
+    "priority_reason": "后续恢复完整战斗、允许炸弹/击破或由HP/超时触发跨段/死亡发射时再评估；固定rank可由转换输入给定，单段结束可由卡的时长定义。本轮不提议实施完整原作战斗系统。"
+  },
+  {
+    "key": "modern-difficulty",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      535,
+      536,
+      548
+    ],
+    "names": [
+      "diffI",
+      "diffF",
+      "diffWait"
+    ],
+    "behavior": "按当前难度选整数/浮点参数或等待时长。",
+    "category": 2,
+    "conditions": "按配置分别转换四种难度；Extra等值另设固定输入；选值本身不依赖动态RANK；转换后同帧执行量须不超现有任务/全局指令预算。",
+    "recipe": "每个难度构建相应表达式/等待值；若参数有求值副作用，保留原生先求值顺序。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:179",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:245"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-kill-all",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      525
+    ],
+    "names": [
+      "enmKillAll"
+    ],
+    "behavior": "调用敌管理器清除群敌，需遵循原生豁免与退场规则。",
+    "category": 3,
+    "conditions": "",
+    "recipe": "kill_all_enemies(KILL_SILENT/DIE)并映射豁免标志。",
+    "difference": "两套敌flags及死亡回调范围未等同，不能只凭函数名判断模式。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/enemy.rs:150"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-protect-range",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      526
+    ],
+    "names": [
+      "etProtectRange"
+    ],
+    "behavior": "写该敌发射时使用的自机附近保护半径，601将其临时传入弹管理器。",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/05-fire-interface.md:42",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "依赖发射器领域对601原生spawn抑制与当前shooter接口的专项核对；本VM报告不将参数存在当成已实现。",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-cancel-lasers",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      545
+    ],
+    "names": [
+      "laserCancel"
+    ],
+    "behavior": "原生派发case0x56调用全激光取消函数。",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "取消范围、各激光状态及转道具规则由modern-bullets报告核对；不因当前有laser_clear就先判精准。",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-bomb-damage",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      546,
+      565
+    ],
+    "names": [
+      "bombShield",
+      "bombInvuln"
+    ],
+    "behavior": "写炸弹护盾开关/参数与受炸弹伤害比例。",
+    "category": null,
+    "conditions": "适用目标：恢复完整战斗或全关卡；当前固定rank、单段、敌无敌的躲弹卡不被此项阻塞。原生565可含负值回血，set_invuln只提供二值门。",
+    "recipe": "没有对应可编程伤害比例口；不得以固定无敌帧替代比例。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/enemy.rs:89"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "原生行为及当前缺少通用对应机制的能力事实已核；尚无证据证明它是当前扩充固定rank单段无敌躲弹卡的关键前置，因此重要性待用户目标/样本确认，暂不列5类必做建议。",
+    "priority_reason": "后续恢复完整战斗、允许炸弹/击破或由HP/超时触发跨段/死亡发射时再评估；固定rank可由转换输入给定，单段结束可由卡的时长定义。本轮不提议实施完整原作战斗系统。"
+  },
+  {
+    "key": "modern-enemy-limit",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      559
+    ],
+    "names": [
+      "enmLimit"
+    ],
+    "behavior": "写敌管理器可生成敌人上限。",
+    "category": 3,
+    "conditions": "",
+    "recipe": "脚本维护自身已知生成/退场计数，在spawn前检查所需上限；当前池cap仍是硬上限。",
+    "difference": "不能覆盖不经该脚本创建的敌或超池容量的原生场景。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/enemy.rs:180"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-pending-322",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      322
+    ],
+    "names": [
+      "enm322"
+    ],
+    "behavior": "按ANM槽索引写辅助数组，消费者待查",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "pending",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "已核TH16派发存在，但字段消费者/完整模式或引擎映射不足；暂不推为5类。",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-pending-524",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      524
+    ],
+    "names": [
+      "setChapter"
+    ],
+    "behavior": "章节/关卡状态相关写入，完整副作用待查",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "pending",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "已核TH16派发存在，但字段消费者/完整模式或引擎映射不足；暂不推为5类。",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-pending-544",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      544
+    ],
+    "names": [
+      "unknown544"
+    ],
+    "behavior": "写敌flag bit27",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "pending",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "已核TH16派发存在，但字段消费者/完整模式或引擎映射不足；暂不推为5类。",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-pending-549",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      549
+    ],
+    "names": [
+      "unknown549"
+    ],
+    "behavior": "写敌flag bit31",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "pending",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "已核TH16派发存在，但字段消费者/完整模式或引擎映射不足；暂不推为5类。",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-pending-550",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      550
+    ],
+    "names": [
+      "unknown550"
+    ],
+    "behavior": "写敌数据+0x278字段",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "pending",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "已核TH16派发存在，但字段消费者/完整模式或引擎映射不足；暂不推为5类。",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-pending-551",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      551
+    ],
+    "names": [
+      "unknown551"
+    ],
+    "behavior": "调用0x41da30辅助函数",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "pending",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "已核TH16派发存在，但字段消费者/完整模式或引擎映射不足；暂不推为5类。",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-pending-560",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      560
+    ],
+    "names": [
+      "unknown560"
+    ],
+    "behavior": "向派发时取得的目标结构+0x48/+0x4c写浮点",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "pending",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "已核TH16派发存在，但字段消费者/完整模式或引擎映射不足；暂不推为5类。",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-pending-569",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      569
+    ],
+    "names": [
+      "unknown569"
+    ],
+    "behavior": "调整章节出生数计数",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "pending",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "已核TH16派发存在，但字段消费者/完整模式或引擎映射不足；暂不推为5类。",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-pending-570",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      570
+    ],
+    "names": [
+      "unknown570"
+    ],
+    "behavior": "按章节条件累加击破数",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "pending",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "已核TH16派发存在，但字段消费者/完整模式或引擎映射不足；暂不推为5类。",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-pending-571",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      571
+    ],
+    "names": [
+      "unknown571"
+    ],
+    "behavior": "调用未展开辅助函数",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "pending",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "已核TH16派发存在，但字段消费者/完整模式或引擎映射不足；暂不推为5类。",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-var-shared",
+    "namespace": "variable",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      -9985,
+      -9984,
+      -9983,
+      -9982,
+      -9981,
+      -9980,
+      -9979,
+      -9978,
+      -9935,
+      -9934,
+      -9933,
+      -9932
+    ],
+    "names": [
+      "I0",
+      "I1",
+      "I2",
+      "I3",
+      "F0",
+      "F1",
+      "F2",
+      "F3",
+      "F4",
+      "F5",
+      "F6",
+      "F7"
+    ],
+    "behavior": "I0..I3/F0..F7是每敌共享槽，同敌main/async互通，与每调用locals不同。",
+    "category": 1,
+    "conditions": "只判同敌读写；继承另列。",
+    "recipe": "I0..3=>self_int/set_self_int(0..3)；F0..7=>self_fx/set_self_fx(0..7)。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/enemy.rs:412",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/enemy_vars.rs:26"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/01-ecl-context-and-variables.md:45"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-var-positions",
+    "namespace": "variable",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      -9997,
+      -9996,
+      -9977,
+      -9976
+    ],
+    "names": [
+      "FINAL_X",
+      "FINAL_Y",
+      "FINAL_X2",
+      "FINAL_Y2"
+    ],
+    "behavior": "敌最终二维位置及其别名。",
+    "category": 1,
+    "conditions": "当前owner是该敌；原生坐标系须转换；不据此宣称abs/rel层已有。",
+    "recipe": "self_x/self_y。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:16"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/01-ecl-context-and-variables.md:35"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-var-player",
+    "namespace": "variable",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      -9991,
+      -9990,
+      -9965,
+      -9964
+    ],
+    "names": [
+      "PLAYER_X",
+      "PLAYER_Y",
+      "PLAYER_X2",
+      "PLAYER_Y2"
+    ],
+    "behavior": "自机坐标及其别名。",
+    "category": 1,
+    "conditions": "单人，按原作目标自机配置为players[0]。",
+    "recipe": "player_x/player_y。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall.rs:704"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/01-ecl-context-and-variables.md:61"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-var-aim",
+    "namespace": "variable",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      -9989,
+      -9944
+    ],
+    "names": [
+      "ANGLE_PLAYER",
+      "DIST_PLAYER"
+    ],
+    "behavior": "从敌最终位置到自机的角度/距离。",
+    "category": 2,
+    "conditions": "单人；差值在fx范围内；转换后同帧执行量须不超现有任务/全局指令预算。",
+    "recipe": "atan2(player_y-self_y,player_x-self_x)；dist(dx,dy)。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:61",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:93"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/01-ecl-context-and-variables.md:65"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-var-life",
+    "namespace": "variable",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      -9954
+    ],
+    "names": [
+      "LIFE"
+    ],
+    "behavior": "敌当前生命。",
+    "category": 1,
+    "conditions": "",
+    "recipe": "self_hp。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:46"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:361"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-var-constant",
+    "namespace": "variable",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      -9957
+    ],
+    "names": [
+      "TRUE"
+    ],
+    "behavior": "常量真。",
+    "category": 2,
+    "conditions": "转换后同帧执行量须不超现有任务/全局指令预算。",
+    "recipe": "发字面整数1。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:241"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:361"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-var-difficulty",
+    "namespace": "variable",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      -9959,
+      -9953,
+      -9952,
+      -9951,
+      -9950
+    ],
+    "names": [
+      "DIFF",
+      "EASY",
+      "NORMAL",
+      "HARD",
+      "LUNATIC"
+    ],
+    "behavior": "难度枚举和四个相等谓词。",
+    "category": 2,
+    "conditions": "每难度独立构建脚本/输入常量，不误用动态rank；转换后同帧执行量须不超现有任务/全局指令预算。",
+    "recipe": "固定difficulty值及其==0/1/2/3。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:241"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/01-ecl-context-and-variables.md:62"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-var-rng",
+    "namespace": "variable",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      -10000,
+      -9999,
+      -9998,
+      -9987
+    ],
+    "names": [
+      "RAND",
+      "RANDF",
+      "RANDRAD",
+      "RANDF2"
+    ],
+    "behavior": "原作RNG的整数、单位、有符号和弧度取样。",
+    "category": 3,
+    "conditions": "",
+    "recipe": "rand(n)并缩放到对应区间，保持每次读取都抽新值。",
+    "difference": "PRNG流、整数取样范围和分布未对齐，不因数值豁免跳过分布验证。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:75"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/01-ecl-context-and-variables.md:64"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-var-enemy-age",
+    "namespace": "variable",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      -9988
+    ],
+    "names": [
+      "TIME"
+    ],
+    "behavior": "敌已存活时间，不是当前任务的age，也不是可被513重置的脚本time_in_ecl。",
+    "category": 2,
+    "conditions": "敌出生帧显式传入全部async且跨主sub切换保留；dt=1；必须明确采样相位；转换后同帧执行量须不超现有任务/全局指令预算。",
+    "recipe": "在创建时保存$frame为共享初值或任务实参；所有读取=$frame-enemy_birth_frame，避免现有self_age()直接替代。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:56",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall.rs:703"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:361"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-var-motion-layers",
+    "namespace": "variable",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      -9995,
+      -9994,
+      -9993,
+      -9992,
+      -9975,
+      -9974,
+      -9973,
+      -9972,
+      -9971,
+      -9970,
+      -9969,
+      -9968,
+      -9967,
+      -9966,
+      -9958,
+      -9956,
+      -9955
+    ],
+    "names": [
+      "ABS_X",
+      "ABS_Y",
+      "REL_X",
+      "REL_Y",
+      "ABS_X2",
+      "ABS_Y2",
+      "REL_X2",
+      "REL_Y2",
+      "ABS_ANGLE",
+      "REL_ANGLE",
+      "ABS_SPEED",
+      "REL_SPEED",
+      "ABS_ORIGIN_DIST",
+      "REL_ORIGIN_DIST",
+      "FINAL_ANGLE",
+      "ABS_ANGLE_PLAYER",
+      "REL_ANGLE_PLAYER"
+    ],
+    "behavior": "绝对/相对运动层的坐标、角、速度、圆半径与朝自机角。",
+    "category": 3,
+    "conditions": "",
+    "recipe": "转换脚本维护两层状态，合成坐标后写当前单层敌位置；读值从各自脚本变量取。",
+    "difference": "当前self_angle/self_speed只有单份运动状态，近零朝向回填还有阈值；并发写层及同帧观察相位未保证。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/motion.rs:115",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:36"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/01-ecl-context-and-variables.md:35"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-var-rank",
+    "namespace": "variable",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      -9960
+    ],
+    "names": [
+      "RANK"
+    ],
+    "behavior": "动态Rank，随游戏进度与miss/bomb变化。",
+    "category": null,
+    "conditions": "适用目标：恢复完整战斗或全关卡；当前固定rank、单段、敌无敌的躲弹卡不被此项阻塞。",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall.rs:703"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/01-ecl-context-and-variables.md:63"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "原生行为及当前缺少通用对应机制的能力事实已核；尚无证据证明它是当前扩充固定rank单段无敌躲弹卡的关键前置，因此重要性待用户目标/样本确认，暂不列5类必做建议。",
+    "priority_reason": "后续恢复完整战斗、允许炸弹/击破或由HP/超时触发跨段/死亡发射时再评估；固定rank可由转换输入给定，单段结束可由卡的时长定义。本轮不提议实施完整原作战斗系统。"
+  },
+  {
+    "key": "modern-var-global-slots",
+    "namespace": "variable",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      -9926,
+      -9925,
+      -9924,
+      -9923,
+      -9922,
+      -9921,
+      -9920,
+      -9919,
+      -9918,
+      -9917,
+      -9916,
+      -9915
+    ],
+    "names": [
+      "GI0",
+      "GI1",
+      "GI2",
+      "GI3",
+      "GF0",
+      "GF1",
+      "GF2",
+      "GF3",
+      "GF4",
+      "GF5",
+      "GF6",
+      "GF7"
+    ],
+    "behavior": "管理器级全局4int/8float槽，跨敌共享。",
+    "category": 2,
+    "conditions": "可用共享var槽预留12个，其他脚本不占用；完整编号空间统一重命名；转换后同帧执行量须不超现有任务/全局指令预算。",
+    "recipe": "I/GF映射到独立get_var/set_var槽；float按fx传raw，禁止与敌槽/局部槽混用。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/stage.rs:58"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:361"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-var-boss-shared",
+    "namespace": "variable",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      -9943,
+      -9942,
+      -9941,
+      -9940,
+      -9939,
+      -9938,
+      -9937,
+      -9936,
+      -9963,
+      -9962,
+      -9911,
+      -9910
+    ],
+    "names": [
+      "BI0",
+      "BI1",
+      "BI2",
+      "BI3",
+      "BF0",
+      "BF1",
+      "BF2",
+      "BF3",
+      "BOSS_X",
+      "BOSS_Y",
+      "ANGLE_BOSS",
+      "SPEED_BOSS"
+    ],
+    "behavior": "boss0的共享槽与最终位置/移动角速。",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/enemy.rs:50",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/enemy_vars.rs:26"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/01-ecl-context-and-variables.md:63"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "现有self_int/fx不能按任意敌句柄读取；可由boss主动镜像到全局槽的静态子集有候选方案，但未核原生读时序与boss0不存在时的返回。",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-var-ids",
+    "namespace": "variable",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      -9931,
+      -9914,
+      -9909
+    ],
+    "names": [
+      "LAST_ENM_ID",
+      "ID",
+      "UNKNOWN9"
+    ],
+    "behavior": "最后生成敌ID、自身ID和父敌ID。",
+    "category": 2,
+    "conditions": "静态/有界ID映射；数值只作身份与查找，不依赖原生分配器具体递增值；原生父ID含义仍按变量读取器核；转换后同帧执行量须不超现有任务/全局指令预算。",
+    "recipe": "保存spawn_enemy句柄，子任务显式传parent句柄；self_enemy读当前句柄；编号表用于801/555转换。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:3",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/enemy.rs:180"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:361"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-var-pending-9986",
+    "namespace": "variable",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      -9986
+    ],
+    "names": [
+      "TIMEOUT"
+    ],
+    "behavior": "敌超时标志；不等于当前spell_result",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/01-ecl-context-and-variables.md:83",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:361"
+    ],
+    "evidence": "pending",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "需逐case核TH16读取来源、作用域及无对象返回；当前没有已确认等价公开ECL读口，未知不自动归5。",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-var-pending-9961",
+    "namespace": "variable",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      -9961
+    ],
+    "names": [
+      "ANM_ID"
+    ],
+    "behavior": "ANM slot0状态，可被ECL读取，不能随ANM外观一并无条件删",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/01-ecl-context-and-variables.md:83",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:361"
+    ],
+    "evidence": "pending",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "需逐case核TH16读取来源、作用域及无对象返回；当前没有已确认等价公开ECL读口，未知不自动归5。",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-var-pending-9949",
+    "namespace": "variable",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      -9949
+    ],
+    "names": [
+      "MISS_COUNT"
+    ],
+    "behavior": "局内miss累计",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/01-ecl-context-and-variables.md:83",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:361"
+    ],
+    "evidence": "pending",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "需逐case核TH16读取来源、作用域及无对象返回；当前没有已确认等价公开ECL读口，未知不自动归5。",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-var-pending-9948",
+    "namespace": "variable",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      -9948
+    ],
+    "names": [
+      "BOMB_COUNT"
+    ],
+    "behavior": "局内bomb累计",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/01-ecl-context-and-variables.md:83",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:361"
+    ],
+    "evidence": "pending",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "需逐case核TH16读取来源、作用域及无对象返回；当前没有已确认等价公开ECL读口，未知不自动归5。",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-var-pending-9947",
+    "namespace": "variable",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      -9947
+    ],
+    "names": [
+      "CAPTURE"
+    ],
+    "behavior": "收符资格标志",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/01-ecl-context-and-variables.md:83",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:361"
+    ],
+    "evidence": "pending",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "需逐case核TH16读取来源、作用域及无对象返回；当前没有已确认等价公开ECL读口，未知不自动归5。",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-var-pending-9946",
+    "namespace": "variable",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      -9946
+    ],
+    "names": [
+      "ENM_CNT_REAL"
+    ],
+    "behavior": "含特殊敌的存活敌数量",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/01-ecl-context-and-variables.md:83",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:361"
+    ],
+    "evidence": "pending",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "需逐case核TH16读取来源、作用域及无对象返回；当前没有已确认等价公开ECL读口，未知不自动归5。",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-var-pending-9945",
+    "namespace": "variable",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      -9945
+    ],
+    "names": [
+      "SHOTTYPE"
+    ],
+    "behavior": "机体shot类型",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/01-ecl-context-and-variables.md:83",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:361"
+    ],
+    "evidence": "pending",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "需逐case核TH16读取来源、作用域及无对象返回；当前没有已确认等价公开ECL读口，未知不自动归5。",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-var-pending-9930",
+    "namespace": "variable",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      -9930
+    ],
+    "names": [
+      "POWER"
+    ],
+    "behavior": "自机火力",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/01-ecl-context-and-variables.md:83",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:361"
+    ],
+    "evidence": "pending",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "需逐case核TH16读取来源、作用域及无对象返回；当前没有已确认等价公开ECL读口，未知不自动归5。",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-var-pending-9929",
+    "namespace": "variable",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      -9929
+    ],
+    "names": [
+      "DS1"
+    ],
+    "behavior": "继承网站表列出的特殊变量；本作含义/消费者尚未完成原生核对。",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/01-ecl-context-and-variables.md:83",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:361"
+    ],
+    "evidence": "pending",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "需逐case核TH16读取来源、作用域及无对象返回；当前没有已确认等价公开ECL读口，未知不自动归5。",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-var-pending-9928",
+    "namespace": "variable",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      -9928
+    ],
+    "names": [
+      "DS2"
+    ],
+    "behavior": "继承网站表列出的特殊变量；本作含义/消费者尚未完成原生核对。",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/01-ecl-context-and-variables.md:83",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:361"
+    ],
+    "evidence": "pending",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "需逐case核TH16读取来源、作用域及无对象返回；当前没有已确认等价公开ECL读口，未知不自动归5。",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-var-pending-9927",
+    "namespace": "variable",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      -9927
+    ],
+    "names": [
+      "DS3"
+    ],
+    "behavior": "继承网站表列出的特殊变量；本作含义/消费者尚未完成原生核对。",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/01-ecl-context-and-variables.md:83",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:361"
+    ],
+    "evidence": "pending",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "需逐case核TH16读取来源、作用域及无对象返回；当前没有已确认等价公开ECL读口，未知不自动归5。",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-var-pending-9913",
+    "namespace": "variable",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      -9913
+    ],
+    "names": [
+      "DS_PHOTOCOUNT"
+    ],
+    "behavior": "继承网站表列出的特殊变量；本作含义/消费者尚未完成原生核对。",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/01-ecl-context-and-variables.md:83",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:361"
+    ],
+    "evidence": "pending",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "需逐case核TH16读取来源、作用域及无对象返回；当前没有已确认等价公开ECL读口，未知不自动归5。",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-var-pending-9912",
+    "namespace": "variable",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      -9912
+    ],
+    "names": [
+      "DS4"
+    ],
+    "behavior": "继承网站表列出的特殊变量；本作含义/消费者尚未完成原生核对。",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/01-ecl-context-and-variables.md:83",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:361"
+    ],
+    "evidence": "pending",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "需逐case核TH16读取来源、作用域及无对象返回；当前没有已确认等价公开ECL读口，未知不自动归5。",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-var-pending-9908",
+    "namespace": "variable",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      -9908
+    ],
+    "names": [
+      "ENM_CNT"
+    ],
+    "behavior": "可击破敌数量",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/01-ecl-context-and-variables.md:83",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:361"
+    ],
+    "evidence": "pending",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "需逐case核TH16读取来源、作用域及无对象返回；当前没有已确认等价公开ECL读口，未知不自动归5。",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-var-pending-9907",
+    "namespace": "variable",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      -9907
+    ],
+    "names": [
+      "SPELL_ID"
+    ],
+    "behavior": "符卡ID",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/01-ecl-context-and-variables.md:83",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:361"
+    ],
+    "evidence": "pending",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "需逐case核TH16读取来源、作用域及无对象返回；当前没有已确认等价公开ECL读口，未知不自动归5。",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-var-pending-9906",
+    "namespace": "variable",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      -9906
+    ],
+    "names": [
+      "MIRROR"
+    ],
+    "behavior": "镜像标志，网站自己标版本待核",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/01-ecl-context-and-variables.md:83",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:361"
+    ],
+    "evidence": "pending",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "需逐case核TH16读取来源、作用域及无对象返回；当前没有已确认等价公开ECL读口，未知不自动归5。",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-var-pending-9905",
+    "namespace": "variable",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      -9905
+    ],
+    "names": [
+      "unnamed-9905"
+    ],
+    "behavior": "章节相关值，描述指向TH17，不作为TH16原生定论",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/01-ecl-context-and-variables.md:83",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:361"
+    ],
+    "evidence": "pending",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "需逐case核TH16读取来源、作用域及无对象返回；当前没有已确认等价公开ECL读口，未知不自动归5。",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-var-pending-9904",
+    "namespace": "variable",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      -9904
+    ],
+    "names": [
+      "MISS_COUNT_GLOBAL"
+    ],
+    "behavior": "全局miss累计",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/01-ecl-context-and-variables.md:83",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:361"
+    ],
+    "evidence": "pending",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "需逐case核TH16读取来源、作用域及无对象返回；当前没有已确认等价公开ECL读口，未知不自动归5。",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-var-pending-9903",
+    "namespace": "variable",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      -9903
+    ],
+    "names": [
+      "SUBSEASON"
+    ],
+    "behavior": "TH16所选副季枚举",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/01-ecl-context-and-variables.md:83",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:361"
+    ],
+    "evidence": "pending",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "需逐case核TH16读取来源、作用域及无对象返回；当前没有已确认等价公开ECL读口，未知不自动归5。",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-inheritance",
+    "namespace": "mechanism",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [],
+    "names": [],
+    "behavior": "每敌共享12数值槽在原作创建参数块中快照继承；当前新敌脚本槽默认全零。",
+    "category": 2,
+    "conditions": "子敌首条业务操作前初始化；原生观察者不会在初始化前读取子敌槽；父/子调度相位已单独处理；转换后同帧执行量须不超现有任务/全局指令预算。",
+    "recipe": "父读取self_int(0..3)/self_fx(0..7)作为12个spawn_enemy实参，子sub开头逐项set_self_*；子后续再spawn同样传递。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/enemy.rs:263",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/task.rs:198"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:356"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-th18-native-interrupt",
+    "namespace": "mechanism",
+    "games": [
+      "th18"
+    ],
+    "opcodes": [],
+    "names": [],
+    "behavior": "TH18 v1.00a的8槽HP/超时中断与Spellcard对象分开；time_alive和time_in_ecl是两个Timer，按GAME_SPEED递增。",
+    "category": null,
+    "conditions": "适用目标：恢复完整战斗或全关卡；当前固定rank、单段、敌无敌的躲弹卡不被此项阻塞。只限本作已读原生文档；不把TH16 opcode561/566或全部变量表移植到TH18。",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/spell.rs:85",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:56"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th18/01-boss-interrupts-and-spellcard.md:11",
+      "/data/sunyunbo/www/renkolab/engine/ecl/th18/01-boss-interrupts-and-spellcard.md:40"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "原生行为及当前缺少通用对应机制的能力事实已核；尚无证据证明它是当前扩充固定rank单段无敌躲弹卡的关键前置，因此重要性待用户目标/样本确认，暂不列5类必做建议。",
+    "priority_reason": "后续恢复完整战斗、允许炸弹/击破或由HP/超时触发跨段/死亡发射时再评估；固定rank可由转换输入给定，单段结束可由卡的时长定义。本轮不提议实施完整原作战斗系统。"
+  },
+  {
+    "key": "modern-single-layer-instant",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      400,
+      404,
+      428,
+      440,
+      444
+    ],
+    "names": [
+      "movePos",
+      "moveVel",
+      "moveVelNM",
+      "moveAngle",
+      "moveSpeed"
+    ],
+    "behavior": "单一绝对层的立即位置/极坐标速度/朝向/速率写入，可用现有运动接口直接表达。",
+    "category": 1,
+    "conditions": "rel层恒零，无mirror或原生skip-argument哨兵，无正在运行的位置/速度插值；400另要求原速度为零；两端都在本帧运动积分前执行；正常参数范围。",
+    "recipe": "400=>move_to(0,x,y,linear)；404/428=>move_vel(0,angle,speed,linear)；440=>move_angle(0,angle,linear)；444=>move_speed(0,speed,linear)。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/enemy.rs:302",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/enemy.rs:341",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/enemy.rs:376",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/enemy.rs:390",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/motion.rs:341"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-main-end-with-async",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      1
+    ],
+    "names": [
+      "delete"
+    ],
+    "behavior": "主上下文结束与同敌异步任务同时存在时的退场相位。",
+    "category": 3,
+    "conditions": "",
+    "recipe": "尽可能在结束主sub前由脚本通知已知async停止；不把未知后代混进kill_children。",
+    "difference": "当前main自然End只标ENEMY_DYING，owner门只检查槽存活；本帧后续同敌任务仍可能跑到相位9回收。原生main返回非0立即退出该敌上下文遍历。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:506",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:611"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:1042"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "modern-th18-timed-drop",
+    "namespace": "instruction",
+    "games": [
+      "th18"
+    ],
+    "opcodes": [
+      573,
+      574
+    ],
+    "names": [
+      "unknown573",
+      "574"
+    ],
+    "behavior": "TH18 573按type覆盖timed_ex_drop计数；574设置限时奖励窗口并复位计时；掉落路径按剩余时间衰减并入额外掉落。",
+    "category": 3,
+    "conditions": "仅TH18 v1.00a；TH16同号573已证默认no-op，不能跨作合并。",
+    "recipe": "脚本保存每type最后写入值及窗口起始frame，掉落时按已核公式计算后drop_add；要保留原生time_alive/GAME_SPEED与自动死亡回调时机。",
+    "difference": "当前drop_add是加法且计数钳u8；无原生timed窗口和自动回调，现配方仅近似。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/enemy.rs:135",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world.rs:690"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th18/02-item-drops.md:300",
+      "/data/sunyunbo/www/renkolab/engine/ecl/th18/02-item-drops.md:318"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  }
+]

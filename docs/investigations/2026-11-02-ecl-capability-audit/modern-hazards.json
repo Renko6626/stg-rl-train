@@ -1,0 +1,3403 @@
+[
+  {
+    "key": "th16-ins-600",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      600
+    ],
+    "names": [
+      "etNew"
+    ],
+    "behavior": "重置发射描述符、辅助偏移和EX追加游标",
+    "category": 3,
+    "conditions": "",
+    "recipe": "sh_reset后显式补原作默认速度2、瞄准模式和其余将使用的字段；无EX时可规避多数差别。",
+    "difference": "sh_reset默认速度0；源重置同时清EX程序/游标/辅助坐标，我方没有同构描述符。直接重命名会改变未重设字段后的出弹。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/shooter.rs:75",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:21"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (TH16 v1.00a 0x41dcb0)",
+      "https://priw8.github.io/#b=modding/&p=ins"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-601",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      601
+    ],
+    "names": [
+      "etOn"
+    ],
+    "behavior": "按发射器当前状态生成整波弹",
+    "category": 3,
+    "conditions": "",
+    "recipe": "确定模式按下列模式记录计算角/速，sh_fire或逐颗fire；EX另行处理。",
+    "difference": "默认参数、共享状态、出生保护、EX首次执行、发射顺序和满池行为需分开对齐；sh_fire不能整体替代etOn。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:203",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (case 0x73)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:238 (0x412cb0)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:240 (0x414da0)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-602",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      602
+    ],
+    "names": [
+      "etSprite"
+    ],
+    "behavior": "设置源弹种和颜色；弹种同时决定判定半径及动画",
+    "category": 3,
+    "conditions": "",
+    "recipe": "sh_sprite设置已校准appearance；尚未建立TH16逐弹种半径/动画映射的部分保持拒绝。",
+    "difference": "当前appearance不是TH16原生类型表；换色/外形不能保证半径、旋转和ANM驱动状态相同。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:29",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:245"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:82",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:238"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-603",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      603
+    ],
+    "names": [
+      "etOffset"
+    ],
+    "behavior": "设置相对敌人的直角偏移",
+    "category": 1,
+    "conditions": "仅配置字段；源槽已静态映射到当前同一任务的0..3，不涉及跨async共享；数值在写API范围内。后续发射/判定另看模式与机制记录。另限源628绝对模式未激活，且我方polar_r=0；一般混用需缓存偏移后按626/628配方合成。",
+    "recipe": "sh_offset(mapped_id, 动态参数)。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:50"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/05-fire-interface.md:31",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-604",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      604
+    ],
+    "names": [
+      "etAngle"
+    ],
+    "behavior": "保存角度基值与散布参数",
+    "category": 1,
+    "conditions": "仅配置字段；源槽已静态映射到当前同一任务的0..3，不涉及跨async共享；数值在写API范围内。后续发射/判定另看模式与机制记录。",
+    "recipe": "sh_angle(mapped_id, 动态参数)。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:94"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/05-fire-interface.md:31",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-606",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      606
+    ],
+    "names": [
+      "etCount"
+    ],
+    "behavior": "保存路数与层数",
+    "category": 1,
+    "conditions": "仅配置字段；源槽已静态映射到当前同一任务的0..3，不涉及跨async共享；数值在写API范围内。后续发射/判定另看模式与机制记录。路数/层数均在0..255；更大数量需逐颗循环另核容量。",
+    "recipe": "sh_count(mapped_id, 动态参数)。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:116"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/05-fire-interface.md:31",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-626",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      626
+    ],
+    "names": [
+      "etOffsetRad"
+    ],
+    "behavior": "将极坐标换算为直角偏移，覆盖603同一对字段",
+    "category": 2,
+    "conditions": "同一任务≤4槽；rx/ry和绝对基点、模式位分别缓存在locals（总≤64），开火前合成。不用原样sh_offset_rad，后者永远叠加。",
+    "recipe": "在626处计算rx=r*cos(a),ry=r*sin(a)，替换转换缓存中的相对偏移；清我方sh_offset_rad半径，开火前用sh_offset/sh_offset_abs写合成基点。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:74"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (case 0x89，写+0xf76/+0xf77)",
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/05-fire-interface.md:31"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-627",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      627
+    ],
+    "names": [
+      "etDist"
+    ],
+    "behavior": "设置沿每颗弹实际发射角的出生距离",
+    "category": 1,
+    "conditions": "仅配置字段；源槽已静态映射到当前同一任务的0..3，不涉及跨async共享；数值在写API范围内。后续发射/判定另看模式与机制记录。",
+    "recipe": "sh_dist(mapped_id, 动态参数)。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:85"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/05-fire-interface.md:31",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-628",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      628
+    ],
+    "names": [
+      "etOffsetAbs"
+    ],
+    "behavior": "设置独立绝对基点并按x阈值切换模式，仍叠加相对偏移",
+    "category": 2,
+    "conditions": "同一任务≤4槽、总缓存≤64locals；rel由603/626最后一次写决定，绝对模式开关独立保留；开火前求值不yield。",
+    "recipe": "缓存abs_x/abs_y及enabled=(abs_x>=-990)；开火前若enabled，sh_offset_abs(abs_x+rel_x,abs_y+rel_y)，否则sh_offset(rel_x,rel_y)；sh_offset_rad半径清0。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:62"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/05-fire-interface.md:31",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-605",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      605
+    ],
+    "names": [
+      "etSpeed"
+    ],
+    "behavior": "保存首层与末层速度",
+    "category": 2,
+    "conditions": "仅配置字段；源槽已静态映射到当前同一任务的0..3，不涉及跨async共享；数值在写API范围内。后续发射/判定另看模式与机制记录。源605后可以再改606，所以不要在605时用旧M永久折算；先缓存端点再开火时算。",
+    "recipe": "在源605处缓存s0/s1；每次开火按最终M重算step=M>1?(s1-s0)/(M-1):0，调用sh_speed(id,s0,step)。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:105",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:354"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:238 (0x412cb0 速度层端点读取)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-607",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      607
+    ],
+    "names": [
+      "etAim"
+    ],
+    "behavior": "选择13种发射分布",
+    "category": null,
+    "conditions": "",
+    "recipe": "见namespace mechanism的mode-0..mode-12，按每种模式降低。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:325"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:238 (0x412cb0 switch 0..0xc)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "同一opcode含精准子集、随机近似和未化简模式，不能给统一类别。",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-608",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      608
+    ],
+    "names": [
+      "etSound"
+    ],
+    "behavior": "配置开火/变换音效",
+    "category": 4,
+    "conditions": "仅声音，不把伴随动画/状态门一并省略。",
+    "recipe": "纯躲弹训练可省略声音，或用sh_req/emit_req输出表现事件。",
+    "difference": "不保留原音效播放。待用户确认取舍。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:185",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:415"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/05-fire-interface.md:48"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "proposed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-609",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      609
+    ],
+    "names": [
+      "etExSet"
+    ],
+    "behavior": "按索引写入或追加EX记录（扩展版本含额外参数）",
+    "category": 5,
+    "conditions": "",
+    "recipe": "无通用现成组合；只有已证明静态、无并发冲突的子集可降到xform/弹任务，逐EX见表。",
+    "difference": "原作18条独立程序记录、async门和各效果私有状态；我方16槽且STEP扩展另占槽，动态索引改写/独立计时没有同义接口。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/xform.rs:10",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/transform.rs:20",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:154"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (case 0x7b)",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/02-bullet-vm-model.md:31",
+      "/data/sunyunbo/www/stg-rl-train/docs/investigations/2026-10-23-modern-ecl-engine-capabilities.md:45"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": "TH18已扫描609/610/611/612共847处，含89处async=1；这是同类需求的本作证据，不等于TH16出现次数。TH16原生存在该机制。"
+  },
+  {
+    "key": "th16-ins-610",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      610
+    ],
+    "names": [
+      "etExSet2"
+    ],
+    "behavior": "按索引写入或追加EX记录（扩展版本含额外参数）",
+    "category": 5,
+    "conditions": "",
+    "recipe": "无通用现成组合；只有已证明静态、无并发冲突的子集可降到xform/弹任务，逐EX见表。",
+    "difference": "原作18条独立程序记录、async门和各效果私有状态；我方16槽且STEP扩展另占槽，动态索引改写/独立计时没有同义接口。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/xform.rs:10",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/transform.rs:20",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:154"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (case 0x7b)",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/02-bullet-vm-model.md:31",
+      "/data/sunyunbo/www/stg-rl-train/docs/investigations/2026-10-23-modern-ecl-engine-capabilities.md:45"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": "TH18已扫描609/610/611/612共847处，含89处async=1；这是同类需求的本作证据，不等于TH16出现次数。TH16原生存在该机制。"
+  },
+  {
+    "key": "th16-ins-611",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      611
+    ],
+    "names": [
+      "etEx"
+    ],
+    "behavior": "按索引写入或追加EX记录（扩展版本含额外参数）",
+    "category": 5,
+    "conditions": "",
+    "recipe": "无通用现成组合；只有已证明静态、无并发冲突的子集可降到xform/弹任务，逐EX见表。",
+    "difference": "原作18条独立程序记录、async门和各效果私有状态；我方16槽且STEP扩展另占槽，动态索引改写/独立计时没有同义接口。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/xform.rs:10",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/transform.rs:20",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:154"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (case 0x7b)",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/02-bullet-vm-model.md:31",
+      "/data/sunyunbo/www/stg-rl-train/docs/investigations/2026-10-23-modern-ecl-engine-capabilities.md:45"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": "TH18已扫描609/610/611/612共847处，含89处async=1；这是同类需求的本作证据，不等于TH16出现次数。TH16原生存在该机制。"
+  },
+  {
+    "key": "th16-ins-612",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      612
+    ],
+    "names": [
+      "etEx2"
+    ],
+    "behavior": "按索引写入或追加EX记录（扩展版本含额外参数）",
+    "category": 5,
+    "conditions": "",
+    "recipe": "无通用现成组合；只有已证明静态、无并发冲突的子集可降到xform/弹任务，逐EX见表。",
+    "difference": "原作18条独立程序记录、async门和各效果私有状态；我方16槽且STEP扩展另占槽，动态索引改写/独立计时没有同义接口。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/xform.rs:10",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/transform.rs:20",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:154"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (case 0x7b)",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/02-bullet-vm-model.md:31",
+      "/data/sunyunbo/www/stg-rl-train/docs/investigations/2026-10-23-modern-ecl-engine-capabilities.md:45"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": "TH18已扫描609/610/611/612共847处，含89处async=1；这是同类需求的本作证据，不等于TH16出现次数。TH16原生存在该机制。"
+  },
+  {
+    "key": "th16-ins-613",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      613
+    ],
+    "names": [
+      "etClearAll"
+    ],
+    "behavior": "立即全清普通弹与激光",
+    "category": 3,
+    "conditions": "",
+    "recipe": "clear_bullets()创建全屏field。",
+    "difference": "field在积分后结算；原作在ECL执行点取消，激光取消和退场时序亦不同。不是仅数值差。当前clear_bullets全屏field还默认转星；TH16该入口不产实体，需无星field能力才能消除这项差别。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/bullet.rs:83",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/settle.rs:175"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (case 0x7c)",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/04-cancel-to-item.md:105"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-614",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      614
+    ],
+    "names": [
+      "etCopy"
+    ],
+    "behavior": "复制描述符与辅助偏移，但不复制EX追加游标",
+    "category": 2,
+    "conditions": "仅无EX、槽数≤4、已证明无跨任务共享的发射器；字段与脚本locals总计≤64；源/目标动态id可用有限分支选缓存。不支持完整0x380字节含EX描述符复制。",
+    "recipe": "在同一转换任务缓存每源槽所有实际读取的字段；copy语句逐字段赋值，再重放sh_*；目标EX追加游标必须保留原值。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/shooter.rs:38",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/task.rs:24"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (case 0x7d 不写+0xf66游标)",
+      "https://priw8.github.io/#b=modding/&p=ins"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-615",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      615
+    ],
+    "names": [
+      "etCancel"
+    ],
+    "behavior": "以调用者为中心圆形清弹",
+    "category": 3,
+    "conditions": "",
+    "recipe": "clear_bullets_at(self_x,self_y,r,0)，TH16 mode0/1都不应转实体星。",
+    "difference": "field按积分后位置测试，并取消整根接触激光；源立即检查弹位置，激光逐段取消。635/636另缺逐弹bomb免疫过滤；mode1计数也未保留。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/bullet.rs:69",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/settle.rs:175"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/04-cancel-to-item.md:14",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/04-cancel-to-item.md:92",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-616",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      616
+    ],
+    "names": [
+      "etClear"
+    ],
+    "behavior": "以调用者为中心圆形清弹",
+    "category": 3,
+    "conditions": "",
+    "recipe": "clear_bullets_at(self_x,self_y,r,0)，TH16 mode0/1都不应转实体星。",
+    "difference": "field按积分后位置测试，并取消整根接触激光；源立即检查弹位置，激光逐段取消。635/636另缺逐弹bomb免疫过滤；mode1计数也未保留。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/bullet.rs:69",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/settle.rs:175"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/04-cancel-to-item.md:14",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/04-cancel-to-item.md:92",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-635",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      635
+    ],
+    "names": [
+      "etCancel2"
+    ],
+    "behavior": "以调用者为中心圆形清弹，尊重bomb保护",
+    "category": 3,
+    "conditions": "",
+    "recipe": "clear_bullets_at(self_x,self_y,r,0)，TH16 mode0/1都不应转实体星。",
+    "difference": "field按积分后位置测试，并取消整根接触激光；源立即检查弹位置，激光逐段取消。635/636另缺逐弹bomb免疫过滤；mode1计数也未保留。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/bullet.rs:69",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/settle.rs:175"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/04-cancel-to-item.md:14",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/04-cancel-to-item.md:92",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-636",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      636
+    ],
+    "names": [
+      "etClear2"
+    ],
+    "behavior": "以调用者为中心圆形清弹，尊重bomb保护",
+    "category": 3,
+    "conditions": "",
+    "recipe": "clear_bullets_at(self_x,self_y,r,0)，TH16 mode0/1都不应转实体星。",
+    "difference": "field按积分后位置测试，并取消整根接触激光；源立即检查弹位置，激光逐段取消。635/636另缺逐弹bomb免疫过滤；mode1计数也未保留。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/bullet.rs:69",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/settle.rs:175"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/04-cancel-to-item.md:14",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/04-cancel-to-item.md:92",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-617",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      617
+    ],
+    "names": [
+      "etSpeedR3"
+    ],
+    "behavior": "按游戏内rank插值选择速度或数量",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:105"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (cases 0x80..0x85)",
+      "https://priw8.github.io/#b=modding/&p=ins"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "已知写入字段；本轮未核TH16的rank分段/插值和整数舍入公式。不能把difficulty直接当rank。",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-618",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      618
+    ],
+    "names": [
+      "etSpeedR5"
+    ],
+    "behavior": "按游戏内rank插值选择速度或数量",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:105"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (cases 0x80..0x85)",
+      "https://priw8.github.io/#b=modding/&p=ins"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "已知写入字段；本轮未核TH16的rank分段/插值和整数舍入公式。不能把difficulty直接当rank。",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-619",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      619
+    ],
+    "names": [
+      "etSpeedR2"
+    ],
+    "behavior": "按游戏内rank插值选择速度或数量",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:105"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (cases 0x80..0x85)",
+      "https://priw8.github.io/#b=modding/&p=ins"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "已知写入字段；本轮未核TH16的rank分段/插值和整数舍入公式。不能把difficulty直接当rank。",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-620",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      620
+    ],
+    "names": [
+      "etCountR3"
+    ],
+    "behavior": "按游戏内rank插值选择速度或数量",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:105"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (cases 0x80..0x85)",
+      "https://priw8.github.io/#b=modding/&p=ins"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "已知写入字段；本轮未核TH16的rank分段/插值和整数舍入公式。不能把difficulty直接当rank。",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-621",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      621
+    ],
+    "names": [
+      "etCountR5"
+    ],
+    "behavior": "按游戏内rank插值选择速度或数量",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:105"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (cases 0x80..0x85)",
+      "https://priw8.github.io/#b=modding/&p=ins"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "已知写入字段；本轮未核TH16的rank分段/插值和整数舍入公式。不能把difficulty直接当rank。",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-622",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      622
+    ],
+    "names": [
+      "etCountR2"
+    ],
+    "behavior": "按游戏内rank插值选择速度或数量",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:105"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (cases 0x80..0x85)",
+      "https://priw8.github.io/#b=modding/&p=ins"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "已知写入字段；本轮未核TH16的rank分段/插值和整数舍入公式。不能把difficulty直接当rank。",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-623",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      623
+    ],
+    "names": [
+      "angleToPlayer"
+    ],
+    "behavior": "从任意坐标求朝自机角并写变量",
+    "category": 2,
+    "conditions": "单玩家；目标是可写的普通局部。若目标为敌共享变量，另受共享状态映射约束。若origin恰等于玩家坐标，math_atan2f的零向量返回未核，本行排除该退化点。",
+    "recipe": "atan2(player_y-y,player_x-x)写转换后的目标变量；保留坐标相等时源回退角。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:93",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall.rs:750"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (case 0x86)",
+      "https://priw8.github.io/#b=modding/&p=ins"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-624",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      624
+    ],
+    "names": [
+      "etSpeedD"
+    ],
+    "behavior": "按四档difficulty选择两项速度/数量",
+    "category": 2,
+    "conditions": "0 Easy/1 Normal/2 Hard/3 Lunatic；速度第二项仍是端点；沿用605/606槽和容量限制。",
+    "recipe": "固定导入rank0..3时在转换期选择对应两项；动态difficulty先分支后调用605/606对应降低。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:105",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:116"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (cases 0x87/0x88)",
+      "https://priw8.github.io/#b=modding/&p=ins"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-625",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      625
+    ],
+    "names": [
+      "etCountD"
+    ],
+    "behavior": "按四档difficulty选择两项速度/数量",
+    "category": 2,
+    "conditions": "0 Easy/1 Normal/2 Hard/3 Lunatic；速度第二项仍是端点；沿用605/606槽和容量限制。",
+    "recipe": "固定导入rank0..3时在转换期选择对应两项；动态difficulty先分支后调用605/606对应降低。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:105",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:116"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (cases 0x87/0x88)",
+      "https://priw8.github.io/#b=modding/&p=ins"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-629",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      629
+    ],
+    "names": [
+      "fog"
+    ],
+    "behavior": "重设敌人雾的半径颜色及出现动画",
+    "category": 4,
+    "conditions": "须先确认脚本不依赖STD/表现回写；此结论不包含等待类指令。",
+    "recipe": "纯训练输出可省略或输出表现请求。",
+    "difference": "不保留原作表现。待用户确认取舍。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall.rs:745"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355",
+      "https://priw8.github.io/#b=modding/&p=ins"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "proposed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-630",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      630
+    ],
+    "names": [
+      "callSTD"
+    ],
+    "behavior": "触发STD脚本标签",
+    "category": 4,
+    "conditions": "须先确认脚本不依赖STD/表现回写；此结论不包含等待类指令。",
+    "recipe": "纯训练输出可省略或输出表现请求。",
+    "difference": "不保留原作表现。待用户确认取舍。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall.rs:745"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355",
+      "https://priw8.github.io/#b=modding/&p=ins"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "proposed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-631",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      631
+    ],
+    "names": [
+      "lifeHide"
+    ],
+    "behavior": "暂时隐藏Boss血条",
+    "category": 4,
+    "conditions": "须先确认脚本不依赖STD/表现回写；此结论不包含等待类指令。",
+    "recipe": "纯训练输出可省略或输出表现请求。",
+    "difference": "不保留原作表现。待用户确认取舍。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall.rs:745"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355",
+      "https://priw8.github.io/#b=modding/&p=ins"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "proposed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-632",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      632
+    ],
+    "names": [
+      "funcSet"
+    ],
+    "behavior": "注册每帧硬编码函数",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall.rs:745"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (cases 0x8f..0x96)",
+      "https://priw8.github.io/#b=modding/&p=ins"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "分派/写字段路径已定位；须逐TH16函数ID和消费者核原生行为。未查明不能省略或自动归5。",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-633",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      633
+    ],
+    "names": [
+      "flagExtDmg"
+    ],
+    "behavior": "设置外部伤害消费开关",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall.rs:745"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (cases 0x8f..0x96)",
+      "https://priw8.github.io/#b=modding/&p=ins"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "分派/写字段路径已定位；须逐TH16函数ID和消费者核原生行为。未查明不能省略或自动归5。",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-634",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      634
+    ],
+    "names": [
+      "setHitboxFunc"
+    ],
+    "behavior": "设置特殊敌人体碰函数",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall.rs:745"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (cases 0x8f..0x96)",
+      "https://priw8.github.io/#b=modding/&p=ins"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "分派/写字段路径已定位；须逐TH16函数ID和消费者核原生行为。未查明不能省略或自动归5。",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-637",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      637
+    ],
+    "names": [
+      "funcCall"
+    ],
+    "behavior": "立即调用硬编码函数",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall.rs:745"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (cases 0x8f..0x96)",
+      "https://priw8.github.io/#b=modding/&p=ins"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "分派/写字段路径已定位；须逐TH16函数ID和消费者核原生行为。未查明不能省略或自动归5。",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-639",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      639
+    ],
+    "names": [
+      "funcSet2"
+    ],
+    "behavior": "以另一flag注册每帧硬编码函数",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall.rs:745"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (cases 0x8f..0x96)",
+      "https://priw8.github.io/#b=modding/&p=ins"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "分派/写字段路径已定位；须逐TH16函数ID和消费者核原生行为。未查明不能省略或自动归5。",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-638",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      638
+    ],
+    "names": [
+      "scoreAdd"
+    ],
+    "behavior": "增加分数并生成分数弹窗",
+    "category": 4,
+    "conditions": "不保留分数溢出行为或弹窗。",
+    "recipe": "仅躲弹训练可省略；如有依赖分数的逻辑须重新判断。",
+    "difference": "玩家分数不同。待用户确认。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall.rs:745"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (case 0x95)",
+      "https://priw8.github.io/#b=modding/&p=ins"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "proposed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-640",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      640
+    ],
+    "names": [
+      "etExSub"
+    ],
+    "behavior": "写指定EX条目的字符串参数（如生成敌人sub）",
+    "category": 5,
+    "conditions": "",
+    "recipe": "静态目标字符串可编译为已知SubRef，但一般EX程序改写没有现成表达。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:169",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/xform.rs:41"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (case 0x97)",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:96"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": "EX_ENMCREATE需要保留子程序身份和动态程序索引；直接忽略会丢后续敌人/攻击。"
+  },
+  {
+    "key": "th16-ins-641",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      641
+    ],
+    "names": [
+      "etExSubtract"
+    ],
+    "behavior": "EX追加游标减1并钳0",
+    "category": 5,
+    "conditions": "",
+    "recipe": "仅静态游标程序可在转换时求值，生成静态xform；动态改写未支持。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/xform.rs:10",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:154"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (case 0x98)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": "影响下一EX写入的槽与后续分裂继承的程序；不是普通等待或可丢的计数。"
+  },
+  {
+    "key": "th16-ins-700",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      700
+    ],
+    "names": [
+      "laserNew"
+    ],
+    "behavior": "存激光初长/终长/几何参数与宽度",
+    "category": null,
+    "conditions": "",
+    "recipe": "可在转换层缓存参数；不能把所有类型打包成我方laser九参。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/laser.rs:52",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/lasers.rs:1"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (case 0x99/0x9a)",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/03-lasers.md:185",
+      "https://priw8.github.io/#b=modding/&p=ins"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "共享descriptor的参数含义随子类变化；本轮未完成各子类字段全表和flags的精确核对。",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-701",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      701
+    ],
+    "names": [
+      "laserTiming"
+    ],
+    "behavior": "存无限激光时序、初flags；曲线激光复用首参数作节点长度",
+    "category": null,
+    "conditions": "",
+    "recipe": "可在转换层缓存参数；不能把所有类型打包成我方laser九参。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/laser.rs:52",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/lasers.rs:1"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (case 0x99/0x9a)",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/03-lasers.md:185",
+      "https://priw8.github.io/#b=modding/&p=ins"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "共享descriptor的参数含义随子类变化；本轮未完成各子类字段全表和flags的精确核对。",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-702",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      702
+    ],
+    "names": [
+      "laserOn"
+    ],
+    "behavior": "由发射器生成直线激光（复制EX程序）",
+    "category": 3,
+    "conditions": "",
+    "recipe": "无EX的平直片段用laser+lz_speed+lz_start配置初始段和移动；保存句柄。",
+    "difference": "我方射线区间可表达主体形状，但屏缘分裂/环绕、18条激光EX、原生首尾判定裁剪和生命周期未统一；只能有限近似。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/lasers.rs:1",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/integrate.rs:200"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (case 0x9b)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:523 (0x431fe0)",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/03-lasers.md:180"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-703",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      703
+    ],
+    "names": [
+      "laserStOn"
+    ],
+    "behavior": "生成带脚本ID的无限激光（复制EX程序）",
+    "category": 3,
+    "conditions": "",
+    "recipe": "laser建立定长段，保存源ID→句柄；warn=startup，active近似expand+duration，fade=shrink。",
+    "difference": "源扩张期宽度线性增加且已有判定；我方ACTIVE立即全宽、fade无判定；通用外观/flags/EX、同ID多根及起始相位需另核。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/lasers.rs:1",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/integrate.rs:236"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (case 0x9c)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:546 (0x436fd0)",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/03-lasers.md:122"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-704",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      704
+    ],
+    "names": [
+      "laserOffset"
+    ],
+    "behavior": "按脚本ID修改激光绝对原点",
+    "category": 1,
+    "conditions": "目标laser存在且源ID唯一，无遮挡挂靠；我方坐标±4096；只核原点setter，不含该激光其他行为。",
+    "recipe": "已持有唯一映射句柄时lz_origin(h,x,y)。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/laser.rs:184"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (case 0x9d)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-705",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      705
+    ],
+    "names": [
+      "laserTrajectory"
+    ],
+    "behavior": "设置无限激光原点每帧偏移速度",
+    "category": 3,
+    "conditions": "",
+    "recipe": "控制任务每帧读取/缓存原点并lz_origin(x+vx,y+vy)。",
+    "difference": "原作激光tick在enemy之后、bullet之前；我方任务在积分前，任务出生次帧首跑。简单循环会产生一帧相位差，且task wait(1)并非每帧yield。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/laser.rs:184",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (case 0x9e)",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/03-lasers.md:281"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-706",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      706
+    ],
+    "names": [
+      "laserStLength"
+    ],
+    "behavior": "修改原生激光+0x78长度变化速率",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/laser.rs:113"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (case 0x9f)",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/03-lasers.md:120",
+      "https://priw8.github.io/#b=modding/&p=ins"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "Priw8命名speed，但native写+0x78而非我方lz_speed同义已证；须核无限子类消费，不能直接映射。",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-707",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      707
+    ],
+    "names": [
+      "laserStWidth"
+    ],
+    "behavior": "动态修改原生激光宽度",
+    "category": 5,
+    "conditions": "",
+    "recipe": "当前ECL无活激光宽度写口；重建激光会改生命周期/句柄/擦弹，不能作精准替代。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/laser.rs:52",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/lasers.rs:35"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (case 0xa0)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": "无限激光扩张和脚本动态宽度直接改变避让通道；需要保留几何变化。"
+  },
+  {
+    "key": "th16-ins-708",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      708
+    ],
+    "names": [
+      "laserStAngle"
+    ],
+    "behavior": "修改激光绝对角",
+    "category": 2,
+    "conditions": "同一任务内连续执行读/写、无中途yield；角BAM回绕；只核setter，非无限激光整体等价。",
+    "recipe": "对唯一句柄读取lz_angle，调用lz_rotate(h,target-lz_angle(h))。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/laser.rs:136",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/laser.rs:209"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (case 0xa1)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-709",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      709
+    ],
+    "names": [
+      "laserStRotation"
+    ],
+    "behavior": "设置无限激光角速度",
+    "category": 1,
+    "conditions": "唯一有效句柄；角速在有符号BAM每帧范围；只核角速字段/每tick加角，生命周期另核。",
+    "recipe": "lz_omega(h,omega)。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/laser.rs:127",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/integrate.rs:226"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (case 0xa2)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-710",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      710
+    ],
+    "names": [
+      "laserStEnd"
+    ],
+    "behavior": "对同脚本ID的激光逐一触发原生结束",
+    "category": 3,
+    "conditions": "",
+    "recipe": "控制方缓存该ID的全部句柄逐一lz_cancel。",
+    "difference": "原生循环find_by_id并调用vtable[10]、清ID；我方转fade而非同一销毁/清除路径，fade剩余时间取原建参，不能保证即刻消失。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/laser.rs:239",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/laser.rs:194"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (case 0xa3)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-711",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      711
+    ],
+    "names": [
+      "laserCuOn"
+    ],
+    "behavior": "生成带历史节点的曲线激光",
+    "category": 5,
+    "conditions": "",
+    "recipe": "当前没有曲线节点或对应判定；多段直线是待设计方案，不能称现有精准组合。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/lasers.rs:1",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/collide.rs:22"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (case 0xa4)",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/03-lasers.md:77",
+      "/data/sunyunbo/www/stg-rl-train/docs/investigations/2026-10-23-modern-ecl-engine-capabilities.md:57"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": "TH18真实st07bs::BossCard3_at/at2各有711；TH16有原生曲线对象和逐节点取消。影响可避让空间与曲线演化。"
+  },
+  {
+    "key": "th16-ins-712",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      712
+    ],
+    "names": [
+      "etCancelRect"
+    ],
+    "behavior": "以旋转矩形区域取消普通弹，尊重bomb保护",
+    "category": 5,
+    "conditions": "",
+    "recipe": "无现成ECL矩形清弹区域接口；圆场是不同几何，不能当精准替代。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/field.rs:87",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/bullet.rs:69"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (case 0xa5)",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/04-cancel-to-item.md:92"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": "矩形作用域与免疫过滤均会保留/删去不同弹；原生已有明确入口。"
+  },
+  {
+    "key": "th16-ins-713",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      713
+    ],
+    "names": [
+      "unknown713"
+    ],
+    "behavior": "分配type3 LaserBeam对象并复制EX",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/lasers.rs:1"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (case 0xa6)",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/03-lasers.md:76",
+      "https://priw8.github.io/#b=modding/&p=ins"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "TH16原生存在真实ctor/分配路径，Priw8“GFW以外损坏”不能照用；beam运行几何与本作使用情况未完成核对。",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ins-714",
+    "namespace": "instruction",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      714
+    ],
+    "names": [
+      "unknown714"
+    ],
+    "behavior": "查激光ID，对非Infinite对象调用vtable[2]并传整数",
+    "category": null,
+    "conditions": "",
+    "recipe": "",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall.rs:745"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355 (case 0xa7)",
+      "https://priw8.github.io/#b=modding/&p=ins"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "原生分派存在；vtable[2]各子类消费者与实际用途未核，不从unknown名称推断无效。",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-mode-0",
+    "namespace": "mechanism",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      0
+    ],
+    "names": [
+      "th16-mode-0"
+    ],
+    "behavior": "自机狙居中扇",
+    "category": 2,
+    "conditions": "仅发射几何；单自机、无EX/出生保护/动态共享，外观已校准；全波有空闲弹槽且每任务预算足够，同帧完成全部fire（每任务≤1024指令、全局预算亦足）。角/速端点在开火时求值，不yield。",
+    "recipe": "按源顺序外层q=速度层、内层j=路：M>1时s=s0+(s1-s0)*q/(M-1)，否则s=s0。N奇数d=ceil(j/2)*delta；偶数d=floor(j/2)*delta+delta/2；j奇数取负。angle=alpha+d+aim(origin)；逐颗fire并叠加dist。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/bullet.rs:94",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:325",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:238 (0x412cb0 case 0x0)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:240 (0x414da0)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-mode-1",
+    "namespace": "mechanism",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      1
+    ],
+    "names": [
+      "th16-mode-1"
+    ],
+    "behavior": "固定居中扇",
+    "category": 2,
+    "conditions": "仅发射几何；单自机、无EX/出生保护/动态共享，外观已校准；全波有空闲弹槽且每任务预算足够，同帧完成全部fire（每任务≤1024指令、全局预算亦足）。角/速端点在开火时求值，不yield。",
+    "recipe": "按源顺序外层q=速度层、内层j=路：M>1时s=s0+(s1-s0)*q/(M-1)，否则s=s0。N奇数d=ceil(j/2)*delta；偶数d=floor(j/2)*delta+delta/2；j奇数取负。angle=alpha+d；逐颗fire并叠加dist。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/bullet.rs:94",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:325",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:238 (0x412cb0 case 0x1)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:240 (0x414da0)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-mode-2",
+    "namespace": "mechanism",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      2
+    ],
+    "names": [
+      "th16-mode-2"
+    ],
+    "behavior": "自机狙整环",
+    "category": 2,
+    "conditions": "仅发射几何；单自机、无EX/出生保护/动态共享，外观已校准；全波有空闲弹槽且每任务预算足够，同帧完成全部fire（每任务≤1024指令、全局预算亦足）。角/速端点在开火时求值，不yield。",
+    "recipe": "按q外层/j内层逐颗fire：angle=alpha+2π*j/N+q*delta+aim(origin)；speed按两端点插值。单层2/3可直接sh_ring；多层仍逐颗保持源顺序。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/bullet.rs:94",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:325",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:238 (0x412cb0 case 0x2)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:240 (0x414da0)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-mode-3",
+    "namespace": "mechanism",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      3
+    ],
+    "names": [
+      "th16-mode-3"
+    ],
+    "behavior": "固定整环",
+    "category": 2,
+    "conditions": "仅发射几何；单自机、无EX/出生保护/动态共享，外观已校准；全波有空闲弹槽且每任务预算足够，同帧完成全部fire（每任务≤1024指令、全局预算亦足）。角/速端点在开火时求值，不yield。",
+    "recipe": "按q外层/j内层逐颗fire：angle=alpha+2π*j/N+q*delta；speed按两端点插值。单层2/3可直接sh_ring；多层仍逐颗保持源顺序。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/bullet.rs:94",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:325",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:238 (0x412cb0 case 0x3)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:240 (0x414da0)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-mode-4",
+    "namespace": "mechanism",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      4
+    ],
+    "names": [
+      "th16-mode-4"
+    ],
+    "behavior": "自机狙半步错开整环",
+    "category": 2,
+    "conditions": "仅发射几何；单自机、无EX/出生保护/动态共享，外观已校准；全波有空闲弹槽且每任务预算足够，同帧完成全部fire（每任务≤1024指令、全局预算亦足）。角/速端点在开火时求值，不yield。",
+    "recipe": "按q外层/j内层逐颗fire：angle=alpha+2π*j/N+q*delta+π/N+aim(origin)；speed按两端点插值。单层2/3可直接sh_ring；多层仍逐颗保持源顺序。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/bullet.rs:94",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:325",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:238 (0x412cb0 case 0x4)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:240 (0x414da0)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-mode-5",
+    "namespace": "mechanism",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      5
+    ],
+    "names": [
+      "th16-mode-5"
+    ],
+    "behavior": "固定半步错开整环",
+    "category": 2,
+    "conditions": "仅发射几何；单自机、无EX/出生保护/动态共享，外观已校准；全波有空闲弹槽且每任务预算足够，同帧完成全部fire（每任务≤1024指令、全局预算亦足）。角/速端点在开火时求值，不yield。",
+    "recipe": "按q外层/j内层逐颗fire：angle=alpha+2π*j/N+q*delta+π/N；speed按两端点插值。单层2/3可直接sh_ring；多层仍逐颗保持源顺序。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/bullet.rs:94",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:325",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:238 (0x412cb0 case 0x5)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:240 (0x414da0)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-mode-6",
+    "namespace": "mechanism",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      6
+    ],
+    "names": [
+      "th16-mode-6"
+    ],
+    "behavior": "随机角",
+    "category": 2,
+    "conditions": "仅发射几何；单自机、无EX/出生保护/动态共享，外观已校准；全波有空闲弹槽且每任务预算足够，同帧完成全部fire（每任务≤1024指令、全局预算亦足）。角/速端点在开火时求值，不yield。本行比较给定参数下角/速的区间、均匀边际分布和抽样次数；不要求同seed序列。原生PRNG高低位及连续抽样的相关结构未纳入本行精准子集，完整联合随机流等价仍未核。",
+    "recipe": "逐颗fire；6/8角=alpha+signed_random*delta；7角=alpha+2π*j/N+q*delta；7/8速度=s0+unit_random*s1。保持先角随机再速随机的调用顺序。U可用rand(65536)/65536的定点值，signed=2*U-1；每个源抽样调用对应一次，mode8先角后速。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/bullet.rs:94",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:325",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:238 (0x412cb0 case 0x6)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:240 (0x414da0)",
+      "/data/sunyunbo/www/renkolab/engine/_shared/math-and-prng.md:150"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-mode-7",
+    "namespace": "mechanism",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      7
+    ],
+    "names": [
+      "th16-mode-7"
+    ],
+    "behavior": "整环随机速度",
+    "category": 2,
+    "conditions": "仅发射几何；单自机、无EX/出生保护/动态共享，外观已校准；全波有空闲弹槽且每任务预算足够，同帧完成全部fire（每任务≤1024指令、全局预算亦足）。角/速端点在开火时求值，不yield。本行比较给定参数下角/速的区间、均匀边际分布和抽样次数；不要求同seed序列。原生PRNG高低位及连续抽样的相关结构未纳入本行精准子集，完整联合随机流等价仍未核。",
+    "recipe": "逐颗fire；6/8角=alpha+signed_random*delta；7角=alpha+2π*j/N+q*delta；7/8速度=s0+unit_random*s1。保持先角随机再速随机的调用顺序。U可用rand(65536)/65536的定点值，signed=2*U-1；每个源抽样调用对应一次，mode8先角后速。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/bullet.rs:94",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:325",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:238 (0x412cb0 case 0x7)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:240 (0x414da0)",
+      "/data/sunyunbo/www/renkolab/engine/_shared/math-and-prng.md:150"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-mode-8",
+    "namespace": "mechanism",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      8
+    ],
+    "names": [
+      "th16-mode-8"
+    ],
+    "behavior": "独立随机角和速度",
+    "category": 2,
+    "conditions": "仅发射几何；单自机、无EX/出生保护/动态共享，外观已校准；全波有空闲弹槽且每任务预算足够，同帧完成全部fire（每任务≤1024指令、全局预算亦足）。角/速端点在开火时求值，不yield。本行比较给定参数下角/速的区间、均匀边际分布和抽样次数；不要求同seed序列。原生PRNG高低位及连续抽样的相关结构未纳入本行精准子集，完整联合随机流等价仍未核。",
+    "recipe": "逐颗fire；6/8角=alpha+signed_random*delta；7角=alpha+2π*j/N+q*delta；7/8速度=s0+unit_random*s1。保持先角随机再速随机的调用顺序。U可用rand(65536)/65536的定点值，signed=2*U-1；每个源抽样调用对应一次，mode8先角后速。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/bullet.rs:94",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:325",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:238 (0x412cb0 case 0x8)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:240 (0x414da0)",
+      "/data/sunyunbo/www/renkolab/engine/_shared/math-and-prng.md:150"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-mode-9",
+    "namespace": "mechanism",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      9
+    ],
+    "names": [
+      "th16-mode-9"
+    ],
+    "behavior": "交替镜像的多层环（瞄准）",
+    "category": 2,
+    "conditions": "仅发射几何；单自机、无EX/出生保护/动态共享，外观已校准；全波有空闲弹槽且每任务预算足够，同帧完成全部fire（每任务≤1024指令、全局预算亦足）。角/速端点在开火时求值，不yield。",
+    "recipe": "q层/j路：h=M偶数?floor(q/2)*delta+delta/2:floor((q+1)/2)*delta；angle=alpha+(-1)^q*(2π*j/N+h)+aim(origin)。M>1时k=M偶数?(q&~1):((q+1)&~1)，speed=s0+(s1-s0)*k/(M-1)。M=1用s0。按源顺序逐颗fire。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/bullet.rs:94",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:325",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:238 (0x412cb0 case 0x9)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:240 (0x414da0)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-mode-10",
+    "namespace": "mechanism",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      10
+    ],
+    "names": [
+      "th16-mode-10"
+    ],
+    "behavior": "交替镜像的多层环（固定）",
+    "category": 2,
+    "conditions": "仅发射几何；单自机、无EX/出生保护/动态共享，外观已校准；全波有空闲弹槽且每任务预算足够，同帧完成全部fire（每任务≤1024指令、全局预算亦足）。角/速端点在开火时求值，不yield。",
+    "recipe": "q层/j路：h=M偶数?floor(q/2)*delta+delta/2:floor((q+1)/2)*delta；angle=alpha+(-1)^q*(2π*j/N+h)。M>1时k=M偶数?(q&~1):((q+1)&~1)，speed=s0+(s1-s0)*k/(M-1)。M=1用s0。按源顺序逐颗fire。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/bullet.rs:94",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:325",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:238 (0x412cb0 case 0xa)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:240 (0x414da0)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-mode-11",
+    "namespace": "mechanism",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      11
+    ],
+    "names": [
+      "th16-mode-11"
+    ],
+    "behavior": "正弦调速整环",
+    "category": null,
+    "conditions": "仅发射几何；单自机、无EX/出生保护/动态共享，外观已校准；全波有空闲弹槽且每任务预算足够，同帧完成全部fire（每任务≤1024指令、全局预算亦足）。角/速端点在开火时求值，不yield。",
+    "recipe": "已定位0x412cb0 case0xb/0xc；角为alpha+2π*j/N。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/bullet.rs:94",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:325",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:238 (0x412cb0 case 0xb)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:240 (0x414da0)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "反编译sin调用的寄存器参数/输出未正确表达，不能从局部dVar16直接推断调速公式；须回反汇编核对。",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-mode-12",
+    "namespace": "mechanism",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      12
+    ],
+    "names": [
+      "th16-mode-12"
+    ],
+    "behavior": "正弦调速整环（半路错开）",
+    "category": null,
+    "conditions": "仅发射几何；单自机、无EX/出生保护/动态共享，外观已校准；全波有空闲弹槽且每任务预算足够，同帧完成全部fire（每任务≤1024指令、全局预算亦足）。角/速端点在开火时求值，不yield。",
+    "recipe": "已定位0x412cb0 case0xb/0xc；角为alpha+2π*j/N+π/N。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/bullet.rs:94",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:325",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:238 (0x412cb0 case 0xc)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:240 (0x414da0)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "反编译sin调用的寄存器参数/输出未正确表达，不能从局部dVar16直接推断调速公式；须回反汇编核对。",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ex-speedup",
+    "namespace": "ex",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      1
+    ],
+    "names": [
+      "th16-ex-speedup"
+    ],
+    "behavior": "16tick衰减速度增量",
+    "category": 3,
+    "conditions": "TH16旧位场数值，不使用跨版本0..33序号。",
+    "recipe": "用弹任务逐帧重算附加速度；需专门校准原生首tick和终止。",
+    "difference": "没有独立boost状态，和其他持续效果叠加/清位顺序不同。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/xform.rs:10",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/transform.rs:20",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/integrate.rs:66",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:16"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:74",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:189",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:239 (0x413860)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:233 (0x411e70)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ex-anim",
+    "namespace": "ex",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      2
+    ],
+    "names": [
+      "th16-ex-anim"
+    ],
+    "behavior": "进入ANM驱动的半速出生态",
+    "category": 5,
+    "conditions": "TH16旧位场数值，不使用跨版本0..33序号。",
+    "recipe": "无同构机制；delay只能全停。",
+    "difference": "源pos-=4*v、半速移动、碰撞门和ANM I0转态；delay全停且无ANM消费。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/xform.rs:10",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/transform.rs:20",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/integrate.rs:66",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:16"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:74",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:189",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:239 (0x413860)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:233 (0x411e70)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": "影响出生态/弹幕程序或实际判定；这是机制研究建议，须独立确认实施方案。"
+  },
+  {
+    "key": "th16-ex-accel",
+    "namespace": "ex",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      4
+    ],
+    "names": [
+      "th16-ex-accel"
+    ],
+    "behavior": "固定方向的向量加速度",
+    "category": 3,
+    "conditions": "TH16旧位场数值，不使用跨版本0..33序号。",
+    "recipe": "set_gravity或逐帧弹任务；动态哨兵角须在效果启用时从当前弹/玩家解析。",
+    "difference": "向量模式会覆盖极坐标持续效果，缺独立计时；原生handler结束同帧续跑VM的语义未对齐。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/xform.rs:10",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/transform.rs:20",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/integrate.rs:66",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:16"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:74",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:189",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:239 (0x413860)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:233 (0x411e70)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ex-angle_accel",
+    "namespace": "ex",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      8
+    ],
+    "names": [
+      "th16-ex-angle_accel"
+    ],
+    "behavior": "角速度与标量加速度并行",
+    "category": 3,
+    "conditions": "TH16旧位场数值，不使用跨版本0..33序号。",
+    "recipe": "xform设角速度/加速度，在到期处stop_fx；预期N次积分需单独核时序。",
+    "difference": "不能直接把所有async效果串行；同类重启和独立计时/完成重入没有通用对应。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/xform.rs:10",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/transform.rs:20",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/integrate.rs:66",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:16"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:74",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:189",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:239 (0x413860)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:233 (0x411e70)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ex-step",
+    "namespace": "ex",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      16
+    ],
+    "names": [
+      "th16-ex-step"
+    ],
+    "behavior": "停顿/变向的两段过渡及重复子模式",
+    "category": 3,
+    "conditions": "TH16旧位场数值，不使用跨版本0..33序号。",
+    "recipe": "仅单次目标变化可用STEP_ANGLE/STEP_SPEED；随机、saved-state和重复要弹任务。",
+    "difference": "原生两段降速再snap，不是通用ease插值；子模式、max_count和完成续跑不同。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/xform.rs:10",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/transform.rs:20",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/integrate.rs:66",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:16"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:74",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:189",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:239 (0x413860)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:233 (0x411e70)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ex-bounce",
+    "namespace": "ex",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      64
+    ],
+    "names": [
+      "th16-ex-bounce"
+    ],
+    "behavior": "指定墙、次数、尺寸及最小反弹速度",
+    "category": 3,
+    "conditions": "TH16旧位场数值，不使用跨版本0..33序号。",
+    "recipe": "BOUNCE_ARM可表达固定屏幕内≤3次基本反射。",
+    "difference": "源可自定义边界和最小速；源handler在位移前反射，我方积分后反射，每帧每轴至多一次，容量/墙读取还受xform回跳影响。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/xform.rs:10",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/transform.rs:20",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/integrate.rs:66",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:16"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:74",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:189",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:239 (0x413860)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:233 (0x411e70)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ex-invuln",
+    "namespace": "ex",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      128
+    ],
+    "names": [
+      "th16-ex-invuln"
+    ],
+    "behavior": "逐弹bomb取消免疫倒计时",
+    "category": 5,
+    "conditions": "TH16旧位场数值，不使用跨版本0..33序号。",
+    "recipe": "没有ECL逐弹保护写口。",
+    "difference": "普通无敌敌人setter不作用于弹；无法保留635/636/712免疫过滤。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/xform.rs:10",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/transform.rs:20",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/integrate.rs:66",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:16"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:74",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:189",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:239 (0x413860)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:233 (0x411e70)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": "影响出生态/弹幕程序或实际判定；这是机制研究建议，须独立确认实施方案。"
+  },
+  {
+    "key": "th16-ex-offscreen",
+    "namespace": "ex",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      256
+    ],
+    "names": [
+      "th16-ex-offscreen"
+    ],
+    "behavior": "临时保留离屏弹并可启用可见性测试",
+    "category": null,
+    "conditions": "TH16旧位场数值，不使用跨版本0..33序号。",
+    "recipe": "life不是关闭离屏裁剪；没有已证明可操作的通用近似。",
+    "difference": "我方清理按固定边界，life不等于关闭离屏裁剪；ANM四角可见性没有对应。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/xform.rs:10",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/transform.rs:20",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/integrate.rs:66",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:16"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:74",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:189",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:239 (0x413860)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:233 (0x411e70)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "原生时长/可见性行为已知；现有ECL缺离屏保活写口，本轮未建立必须实施的具体关键样本，暂不自动归5。",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ex-setsprite",
+    "namespace": "ex",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      512
+    ],
+    "names": [
+      "th16-ex-setsprite"
+    ],
+    "behavior": "更换弹种颜色、重置判定半径并可触发ANM中断",
+    "category": 3,
+    "conditions": "TH16旧位场数值，不使用跨版本0..33序号。",
+    "recipe": "SET_SHAPE/SET_COLOR/SET_SPRITE仅保留选定外观。",
+    "difference": "当前xform换sprite不按原生类型表重置radius，也无ANM中断2。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/xform.rs:10",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/transform.rs:20",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/integrate.rs:66",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:16"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:74",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:189",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:239 (0x413860)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:233 (0x411e70)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ex-delete",
+    "namespace": "ex",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      1024
+    ],
+    "names": [
+      "th16-ex-delete"
+    ],
+    "behavior": "取消当前弹，可抑制取消特效",
+    "category": 3,
+    "conditions": "TH16旧位场数值，不使用跨版本0..33序号。",
+    "recipe": "xform SET_LIFE=0或短life后回收。",
+    "difference": "回收发生在cleanup，原生即时取消并可能播放特效/回退状态，后续同帧程序和容量不同。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/xform.rs:10",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/transform.rs:20",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/integrate.rs:66",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:16"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:74",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:189",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:239 (0x413860)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:233 (0x411e70)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ex-playsound",
+    "namespace": "ex",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      2048
+    ],
+    "names": [
+      "th16-ex-playsound"
+    ],
+    "behavior": "在变换点播放音效",
+    "category": 4,
+    "conditions": "TH16旧位场数值，不使用跨版本0..33序号。",
+    "recipe": "纯训练可忽略，表现侧可用emit_req。",
+    "difference": "不保留原音效。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/xform.rs:10",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/transform.rs:20",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/integrate.rs:66",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:16"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:74",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:189",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:239 (0x413860)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:233 (0x411e70)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "proposed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ex-wrap",
+    "namespace": "ex",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      4096
+    ],
+    "names": [
+      "th16-ex-wrap"
+    ],
+    "behavior": "按墙掩码/次数跨边传送",
+    "category": null,
+    "conditions": "TH16旧位场数值，不使用跨版本0..33序号。",
+    "recipe": "未找到现有ECL对当前弹位置的写口；不能只靠angle反射。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/xform.rs:10",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/transform.rs:20",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/integrate.rs:66",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:16"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:74",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:189",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:239 (0x413860)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:233 (0x411e70)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "原生传送语义已知；本轮未确认可操作现有组合及本作关键样本，暂不归5。",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ex-shootprep",
+    "namespace": "ex",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      8192
+    ],
+    "names": [
+      "th16-ex-shootprep"
+    ],
+    "behavior": "读取紧随的数据记录、构造子弹发射描述符",
+    "category": 3,
+    "conditions": "TH16旧位场数值，不使用跨版本0..33序号。",
+    "recipe": "挂弹任务在指定时间fire子弹；静态子程序复制所需参数。",
+    "difference": "原生复制父EX程序、按effect_index启动且在bullet tick内立即创建/执行；任务次帧首跑，任务容量256且无一般动态EX继承。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/xform.rs:10",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/transform.rs:20",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/integrate.rs:66",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:16"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:74",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:189",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:239 (0x413860)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:233 (0x411e70)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ex-shoot_data",
+    "namespace": "ex",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      16384
+    ],
+    "names": [
+      "th16-ex-shoot_data"
+    ],
+    "behavior": "被SHOOTPREP消费的配对数据记录",
+    "category": null,
+    "conditions": "TH16旧位场数值，不使用跨版本0..33序号。",
+    "recipe": "作为上一条0x2000的附加记录解释，不能单独替换为一次fire。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/xform.rs:10",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/transform.rs:20",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/integrate.rs:66",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:16"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:74",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:189",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:239 (0x413860)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:233 (0x411e70)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "仅作为配对参数被消费；其独立执行含义仍需核，不能把数据槽当新发射。",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ex-react",
+    "namespace": "ex",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      32768
+    ],
+    "names": [
+      "th16-ex-react"
+    ],
+    "behavior": "设置逐弹反应函数编号",
+    "category": null,
+    "conditions": "TH16旧位场数值，不使用跨版本0..33序号。",
+    "recipe": "仅定位写+c4c。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/xform.rs:10",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/transform.rs:20",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/integrate.rs:66",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:16"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:74",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:189",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:239 (0x413860)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:233 (0x411e70)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "消费者未知，不能凭字段名认定回调行为。",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ex-goto",
+    "namespace": "ex",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      65536
+    ],
+    "names": [
+      "th16-ex-goto"
+    ],
+    "behavior": "EX程序跳转与计数循环",
+    "category": 3,
+    "conditions": "TH16旧位场数值，不使用跨版本0..33序号。",
+    "recipe": "无同帧循环的静态子集可用OP_LOOP。",
+    "difference": "我方OP_LOOP回跳当帧强制结束；原生PC跳转可同帧继续，且repeat计数属于弹体而非每条槽独立状态。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/xform.rs:10",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/transform.rs:20",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/integrate.rs:66",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:16"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:74",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:189",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:239 (0x413860)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:233 (0x411e70)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ex-move",
+    "namespace": "ex",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      131072
+    ],
+    "names": [
+      "th16-ex-move"
+    ],
+    "behavior": "按插值模式趋向绝对/相对点",
+    "category": 3,
+    "conditions": "TH16旧位场数值，不使用跨版本0..33序号。",
+    "recipe": "挂弹任务根据起点/目标/缓动算本帧速度，用set_vel实现位移。",
+    "difference": "首跑次帧；没有当前弹位置写口作终帧snap；与其他连续效果的执行次序未统一。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/xform.rs:10",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/transform.rs:20",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/integrate.rs:66",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:16"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:74",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:189",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:239 (0x413860)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:233 (0x411e70)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ex-vel",
+    "namespace": "ex",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      262144
+    ],
+    "names": [
+      "th16-ex-vel"
+    ],
+    "behavior": "即刻设置速度和角，支持特殊数值哨兵",
+    "category": 2,
+    "conditions": "TH16旧位场数值，不使用跨版本0..33序号。仅上述字面、无持续FX子集；总xform≤16槽且段池可用，触发在phase4；动态哨兵/其他状态组合不在2类内。原作同帧其他弹/任务不得观察两次setter之间的中间值；只承诺指定触发帧的字面变角变速。",
+    "recipe": "限字面角/速、无持续FX的子集：同一帧xform连续SET_ANGLE/SET_SPEED；若位于首条且无后续依赖，可出生前折入sh_angle/sh_speed。",
+    "difference": "",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/xform.rs:10",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/transform.rs:20",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/integrate.rs:66",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:16"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:74",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:189",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:239 (0x413860)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:233 (0x411e70)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ex-veladd",
+    "namespace": "ex",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      524288
+    ],
+    "names": [
+      "th16-ex-veladd"
+    ],
+    "behavior": "附加方向位移；启用后持续到弹死",
+    "category": 3,
+    "conditions": "TH16旧位场数值，不使用跨版本0..33序号。",
+    "recipe": "按最终速度叠加向量的弹任务可近似。",
+    "difference": "原生自带状态且到期清0x1|0x8不清自身，不能当普通duration后stop；任务不能直接保留同帧叠加与重入。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/xform.rs:10",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/transform.rs:20",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/integrate.rs:66",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:16"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:74",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:189",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:239 (0x413860)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:233 (0x411e70)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ex-bright",
+    "namespace": "ex",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      1048576
+    ],
+    "names": [
+      "th16-ex-bright"
+    ],
+    "behavior": "修改混合显示模式",
+    "category": 4,
+    "conditions": "TH16旧位场数值，不使用跨版本0..33序号。",
+    "recipe": "纯训练可省略。",
+    "difference": "不保留blend。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/xform.rs:10",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/transform.rs:20",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/integrate.rs:66",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:16"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:74",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:189",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:239 (0x413860)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:233 (0x411e70)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "proposed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ex-veltime",
+    "namespace": "ex",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      2097152
+    ],
+    "names": [
+      "th16-ex-veltime"
+    ],
+    "behavior": "在N帧内沿选定方向作速度斜坡",
+    "category": 3,
+    "conditions": "TH16旧位场数值，不使用跨版本0..33序号。",
+    "recipe": "STEP_SPEED或弹任务按目标差/N更新。",
+    "difference": "原生每步处理向量/角与独立私有计时，不能等同普通step-speed，哨兵解析、同帧完成续跑另核。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/xform.rs:10",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/transform.rs:20",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/integrate.rs:66",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:16"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:74",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:189",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:239 (0x413860)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:233 (0x411e70)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ex-size",
+    "namespace": "ex",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      4194304
+    ],
+    "names": [
+      "th16-ex-size"
+    ],
+    "behavior": "尺寸插值并改变相关判定",
+    "category": 5,
+    "conditions": "TH16旧位场数值，不使用跨版本0..33序号。",
+    "recipe": "没有ECL活弹缩放/半径插值口。",
+    "difference": "改sprite不等同几何缩放；离屏裁剪/碰撞也消费尺寸状态。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/xform.rs:10",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/transform.rs:20",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/integrate.rs:66",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:16"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:74",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:189",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:239 (0x413860)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:233 (0x411e70)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": "影响出生态/弹幕程序或实际判定；这是机制研究建议，须独立确认实施方案。"
+  },
+  {
+    "key": "th16-ex-save",
+    "namespace": "ex",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      8388608
+    ],
+    "names": [
+      "th16-ex-save"
+    ],
+    "behavior": "保存位置、角度和速度供STEP回读",
+    "category": 3,
+    "conditions": "≤64locals、总弹任务≤256；仅能在任务执行时取快照。",
+    "recipe": "弹任务将self_x/self_y/self_angle/self_speed存locals，后续由同任务回读。",
+    "difference": "一般源快照在bullet VM相位；我方任务在phase2且出生次帧首跑，不能保证与先前EX/运动同一相位。静态初值可折叠，但不代表通用SAVE。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/xform.rs:10",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/transform.rs:20",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/integrate.rs:66",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:16"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:74",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:189",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:239 (0x413860)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:233 (0x411e70)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ex-enmcreate",
+    "namespace": "ex",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      16777216
+    ],
+    "names": [
+      "th16-ex-enmcreate"
+    ],
+    "behavior": "在弹当前位置创建指定sub敌人并传I/F参数",
+    "category": 3,
+    "conditions": "TH16旧位场数值，不使用跨版本0..33序号。",
+    "recipe": "挂弹任务spawn_enemy，显式传八个转换参数。",
+    "difference": "父EX字符串/参数动态改写、在bullet tick创建的相位和子敌首跑时刻，与ECL phase2任务派生不同。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/xform.rs:10",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/transform.rs:20",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/integrate.rs:66",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:16"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:74",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:189",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:239 (0x413860)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:233 (0x411e70)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ex-layer",
+    "namespace": "ex",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      33554432
+    ],
+    "names": [
+      "th16-ex-layer"
+    ],
+    "behavior": "覆盖弹渲染层",
+    "category": 4,
+    "conditions": "TH16旧位场数值，不使用跨版本0..33序号。",
+    "recipe": "纯训练可省略。",
+    "difference": "不保留渲染排序。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/xform.rs:10",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/transform.rs:20",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/integrate.rs:66",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:16"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:74",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:189",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:239 (0x413860)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:233 (0x411e70)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "proposed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ex-delay",
+    "namespace": "ex",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      67108864
+    ],
+    "names": [
+      "th16-ex-delay"
+    ],
+    "behavior": "停止弹运动/判定和VM一段时间",
+    "category": 3,
+    "conditions": "TH16旧位场数值，不使用跨版本0..33序号。",
+    "recipe": "首段delay可近似；中途可用弹任务缓存速度再设0。",
+    "difference": "我方delay仅出生参数且u8；设speed0并未禁判定/VM，不能精准替代中途DELAY，完成同帧续跑也不同。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/xform.rs:10",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/transform.rs:20",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/integrate.rs:66",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:16"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:74",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:189",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:239 (0x413860)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:233 (0x411e70)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ex-laser",
+    "namespace": "ex",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      134217728
+    ],
+    "names": [
+      "th16-ex-laser"
+    ],
+    "behavior": "由父弹生成线/无限激光，可删除父弹并复制EX",
+    "category": 3,
+    "conditions": "TH16旧位场数值，不使用跨版本0..33序号。",
+    "recipe": "挂弹任务读取父位/角，laser构造近似直线或无限激光。",
+    "difference": "父字节码继承、effect_index、同帧执行、删父以及宽度/时序/flags不保真；不能生成曲线。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/xform.rs:10",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/transform.rs:20",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/integrate.rs:66",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:16"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:74",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:189",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:239 (0x413860)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:233 (0x411e70)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-ex-hitbox",
+    "namespace": "ex",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      536870912
+    ],
+    "names": [
+      "th16-ex-hitbox"
+    ],
+    "behavior": "动态修改半径，负值恢复弹种默认",
+    "category": 5,
+    "conditions": "TH16旧位场数值，不使用跨版本0..33序号。",
+    "recipe": "出生前固定半径可通过校准appearance；活弹变半径没有现成ECL接口。",
+    "difference": "逐弹动态判定半径与sprite分离，直接影响通过缝隙。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/xform.rs:10",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/transform.rs:20",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/integrate.rs:66",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:16"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:74",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:189",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:239 (0x413860)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:233 (0x411e70)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": "影响出生态/弹幕程序或实际判定；这是机制研究建议，须独立确认实施方案。"
+  },
+  {
+    "key": "th16-ex-wait",
+    "namespace": "ex",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      2147483648
+    ],
+    "names": [
+      "th16-ex-wait"
+    ],
+    "behavior": "只阻塞VM、持续效果与运动仍继续",
+    "category": 3,
+    "conditions": "TH16旧位场数值，不使用跨版本0..33序号。",
+    "recipe": "线性静态时间轴可用xform wait。",
+    "difference": "原生按active_fx门与计数完成重入；同一EX效果运行/同步async组合下的等待不是简单固定槽间隔。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/xform.rs:10",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/transform.rs:20",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/integrate.rs:66",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/query.rs:16"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:74",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:189",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:239 (0x413860)",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:233 (0x411e70)"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th16-shared-emitter",
+    "namespace": "mechanism",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [
+      600,
+      601,
+      614,
+      609,
+      610,
+      611,
+      612
+    ],
+    "names": [
+      "th16-shared-emitter"
+    ],
+    "behavior": "敌人共享发射器与EX程序状态所有权",
+    "category": 5,
+    "conditions": "",
+    "recipe": "无通用现成组合；单任务、≤4活槽且无跨async读写时可静态重编号。",
+    "difference": "TH16字段挂在EnemyData；我方挂TaskPool[task]。把每条async分别映射为任务会让原本共享的改写互不生效；单纯扩4槽不解决。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/task.rs:113",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/shooter.rs:24"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:355",
+      "/data/sunyunbo/www/renkolab/engine/ecl/th16/05-fire-interface.md:26"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": "TH18实扫出现ID4/9且并行脚本存在；TH16原生同敌共用descriptor。跨任务配置/开火直接影响实际弹幕。"
+  },
+  {
+    "key": "th16-spawn-phase",
+    "namespace": "mechanism",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [],
+    "names": [
+      "th16-spawn-phase"
+    ],
+    "behavior": "发射即执行首段弹VM及出生态",
+    "category": 5,
+    "conditions": "",
+    "recipe": "简单无EX可在父发射任务预算初值；一般程序不能用次帧挂弹任务替代。",
+    "difference": "原作0x412cb0末尾立即bullet_vm_exec；我方挂弹任务born_frame当帧跳过。出生保护半径、状态2半速/至少8tick判定门与ANM转态均无同构。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/vm.rs:476",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/shooter.rs:389",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/integrate.rs:66"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:238",
+      "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl:233"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": "出生前几帧的避让空间和EX起算直接受影响；TH18样本已发现真实EX2。"
+  },
+  {
+    "key": "th16-collision-scope",
+    "namespace": "mechanism",
+    "games": [
+      "th16"
+    ],
+    "opcodes": [],
+    "names": [
+      "th16-collision-scope"
+    ],
+    "behavior": "原生普通弹/矩形弹/激光碰撞与取消几何",
+    "category": null,
+    "conditions": "",
+    "recipe": "普通圆弹appearance需逐种校准；激光不能仅用同宽矩形称等价。",
+    "difference": "我方是相加半径/圆到线段盒距离；原生弹圆/矩形/激光有独立判定函数，自机判定框和缩放门需逐项核。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/collide.rs:22",
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/lasers.rs:1"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/01-core-engine.md:35",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/03-lasers.md:155"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "本轮未化简两套完整几何公式；不凭都是圆/OBB就宣称精准。TH18本作已知差异另列。",
+    "priority_reason": ""
+  },
+  {
+    "key": "th18-known-birth",
+    "namespace": "ex",
+    "games": [
+      "th18"
+    ],
+    "opcodes": [
+      2
+    ],
+    "names": [
+      "th18-known-birth"
+    ],
+    "behavior": "TH18已考据EX2出生与EX8更新",
+    "category": 3,
+    "conditions": "",
+    "recipe": "原型省略EX2并把EX8转为角速；仅作已知近似。",
+    "difference": "省略pos-=4v、半速移动、至少8tick判定门和ANM I0转态；EX8出生期不推进。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/world/integrate.rs:66"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/stg-rl-train/tools/th18-import-prototype/README.md:132",
+      "/data/sunyunbo/www/stg-rl-train/tools/th18-import-prototype/README.md:138"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "部分",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th18-known-cancel",
+    "namespace": "mechanism",
+    "games": [
+      "th18"
+    ],
+    "opcodes": [
+      615,
+      635
+    ],
+    "names": [
+      "th18-known-cancel"
+    ],
+    "behavior": "TH18 mode1清弹会产type9，与TH16不同",
+    "category": 3,
+    "conditions": "",
+    "recipe": "clear_bullets_at(...,stars=1)只能近似实体掉落；须核本作物品规则。",
+    "difference": "TH16 mode1只计数；TH18产type9。不能复用TH16不产星规则。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/ecl/syscall/bullet.rs:69"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/renkolab/engine/bullet/th18/01-cancel-to-item.md:1",
+      "/data/sunyunbo/www/renkolab/engine/bullet/th16/04-cancel-to-item.md:14"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": ""
+  },
+  {
+    "key": "th18-known-curve",
+    "namespace": "mechanism",
+    "games": [
+      "th18"
+    ],
+    "opcodes": [
+      711
+    ],
+    "names": [
+      "th18-known-curve"
+    ],
+    "behavior": "TH18曲线激光真实样本",
+    "category": 5,
+    "conditions": "",
+    "recipe": "无当前曲线激光实现。",
+    "difference": "单向射线区间无法保存历史曲线节点。",
+    "engine_refs": [
+      "/data/sunyunbo/www/stg-engine/crates/stg-core/src/lasers.rs:1"
+    ],
+    "original_refs": [
+      "/data/sunyunbo/www/stg-rl-train/docs/investigations/2026-10-23-modern-ecl-engine-capabilities.md:57"
+    ],
+    "evidence": "source-reviewed",
+    "importer_status": "未接",
+    "decision": "not-needed",
+    "pending_reason": "",
+    "priority_reason": "st07bs::BossCard3_at和BossCard3_at2各1处；静态用量不是运行覆盖。"
+  }
+]

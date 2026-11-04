@@ -1,0 +1,77 @@
+{
+  "coverage": [
+    {
+      "domain": "th06",
+      "namespace": "instruction",
+      "expected_candidates": 138,
+      "covered_candidates": 138,
+      "missing": []
+    },
+    {
+      "domain": "th06",
+      "namespace": "timeline",
+      "expected_candidates": 13,
+      "covered_candidates": 13,
+      "missing": []
+    },
+    {
+      "domain": "modern-vm",
+      "namespace": "instruction",
+      "expected_candidates": 243,
+      "covered_candidates": 243,
+      "missing": []
+    },
+    {
+      "domain": "modern-hazards",
+      "namespace": "instruction",
+      "expected_candidates": 57,
+      "covered_candidates": 57,
+      "missing": []
+    }
+  ],
+  "supplemental_enumeration": [
+    {
+      "name": "th06-variable-ids",
+      "expected": 25,
+      "actual": 25
+    },
+    {
+      "name": "th06-callback-ids",
+      "expected": 20,
+      "actual": 20
+    },
+    {
+      "name": "th16-variable-ids",
+      "expected": 98,
+      "actual": 98
+    },
+    {
+      "name": "th16-firing-modes",
+      "expected": 13,
+      "actual": 13
+    },
+    {
+      "name": "th16-nonzero-ex-values",
+      "expected": 29,
+      "actual": 29
+    }
+  ],
+  "behavior_records": 278,
+  "categories": {
+    "1": 24,
+    "3": 72,
+    "2": 67,
+    "4": 22,
+    "pending": 72,
+    "5": 21
+  },
+  "category4_decisions": {
+    "existing": 10,
+    "proposed": 12
+  },
+  "references_checked": 1045,
+  "evidence_hashes_checked": 89,
+  "errors": [],
+  "command": "python /tmp/sunyunbo/ecl-audit-verify-20261102.py",
+  "limits": "Schema, enumeration coverage, local reference integrity and input hashes only. No original-game equivalence or training validation."
+}
