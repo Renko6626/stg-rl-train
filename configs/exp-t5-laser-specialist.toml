@@ -9,7 +9,8 @@ ckpt_every = 250
 eval_every = 250
 
 [env]
-cards_dir = ["cards", "cards-synthetic", "cards-laser-specialist"]
+cards_dir = "cards"
+card_filter = { sources = ["th06", "synthetic"] }
 eval_splits = "eval/splits-laser.toml"
 num_envs = 4096
 hit_extra = [0.0, 2.0]

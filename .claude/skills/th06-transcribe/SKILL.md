@@ -1,18 +1,22 @@
 ---
 name: th06-transcribe
-description: Use when running, monitoring, or triaging the TH06 ECL → RL card batch transcription pipeline in stg-rl-train (dsh split / transcribe / review workers, opus sampling, collecting cards), or when a transcribed card, mapping.md entry, or worker contract needs fixing.
+description: Use when running, monitoring, or triaging the TH06/NC ECL to RL card batch transcription pipeline in stg-rl-train, or fixing its cards, mappings, and worker contracts. TH18 transcription uses th18-transcribe.
 ---
 
 # TH06 批量转写：编排与分诊
 
-流水线本体在 `src/stgtranscribe/`，说明在 `transcribe/README.md`，设计在 `docs/2026-09-16-th06-transcribe-design.md`。
+流水线本体在 `src/stgtranscribe/`，说明在 `transcribe/th06/README.md`，设计在 `docs/2026-09-16-th06-transcribe-design.md`。
 这份 skill 讲**主会话**要做的事：启动、盯状态、分诊、opus 抽检、收卡。
+
+TH18 工作使用 [th18-transcribe](../th18-transcribe/SKILL.md) 和 [TH18 转写参考](../../../transcribe/th18/README.md)。下列配置、摘录刷新、批量命令及 TH06 近似约定不套用到 TH18。
+
+ENGINE_VER31已有按作品区分的 `TH06_*` / `TH18_*` 词表和准确出生基础尺寸，见[mapping §3](../../../transcribe/th06/mapping.md#3-弹型与颜色)。现有TH06批量config/旧单元仍用旧12形别名，不自动迁移；若任务指定新词表，显式提供常量与原作色号方案、刷新该单元摘录，不能混用旧8色换色。新表不等于新增动态半径写口。
 
 ## 分工（不要越位）
 
 | 谁 | 做什么 |
 |---|---|
-| dsh-flash worker | 切分 / 转写 / 审核，按 `transcribe/contracts/*.md`，只写自己的 cwd |
+| dsh-flash worker | 切分 / 转写 / 审核，按 `transcribe/th06/contracts/*.md`，只写自己的 cwd |
 | `pipeline.py` | 派活、机械校验、摘录、验收、状态机 |
 | 主会话（你） | 启动命令、分诊 `blocked` / `needs_human`、opus 抽检、修对照表与契约；提交和推送分别取得用户授权 |
 
@@ -128,7 +132,7 @@ $P usage [--stage N] [--since 2026-09-18]   # 步数 / 计费输入估算 / 推�
 
 `sample` 选出每关 pass 卡约 20%（至少 2 张）+ 全部 `needs_human`。对每张：
 
-1. 在提供 Opus 的 Claude 环境使用 Agent tool，**显式 `model: "opus"`**，prompt：读 `transcribe/contracts/review.md` 按契约审
+1. 在提供 Opus 的 Claude 环境使用 Agent tool，**显式 `model: "opus"`**，prompt：读 `transcribe/th06/contracts/review.md` 按契约审
    `transcribe/work/units/<id>/`（卡在 `out/`，原文 `source.txt`），结论写回复里（它不能写 cwd 以外时就写回复）。
    当前环境没有 Opus 时保留待抽检清单并说明，不能换一个模型后宣称已完成 Opus 抽检。
 2. 对比 dsh 的 `work/review/<id>/verdict.json`：

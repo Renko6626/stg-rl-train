@@ -20,7 +20,7 @@ class Card:
     def data_kind(self) -> str:
         """来源标签只用于数据管理，不进入策略观测；未知来源不冒充原作。"""
         source = self.meta.get("source")
-        inferred = {"th06": "original", "synthetic": "synthetic"}.get(source, "unknown")
+        inferred = {"th06": "original", "th18": "original", "synthetic": "synthetic"}.get(source, "unknown")
         explicit = self.meta.get("data_kind", inferred)
         if explicit not in ("original", "synthetic", "unknown") or explicit != inferred:
             raise ValueError(f"{self.id}: data_kind 与 source 不一致")
@@ -92,12 +92,12 @@ def _specialist_metadata_errors(card_id: str, meta: dict) -> list[str]:
     return [f"{card_id}: {error}" for error in errors]
 
 
-def discover(cards_dir: str | Path | list[str | Path]) -> dict[str, Card]:
-    """默认单目录保持旧池；合成卡仅在配置显式列出多个目录时加载。"""
+def discover(cards_dir: str | Path | list[str | Path], *, include_disabled: bool = False) -> dict[str, Card]:
+    """读取单卡或按来源组织的卡库；默认跳过 enabled=false 的卡。"""
     if isinstance(cards_dir, list):
         merged: dict[str, Card] = {}
         for root in cards_dir:
-            found = discover(root)
+            found = discover(root, include_disabled=include_disabled)
             if duplicate := set(merged) & set(found):
                 raise ValueError(f"卡 ID 重复：{sorted(duplicate)}")
             merged.update(found)
@@ -105,24 +105,52 @@ def discover(cards_dir: str | Path | list[str | Path]) -> dict[str, Card]:
     root = Path(cards_dir)
     if not root.is_dir():
         return {}
-    out: dict[str, Card] = {}
-    for d in sorted(p for p in root.iterdir() if p.is_dir()):
-        if not any(d.glob("*.ecl")):
-            continue
-        meta_path = d / "meta.toml"
-        meta = tomllib.loads(meta_path.read_text(encoding="utf-8")) if meta_path.exists() else {}
-        card = Card(id=d.name, path=d, meta=meta)
-        card.laser_intent_mix  # Validate before compiling or constructing an environment.
-        if _standalone_specialist(meta):
-            errors = _specialist_metadata_errors(d.name, meta)
-            if errors:
-                raise ValueError("; ".join(errors))
-        elif meta.get("synthetic_kind") == "laser_specialist":
-            raise ValueError(f"{d.name}: 专项卡须使用generation_mode=standalone")
-        elif card.data_kind == "synthetic" and not meta.get("base_card"):
-            raise ValueError(f"{d.name}: 合成卡缺 base_card")
-        out[d.name] = card
-    return out
+    # 遇到一张卡就停止向下扫描，辅助目录不被当作额外卡。
+    if not any(root.glob("*.ecl")):
+        return discover(sorted(p for p in root.iterdir() if p.is_dir()), include_disabled=include_disabled)
+    meta_path = root / "meta.toml"
+    meta = tomllib.loads(meta_path.read_text(encoding="utf-8")) if meta_path.exists() else {}
+    if not include_disabled and meta.get("enabled", True) is False:
+        return {}
+    card = Card(id=root.name, path=root, meta=meta)
+    card.laser_intent_mix  # Validate before compiling or constructing an environment.
+    if _standalone_specialist(meta):
+        errors = _specialist_metadata_errors(root.name, meta)
+        if errors:
+            raise ValueError("; ".join(errors))
+    elif meta.get("synthetic_kind") == "laser_specialist":
+        raise ValueError(f"{root.name}: 专项卡须使用generation_mode=standalone")
+    elif card.data_kind == "synthetic" and meta.get("generation_mode") != "standalone" and not meta.get("base_card"):
+        raise ValueError(f"{root.name}: 合成卡缺 base_card")
+    return {card.id: card}
+
+
+def configured_cards(env: dict) -> dict[str, Card]:
+    """按实验配置中的来源、标签和ID选择成品卡。标签采用全部匹配。"""
+    filters = env.get("card_filter", {})
+    sources = filters.get("sources", [])
+    tags = set(filters.get("tags", []))
+    ids = set(filters.get("ids", []))
+    excluded = set(filters.get("exclude_synthetic_kinds", []))
+    selected = {cid: card for cid, card in discover(env["cards_dir"]).items()
+            if (not sources or card.meta.get("source") in sources)
+            and tags.issubset(card.meta.get("tags", []))
+            and (not ids or cid in ids)
+            and card.meta.get("synthetic_kind") not in excluded}
+    # 保留旧实验的原作→变体→专项顺序，课程记录的起点列序不随搬目录改变。
+    order = {source: index for index, source in enumerate(sources)}
+    return dict(sorted(selected.items(), key=lambda item: (
+        order.get(item[1].meta.get("source"), len(order)),
+        item[1].meta.get("generation_mode") == "standalone", item[0])))
+
+
+def synthetic_cards(cards_dir: str | Path, kind: str) -> dict[str, Card]:
+    """历史专用检查在混合卡库中只选对应类型；暂停卡仍默认排除。"""
+    return {cid: card for cid, card in discover(cards_dir).items()
+            if card.meta.get("source") == "synthetic" and (
+                (kind == "overlay" and card.meta.get("base_card")
+                 and card.meta.get("generation_mode") != "standalone")
+                or card.meta.get("synthetic_kind") == kind)}
 
 
 def load_splits(path: str | Path, default_episodes: int) -> list[EvalSpec]:
@@ -174,7 +202,7 @@ def source_ranges_overlap(a: str, b: str) -> bool:
 def _synthetic_held_out(card: Card, cards: dict[str, Card], eval_ids: set[str]) -> bool:
     if card.data_kind != "synthetic":
         return False  # 原作历史划分保持不变；新增合成数据作更严格的血缘检查。
-    if _standalone_specialist(card.meta):
+    if card.meta.get("generation_mode") == "standalone":
         return card.meta.get("split") == "held-out"
     seen = set()
     current = card

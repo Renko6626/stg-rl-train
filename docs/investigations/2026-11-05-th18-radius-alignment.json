@@ -1,0 +1,500 @@
+{
+  "date": "2026-11-05",
+  "engine_head": "2f24d86",
+  "native_exe": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/th18.exe",
+  "native_exe_sha256": "5aeb74b19939a29a8cf06e4fe7777aaf9139e93478507e039f43318171020e9f",
+  "native_table": "0x4c5f90",
+  "native_stride": "0x118",
+  "radius_offset": "0x104",
+  "engine_table": "/data/sunyunbo/www/stg-engine/crates/stg-core/src/tables/tables_v0.bin",
+  "engine_table_sha256": "849a827f1d21deb042909d6f45a293cb1cab03801a04dffd4b5b6e23116b8d4a",
+  "engine_table_version": 6,
+  "engine_content_hash": "37a7ff12fe40e24e",
+  "counts": {
+    "direct_same_base_radius": 4,
+    "direct_radius_mismatch": 11,
+    "no_direct_shape": 33
+  },
+  "rows": [
+    {
+      "type": 0,
+      "alias": "Pellet",
+      "native_f32": 2.4000000953674316,
+      "native_q16_raw": 157286,
+      "appearance_or_candidate": 128,
+      "target_radius": 3.0,
+      "radius_delta": 0.5999999046325684,
+      "status": "no_direct_shape"
+    },
+    {
+      "type": 1,
+      "alias": "Pellet2",
+      "native_f32": 2.4000000953674316,
+      "native_q16_raw": 157286,
+      "appearance_or_candidate": 128,
+      "target_radius": 3.0,
+      "radius_delta": 0.5999999046325684,
+      "status": "no_direct_shape"
+    },
+    {
+      "type": 2,
+      "alias": "InvertPopcorn",
+      "native_f32": 2.4000000953674316,
+      "native_q16_raw": 157286,
+      "appearance_or_candidate": 48,
+      "target_radius": 5.0,
+      "radius_delta": 2.5999999046325684,
+      "status": "no_direct_shape"
+    },
+    {
+      "type": 3,
+      "alias": "Popcorn",
+      "native_f32": 2.0,
+      "native_q16_raw": 131072,
+      "appearance_or_candidate": 48,
+      "target_radius": 5.0,
+      "radius_delta": 3.0,
+      "status": "no_direct_shape"
+    },
+    {
+      "type": 4,
+      "alias": "Ball",
+      "native_f32": 4.0,
+      "native_q16_raw": 262144,
+      "appearance_or_candidate": 48,
+      "target_radius": 5.0,
+      "radius_delta": 1.0,
+      "status": "direct_radius_mismatch"
+    },
+    {
+      "type": 5,
+      "alias": "Ball2",
+      "native_f32": 4.0,
+      "native_q16_raw": 262144,
+      "appearance_or_candidate": 48,
+      "target_radius": 5.0,
+      "radius_delta": 1.0,
+      "status": "direct_radius_mismatch"
+    },
+    {
+      "type": 6,
+      "alias": "RingBall",
+      "native_f32": 4.0,
+      "native_q16_raw": 262144,
+      "appearance_or_candidate": 32,
+      "target_radius": 4.0,
+      "radius_delta": 0.0,
+      "status": "direct_same_base_radius"
+    },
+    {
+      "type": 7,
+      "alias": "RingBall2",
+      "native_f32": 4.0,
+      "native_q16_raw": 262144,
+      "appearance_or_candidate": 32,
+      "target_radius": 4.0,
+      "radius_delta": 0.0,
+      "status": "direct_same_base_radius"
+    },
+    {
+      "type": 8,
+      "alias": "Rice",
+      "native_f32": 2.4000000953674316,
+      "native_q16_raw": 157286,
+      "appearance_or_candidate": 64,
+      "target_radius": 2.0,
+      "radius_delta": -0.40000009536743164,
+      "status": "direct_radius_mismatch"
+    },
+    {
+      "type": 9,
+      "alias": "Kunai",
+      "native_f32": 2.4000000953674316,
+      "native_q16_raw": 157286,
+      "appearance_or_candidate": 80,
+      "target_radius": 3.0,
+      "radius_delta": 0.5999999046325684,
+      "status": "direct_radius_mismatch"
+    },
+    {
+      "type": 10,
+      "alias": "Shard",
+      "native_f32": 2.4000000953674316,
+      "native_q16_raw": 157286,
+      "appearance_or_candidate": 96,
+      "target_radius": 2.0,
+      "radius_delta": -0.40000009536743164,
+      "status": "direct_radius_mismatch"
+    },
+    {
+      "type": 11,
+      "alias": "Talisman",
+      "native_f32": 2.799999952316284,
+      "native_q16_raw": 183501,
+      "appearance_or_candidate": 112,
+      "target_radius": 5.0,
+      "radius_delta": 2.200000047683716,
+      "status": "direct_radius_mismatch"
+    },
+    {
+      "type": 12,
+      "alias": "Arrowhead",
+      "native_f32": 2.4000000953674316,
+      "native_q16_raw": 157286,
+      "appearance_or_candidate": 16,
+      "target_radius": 4.0,
+      "radius_delta": 1.5999999046325684,
+      "status": "direct_radius_mismatch"
+    },
+    {
+      "type": 13,
+      "alias": "Bullet",
+      "native_f32": 2.4000000953674316,
+      "native_q16_raw": 157286,
+      "appearance_or_candidate": 128,
+      "target_radius": 3.0,
+      "radius_delta": 0.5999999046325684,
+      "status": "direct_radius_mismatch"
+    },
+    {
+      "type": 14,
+      "alias": "LumpyBall",
+      "native_f32": 2.4000000953674316,
+      "native_q16_raw": 157286,
+      "appearance_or_candidate": 144,
+      "target_radius": 3.0,
+      "radius_delta": 0.5999999046325684,
+      "status": "direct_radius_mismatch"
+    },
+    {
+      "type": 15,
+      "alias": "InvertRice",
+      "native_f32": 2.4000000953674316,
+      "native_q16_raw": 157286,
+      "appearance_or_candidate": 64,
+      "target_radius": 2.0,
+      "radius_delta": -0.40000009536743164,
+      "status": "no_direct_shape"
+    },
+    {
+      "type": 16,
+      "alias": "StarR",
+      "native_f32": 4.0,
+      "native_q16_raw": 262144,
+      "appearance_or_candidate": 160,
+      "target_radius": 4.0,
+      "radius_delta": 0.0,
+      "status": "direct_same_base_radius"
+    },
+    {
+      "type": 17,
+      "alias": "Coin",
+      "native_f32": 4.0,
+      "native_q16_raw": 262144,
+      "appearance_or_candidate": 48,
+      "target_radius": 5.0,
+      "radius_delta": 1.0,
+      "status": "no_direct_shape"
+    },
+    {
+      "type": 18,
+      "alias": "BigBall",
+      "native_f32": 8.5,
+      "native_q16_raw": 557056,
+      "appearance_or_candidate": 48,
+      "target_radius": 5.0,
+      "radius_delta": -3.5,
+      "status": "no_direct_shape"
+    },
+    {
+      "type": 19,
+      "alias": "BigBall2",
+      "native_f32": 8.5,
+      "native_q16_raw": 557056,
+      "appearance_or_candidate": 48,
+      "target_radius": 5.0,
+      "radius_delta": -3.5,
+      "status": "no_direct_shape"
+    },
+    {
+      "type": 20,
+      "alias": "Oval",
+      "native_f32": 7.0,
+      "native_q16_raw": 458752,
+      "appearance_or_candidate": 128,
+      "target_radius": 3.0,
+      "radius_delta": -4.0,
+      "status": "no_direct_shape"
+    },
+    {
+      "type": 21,
+      "alias": "Dagger",
+      "native_f32": 6.0,
+      "native_q16_raw": 393216,
+      "appearance_or_candidate": 16,
+      "target_radius": 4.0,
+      "radius_delta": -2.0,
+      "status": "no_direct_shape"
+    },
+    {
+      "type": 22,
+      "alias": "Butterfly",
+      "native_f32": 7.0,
+      "native_q16_raw": 458752,
+      "appearance_or_candidate": 160,
+      "target_radius": 4.0,
+      "radius_delta": -3.0,
+      "status": "no_direct_shape"
+    },
+    {
+      "type": 23,
+      "alias": "BigStarR",
+      "native_f32": 7.0,
+      "native_q16_raw": 458752,
+      "appearance_or_candidate": 160,
+      "target_radius": 4.0,
+      "radius_delta": -3.0,
+      "status": "no_direct_shape"
+    },
+    {
+      "type": 24,
+      "alias": "BigStarL",
+      "native_f32": 7.0,
+      "native_q16_raw": 458752,
+      "appearance_or_candidate": 160,
+      "target_radius": 4.0,
+      "radius_delta": -3.0,
+      "status": "no_direct_shape"
+    },
+    {
+      "type": 25,
+      "alias": "FireballRed",
+      "native_f32": 6.0,
+      "native_q16_raw": 393216,
+      "appearance_or_candidate": 48,
+      "target_radius": 5.0,
+      "radius_delta": -1.0,
+      "status": "no_direct_shape"
+    },
+    {
+      "type": 26,
+      "alias": "FireballPurple",
+      "native_f32": 6.0,
+      "native_q16_raw": 393216,
+      "appearance_or_candidate": 48,
+      "target_radius": 5.0,
+      "radius_delta": -1.0,
+      "status": "no_direct_shape"
+    },
+    {
+      "type": 27,
+      "alias": "FireballBlue",
+      "native_f32": 4.0,
+      "native_q16_raw": 262144,
+      "appearance_or_candidate": 48,
+      "target_radius": 5.0,
+      "radius_delta": 1.0,
+      "status": "no_direct_shape"
+    },
+    {
+      "type": 28,
+      "alias": "FireballYellow",
+      "native_f32": 4.0,
+      "native_q16_raw": 262144,
+      "appearance_or_candidate": 48,
+      "target_radius": 5.0,
+      "radius_delta": 1.0,
+      "status": "no_direct_shape"
+    },
+    {
+      "type": 29,
+      "alias": "Heart",
+      "native_f32": 10.0,
+      "native_q16_raw": 655360,
+      "appearance_or_candidate": 48,
+      "target_radius": 5.0,
+      "radius_delta": -5.0,
+      "status": "no_direct_shape"
+    },
+    {
+      "type": 30,
+      "alias": "PulseBall",
+      "native_f32": 7.0,
+      "native_q16_raw": 458752,
+      "appearance_or_candidate": 32,
+      "target_radius": 4.0,
+      "radius_delta": -3.0,
+      "status": "no_direct_shape"
+    },
+    {
+      "type": 31,
+      "alias": "Arrow",
+      "native_f32": 4.0,
+      "native_q16_raw": 262144,
+      "appearance_or_candidate": 16,
+      "target_radius": 4.0,
+      "radius_delta": 0.0,
+      "status": "no_direct_shape"
+    },
+    {
+      "type": 32,
+      "alias": "Bubble",
+      "native_f32": 14.0,
+      "native_q16_raw": 917504,
+      "appearance_or_candidate": 32,
+      "target_radius": 4.0,
+      "radius_delta": -10.0,
+      "status": "no_direct_shape"
+    },
+    {
+      "type": 33,
+      "alias": "GlowBall",
+      "native_f32": 12.0,
+      "native_q16_raw": 786432,
+      "appearance_or_candidate": 48,
+      "target_radius": 5.0,
+      "radius_delta": -7.0,
+      "status": "no_direct_shape"
+    },
+    {
+      "type": 34,
+      "alias": "Droplet",
+      "native_f32": 2.4000000953674316,
+      "native_q16_raw": 157286,
+      "appearance_or_candidate": 64,
+      "target_radius": 2.0,
+      "radius_delta": -0.40000009536743164,
+      "status": "no_direct_shape"
+    },
+    {
+      "type": 35,
+      "alias": "SpinRice",
+      "native_f32": 3.200000047683716,
+      "native_q16_raw": 209715,
+      "appearance_or_candidate": 64,
+      "target_radius": 2.0,
+      "radius_delta": -1.2000000476837158,
+      "status": "direct_radius_mismatch"
+    },
+    {
+      "type": 36,
+      "alias": "SpinShard",
+      "native_f32": 3.200000047683716,
+      "native_q16_raw": 209715,
+      "appearance_or_candidate": 96,
+      "target_radius": 2.0,
+      "radius_delta": -1.2000000476837158,
+      "status": "direct_radius_mismatch"
+    },
+    {
+      "type": 37,
+      "alias": "StarL",
+      "native_f32": 4.0,
+      "native_q16_raw": 262144,
+      "appearance_or_candidate": 160,
+      "target_radius": 4.0,
+      "radius_delta": 0.0,
+      "status": "direct_same_base_radius"
+    },
+    {
+      "type": 38,
+      "alias": "LaserChunk",
+      "native_f32": 4.0,
+      "native_q16_raw": 262144,
+      "appearance_or_candidate": 0,
+      "target_radius": 3.0,
+      "radius_delta": -1.0,
+      "status": "no_direct_shape"
+    },
+    {
+      "type": 39,
+      "alias": "NoteRed",
+      "native_f32": 4.0,
+      "native_q16_raw": 262144,
+      "appearance_or_candidate": 128,
+      "target_radius": 3.0,
+      "radius_delta": -1.0,
+      "status": "no_direct_shape"
+    },
+    {
+      "type": 40,
+      "alias": "NoteBlue",
+      "native_f32": 4.0,
+      "native_q16_raw": 262144,
+      "appearance_or_candidate": 128,
+      "target_radius": 3.0,
+      "radius_delta": -1.0,
+      "status": "no_direct_shape"
+    },
+    {
+      "type": 41,
+      "alias": "NoteYellow",
+      "native_f32": 4.0,
+      "native_q16_raw": 262144,
+      "appearance_or_candidate": 128,
+      "target_radius": 3.0,
+      "radius_delta": -1.0,
+      "status": "no_direct_shape"
+    },
+    {
+      "type": 42,
+      "alias": "NotePurple",
+      "native_f32": 4.0,
+      "native_q16_raw": 262144,
+      "appearance_or_candidate": 128,
+      "target_radius": 3.0,
+      "radius_delta": -1.0,
+      "status": "no_direct_shape"
+    },
+    {
+      "type": 43,
+      "alias": "Rest",
+      "native_f32": 5.0,
+      "native_q16_raw": 327680,
+      "appearance_or_candidate": 128,
+      "target_radius": 3.0,
+      "radius_delta": -2.0,
+      "status": "no_direct_shape"
+    },
+    {
+      "type": 44,
+      "alias": "YinYangR",
+      "native_f32": 10.0,
+      "native_q16_raw": 655360,
+      "appearance_or_candidate": 48,
+      "target_radius": 5.0,
+      "radius_delta": -5.0,
+      "status": "no_direct_shape"
+    },
+    {
+      "type": 45,
+      "alias": "YinYangL",
+      "native_f32": 10.0,
+      "native_q16_raw": 655360,
+      "appearance_or_candidate": 48,
+      "target_radius": 5.0,
+      "radius_delta": -5.0,
+      "status": "no_direct_shape"
+    },
+    {
+      "type": 46,
+      "alias": "BigYinYangR",
+      "native_f32": 28.0,
+      "native_q16_raw": 1835008,
+      "appearance_or_candidate": 48,
+      "target_radius": 5.0,
+      "radius_delta": -23.0,
+      "status": "no_direct_shape"
+    },
+    {
+      "type": 47,
+      "alias": "BigYinYangL",
+      "native_f32": 28.0,
+      "native_q16_raw": 1835008,
+      "appearance_or_candidate": 48,
+      "target_radius": 5.0,
+      "radius_delta": -23.0,
+      "status": "no_direct_shape"
+    }
+  ]
+}

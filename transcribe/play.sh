@@ -24,6 +24,7 @@ list_cards() {
   "$PY" - "$REPO" <<'PY'
 import json, sys, tomllib
 from pathlib import Path
+from stgtrain.cards import discover
 repo = Path(sys.argv[1])
 found = {}
 def add(d, src):
@@ -33,8 +34,8 @@ def add(d, src):
     meta = tomllib.loads(m.read_text(encoding="utf-8"))
     found[d.name] = (d, src, meta.get("ranks", [0, 3]), meta.get("title", ""))
 cards = repo / "cards"
-for d in sorted(cards.glob("th06_*")) if cards.is_dir() else []:
-    add(d, "cards")
+for card in discover(cards).values():
+    add(card.path, card.meta.get("source", "cards"))
 state = {}
 sp = repo / "transcribe/work/state.jsonl"
 if sp.exists():

@@ -6,7 +6,7 @@
 
 - [直接在 main 上提交](commit-directly-on-main.md) — stg-rl-train 不开功能分支，提交/推送都走 main
 - [Astra 委派代码执行工作](astra-delegates-code-work.md) — 改代码与大量代码库阅读优先交给子代理；类似任务优先 Sol / medium，主代理负责判断与审查
-- [Luna 练习卡生产与试产经验](luna-practice-card-workflow.md) — 用户优先低成本扩卡；独立写审、READY/FROZEN+SHA、来源隔离、严格机器门及批量化边界
+- [Luna 练习卡生产与试产经验](luna-practice-card-workflow.md) — 用户优先低成本扩卡与独立写审；2026-11-05明确反对新通用流程重复hash/过度防御验证，早期冻结与SHA流程不默认沿用；synthetic同级与统一卡池提案见当前设计
 - [租的训练机只有 24 核 CPU 配额](rented-box-cpu-quota.md) — nproc 的 255 是宿主机的；并行两条会被 cgroup 节流，下一轮开跑前要先确认
 - [Magnus 是旧 torch 栈](magnus-old-torch-stack.md) — torch 2.5.1 / tensordict 0.6.2；提交 Job 前先在同版本 venv 跑测试
 - [Magnus 用 B2 优先级](magnus-job-type-b2.md) — 提交 Job 一律 --job-type B2，不用 A2（用户要求礼貌）
@@ -44,6 +44,16 @@
 - [原作ECL能力调研与动态xform交付（2026-11-02/03）](ecl-capability-audit.md) — 五类表按LLM整段转写收窄；引擎07058f3含ENGINE_VER29动态xform及单值STEP，训练已接入0.4.3 wheel；TH06转写skill/写审契约/对照表已同步，176份单元输入已刷新，旧卡未迁移
 - [原作EX效果时随机取样（2026-11-04）](ecl-capability-audit.md#2026-11-04-原作ex执行时随机取样已确认) — TH18五面Boss三处VELTIME在效果进入时逐弹抽随机方向；原生调用链已核，不能混同配置时RAND；TH16随机STEP分支支持与脚本实际使用分开判断
 - [xform三阶段rand接入（2026-11-04）](ecl-capability-audit.md#2026-11-04-xform三阶段rand已实现并接入训练) — 用户确认后ENGINE_VER30支持绑定/出生/效果时rand，沿用World RNG；训练wheel0.4.4，写审指引及176份派生资料同步，旧卡未迁移
+
+- [TH18转写教材与五份参考表（2026-11-05）](../../transcribe/th18/mapping.md) — 双语法、时间/任务、移动、发弹、EX、激光和验证正文；48弹型/13发射模式/32插值/30EX与激光表外置，目标差异和未解项逐条保留；8原作合成例及30目标例编译，目标例运行通过；后补普通指令/敌状态/案例/统一口径，曲线激光用户明确暂不做，未接批量工具/训练
+
+- [高版本ECL切分指南（2026-11-05）](../../transcribe/th18/splitting.md) — 用户要求仿TH06写指南；Boss以符卡声明＋中断链定位，道中恢复main编排；交接依赖、入口状态、重叠与曲线暂缓，split.md目前为人工/AI记录；用户已准奖励编队独立成波、波次尾部/交接差异可牺牲；普通掉落/纯表现省略，未接自动CLI
+
+- [TH18弹型与半径对齐初查（2026-11-05）](../investigations/2026-11-05-th18-radius-alignment.md) — 旧192项4同形同基础半径/11半径差/33缺直接形；TH06/NC版本区别已纠正，后续大表接入见下一条；碰撞算法选择后置，出生减速/无判定可省
+- [TH06/TH18弹型大表接入（2026-11-05）](../investigations/2026-11-05-touhou-bullet-catalog.md) — ENGINE_VER31/wheel0.4.5，旧192项保持，新增58型/总1120逻辑项/635物理格；727新有效槽原生出生半径实测匹配，六组旧回放一致；两份图源/生成器/词表落地；后按用户要求清理过程目录，Stage01资料在work/th18/stage01，总览在work/preview/bullet-catalog.png，避免长期堆日期目录
+- [TH18单元编号与单卡验收（2026-11-05）](../../transcribe/th18/validation.md) — 共用 validate 支持 th18_s…/source=th18，并校验来源一致；时限1–65535、不套旧1024弹预算，池耗尽/段事件/开场安全继续检查；TH06保持3000帧/1024弹，批量pipeline/摘录/split_check仍仅TH06；单卡通过后仍须独立源语义审核，未启动训练或自动收卡
+
+- [多作品转写整理与模块化方向（2026-11-05）](../superpowers/specs/2026-11-05-transcribe-modular-design.md) — 用户已选择共用流程＋作品适配，先TH18再逐步迁TH06，沿用文件记录和现有模型后端；基本架构随后获认可；已确认并完成cards与transcribe按th06/th18/synthetic分目录及消费端迁移（[实施记录](../superpowers/plans/2026-11-05-card-source-layout.md)）；已按反馈删新流程重复hash要求，共用批量编排尚未实施。根transcribe/README改总览，TH06操作说明/契约归入th06/，18项历史材料归档到work/archive/th06；现有生产状态不迁移。123项转写检查通过，TH18仅合成卡验收，无真实收卡/模型调用/训练。
 
 ## 迁移说明
 

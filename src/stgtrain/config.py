@@ -9,7 +9,8 @@ from pathlib import Path
 DEFAULTS: dict = {
     "run": {"seed": 1, "device": "auto", "total_updates": 2000, "ckpt_every": 50, "eval_every": 50,
             "torch_threads": 2, "max_minutes": 0.0},
-    "env": {"cards_dir": "cards", "eval_splits": "eval/splits.toml", "num_envs": 2048, "threads": 0,
+    "env": {"cards_dir": "cards/th06", "card_filter": {"sources": [], "tags": [], "ids": [], "exclude_synthetic_kinds": []},
+            "eval_splits": "eval/splits.toml", "num_envs": 2048, "threads": 0,
             "frame_skip": 1, "max_frames": 3600, "warmup_max": 120, "bullets_cap": 1024, "ranks": [2],
             "mirror": True,
             # 判定点随机增大（实验 S）：每局每 env 抽 m ~ U[lo, hi] px 追加到自机中弹判定半径，对模型不可见；
@@ -82,6 +83,9 @@ def validate(cfg: dict) -> None:
         raise ValueError(f"run.device 须为 auto/cuda/cpu，得 {run['device']!r}")
     if env["num_envs"] < 1 or env["frame_skip"] < 1 or env["max_frames"] < 1:
         raise ValueError("env.num_envs / frame_skip / max_frames 须 ≥ 1")
+    for key, value in env["card_filter"].items():
+        if not isinstance(value, list) or any(not isinstance(item, str) for item in value):
+            raise ValueError(f"env.card_filter.{key} 须为字符串列表")
     if cfg["reward"]["action_source"] not in ("executed", "request"):
         raise ValueError("reward.action_source 须为 executed/request")
     if cfg["reward"]["action_source"] == "request" and env["frame_skip"] != 1:
@@ -137,6 +141,22 @@ def validate(cfg: dict) -> None:
 
 
 def from_dict(d: dict) -> dict:
+    # 旧checkpoint保存的是当时的根目录名，转换为同一批卡的metadata选择。
+    # 显式card_filter采用新规则；测试夹具、自定义目录保持原样。
+    env = d.get("env", {})
+    roots = env.get("cards_dir")
+    roots = [roots] if isinstance(roots, str) else roots
+    legacy = {"cards", "cards-synthetic", "cards-laser-specialist"}
+    if "card_filter" not in env and isinstance(roots, list) and roots and all(r in legacy for r in roots):
+        sources = (["th06"] if "cards" in roots else [])
+        if any(r != "cards" for r in roots):
+            sources.append("synthetic")
+        filters = {"sources": sources}
+        if "cards-synthetic" in roots and "cards-laser-specialist" not in roots:
+            filters["exclude_synthetic_kinds"] = ["laser_specialist"]
+        elif roots == ["cards-laser-specialist"]:
+            filters["tags"] = ["specialist"]
+        d = {**d, "env": {**env, "cards_dir": "cards", "card_filter": filters}}
     cfg = deep_merge(DEFAULTS, d)
     validate(cfg)
     return cfg

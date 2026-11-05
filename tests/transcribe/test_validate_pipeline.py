@@ -63,6 +63,101 @@ def test_lint_dir_name(tmp_path):
     assert any("目录名" in e for e in lint_errs(make_card(tmp_path, name="orig_ring")))
 
 
+@pytest.mark.parametrize("name", ["th18_s1_w01", "th18_s1_mb1", "th18_s6_b12", "th18_s7_b1"])
+def test_lint_th18_ids(tmp_path, name):
+    assert lint_errs(make_card(tmp_path, name=name, source='"th18"')) == []
+
+
+@pytest.mark.parametrize("name, source", [
+    ("th18_s1_w01", '"th06"'),
+    ("th06_s1_w01", '"th18"'),
+    ("th18_s1_w01", '"th19"'),
+])
+def test_lint_id_source_mismatch(tmp_path, name, source):
+    assert any("source" in e for e in lint_errs(make_card(tmp_path, name=name, source=source)))
+
+
+@pytest.mark.parametrize("name", ["th18_s0_w01", "th18_s8_w01", "th18_s1_x1", "th18_s1_w001", "th19_s1_b1"])
+def test_lint_invalid_modern_id(tmp_path, name):
+    assert any("目录名" in e for e in lint_errs(make_card(tmp_path, name=name, source='"th18"')))
+
+
+@pytest.mark.parametrize("source, limit, valid", [
+    ("th06", 3500, False), ("th18", 3500, True),
+    ("th18", 65535, True), ("th18", 65536, False), ("th18", 0, False),
+])
+def test_time_limit_by_source(tmp_path, source, limit, valid):
+    d = make_card(tmp_path, name=f"{source}_s1_w01", source=f'"{source}"', time_limit=str(limit))
+    p = d / "main.ecl"
+    p.write_text(p.read_text().replace("TIME_LIMIT: int = 1400", f"TIME_LIMIT: int = {limit}"))
+    errors = lint_errs(d)
+    if valid:
+        assert errors == []
+    else:
+        assert any("time_limit" in e for e in errors)
+
+
+def test_th06_batch_does_not_select_th18(work):
+    pipeline.record("th06_s1_w01", "pending")
+    pipeline.record("th18_s1_w01", "pending")
+    assert pipeline._select(1, {"pending"}, None) == ["th06_s1_w01"]
+    assert "th18_s1_w01" not in pipeline.status_table(None)
+
+
+@pytest.mark.parametrize("source, pool_full, expected_ok", [
+    ("th06", 0, False), ("th18", 0, True), ("th18", 1, False),
+])
+def test_peak_policy_keeps_pool_exhaustion_error(tmp_path, monkeypatch, source, pool_full, expected_ok):
+    monkeypatch.setattr(validate, "harness_run", lambda *args: {
+        "exit": 0, "peak_bullets": 1100, "diag": {"pool_full": pool_full}, "seg_end": 1403,
+    })
+    report = validate.Report(card=str(tmp_path))
+    validate.check_runs(report, tmp_path, {"source": source, "ranks": [0, 0], "time_limit": 1400})
+    assert report.ok == expected_ok
+    if pool_full:
+        assert any("pool_full" in e for e in report.errors)
+    elif not expected_ok:
+        assert any("弹峰值" in e for e in report.errors)
+
+
+@pytest.mark.skipif(not HAS_HARNESS, reason="没有 stg-engine release harness")
+def test_th18_cli_all_layers_with_native_bullets(tmp_path):
+    """自写合成卡验证新词表、旧预算之外的运行和 JSON；不冒充原作转写。"""
+    d = make_card(tmp_path, name="th18_s1_w01", source='"th18"', ranks="[0, 0]", time_limit="3500")
+    shutil.copyfile(config.engine_dir() / "godot/ecl/game/touhou-bullets.ecl", d / "touhou-bullets.ecl")
+    (d / "main.ecl").write_text("""
+const TIME_LIMIT: int = 3500;
+async sub attack() {
+    wait(120);
+    for wave in 0..55 {
+        for i in 0..20 {
+            _ = fire(TH18_RICE, 0, (i - 50) as fx, 32fx, 0fx, 90deg, none, none);
+        }
+        wait(1);
+    }
+    loop { wait(1); }
+}
+async sub director() {
+    set_invuln(65535);
+    set_enemy_flag(ENEMY_NO_BODY, 1);
+    phase_begin(0, attack, TIME_LIMIT, 0);
+    wait_spell();
+    loop { wait(1); }
+}
+sub main() {
+    _ = spawn_enemy(0fx, 0fx, 1000, 0, 0, 0, director);
+    loop { wait(600); }
+}
+""", encoding="utf-8")
+    output = tmp_path / "validate.json"
+    assert validate.main([str(d), "--json", str(output)]) == 0
+    report = json.loads(output.read_text())
+    assert report["ok"], report
+    assert report["runs"]["0"]["peak_bullets"] == 1100
+    assert 3500 <= report["runs"]["0"]["seg_end"] <= 3560
+    assert report["opening_death_rate"] == {"0": 0.0}
+
+
 @pytest.mark.skipif(not HAS_HARNESS, reason="没有 stg-engine release harness")
 @pytest.mark.parametrize("card", sorted(p.name for p in EXAMPLES.iterdir() if p.is_dir()))
 def test_examples_pass_all_layers(card):
@@ -178,8 +273,8 @@ def test_select_sample_collect_status(work):
     chosen = pipeline.do_sample(1, 0.2)
     assert "th06_s1_w05" in chosen and len(chosen) == 3
     done = pipeline.do_collect(1)
-    assert len(done) == 4 and (config.CARDS_DIR / "th06_s1_w01" / "main.ecl").exists()
-    assert not (config.CARDS_DIR / "th06_s1_w01" / "report.md").exists()
+    assert len(done) == 4 and (config.CARDS_DIR / "th06" / "th06_s1_w01" / "main.ecl").exists()
+    assert not (config.CARDS_DIR / "th06" / "th06_s1_w01" / "report.md").exists()
     table = pipeline.status_table(1)
     assert "collected 4" in table and "needs_human" in table
 

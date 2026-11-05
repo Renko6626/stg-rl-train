@@ -166,7 +166,8 @@ def _card_dirs(path: Path, all_cards: bool) -> list[Path]:
         path = path.parent
     if (path / "main.ecl").is_file():
         return [path]
-    cards = sorted(p.parent for p in path.rglob("main.ecl")) if all_cards else []
+    from .cards import synthetic_cards
+    cards = [card.path for card in synthetic_cards(path, "laser_specialist").values()] if all_cards else []
     if not cards:
         raise ValueError(f"no main.ecl found at {path}; use --all for a card root")
     return cards

@@ -5,6 +5,14 @@ metadata:
   type: feedback
 ---
 
+## 当前覆盖约定（2026-11-05）
+
+用户明确反对在通用转写/合成流程中反复加入hash和过度防御性验证。下文READY/FROZEN、逐文件SHA、文修使旧pass失效等是早期批次做法，不再默认推广到新流水线。后续保留来源路径/版本、必要的编译运行检查与独立语义/设计审核；行为变化只补受影响检查，纯文案不触发整轮重验，不新增冻结/签名/自动失效机制。历史证据和已有验收器不因这条反馈自动删除；引擎wheel交付要求另按对应约定。
+
+用户提出synthetic与作品同级、卡池归并并依metadata分类。已确认并迁移为cards/th06、cards/th18、cards/synthetic；暂停用enabled=false，旧批次目录说明为历史记录，见[当前设计](../superpowers/specs/2026-11-05-transcribe-modular-design.md)。
+
+## 历史批次约定
+
 2026-09-27 用户提出后续练习卡生产计划：dispatch 大量 Luna 子代理写弹幕脚本，采用「编写 → 自动校验（语法和参数）及另一个 Luna 模型审查 → 返工」循环。
 
 - 编写前读取 `/data/sunyunbo/www/stg-engine/.claude/skills/writing-danmaku-ecl/SKILL.md`，检查并按需补充激光内容。

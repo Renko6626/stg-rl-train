@@ -21,7 +21,7 @@ import torch
 
 from . import console, plots
 from .actions import ACTION_TABLE_VERSION
-from .cards import card_manifest, compile_cards, discover, load_splits, train_starts, start_intent_mixes
+from .cards import card_manifest, compile_cards, configured_cards, load_splits, train_starts, start_intent_mixes
 from .checkpoint import load_checkpoint, restore_rng, save_checkpoint
 from .config import deep_merge, dump_toml, from_dict, load_config
 from .curriculum import Curriculum
@@ -79,7 +79,7 @@ def pack(run_dir: Path) -> Path:
 
 def build_components(cfg: dict, device: torch.device):
     load_builtins()
-    cards = discover(cfg["env"]["cards_dir"])
+    cards = configured_cards(cfg["env"])
     specs = load_splits(cfg["env"]["eval_splits"], cfg["eval"]["episodes"])
     missing = [s.card for s in specs if s.card not in cards]
     if missing:
@@ -163,7 +163,7 @@ def train(cfg: dict, run_dir: Path, resume: dict | None = None, pack_result: boo
     torch.set_num_threads(int(cfg["run"]["torch_threads"]))
     dump_toml(cfg, run_dir / "config.toml")
     images, starts, specs, featurizer, factory = build_components(cfg, device)
-    start_mixes = start_intent_mixes(discover(cfg["env"]["cards_dir"]), starts, cfg["intent"]["mix"],
+    start_mixes = start_intent_mixes(configured_cards(cfg["env"]), starts, cfg["intent"]["mix"],
                                      cfg["intent"].get("card_mix_enabled", False))
     ppo = PPO(cfg, factory, device)
     initial_checkpoint = initialize_from_checkpoint(ppo, cfg, init_from) if init_from is not None else None
@@ -184,7 +184,7 @@ def train(cfg: dict, run_dir: Path, resume: dict | None = None, pack_result: boo
                          action_table_version=ACTION_TABLE_VERSION, machine=machine_info(),
                          # 起点顺序 = 课程权重向量的列序（curriculum.jsonl 按它回看）
                          starts=[f"{s.image}:{s.mark}:{s.rank}" for s in starts],
-                         cards=card_manifest(discover(cfg["env"]["cards_dir"])),
+                         cards=card_manifest(configured_cards(cfg["env"])),
                          start_intent_mixes=start_mixes)
     if initial_checkpoint is not None:
         _update_env_json(run_dir, initial_checkpoint=initial_checkpoint)
@@ -200,7 +200,7 @@ def train(cfg: dict, run_dir: Path, resume: dict | None = None, pack_result: boo
     envw = EnvWrapper(cfg, images, starts, device, seed=int(cfg["run"]["seed"]) + start - 1,
                       start_intent_mixes=start_mixes)  # Ruling 7
     laser_indices = {i for i, s in enumerate(starts)
-                     if discover(cfg["env"]["cards_dir"])[s.image].laser_intent_mix is not None}
+                     if configured_cards(cfg["env"])[s.image].laser_intent_mix is not None}
     curriculum = Curriculum(len(starts), cfg["curriculum"], laser_indices=laser_indices)
     reward_fn = RewardFn(cfg)
     tracker = EpisodeTracker(envw.n, device, list(reward_fn.terms), cfg["reward"]["hold_radius"],

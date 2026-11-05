@@ -87,9 +87,14 @@ def test_pick_frames_includes_peak_and_stays_in_range():
 
 
 def test_cell_box_row_major_16px():
-    assert preview.cell_box(86) == (96, 80, 112, 96)   # KUNAI(80) 色 6 → 第 5 行第 6 列
-    assert preview.cell_box(0) == (0, 0, 16, 16)
-    assert preview.cell_box(192 + 5) == preview.cell_box(5)   # 越界号回卷，同 layer.gdshader
+    assert preview.cell_box(86, cell=16, cols=16, rows=12) == (96, 80, 112, 96)   # KUNAI(80) 色 6 → 第 5 行第 6 列
+    assert preview.cell_box(0, cell=16, cols=16, rows=12) == (0, 0, 16, 16)
+    assert preview.cell_box(192 + 5, cell=16, cols=16, rows=12) == preview.cell_box(5, cell=16, cols=16, rows=12)   # 越界号回卷，同 layer.gdshader
+
+
+def test_cell_box_64px_large_atlas():
+    assert preview.cell_box(400, cell=64, cols=16, rows=40) == (0, 1600, 64, 1664)
+    assert preview.cell_box(635, cell=64, cols=16, rows=40) == (704, 2496, 768, 2560)
 
 
 def test_rotation_matches_bridge_basis():
@@ -101,6 +106,21 @@ def test_rotation_matches_bridge_basis():
 
 HAS_ASSETS = config.harness_bin().exists() and preview.atlas_path().exists()
 EXAMPLE = config.TH06_DIR / "examples" / "th06_s1_w01"
+
+
+@pytest.mark.skipif(not preview.atlas_path().exists(), reason="没有 stg-engine 弹图集")
+def test_renderer_uses_64px_physical_cell_without_remapping():
+    layout = preview.atlas_layout()
+    if not layout:
+        pytest.skip("没有新弹型图集布局")
+    physical = layout["appearances"][192]["sprite"]
+    assert physical != 192
+    renderer = preview.Renderer()
+    expected = renderer.atlas.crop(preview.cell_box(physical, cell=64,
+                                                  cols=layout["columns"], rows=layout["rows"]))
+    got = renderer.sprite(physical, -90.0)
+    assert got.size == (64, 64)
+    assert got.tobytes() == expected.tobytes()
 
 
 @pytest.mark.skipif(not HAS_ASSETS, reason="没有 stg-engine release harness 或弹图集")
@@ -154,3 +174,20 @@ def test_active_window_bisects_sample_gaps():
 def test_pick_frames_with_start():
     fs = preview.pick_frames(end=760, peak=507, n=8, start=190)
     assert fs[0] == 190 and fs[-1] == 760 and 507 in fs and len(fs) == 8
+
+
+def test_preview_discovers_source_folders_and_reads_catalog_titles(tmp_path, monkeypatch):
+    catalog = tmp_path / 'cards'
+    card = catalog / 'th18' / 'th18_s1_b1'
+    card.mkdir(parents=True)
+    (card / 'main.ecl').write_text('sub main() {}')
+    (card / 'meta.toml').write_text('source="th18"\ntitle="一面非符"')
+    paused = catalog / 'synthetic' / 'paused'
+    paused.mkdir(parents=True)
+    (paused / 'main.ecl').write_text('sub main() {}')
+    (paused / 'meta.toml').write_text('enabled=false')
+    assert preview.find_cards([catalog]) == [card]
+    monkeypatch.setattr(config, 'CARDS_DIR', catalog)
+    out = tmp_path / 'preview'
+    (out / card.name).mkdir(parents=True)
+    assert '一面非符' in preview.write_index(out).read_text()

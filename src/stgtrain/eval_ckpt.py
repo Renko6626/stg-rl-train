@@ -19,9 +19,9 @@ from pathlib import Path
 import torch
 
 from . import console
-from .cards import EvalSpec, allowed_ranks, discover
+from .cards import EvalSpec, allowed_ranks, configured_cards
 from .checkpoint import load_checkpoint
-from .config import deep_merge, from_dict
+from .config import DEFAULTS, deep_merge, from_dict
 from .evaluate import evaluate
 from .ppo import PPO
 from .train import build_components, pick_device
@@ -59,7 +59,7 @@ def main(argv: list[str] | None = None) -> int:
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("checkpoint")
     ap.add_argument("--device", default="auto", choices=("auto", "cpu", "cuda"))
-    ap.add_argument("--cards-dir", default=None, help="覆盖配置里的 env.cards_dir")
+    ap.add_argument("--cards-dir", default=None, help="覆盖卡目录并清空原来源/标签筛选")
     ap.add_argument("--all-cards", action="store_true", help="评卡池里所有卡（含训练卡），不用评测划分")
     ap.add_argument("--ranks", default=None, help="限制难度，逗号分隔；全卡默认2，划分默认不筛选")
     ap.add_argument("--episodes", type=int, default=None, help="每组局数（默认取配置 eval.episodes / 划分文件）")
@@ -78,7 +78,7 @@ def main(argv: list[str] | None = None) -> int:
     ck = load_checkpoint(a.checkpoint, map_location="cpu")
     over: dict = {"run": {"device": a.device}}
     if a.cards_dir:
-        over["env"] = {"cards_dir": a.cards_dir}
+        over["env"] = {"cards_dir": a.cards_dir, "card_filter": DEFAULTS["env"]["card_filter"]}
     if a.splits:
         over.setdefault("env", {})["eval_splits"] = a.splits
     if a.eval_seed is not None:
@@ -95,7 +95,7 @@ def main(argv: list[str] | None = None) -> int:
         want = [int(r) for r in (a.ranks or "2").split(",")]
         n = a.episodes or int(cfg["eval"]["episodes"])
         specs = [EvalSpec(card=c.id, ranks=tuple(r), episodes=n)
-                 for c in discover(cfg["env"]["cards_dir"]).values() if (r := allowed_ranks(c, want))]
+                 for c in configured_cards(cfg["env"]).values() if (r := allowed_ranks(c, want))]
     elif a.episodes:
         specs = [EvalSpec(s.card, s.ranks, a.episodes) for s in specs]
     if a.ranks and not a.all_cards:

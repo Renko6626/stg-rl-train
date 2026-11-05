@@ -1,0 +1,174 @@
+{
+  "source_base_commit": "2f24d8628231126b01f3025b065117c9013a4934",
+  "source_archive_sha256": "f1c51c43d215a52ac28dc0bda31d9a66fb79d41c0c9bd1d8d949a80da28274bb",
+  "source_patch_sha256": "f4006cc345824d1e528682b9360f67d24a12b5ab3dcfdd9718941412db5de7dc",
+  "untracked_files_sha256": {
+    "crates/stg-core/src/tables/touhou_appearances.rs": "d371d72de9e7cfff78af30004697572b17add48cd7249ed3d2e9e75d2df815a8",
+    "dist/stg_rl-0.3.0-cp310-abi3-manylinux_2_34_x86_64.whl": "db1a11d52bc63197ec2f67c8e205413f80d650f2d3b5ba9532ba0dfe57fa73ed",
+    "godot/assets/bullet/atlas-layout.json": "fd68a88db6f629edecb4654ca742770ea8fac499461311f17ffcb7093186c3f8",
+    "godot/assets/bullet/catalog.json": "cfe99af6c81daae3a757de81e0ac5e49c86d2a9f161202622b7b49cb5d19f75c",
+    "godot/assets/bullet/source_th06.png": "3fe06c5d395837cbdedd98c68846ecc1a2e5632efa9564a735fe5aaadbe8759f",
+    "godot/assets/bullet/source_th06.png.import": "bbfa6fdafc8bed4027ebb8e9c8b383603717fc4624240209fb89308b901c6cb8",
+    "godot/assets/bullet/source_th18.png": "3a51e9fd7077d001ccc88e239360aaa470642e8079acb9e418a22e20a8557cbe",
+    "godot/assets/bullet/source_th18.png.import": "1f8c4b701c35faf8f913c472c8be4ab05c9825f3a022d4039b1d64dc62adc725",
+    "godot/ecl/game/touhou-bullets.ecl": "d3acdbb067c8ea67290049c5614bd69b77b70074c7c5c2530d8ae8cd5ad78463"
+  },
+  "packaging_version": "0.4.5",
+  "engine_ver": 31,
+  "date": "2026-11-05",
+  "wheel": "stg_rl-0.4.5-cp310-abi3-manylinux_2_34_x86_64.whl",
+  "wheel_sha256": "07b6141fd99ee490fddf4219422ae5483039ac8984cf0544cf56db9e8bd0c8c7",
+  "build_info": {
+    "version": "0.4.5",
+    "git_sha": "unknown",
+    "engine_ver": "31",
+    "tables_hash": "7091aec34290ffd7"
+  },
+  "build_info_note": "Exported source snapshot has no Git metadata; exact base commit, binary patch hash, and additional-file hashes identify build inputs. Later version-anchor/pack-count test expectation updates and documentation do not change production behavior.",
+  "packaging_changes": "Snapshot-only stg-py Cargo.toml and pyproject.toml 0.4.1 -> 0.4.5; Cargo.lock follows package version.",
+  "equivalence_replay": {
+    "baseline_build_info": {
+      "tables_hash": "37a7ff12fe40e24e",
+      "version": "0.4.4",
+      "git_sha": "unknown",
+      "engine_ver": "30"
+    },
+    "cases": [
+      {
+        "density": 3,
+        "cap": 1,
+        "steps": 600,
+        "max_observed_rows": 1,
+        "sha256": "53992900c4bee9dc1205ee702ab82187cbdd3448fe562725b4649cafd12a12c3"
+      },
+      {
+        "density": 3,
+        "cap": 64,
+        "steps": 600,
+        "max_observed_rows": 21,
+        "sha256": "d9c50b4e7553ce476c9faa53e09d066f599f25d28759789585efad61349ee0ff"
+      },
+      {
+        "density": 3,
+        "cap": 1024,
+        "steps": 600,
+        "max_observed_rows": 21,
+        "sha256": "97303f27e265c2a8cc92dddf82beee1e8d673c276701ef238f44f2bcfc5b1967"
+      },
+      {
+        "density": 12,
+        "cap": 1,
+        "steps": 600,
+        "max_observed_rows": 1,
+        "sha256": "9d9ae283b9c5e9a1df3bff262d83a3f2462e5d86c5a46ef926d769eeeaf0c23a"
+      },
+      {
+        "density": 12,
+        "cap": 64,
+        "steps": 600,
+        "max_observed_rows": 64,
+        "sha256": "5a941f641c902449aa570599c257fa9676a4f50fd9cbb0cd2b88945c018bcd7e"
+      },
+      {
+        "density": 12,
+        "cap": 1024,
+        "steps": 600,
+        "max_observed_rows": 84,
+        "sha256": "24e8621cd90369cd5d221dd7496642f54c8e9db3ec22a4af9657f51cba3abb40"
+      }
+    ],
+    "all_buffer_bytes_and_start_indices_equal": true
+  },
+  "catalog_probe": {
+    "build_info": {
+      "git_sha": "unknown",
+      "engine_ver": "31",
+      "tables_hash": "7091aec34290ffd7",
+      "version": "0.4.5"
+    },
+    "types": 58,
+    "valid_new_appearances": 727,
+    "observed_count": 727,
+    "all_birth_radii_and_logical_ids_match_native": true,
+    "static_bullets_use_xform_none": true,
+    "invalid_coin_color3_rejected": true,
+    "representatives": {
+      "TH06_RICE": {
+        "appearance": 224,
+        "radius_raw": 131072,
+        "physical_sprite": 225
+      },
+      "TH18_RICE": {
+        "appearance": 480,
+        "radius_raw": 157286,
+        "physical_sprite": 361
+      },
+      "TH06_BUBBLE": {
+        "appearance": 336,
+        "radius_raw": 1048576,
+        "physical_sprite": 309
+      },
+      "TH18_BUBBLE": {
+        "appearance": 864,
+        "radius_raw": 917504,
+        "physical_sprite": 551
+      },
+      "TH18_BIG_YIN_YANG_R": {
+        "appearance": 1088,
+        "radius_raw": 1835008,
+        "physical_sprite": 631
+      }
+    }
+  },
+  "golden": {
+    "same_as_baseline": false,
+    "reason": "World.tables_hash participates in checksum; content table changed 37a7ff12fe40e24e -> 7091aec34290ffd7. Baseline and new streams saved; legacy observations compared independently.",
+    "before_sha256": "24d2e24f67c5f01e55029586fef81951ed6faee807b83889ce9a0831f16a3529",
+    "after_sha256": "d6bcd938647107de75339ac90ee405d65b95ebe358b741aaaa80a4736e79c30d"
+  },
+  "validation": [
+    {
+      "command": "cargo test -p stg-core -p stg-ecl-compiler -p stg-harness -p stg-rl -p stg-godot",
+      "result": "core/compiler/harness/godot and earlier RL groups passed; retained ENGINE_VER anchor updated to31 and bundled file count to6; final RL package separately rerun with cargo test -p stg-rl, passed"
+    },
+    {
+      "command": "cargo fmt --all -- --check",
+      "result": "passed"
+    },
+    {
+      "command": "cargo clippy --workspace --all-targets -- -D warnings",
+      "result": "passed"
+    },
+    {
+      "command": "target/release/stg-harness verify-tables",
+      "result": "all four baked tables match generators"
+    },
+    {
+      "command": "uv run --frozen pytest -q tests/transcribe/test_preview.py tests/test_replay_gif.py -k \"not replay_gif_end_to_end\"",
+      "result": "20 passed, 1 deselected; excludes existing PPO-training replay test"
+    },
+    {
+      "command": "uv run --frozen pytest -q /data/sunyunbo/www/stg-engine/crates/stg-py/tests/test_smoke.py",
+      "result": "15 passed"
+    },
+    {
+      "command": "uv run --frozen python transcribe/work/touhou-bullet-catalog-20261105/probe_catalog.py",
+      "result": "727 valid new appearances created, all native birth radii/logical ids correct; missing coin color rejected"
+    },
+    {
+      "command": "python transcribe/work/th18-bullet-textures-20261105/verify_bake.py",
+      "result": "producer evidence: deterministic repeated bake, all 192 legacy cells unchanged, valid alpha/transparent gaps/source-to-output pixel equality"
+    }
+  ],
+  "limits": [
+    "Static ordinary flight art only; no general ANM animation, static anchor offset or additive blend reproduction.",
+    "Collision formula unchanged; no dynamic radius/scale setter added; xform sprite/shape/color retain birth radius.",
+    "No original-game run, Windows/GPU/cross-platform deterministic replay or PPO training."
+  ],
+  "temporary_artifacts_status": {
+    "date": "2026-11-05",
+    "status": "Cleaned at user request after conclusions and source hashes were recorded. Historical transcribe/work date paths and commands are no longer persistent tool entry points.",
+    "preserved_preview": "transcribe/work/preview/bullet-catalog.png",
+    "production_inputs": "stg-engine/godot/assets/bullet/catalog.json and source_th06.png/source_th18.png; offline generator godot/tools/slice_bullet_sheet.gd"
+  }
+}

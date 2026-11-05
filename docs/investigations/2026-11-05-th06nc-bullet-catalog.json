@@ -1,0 +1,4519 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-05",
+  "purpose": "Independent TH06 classic and TH06NC source catalog evidence; no original images or decompiled body are included in this tracked artifact.",
+  "evidence_status": "Static source-byte and existing Ghidra instruction/decompilation export cross-check. Games were not executed.",
+  "games": {
+    "th06": {
+      "sample": "/data/sunyunbo/www/renkolab/local/th06.v1.02h/th06.exe",
+      "exe_sha256": "327c4e923d7057d80d3057aed1e60389f4b560fabcec73c9dbb956ea68ec52ab",
+      "pe_image_base": "0x400000",
+      "script_table_va": "0x46a6e8",
+      "script_table_stride": 20,
+      "anm_sources": [
+        {
+          "file": "/data/sunyunbo/www/stg-rl-train/transcribe/work/th06nc-bullet-catalog-20261105/classic/etama3.anm",
+          "sha256": "1bbbbea06778111585c33223a9376e76299db746fbed627908d09807b114cd4c",
+          "texture_name": "data/etama/etama3.png",
+          "alpha_texture_name": "data/etama/etama3_a.png",
+          "texture_size": [
+            256,
+            256
+          ]
+        },
+        {
+          "file": "/data/sunyunbo/www/stg-rl-train/transcribe/work/th06nc-bullet-catalog-20261105/classic/etama4.anm",
+          "sha256": "edf59b5ddab4b19026938a3831185b1e16fb6ff905cfa62340ffeca471687b04",
+          "texture_name": "data/etama/etama4.png",
+          "alpha_texture_name": "data/etama/etama4_a.png",
+          "texture_size": [
+            256,
+            256
+          ]
+        }
+      ],
+      "texture_local_directory": "/data/sunyunbo/www/stg-rl-train/transcribe/work/th06nc-bullet-catalog-20261105/classic",
+      "max_source_frame_pixels": 64,
+      "max_logical_frame_size": 64,
+      "types": [
+        {
+          "type": 0,
+          "alias": "PELLET",
+          "native_script_tuple": [
+            512,
+            526,
+            527,
+            528,
+            523
+          ],
+          "main_script_local": 0,
+          "main_script_global": 512,
+          "anm": "etama3.anm",
+          "texture_name": "data/etama/etama3.png",
+          "alpha_texture_name": "data/etama/etama3_a.png",
+          "sprite_local": 14,
+          "sprite_global": 526,
+          "color_count": 16,
+          "color_semantics": "consecutive source palette variants",
+          "colors": [
+            {
+              "color": 0,
+              "sprite_local": 14,
+              "sprite_global": 526,
+              "texture_rect": [
+                128.0,
+                208.0,
+                8.0,
+                8.0
+              ],
+              "logical_render_size": [
+                8.0,
+                8.0
+              ]
+            },
+            {
+              "color": 1,
+              "sprite_local": 15,
+              "sprite_global": 527,
+              "texture_rect": [
+                136.0,
+                208.0,
+                8.0,
+                8.0
+              ],
+              "logical_render_size": [
+                8.0,
+                8.0
+              ]
+            },
+            {
+              "color": 2,
+              "sprite_local": 16,
+              "sprite_global": 528,
+              "texture_rect": [
+                144.0,
+                208.0,
+                8.0,
+                8.0
+              ],
+              "logical_render_size": [
+                8.0,
+                8.0
+              ]
+            },
+            {
+              "color": 3,
+              "sprite_local": 17,
+              "sprite_global": 529,
+              "texture_rect": [
+                152.0,
+                208.0,
+                8.0,
+                8.0
+              ],
+              "logical_render_size": [
+                8.0,
+                8.0
+              ]
+            },
+            {
+              "color": 4,
+              "sprite_local": 18,
+              "sprite_global": 530,
+              "texture_rect": [
+                160.0,
+                208.0,
+                8.0,
+                8.0
+              ],
+              "logical_render_size": [
+                8.0,
+                8.0
+              ]
+            },
+            {
+              "color": 5,
+              "sprite_local": 19,
+              "sprite_global": 531,
+              "texture_rect": [
+                168.0,
+                208.0,
+                8.0,
+                8.0
+              ],
+              "logical_render_size": [
+                8.0,
+                8.0
+              ]
+            },
+            {
+              "color": 6,
+              "sprite_local": 20,
+              "sprite_global": 532,
+              "texture_rect": [
+                176.0,
+                208.0,
+                8.0,
+                8.0
+              ],
+              "logical_render_size": [
+                8.0,
+                8.0
+              ]
+            },
+            {
+              "color": 7,
+              "sprite_local": 21,
+              "sprite_global": 533,
+              "texture_rect": [
+                184.0,
+                208.0,
+                8.0,
+                8.0
+              ],
+              "logical_render_size": [
+                8.0,
+                8.0
+              ]
+            },
+            {
+              "color": 8,
+              "sprite_local": 22,
+              "sprite_global": 534,
+              "texture_rect": [
+                128.0,
+                216.0,
+                8.0,
+                8.0
+              ],
+              "logical_render_size": [
+                8.0,
+                8.0
+              ]
+            },
+            {
+              "color": 9,
+              "sprite_local": 23,
+              "sprite_global": 535,
+              "texture_rect": [
+                136.0,
+                216.0,
+                8.0,
+                8.0
+              ],
+              "logical_render_size": [
+                8.0,
+                8.0
+              ]
+            },
+            {
+              "color": 10,
+              "sprite_local": 24,
+              "sprite_global": 536,
+              "texture_rect": [
+                144.0,
+                216.0,
+                8.0,
+                8.0
+              ],
+              "logical_render_size": [
+                8.0,
+                8.0
+              ]
+            },
+            {
+              "color": 11,
+              "sprite_local": 25,
+              "sprite_global": 537,
+              "texture_rect": [
+                152.0,
+                216.0,
+                8.0,
+                8.0
+              ],
+              "logical_render_size": [
+                8.0,
+                8.0
+              ]
+            },
+            {
+              "color": 12,
+              "sprite_local": 26,
+              "sprite_global": 538,
+              "texture_rect": [
+                160.0,
+                216.0,
+                8.0,
+                8.0
+              ],
+              "logical_render_size": [
+                8.0,
+                8.0
+              ]
+            },
+            {
+              "color": 13,
+              "sprite_local": 27,
+              "sprite_global": 539,
+              "texture_rect": [
+                168.0,
+                216.0,
+                8.0,
+                8.0
+              ],
+              "logical_render_size": [
+                8.0,
+                8.0
+              ]
+            },
+            {
+              "color": 14,
+              "sprite_local": 28,
+              "sprite_global": 540,
+              "texture_rect": [
+                176.0,
+                216.0,
+                8.0,
+                8.0
+              ],
+              "logical_render_size": [
+                8.0,
+                8.0
+              ]
+            },
+            {
+              "color": 15,
+              "sprite_local": 29,
+              "sprite_global": 541,
+              "texture_rect": [
+                184.0,
+                216.0,
+                8.0,
+                8.0
+              ],
+              "logical_render_size": [
+                8.0,
+                8.0
+              ]
+            }
+          ],
+          "animation_frames": [
+            {
+              "frame": 0,
+              "sprite_local": 14
+            }
+          ],
+          "auto_rotate": false,
+          "unrotated_direction": null,
+          "graze_size_xy": [
+            4.0,
+            4.0
+          ],
+          "radius": 2.0,
+          "radius_q16_nearest": 131072,
+          "radius_scope": "default template initialized from main ANM script logical sprite height; runtime source geometry is distinct from target radius-add collision"
+        },
+        {
+          "type": 1,
+          "alias": "RING_BALL",
+          "native_script_tuple": [
+            513,
+            529,
+            530,
+            531,
+            524
+          ],
+          "main_script_local": 1,
+          "main_script_global": 513,
+          "anm": "etama3.anm",
+          "texture_name": "data/etama/etama3.png",
+          "alpha_texture_name": "data/etama/etama3_a.png",
+          "sprite_local": 30,
+          "sprite_global": 542,
+          "color_count": 16,
+          "color_semantics": "consecutive source palette variants",
+          "colors": [
+            {
+              "color": 0,
+              "sprite_local": 30,
+              "sprite_global": 542,
+              "texture_rect": [
+                0.0,
+                32.0,
+                16.0,
+                16.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 1,
+              "sprite_local": 31,
+              "sprite_global": 543,
+              "texture_rect": [
+                16.0,
+                32.0,
+                16.0,
+                16.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 2,
+              "sprite_local": 32,
+              "sprite_global": 544,
+              "texture_rect": [
+                32.0,
+                32.0,
+                16.0,
+                16.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 3,
+              "sprite_local": 33,
+              "sprite_global": 545,
+              "texture_rect": [
+                48.0,
+                32.0,
+                16.0,
+                16.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 4,
+              "sprite_local": 34,
+              "sprite_global": 546,
+              "texture_rect": [
+                64.0,
+                32.0,
+                16.0,
+                16.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 5,
+              "sprite_local": 35,
+              "sprite_global": 547,
+              "texture_rect": [
+                80.0,
+                32.0,
+                16.0,
+                16.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 6,
+              "sprite_local": 36,
+              "sprite_global": 548,
+              "texture_rect": [
+                96.0,
+                32.0,
+                16.0,
+                16.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 7,
+              "sprite_local": 37,
+              "sprite_global": 549,
+              "texture_rect": [
+                112.0,
+                32.0,
+                16.0,
+                16.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 8,
+              "sprite_local": 38,
+              "sprite_global": 550,
+              "texture_rect": [
+                128.0,
+                32.0,
+                16.0,
+                16.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 9,
+              "sprite_local": 39,
+              "sprite_global": 551,
+              "texture_rect": [
+                144.0,
+                32.0,
+                16.0,
+                16.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 10,
+              "sprite_local": 40,
+              "sprite_global": 552,
+              "texture_rect": [
+                160.0,
+                32.0,
+                16.0,
+                16.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 11,
+              "sprite_local": 41,
+              "sprite_global": 553,
+              "texture_rect": [
+                176.0,
+                32.0,
+                16.0,
+                16.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 12,
+              "sprite_local": 42,
+              "sprite_global": 554,
+              "texture_rect": [
+                192.0,
+                32.0,
+                16.0,
+                16.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 13,
+              "sprite_local": 43,
+              "sprite_global": 555,
+              "texture_rect": [
+                208.0,
+                32.0,
+                16.0,
+                16.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 14,
+              "sprite_local": 44,
+              "sprite_global": 556,
+              "texture_rect": [
+                224.0,
+                32.0,
+                16.0,
+                16.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 15,
+              "sprite_local": 45,
+              "sprite_global": 557,
+              "texture_rect": [
+                240.0,
+                32.0,
+                16.0,
+                16.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            }
+          ],
+          "animation_frames": [
+            {
+              "frame": 0,
+              "sprite_local": 30
+            }
+          ],
+          "auto_rotate": false,
+          "unrotated_direction": null,
+          "graze_size_xy": [
+            6.0,
+            6.0
+          ],
+          "radius": 3.0,
+          "radius_q16_nearest": 196608,
+          "radius_scope": "default template initialized from main ANM script logical sprite height; runtime source geometry is distinct from target radius-add collision"
+        },
+        {
+          "type": 2,
+          "alias": "RICE",
+          "native_script_tuple": [
+            514,
+            529,
+            530,
+            531,
+            524
+          ],
+          "main_script_local": 2,
+          "main_script_global": 514,
+          "anm": "etama3.anm",
+          "texture_name": "data/etama/etama3.png",
+          "alpha_texture_name": "data/etama/etama3_a.png",
+          "sprite_local": 46,
+          "sprite_global": 558,
+          "color_count": 16,
+          "color_semantics": "consecutive source palette variants",
+          "colors": [
+            {
+              "color": 0,
+              "sprite_local": 46,
+              "sprite_global": 558,
+              "texture_rect": [
+                1.0,
+                64.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 1,
+              "sprite_local": 47,
+              "sprite_global": 559,
+              "texture_rect": [
+                17.0,
+                64.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 2,
+              "sprite_local": 48,
+              "sprite_global": 560,
+              "texture_rect": [
+                33.0,
+                64.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 3,
+              "sprite_local": 49,
+              "sprite_global": 561,
+              "texture_rect": [
+                49.0,
+                64.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 4,
+              "sprite_local": 50,
+              "sprite_global": 562,
+              "texture_rect": [
+                65.0,
+                64.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 5,
+              "sprite_local": 51,
+              "sprite_global": 563,
+              "texture_rect": [
+                81.0,
+                64.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 6,
+              "sprite_local": 52,
+              "sprite_global": 564,
+              "texture_rect": [
+                97.0,
+                64.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 7,
+              "sprite_local": 53,
+              "sprite_global": 565,
+              "texture_rect": [
+                113.0,
+                64.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 8,
+              "sprite_local": 54,
+              "sprite_global": 566,
+              "texture_rect": [
+                129.0,
+                64.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 9,
+              "sprite_local": 55,
+              "sprite_global": 567,
+              "texture_rect": [
+                145.0,
+                64.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 10,
+              "sprite_local": 56,
+              "sprite_global": 568,
+              "texture_rect": [
+                161.0,
+                64.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 11,
+              "sprite_local": 57,
+              "sprite_global": 569,
+              "texture_rect": [
+                177.0,
+                64.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 12,
+              "sprite_local": 58,
+              "sprite_global": 570,
+              "texture_rect": [
+                193.0,
+                64.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 13,
+              "sprite_local": 59,
+              "sprite_global": 571,
+              "texture_rect": [
+                209.0,
+                64.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 14,
+              "sprite_local": 60,
+              "sprite_global": 572,
+              "texture_rect": [
+                225.0,
+                64.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 15,
+              "sprite_local": 61,
+              "sprite_global": 573,
+              "texture_rect": [
+                241.0,
+                64.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            }
+          ],
+          "animation_frames": [
+            {
+              "frame": 0,
+              "sprite_local": 46
+            }
+          ],
+          "auto_rotate": true,
+          "unrotated_direction": "up",
+          "graze_size_xy": [
+            4.0,
+            4.0
+          ],
+          "radius": 2.0,
+          "radius_q16_nearest": 131072,
+          "radius_scope": "default template initialized from main ANM script logical sprite height; runtime source geometry is distinct from target radius-add collision"
+        },
+        {
+          "type": 3,
+          "alias": "BALL",
+          "native_script_tuple": [
+            515,
+            529,
+            530,
+            531,
+            524
+          ],
+          "main_script_local": 3,
+          "main_script_global": 515,
+          "anm": "etama3.anm",
+          "texture_name": "data/etama/etama3.png",
+          "alpha_texture_name": "data/etama/etama3_a.png",
+          "sprite_local": 62,
+          "sprite_global": 574,
+          "color_count": 16,
+          "color_semantics": "consecutive source palette variants",
+          "colors": [
+            {
+              "color": 0,
+              "sprite_local": 62,
+              "sprite_global": 574,
+              "texture_rect": [
+                0.0,
+                48.0,
+                16.0,
+                16.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 1,
+              "sprite_local": 63,
+              "sprite_global": 575,
+              "texture_rect": [
+                16.0,
+                48.0,
+                16.0,
+                16.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 2,
+              "sprite_local": 64,
+              "sprite_global": 576,
+              "texture_rect": [
+                32.0,
+                48.0,
+                16.0,
+                16.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 3,
+              "sprite_local": 65,
+              "sprite_global": 577,
+              "texture_rect": [
+                48.0,
+                48.0,
+                16.0,
+                16.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 4,
+              "sprite_local": 66,
+              "sprite_global": 578,
+              "texture_rect": [
+                64.0,
+                48.0,
+                16.0,
+                16.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 5,
+              "sprite_local": 67,
+              "sprite_global": 579,
+              "texture_rect": [
+                80.0,
+                48.0,
+                16.0,
+                16.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 6,
+              "sprite_local": 68,
+              "sprite_global": 580,
+              "texture_rect": [
+                96.0,
+                48.0,
+                16.0,
+                16.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 7,
+              "sprite_local": 69,
+              "sprite_global": 581,
+              "texture_rect": [
+                112.0,
+                48.0,
+                16.0,
+                16.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 8,
+              "sprite_local": 70,
+              "sprite_global": 582,
+              "texture_rect": [
+                128.0,
+                48.0,
+                16.0,
+                16.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 9,
+              "sprite_local": 71,
+              "sprite_global": 583,
+              "texture_rect": [
+                144.0,
+                48.0,
+                16.0,
+                16.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 10,
+              "sprite_local": 72,
+              "sprite_global": 584,
+              "texture_rect": [
+                160.0,
+                48.0,
+                16.0,
+                16.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 11,
+              "sprite_local": 73,
+              "sprite_global": 585,
+              "texture_rect": [
+                176.0,
+                48.0,
+                16.0,
+                16.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 12,
+              "sprite_local": 74,
+              "sprite_global": 586,
+              "texture_rect": [
+                192.0,
+                48.0,
+                16.0,
+                16.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 13,
+              "sprite_local": 75,
+              "sprite_global": 587,
+              "texture_rect": [
+                208.0,
+                48.0,
+                16.0,
+                16.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 14,
+              "sprite_local": 76,
+              "sprite_global": 588,
+              "texture_rect": [
+                224.0,
+                48.0,
+                16.0,
+                16.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 15,
+              "sprite_local": 77,
+              "sprite_global": 589,
+              "texture_rect": [
+                240.0,
+                48.0,
+                16.0,
+                16.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            }
+          ],
+          "animation_frames": [
+            {
+              "frame": 0,
+              "sprite_local": 62
+            }
+          ],
+          "auto_rotate": false,
+          "unrotated_direction": null,
+          "graze_size_xy": [
+            6.0,
+            6.0
+          ],
+          "radius": 3.0,
+          "radius_q16_nearest": 196608,
+          "radius_scope": "default template initialized from main ANM script logical sprite height; runtime source geometry is distinct from target radius-add collision"
+        },
+        {
+          "type": 4,
+          "alias": "KUNAI",
+          "native_script_tuple": [
+            516,
+            529,
+            530,
+            531,
+            524
+          ],
+          "main_script_local": 4,
+          "main_script_global": 516,
+          "anm": "etama3.anm",
+          "texture_name": "data/etama/etama3.png",
+          "alpha_texture_name": "data/etama/etama3_a.png",
+          "sprite_local": 78,
+          "sprite_global": 590,
+          "color_count": 16,
+          "color_semantics": "consecutive source palette variants",
+          "colors": [
+            {
+              "color": 0,
+              "sprite_local": 78,
+              "sprite_global": 590,
+              "texture_rect": [
+                1.0,
+                80.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 1,
+              "sprite_local": 79,
+              "sprite_global": 591,
+              "texture_rect": [
+                17.0,
+                80.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 2,
+              "sprite_local": 80,
+              "sprite_global": 592,
+              "texture_rect": [
+                33.0,
+                80.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 3,
+              "sprite_local": 81,
+              "sprite_global": 593,
+              "texture_rect": [
+                49.0,
+                80.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 4,
+              "sprite_local": 82,
+              "sprite_global": 594,
+              "texture_rect": [
+                65.0,
+                80.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 5,
+              "sprite_local": 83,
+              "sprite_global": 595,
+              "texture_rect": [
+                81.0,
+                80.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 6,
+              "sprite_local": 84,
+              "sprite_global": 596,
+              "texture_rect": [
+                97.0,
+                80.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 7,
+              "sprite_local": 85,
+              "sprite_global": 597,
+              "texture_rect": [
+                113.0,
+                80.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 8,
+              "sprite_local": 86,
+              "sprite_global": 598,
+              "texture_rect": [
+                129.0,
+                80.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 9,
+              "sprite_local": 87,
+              "sprite_global": 599,
+              "texture_rect": [
+                145.0,
+                80.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 10,
+              "sprite_local": 88,
+              "sprite_global": 600,
+              "texture_rect": [
+                161.0,
+                80.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 11,
+              "sprite_local": 89,
+              "sprite_global": 601,
+              "texture_rect": [
+                177.0,
+                80.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 12,
+              "sprite_local": 90,
+              "sprite_global": 602,
+              "texture_rect": [
+                193.0,
+                80.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 13,
+              "sprite_local": 91,
+              "sprite_global": 603,
+              "texture_rect": [
+                209.0,
+                80.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 14,
+              "sprite_local": 92,
+              "sprite_global": 604,
+              "texture_rect": [
+                225.0,
+                80.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 15,
+              "sprite_local": 93,
+              "sprite_global": 605,
+              "texture_rect": [
+                241.0,
+                80.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            }
+          ],
+          "animation_frames": [
+            {
+              "frame": 0,
+              "sprite_local": 78
+            }
+          ],
+          "auto_rotate": true,
+          "unrotated_direction": "up",
+          "graze_size_xy": [
+            5.0,
+            5.0
+          ],
+          "radius": 2.5,
+          "radius_q16_nearest": 163840,
+          "radius_scope": "default template initialized from main ANM script logical sprite height; runtime source geometry is distinct from target radius-add collision"
+        },
+        {
+          "type": 5,
+          "alias": "SHARD",
+          "native_script_tuple": [
+            517,
+            529,
+            530,
+            531,
+            524
+          ],
+          "main_script_local": 5,
+          "main_script_global": 517,
+          "anm": "etama3.anm",
+          "texture_name": "data/etama/etama3.png",
+          "alpha_texture_name": "data/etama/etama3_a.png",
+          "sprite_local": 94,
+          "sprite_global": 606,
+          "color_count": 16,
+          "color_semantics": "consecutive source palette variants",
+          "colors": [
+            {
+              "color": 0,
+              "sprite_local": 94,
+              "sprite_global": 606,
+              "texture_rect": [
+                1.0,
+                96.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 1,
+              "sprite_local": 95,
+              "sprite_global": 607,
+              "texture_rect": [
+                17.0,
+                96.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 2,
+              "sprite_local": 96,
+              "sprite_global": 608,
+              "texture_rect": [
+                33.0,
+                96.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 3,
+              "sprite_local": 97,
+              "sprite_global": 609,
+              "texture_rect": [
+                49.0,
+                96.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 4,
+              "sprite_local": 98,
+              "sprite_global": 610,
+              "texture_rect": [
+                65.0,
+                96.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 5,
+              "sprite_local": 99,
+              "sprite_global": 611,
+              "texture_rect": [
+                81.0,
+                96.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 6,
+              "sprite_local": 100,
+              "sprite_global": 612,
+              "texture_rect": [
+                97.0,
+                96.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 7,
+              "sprite_local": 101,
+              "sprite_global": 613,
+              "texture_rect": [
+                113.0,
+                96.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 8,
+              "sprite_local": 102,
+              "sprite_global": 614,
+              "texture_rect": [
+                129.0,
+                96.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 9,
+              "sprite_local": 103,
+              "sprite_global": 615,
+              "texture_rect": [
+                145.0,
+                96.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 10,
+              "sprite_local": 104,
+              "sprite_global": 616,
+              "texture_rect": [
+                161.0,
+                96.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 11,
+              "sprite_local": 105,
+              "sprite_global": 617,
+              "texture_rect": [
+                177.0,
+                96.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 12,
+              "sprite_local": 106,
+              "sprite_global": 618,
+              "texture_rect": [
+                193.0,
+                96.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 13,
+              "sprite_local": 107,
+              "sprite_global": 619,
+              "texture_rect": [
+                209.0,
+                96.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 14,
+              "sprite_local": 108,
+              "sprite_global": 620,
+              "texture_rect": [
+                225.0,
+                96.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 15,
+              "sprite_local": 109,
+              "sprite_global": 621,
+              "texture_rect": [
+                241.0,
+                96.0,
+                14.0,
+                16.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            }
+          ],
+          "animation_frames": [
+            {
+              "frame": 0,
+              "sprite_local": 94
+            }
+          ],
+          "auto_rotate": true,
+          "unrotated_direction": "up",
+          "graze_size_xy": [
+            4.0,
+            4.0
+          ],
+          "radius": 2.0,
+          "radius_q16_nearest": 131072,
+          "radius_scope": "default template initialized from main ANM script logical sprite height; runtime source geometry is distinct from target radius-add collision"
+        },
+        {
+          "type": 6,
+          "alias": "BIG_BALL",
+          "native_script_tuple": [
+            518,
+            532,
+            532,
+            532,
+            525
+          ],
+          "main_script_local": 6,
+          "main_script_global": 518,
+          "anm": "etama3.anm",
+          "texture_name": "data/etama/etama3.png",
+          "alpha_texture_name": "data/etama/etama3_a.png",
+          "sprite_local": 110,
+          "sprite_global": 622,
+          "color_count": 8,
+          "color_semantics": "consecutive source palette variants",
+          "colors": [
+            {
+              "color": 0,
+              "sprite_local": 110,
+              "sprite_global": 622,
+              "texture_rect": [
+                0.0,
+                128.0,
+                32.0,
+                32.0
+              ],
+              "logical_render_size": [
+                32.0,
+                32.0
+              ]
+            },
+            {
+              "color": 1,
+              "sprite_local": 111,
+              "sprite_global": 623,
+              "texture_rect": [
+                32.0,
+                128.0,
+                32.0,
+                32.0
+              ],
+              "logical_render_size": [
+                32.0,
+                32.0
+              ]
+            },
+            {
+              "color": 2,
+              "sprite_local": 112,
+              "sprite_global": 624,
+              "texture_rect": [
+                64.0,
+                128.0,
+                32.0,
+                32.0
+              ],
+              "logical_render_size": [
+                32.0,
+                32.0
+              ]
+            },
+            {
+              "color": 3,
+              "sprite_local": 113,
+              "sprite_global": 625,
+              "texture_rect": [
+                96.0,
+                128.0,
+                32.0,
+                32.0
+              ],
+              "logical_render_size": [
+                32.0,
+                32.0
+              ]
+            },
+            {
+              "color": 4,
+              "sprite_local": 114,
+              "sprite_global": 626,
+              "texture_rect": [
+                128.0,
+                128.0,
+                32.0,
+                32.0
+              ],
+              "logical_render_size": [
+                32.0,
+                32.0
+              ]
+            },
+            {
+              "color": 5,
+              "sprite_local": 115,
+              "sprite_global": 627,
+              "texture_rect": [
+                160.0,
+                128.0,
+                32.0,
+                32.0
+              ],
+              "logical_render_size": [
+                32.0,
+                32.0
+              ]
+            },
+            {
+              "color": 6,
+              "sprite_local": 116,
+              "sprite_global": 628,
+              "texture_rect": [
+                192.0,
+                128.0,
+                32.0,
+                32.0
+              ],
+              "logical_render_size": [
+                32.0,
+                32.0
+              ]
+            },
+            {
+              "color": 7,
+              "sprite_local": 117,
+              "sprite_global": 629,
+              "texture_rect": [
+                224.0,
+                128.0,
+                32.0,
+                32.0
+              ],
+              "logical_render_size": [
+                32.0,
+                32.0
+              ]
+            }
+          ],
+          "animation_frames": [
+            {
+              "frame": 0,
+              "sprite_local": 110
+            }
+          ],
+          "auto_rotate": false,
+          "unrotated_direction": null,
+          "graze_size_xy": [
+            16.0,
+            16.0
+          ],
+          "radius": 8.0,
+          "radius_q16_nearest": 524288,
+          "radius_scope": "default template initialized from main ANM script logical sprite height; runtime source geometry is distinct from target radius-add collision"
+        },
+        {
+          "type": 7,
+          "alias": "FIREBALL",
+          "native_script_tuple": [
+            519,
+            532,
+            532,
+            532,
+            525
+          ],
+          "main_script_local": 7,
+          "main_script_global": 519,
+          "anm": "etama3.anm",
+          "texture_name": "data/etama/etama3.png",
+          "alpha_texture_name": "data/etama/etama3_a.png",
+          "sprite_local": 118,
+          "sprite_global": 630,
+          "color_count": 4,
+          "color_semantics": "initial frame offsets into one four-frame fireball animation",
+          "colors": [
+            {
+              "color": 0,
+              "sprite_local": 118,
+              "sprite_global": 630,
+              "texture_rect": [
+                1.0,
+                193.0,
+                30.0,
+                30.0
+              ],
+              "logical_render_size": [
+                30.0,
+                30.0
+              ]
+            },
+            {
+              "color": 1,
+              "sprite_local": 119,
+              "sprite_global": 631,
+              "texture_rect": [
+                33.0,
+                193.0,
+                30.0,
+                30.0
+              ],
+              "logical_render_size": [
+                30.0,
+                30.0
+              ]
+            },
+            {
+              "color": 2,
+              "sprite_local": 120,
+              "sprite_global": 632,
+              "texture_rect": [
+                65.0,
+                193.0,
+                30.0,
+                30.0
+              ],
+              "logical_render_size": [
+                30.0,
+                30.0
+              ]
+            },
+            {
+              "color": 3,
+              "sprite_local": 121,
+              "sprite_global": 633,
+              "texture_rect": [
+                97.0,
+                193.0,
+                30.0,
+                30.0
+              ],
+              "logical_render_size": [
+                30.0,
+                30.0
+              ]
+            }
+          ],
+          "animation_frames": [
+            {
+              "frame": 0,
+              "sprite_local": 118
+            },
+            {
+              "frame": 5,
+              "sprite_local": 119
+            },
+            {
+              "frame": 10,
+              "sprite_local": 120
+            },
+            {
+              "frame": 15,
+              "sprite_local": 121
+            }
+          ],
+          "auto_rotate": true,
+          "unrotated_direction": "up",
+          "graze_size_xy": [
+            11.0,
+            11.0
+          ],
+          "radius": 5.5,
+          "radius_q16_nearest": 360448,
+          "radius_scope": "default template initialized from main ANM script logical sprite height; runtime source geometry is distinct from target radius-add collision"
+        },
+        {
+          "type": 8,
+          "alias": "DAGGER",
+          "native_script_tuple": [
+            520,
+            532,
+            532,
+            532,
+            525
+          ],
+          "main_script_local": 8,
+          "main_script_global": 520,
+          "anm": "etama3.anm",
+          "texture_name": "data/etama/etama3.png",
+          "alpha_texture_name": "data/etama/etama3_a.png",
+          "sprite_local": 122,
+          "sprite_global": 634,
+          "color_count": 8,
+          "color_semantics": "consecutive source palette variants",
+          "colors": [
+            {
+              "color": 0,
+              "sprite_local": 122,
+              "sprite_global": 634,
+              "texture_rect": [
+                0.0,
+                160.0,
+                32.0,
+                32.0
+              ],
+              "logical_render_size": [
+                32.0,
+                32.0
+              ]
+            },
+            {
+              "color": 1,
+              "sprite_local": 123,
+              "sprite_global": 635,
+              "texture_rect": [
+                32.0,
+                160.0,
+                32.0,
+                32.0
+              ],
+              "logical_render_size": [
+                32.0,
+                32.0
+              ]
+            },
+            {
+              "color": 2,
+              "sprite_local": 124,
+              "sprite_global": 636,
+              "texture_rect": [
+                64.0,
+                160.0,
+                32.0,
+                32.0
+              ],
+              "logical_render_size": [
+                32.0,
+                32.0
+              ]
+            },
+            {
+              "color": 3,
+              "sprite_local": 125,
+              "sprite_global": 637,
+              "texture_rect": [
+                96.0,
+                160.0,
+                32.0,
+                32.0
+              ],
+              "logical_render_size": [
+                32.0,
+                32.0
+              ]
+            },
+            {
+              "color": 4,
+              "sprite_local": 126,
+              "sprite_global": 638,
+              "texture_rect": [
+                128.0,
+                160.0,
+                32.0,
+                32.0
+              ],
+              "logical_render_size": [
+                32.0,
+                32.0
+              ]
+            },
+            {
+              "color": 5,
+              "sprite_local": 127,
+              "sprite_global": 639,
+              "texture_rect": [
+                160.0,
+                160.0,
+                32.0,
+                32.0
+              ],
+              "logical_render_size": [
+                32.0,
+                32.0
+              ]
+            },
+            {
+              "color": 6,
+              "sprite_local": 128,
+              "sprite_global": 640,
+              "texture_rect": [
+                192.0,
+                160.0,
+                32.0,
+                32.0
+              ],
+              "logical_render_size": [
+                32.0,
+                32.0
+              ]
+            },
+            {
+              "color": 7,
+              "sprite_local": 129,
+              "sprite_global": 641,
+              "texture_rect": [
+                224.0,
+                160.0,
+                32.0,
+                32.0
+              ],
+              "logical_render_size": [
+                32.0,
+                32.0
+              ]
+            }
+          ],
+          "animation_frames": [
+            {
+              "frame": 0,
+              "sprite_local": 122
+            }
+          ],
+          "auto_rotate": true,
+          "unrotated_direction": "up",
+          "graze_size_xy": [
+            9.0,
+            9.0
+          ],
+          "radius": 4.5,
+          "radius_q16_nearest": 294912,
+          "radius_scope": "default template initialized from main ANM script logical sprite height; runtime source geometry is distinct from target radius-add collision"
+        },
+        {
+          "type": 9,
+          "alias": "BUBBLE",
+          "native_script_tuple": [
+            666,
+            668,
+            668,
+            668,
+            667
+          ],
+          "main_script_local": 0,
+          "main_script_global": 666,
+          "anm": "etama4.anm",
+          "texture_name": "data/etama/etama4.png",
+          "alpha_texture_name": "data/etama/etama4_a.png",
+          "sprite_local": 0,
+          "sprite_global": 666,
+          "color_count": 4,
+          "color_semantics": "consecutive source palette variants",
+          "colors": [
+            {
+              "color": 0,
+              "sprite_local": 0,
+              "sprite_global": 666,
+              "texture_rect": [
+                0.0,
+                0.0,
+                64.0,
+                64.0
+              ],
+              "logical_render_size": [
+                64.0,
+                64.0
+              ]
+            },
+            {
+              "color": 1,
+              "sprite_local": 1,
+              "sprite_global": 667,
+              "texture_rect": [
+                64.0,
+                0.0,
+                64.0,
+                64.0
+              ],
+              "logical_render_size": [
+                64.0,
+                64.0
+              ]
+            },
+            {
+              "color": 2,
+              "sprite_local": 2,
+              "sprite_global": 668,
+              "texture_rect": [
+                128.0,
+                0.0,
+                64.0,
+                64.0
+              ],
+              "logical_render_size": [
+                64.0,
+                64.0
+              ]
+            },
+            {
+              "color": 3,
+              "sprite_local": 3,
+              "sprite_global": 669,
+              "texture_rect": [
+                192.0,
+                0.0,
+                64.0,
+                64.0
+              ],
+              "logical_render_size": [
+                64.0,
+                64.0
+              ]
+            }
+          ],
+          "animation_frames": [
+            {
+              "frame": 0,
+              "sprite_local": 0
+            }
+          ],
+          "auto_rotate": false,
+          "unrotated_direction": null,
+          "graze_size_xy": [
+            32.0,
+            32.0
+          ],
+          "radius": 16.0,
+          "radius_q16_nearest": 1048576,
+          "radius_scope": "default template initialized from main ANM script logical sprite height; runtime source geometry is distinct from target radius-add collision"
+        }
+      ]
+    },
+    "th06nc": {
+      "sample": "/data/sunyunbo/www/renkolab/local/th06nc/th06nc.exe",
+      "exe_sha256": "07850c8c6e469c0e82c13423e6d0d096a88d693455bdacacbb44c0aa3bcce473",
+      "pe_image_base": "0x140000000",
+      "script_table_va": "0x1403de0e0",
+      "script_table_stride": 20,
+      "anm_sources": [
+        {
+          "file": "/data/sunyunbo/www/renkolab/local/th06nc/extracted/th06CM/etama3.anm",
+          "sha256": "124212fee26407b293c65f15acfc152c60fdda2be769425634f89b1cfb90219b",
+          "texture_name": "data/etama/etama3.png",
+          "alpha_texture_name": null,
+          "texture_size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "file": "/data/sunyunbo/www/renkolab/local/th06nc/extracted/th06CM/etama4.anm",
+          "sha256": "abbe774f20a324a3bbc1d945c3ffd1b366130f7fdf9be772d96a3d6a74ca94db",
+          "texture_name": "data/etama/etama4.png",
+          "alpha_texture_name": null,
+          "texture_size": [
+            512,
+            512
+          ]
+        }
+      ],
+      "texture_local_directory": "/data/sunyunbo/www/renkolab/local/th06nc/decoded/textures/png/th06CM",
+      "max_source_frame_pixels": 144,
+      "max_logical_frame_size": 64,
+      "types": [
+        {
+          "type": 0,
+          "alias": "PELLET",
+          "native_script_tuple": [
+            512,
+            526,
+            527,
+            528,
+            523
+          ],
+          "main_script_local": 0,
+          "main_script_global": 512,
+          "anm": "etama3.anm",
+          "texture_name": "data/etama/etama3.png",
+          "alpha_texture_name": null,
+          "sprite_local": 14,
+          "sprite_global": 526,
+          "color_count": 16,
+          "color_semantics": "consecutive source palette variants",
+          "colors": [
+            {
+              "color": 0,
+              "sprite_local": 14,
+              "sprite_global": 526,
+              "texture_rect": [
+                727.0,
+                254.0,
+                18.0,
+                18.0
+              ],
+              "logical_render_size": [
+                8.0,
+                8.0
+              ]
+            },
+            {
+              "color": 1,
+              "sprite_local": 15,
+              "sprite_global": 527,
+              "texture_rect": [
+                746.0,
+                254.0,
+                18.0,
+                18.0
+              ],
+              "logical_render_size": [
+                8.0,
+                8.0
+              ]
+            },
+            {
+              "color": 2,
+              "sprite_local": 16,
+              "sprite_global": 528,
+              "texture_rect": [
+                1.0,
+                258.0,
+                18.0,
+                18.0
+              ],
+              "logical_render_size": [
+                8.0,
+                8.0
+              ]
+            },
+            {
+              "color": 3,
+              "sprite_local": 17,
+              "sprite_global": 529,
+              "texture_rect": [
+                20.0,
+                258.0,
+                18.0,
+                18.0
+              ],
+              "logical_render_size": [
+                8.0,
+                8.0
+              ]
+            },
+            {
+              "color": 4,
+              "sprite_local": 18,
+              "sprite_global": 530,
+              "texture_rect": [
+                39.0,
+                258.0,
+                18.0,
+                18.0
+              ],
+              "logical_render_size": [
+                8.0,
+                8.0
+              ]
+            },
+            {
+              "color": 5,
+              "sprite_local": 19,
+              "sprite_global": 531,
+              "texture_rect": [
+                58.0,
+                258.0,
+                18.0,
+                18.0
+              ],
+              "logical_render_size": [
+                8.0,
+                8.0
+              ]
+            },
+            {
+              "color": 6,
+              "sprite_local": 20,
+              "sprite_global": 532,
+              "texture_rect": [
+                77.0,
+                258.0,
+                18.0,
+                18.0
+              ],
+              "logical_render_size": [
+                8.0,
+                8.0
+              ]
+            },
+            {
+              "color": 7,
+              "sprite_local": 21,
+              "sprite_global": 533,
+              "texture_rect": [
+                765.0,
+                259.0,
+                18.0,
+                18.0
+              ],
+              "logical_render_size": [
+                8.0,
+                8.0
+              ]
+            },
+            {
+              "color": 8,
+              "sprite_local": 22,
+              "sprite_global": 534,
+              "texture_rect": [
+                784.0,
+                259.0,
+                18.0,
+                18.0
+              ],
+              "logical_render_size": [
+                8.0,
+                8.0
+              ]
+            },
+            {
+              "color": 9,
+              "sprite_local": 23,
+              "sprite_global": 535,
+              "texture_rect": [
+                803.0,
+                259.0,
+                18.0,
+                18.0
+              ],
+              "logical_render_size": [
+                8.0,
+                8.0
+              ]
+            },
+            {
+              "color": 10,
+              "sprite_local": 24,
+              "sprite_global": 536,
+              "texture_rect": [
+                822.0,
+                259.0,
+                18.0,
+                18.0
+              ],
+              "logical_render_size": [
+                8.0,
+                8.0
+              ]
+            },
+            {
+              "color": 11,
+              "sprite_local": 25,
+              "sprite_global": 537,
+              "texture_rect": [
+                841.0,
+                259.0,
+                18.0,
+                18.0
+              ],
+              "logical_render_size": [
+                8.0,
+                8.0
+              ]
+            },
+            {
+              "color": 12,
+              "sprite_local": 26,
+              "sprite_global": 538,
+              "texture_rect": [
+                860.0,
+                259.0,
+                18.0,
+                18.0
+              ],
+              "logical_render_size": [
+                8.0,
+                8.0
+              ]
+            },
+            {
+              "color": 13,
+              "sprite_local": 27,
+              "sprite_global": 539,
+              "texture_rect": [
+                879.0,
+                259.0,
+                18.0,
+                18.0
+              ],
+              "logical_render_size": [
+                8.0,
+                8.0
+              ]
+            },
+            {
+              "color": 14,
+              "sprite_local": 28,
+              "sprite_global": 540,
+              "texture_rect": [
+                917.0,
+                259.0,
+                18.0,
+                18.0
+              ],
+              "logical_render_size": [
+                8.0,
+                8.0
+              ]
+            },
+            {
+              "color": 15,
+              "sprite_local": 29,
+              "sprite_global": 541,
+              "texture_rect": [
+                898.0,
+                259.0,
+                18.0,
+                18.0
+              ],
+              "logical_render_size": [
+                8.0,
+                8.0
+              ]
+            }
+          ],
+          "animation_frames": [
+            {
+              "frame": 0,
+              "sprite_local": 14
+            }
+          ],
+          "auto_rotate": false,
+          "unrotated_direction": null,
+          "graze_size_xy": [
+            4.0,
+            4.0
+          ],
+          "radius": 2.0,
+          "radius_q16_nearest": 131072,
+          "radius_scope": "default template initialized from main ANM script logical sprite height; runtime source geometry is distinct from target radius-add collision"
+        },
+        {
+          "type": 1,
+          "alias": "RING_BALL",
+          "native_script_tuple": [
+            513,
+            529,
+            530,
+            531,
+            524
+          ],
+          "main_script_local": 1,
+          "main_script_global": 513,
+          "anm": "etama3.anm",
+          "texture_name": "data/etama/etama3.png",
+          "alpha_texture_name": null,
+          "sprite_local": 30,
+          "sprite_global": 542,
+          "color_count": 16,
+          "color_semantics": "consecutive source palette variants",
+          "colors": [
+            {
+              "color": 0,
+              "sprite_local": 30,
+              "sprite_global": 542,
+              "texture_rect": [
+                704.0,
+                180.0,
+                36.0,
+                36.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 1,
+              "sprite_local": 31,
+              "sprite_global": 543,
+              "texture_rect": [
+                741.0,
+                180.0,
+                36.0,
+                36.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 2,
+              "sprite_local": 32,
+              "sprite_global": 544,
+              "texture_rect": [
+                1.0,
+                184.0,
+                36.0,
+                36.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 3,
+              "sprite_local": 33,
+              "sprite_global": 545,
+              "texture_rect": [
+                38.0,
+                184.0,
+                36.0,
+                36.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 4,
+              "sprite_local": 34,
+              "sprite_global": 546,
+              "texture_rect": [
+                75.0,
+                184.0,
+                36.0,
+                36.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 5,
+              "sprite_local": 35,
+              "sprite_global": 547,
+              "texture_rect": [
+                778.0,
+                185.0,
+                36.0,
+                36.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 6,
+              "sprite_local": 36,
+              "sprite_global": 548,
+              "texture_rect": [
+                815.0,
+                185.0,
+                36.0,
+                36.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 7,
+              "sprite_local": 37,
+              "sprite_global": 549,
+              "texture_rect": [
+                852.0,
+                185.0,
+                36.0,
+                36.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 8,
+              "sprite_local": 38,
+              "sprite_global": 550,
+              "texture_rect": [
+                889.0,
+                185.0,
+                36.0,
+                36.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 9,
+              "sprite_local": 39,
+              "sprite_global": 551,
+              "texture_rect": [
+                926.0,
+                185.0,
+                36.0,
+                36.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 10,
+              "sprite_local": 40,
+              "sprite_global": 552,
+              "texture_rect": [
+                112.0,
+                217.0,
+                36.0,
+                36.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 11,
+              "sprite_local": 41,
+              "sprite_global": 553,
+              "texture_rect": [
+                911.0,
+                74.0,
+                36.0,
+                36.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 12,
+              "sprite_local": 42,
+              "sprite_global": 554,
+              "texture_rect": [
+                948.0,
+                74.0,
+                36.0,
+                36.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 13,
+              "sprite_local": 43,
+              "sprite_global": 555,
+              "texture_rect": [
+                985.0,
+                74.0,
+                36.0,
+                36.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 14,
+              "sprite_local": 44,
+              "sprite_global": 556,
+              "texture_rect": [
+                837.0,
+                111.0,
+                36.0,
+                36.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 15,
+              "sprite_local": 45,
+              "sprite_global": 557,
+              "texture_rect": [
+                874.0,
+                111.0,
+                36.0,
+                36.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            }
+          ],
+          "animation_frames": [
+            {
+              "frame": 0,
+              "sprite_local": 30
+            }
+          ],
+          "auto_rotate": false,
+          "unrotated_direction": null,
+          "graze_size_xy": [
+            6.0,
+            6.0
+          ],
+          "radius": 3.0,
+          "radius_q16_nearest": 196608,
+          "radius_scope": "default template initialized from main ANM script logical sprite height; runtime source geometry is distinct from target radius-add collision"
+        },
+        {
+          "type": 2,
+          "alias": "RICE",
+          "native_script_tuple": [
+            514,
+            529,
+            530,
+            531,
+            524
+          ],
+          "main_script_local": 2,
+          "main_script_global": 514,
+          "anm": "etama3.anm",
+          "texture_name": "data/etama/etama3.png",
+          "alpha_texture_name": null,
+          "sprite_local": 46,
+          "sprite_global": 558,
+          "color_count": 16,
+          "color_semantics": "consecutive source palette variants",
+          "colors": [
+            {
+              "color": 0,
+              "sprite_local": 46,
+              "sprite_global": 558,
+              "texture_rect": [
+                611.0,
+                217.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 1,
+              "sprite_local": 47,
+              "sprite_global": 559,
+              "texture_rect": [
+                331.0,
+                254.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 2,
+              "sprite_local": 48,
+              "sprite_global": 560,
+              "texture_rect": [
+                430.0,
+                254.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 3,
+              "sprite_local": 49,
+              "sprite_global": 561,
+              "texture_rect": [
+                496.0,
+                254.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 4,
+              "sprite_local": 50,
+              "sprite_global": 562,
+              "texture_rect": [
+                908.0,
+                222.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 5,
+              "sprite_local": 51,
+              "sprite_global": 563,
+              "texture_rect": [
+                941.0,
+                222.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 6,
+              "sprite_local": 52,
+              "sprite_global": 564,
+              "texture_rect": [
+                974.0,
+                222.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 7,
+              "sprite_local": 53,
+              "sprite_global": 565,
+              "texture_rect": [
+                100.0,
+                254.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 8,
+              "sprite_local": 54,
+              "sprite_global": 566,
+              "texture_rect": [
+                133.0,
+                254.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 9,
+              "sprite_local": 55,
+              "sprite_global": 567,
+              "texture_rect": [
+                166.0,
+                254.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 10,
+              "sprite_local": 56,
+              "sprite_global": 568,
+              "texture_rect": [
+                842.0,
+                222.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 11,
+              "sprite_local": 57,
+              "sprite_global": 569,
+              "texture_rect": [
+                232.0,
+                254.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 12,
+              "sprite_local": 58,
+              "sprite_global": 570,
+              "texture_rect": [
+                265.0,
+                254.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 13,
+              "sprite_local": 59,
+              "sprite_global": 571,
+              "texture_rect": [
+                298.0,
+                254.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 14,
+              "sprite_local": 60,
+              "sprite_global": 572,
+              "texture_rect": [
+                364.0,
+                254.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 15,
+              "sprite_local": 61,
+              "sprite_global": 573,
+              "texture_rect": [
+                397.0,
+                254.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            }
+          ],
+          "animation_frames": [
+            {
+              "frame": 0,
+              "sprite_local": 46
+            }
+          ],
+          "auto_rotate": true,
+          "unrotated_direction": "up",
+          "graze_size_xy": [
+            4.0,
+            4.0
+          ],
+          "radius": 2.0,
+          "radius_q16_nearest": 131072,
+          "radius_scope": "default template initialized from main ANM script logical sprite height; runtime source geometry is distinct from target radius-add collision"
+        },
+        {
+          "type": 3,
+          "alias": "BALL",
+          "native_script_tuple": [
+            515,
+            529,
+            530,
+            531,
+            524
+          ],
+          "main_script_local": 3,
+          "main_script_global": 515,
+          "anm": "etama3.anm",
+          "texture_name": "data/etama/etama3.png",
+          "alpha_texture_name": null,
+          "sprite_local": 62,
+          "sprite_global": 574,
+          "color_count": 16,
+          "color_semantics": "consecutive source palette variants",
+          "colors": [
+            {
+              "color": 0,
+              "sprite_local": 62,
+              "sprite_global": 574,
+              "texture_rect": [
+                985.0,
+                111.0,
+                36.0,
+                36.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 1,
+              "sprite_local": 63,
+              "sprite_global": 575,
+              "texture_rect": [
+                147.0,
+                143.0,
+                36.0,
+                36.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 2,
+              "sprite_local": 64,
+              "sprite_global": 576,
+              "texture_rect": [
+                184.0,
+                143.0,
+                36.0,
+                36.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 3,
+              "sprite_local": 65,
+              "sprite_global": 577,
+              "texture_rect": [
+                739.0,
+                143.0,
+                36.0,
+                36.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 4,
+              "sprite_local": 66,
+              "sprite_global": 578,
+              "texture_rect": [
+                813.0,
+                148.0,
+                36.0,
+                36.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 5,
+              "sprite_local": 67,
+              "sprite_global": 579,
+              "texture_rect": [
+                112.0,
+                180.0,
+                36.0,
+                36.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 6,
+              "sprite_local": 68,
+              "sprite_global": 580,
+              "texture_rect": [
+                149.0,
+                180.0,
+                36.0,
+                36.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 7,
+              "sprite_local": 69,
+              "sprite_global": 581,
+              "texture_rect": [
+                186.0,
+                180.0,
+                36.0,
+                36.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 8,
+              "sprite_local": 70,
+              "sprite_global": 582,
+              "texture_rect": [
+                297.0,
+                180.0,
+                36.0,
+                36.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 9,
+              "sprite_local": 71,
+              "sprite_global": 583,
+              "texture_rect": [
+                334.0,
+                180.0,
+                36.0,
+                36.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 10,
+              "sprite_local": 72,
+              "sprite_global": 584,
+              "texture_rect": [
+                371.0,
+                180.0,
+                36.0,
+                36.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 11,
+              "sprite_local": 73,
+              "sprite_global": 585,
+              "texture_rect": [
+                408.0,
+                180.0,
+                36.0,
+                36.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 12,
+              "sprite_local": 74,
+              "sprite_global": 586,
+              "texture_rect": [
+                445.0,
+                180.0,
+                36.0,
+                36.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 13,
+              "sprite_local": 75,
+              "sprite_global": 587,
+              "texture_rect": [
+                482.0,
+                180.0,
+                36.0,
+                36.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 14,
+              "sprite_local": 76,
+              "sprite_global": 588,
+              "texture_rect": [
+                519.0,
+                180.0,
+                36.0,
+                36.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            },
+            {
+              "color": 15,
+              "sprite_local": 77,
+              "sprite_global": 589,
+              "texture_rect": [
+                556.0,
+                180.0,
+                36.0,
+                36.0
+              ],
+              "logical_render_size": [
+                16.0,
+                16.0
+              ]
+            }
+          ],
+          "animation_frames": [
+            {
+              "frame": 0,
+              "sprite_local": 62
+            }
+          ],
+          "auto_rotate": false,
+          "unrotated_direction": null,
+          "graze_size_xy": [
+            6.0,
+            6.0
+          ],
+          "radius": 3.0,
+          "radius_q16_nearest": 196608,
+          "radius_scope": "default template initialized from main ANM script logical sprite height; runtime source geometry is distinct from target radius-add collision"
+        },
+        {
+          "type": 4,
+          "alias": "KUNAI",
+          "native_script_tuple": [
+            516,
+            529,
+            530,
+            531,
+            524
+          ],
+          "main_script_local": 4,
+          "main_script_global": 516,
+          "anm": "etama3.anm",
+          "texture_name": "data/etama/etama3.png",
+          "alpha_texture_name": null,
+          "sprite_local": 78,
+          "sprite_global": 590,
+          "color_count": 16,
+          "color_semantics": "consecutive source palette variants",
+          "colors": [
+            {
+              "color": 0,
+              "sprite_local": 78,
+              "sprite_global": 590,
+              "texture_rect": [
+                199.0,
+                254.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 1,
+              "sprite_local": 79,
+              "sprite_global": 591,
+              "texture_rect": [
+                463.0,
+                254.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 2,
+              "sprite_local": 80,
+              "sprite_global": 592,
+              "texture_rect": [
+                529.0,
+                254.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 3,
+              "sprite_local": 81,
+              "sprite_global": 593,
+              "texture_rect": [
+                562.0,
+                254.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 4,
+              "sprite_local": 82,
+              "sprite_global": 594,
+              "texture_rect": [
+                595.0,
+                254.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 5,
+              "sprite_local": 83,
+              "sprite_global": 595,
+              "texture_rect": [
+                628.0,
+                254.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 6,
+              "sprite_local": 84,
+              "sprite_global": 596,
+              "texture_rect": [
+                661.0,
+                254.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 7,
+              "sprite_local": 85,
+              "sprite_global": 597,
+              "texture_rect": [
+                694.0,
+                254.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 8,
+              "sprite_local": 86,
+              "sprite_global": 598,
+              "texture_rect": [
+                479.0,
+                217.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 9,
+              "sprite_local": 87,
+              "sprite_global": 599,
+              "texture_rect": [
+                512.0,
+                217.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 10,
+              "sprite_local": 88,
+              "sprite_global": 600,
+              "texture_rect": [
+                545.0,
+                217.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 11,
+              "sprite_local": 89,
+              "sprite_global": 601,
+              "texture_rect": [
+                578.0,
+                217.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 12,
+              "sprite_local": 90,
+              "sprite_global": 602,
+              "texture_rect": [
+                644.0,
+                217.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 13,
+              "sprite_local": 91,
+              "sprite_global": 603,
+              "texture_rect": [
+                677.0,
+                217.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 14,
+              "sprite_local": 92,
+              "sprite_global": 604,
+              "texture_rect": [
+                710.0,
+                217.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 15,
+              "sprite_local": 93,
+              "sprite_global": 605,
+              "texture_rect": [
+                743.0,
+                217.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            }
+          ],
+          "animation_frames": [
+            {
+              "frame": 0,
+              "sprite_local": 78
+            }
+          ],
+          "auto_rotate": true,
+          "unrotated_direction": "up",
+          "graze_size_xy": [
+            5.0,
+            5.0
+          ],
+          "radius": 2.5,
+          "radius_q16_nearest": 163840,
+          "radius_scope": "default template initialized from main ANM script logical sprite height; runtime source geometry is distinct from target radius-add collision"
+        },
+        {
+          "type": 5,
+          "alias": "SHARD",
+          "native_script_tuple": [
+            517,
+            529,
+            530,
+            531,
+            524
+          ],
+          "main_script_local": 5,
+          "main_script_global": 517,
+          "anm": "etama3.anm",
+          "texture_name": "data/etama/etama3.png",
+          "alpha_texture_name": null,
+          "sprite_local": 94,
+          "sprite_global": 606,
+          "color_count": 16,
+          "color_semantics": "consecutive source palette variants",
+          "colors": [
+            {
+              "color": 0,
+              "sprite_local": 94,
+              "sprite_global": 606,
+              "texture_rect": [
+                1.0,
+                221.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 1,
+              "sprite_local": 95,
+              "sprite_global": 607,
+              "texture_rect": [
+                34.0,
+                221.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 2,
+              "sprite_local": 96,
+              "sprite_global": 608,
+              "texture_rect": [
+                67.0,
+                221.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 3,
+              "sprite_local": 97,
+              "sprite_global": 609,
+              "texture_rect": [
+                776.0,
+                222.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 4,
+              "sprite_local": 98,
+              "sprite_global": 610,
+              "texture_rect": [
+                809.0,
+                222.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 5,
+              "sprite_local": 99,
+              "sprite_global": 611,
+              "texture_rect": [
+                875.0,
+                222.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 6,
+              "sprite_local": 100,
+              "sprite_global": 612,
+              "texture_rect": [
+                149.0,
+                217.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 7,
+              "sprite_local": 101,
+              "sprite_global": 613,
+              "texture_rect": [
+                182.0,
+                217.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 8,
+              "sprite_local": 102,
+              "sprite_global": 614,
+              "texture_rect": [
+                215.0,
+                217.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 9,
+              "sprite_local": 103,
+              "sprite_global": 615,
+              "texture_rect": [
+                248.0,
+                217.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 10,
+              "sprite_local": 104,
+              "sprite_global": 616,
+              "texture_rect": [
+                281.0,
+                217.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 11,
+              "sprite_local": 105,
+              "sprite_global": 617,
+              "texture_rect": [
+                314.0,
+                217.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 12,
+              "sprite_local": 106,
+              "sprite_global": 618,
+              "texture_rect": [
+                347.0,
+                217.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 13,
+              "sprite_local": 107,
+              "sprite_global": 619,
+              "texture_rect": [
+                380.0,
+                217.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 14,
+              "sprite_local": 108,
+              "sprite_global": 620,
+              "texture_rect": [
+                413.0,
+                217.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            },
+            {
+              "color": 15,
+              "sprite_local": 109,
+              "sprite_global": 621,
+              "texture_rect": [
+                446.0,
+                217.0,
+                32.0,
+                36.0
+              ],
+              "logical_render_size": [
+                14.0,
+                16.0
+              ]
+            }
+          ],
+          "animation_frames": [
+            {
+              "frame": 0,
+              "sprite_local": 94
+            }
+          ],
+          "auto_rotate": true,
+          "unrotated_direction": "up",
+          "graze_size_xy": [
+            4.0,
+            4.0
+          ],
+          "radius": 2.0,
+          "radius_q16_nearest": 131072,
+          "radius_scope": "default template initialized from main ANM script logical sprite height; runtime source geometry is distinct from target radius-add collision"
+        },
+        {
+          "type": 6,
+          "alias": "BIG_BALL",
+          "native_script_tuple": [
+            518,
+            532,
+            532,
+            532,
+            525
+          ],
+          "main_script_local": 6,
+          "main_script_global": 518,
+          "anm": "etama3.anm",
+          "texture_name": "data/etama/etama3.png",
+          "alpha_texture_name": null,
+          "sprite_local": 110,
+          "sprite_global": 622,
+          "color_count": 8,
+          "color_semantics": "consecutive source palette variants",
+          "colors": [
+            {
+              "color": 0,
+              "sprite_local": 110,
+              "sprite_global": 622,
+              "texture_rect": [
+                658.0,
+                1.0,
+                72.0,
+                72.0
+              ],
+              "logical_render_size": [
+                32.0,
+                32.0
+              ]
+            },
+            {
+              "color": 1,
+              "sprite_local": 111,
+              "sprite_global": 623,
+              "texture_rect": [
+                731.0,
+                1.0,
+                72.0,
+                72.0
+              ],
+              "logical_render_size": [
+                32.0,
+                32.0
+              ]
+            },
+            {
+              "color": 2,
+              "sprite_local": 112,
+              "sprite_global": 624,
+              "texture_rect": [
+                804.0,
+                1.0,
+                72.0,
+                72.0
+              ],
+              "logical_render_size": [
+                32.0,
+                32.0
+              ]
+            },
+            {
+              "color": 3,
+              "sprite_local": 113,
+              "sprite_global": 625,
+              "texture_rect": [
+                877.0,
+                1.0,
+                72.0,
+                72.0
+              ],
+              "logical_render_size": [
+                32.0,
+                32.0
+              ]
+            },
+            {
+              "color": 4,
+              "sprite_local": 114,
+              "sprite_global": 626,
+              "texture_rect": [
+                950.0,
+                1.0,
+                72.0,
+                72.0
+              ],
+              "logical_render_size": [
+                32.0,
+                32.0
+              ]
+            },
+            {
+              "color": 5,
+              "sprite_local": 115,
+              "sprite_global": 627,
+              "texture_rect": [
+                1.0,
+                1.0,
+                72.0,
+                72.0
+              ],
+              "logical_render_size": [
+                32.0,
+                32.0
+              ]
+            },
+            {
+              "color": 6,
+              "sprite_local": 116,
+              "sprite_global": 628,
+              "texture_rect": [
+                1.0,
+                74.0,
+                72.0,
+                72.0
+              ],
+              "logical_render_size": [
+                32.0,
+                32.0
+              ]
+            },
+            {
+              "color": 7,
+              "sprite_local": 117,
+              "sprite_global": 629,
+              "texture_rect": [
+                74.0,
+                74.0,
+                72.0,
+                72.0
+              ],
+              "logical_render_size": [
+                32.0,
+                32.0
+              ]
+            }
+          ],
+          "animation_frames": [
+            {
+              "frame": 0,
+              "sprite_local": 110
+            }
+          ],
+          "auto_rotate": false,
+          "unrotated_direction": null,
+          "graze_size_xy": [
+            16.0,
+            16.0
+          ],
+          "radius": 8.0,
+          "radius_q16_nearest": 524288,
+          "radius_scope": "default template initialized from main ANM script logical sprite height; runtime source geometry is distinct from target radius-add collision"
+        },
+        {
+          "type": 7,
+          "alias": "FIREBALL",
+          "native_script_tuple": [
+            519,
+            532,
+            532,
+            532,
+            525
+          ],
+          "main_script_local": 7,
+          "main_script_global": 519,
+          "anm": "etama3.anm",
+          "texture_name": "data/etama/etama3.png",
+          "alpha_texture_name": null,
+          "sprite_local": 118,
+          "sprite_global": 630,
+          "color_count": 4,
+          "color_semantics": "initial frame offsets into one four-frame fireball animation",
+          "colors": [
+            {
+              "color": 0,
+              "sprite_local": 118,
+              "sprite_global": 630,
+              "texture_rect": [
+                561.0,
+                74.0,
+                68.0,
+                68.0
+              ],
+              "logical_render_size": [
+                30.0,
+                30.0
+              ]
+            },
+            {
+              "color": 1,
+              "sprite_local": 119,
+              "sprite_global": 631,
+              "texture_rect": [
+                630.0,
+                74.0,
+                68.0,
+                68.0
+              ],
+              "logical_render_size": [
+                30.0,
+                30.0
+              ]
+            },
+            {
+              "color": 2,
+              "sprite_local": 120,
+              "sprite_global": 632,
+              "texture_rect": [
+                768.0,
+                74.0,
+                68.0,
+                68.0
+              ],
+              "logical_render_size": [
+                30.0,
+                30.0
+              ]
+            },
+            {
+              "color": 3,
+              "sprite_local": 121,
+              "sprite_global": 633,
+              "texture_rect": [
+                147.0,
+                74.0,
+                68.0,
+                68.0
+              ],
+              "logical_render_size": [
+                30.0,
+                30.0
+              ]
+            }
+          ],
+          "animation_frames": [
+            {
+              "frame": 0,
+              "sprite_local": 118
+            },
+            {
+              "frame": 5,
+              "sprite_local": 119
+            },
+            {
+              "frame": 10,
+              "sprite_local": 120
+            },
+            {
+              "frame": 15,
+              "sprite_local": 121
+            }
+          ],
+          "auto_rotate": true,
+          "unrotated_direction": "up",
+          "graze_size_xy": [
+            11.0,
+            11.0
+          ],
+          "radius": 5.5,
+          "radius_q16_nearest": 360448,
+          "radius_scope": "default template initialized from main ANM script logical sprite height; runtime source geometry is distinct from target radius-add collision"
+        },
+        {
+          "type": 8,
+          "alias": "DAGGER",
+          "native_script_tuple": [
+            520,
+            532,
+            532,
+            532,
+            525
+          ],
+          "main_script_local": 8,
+          "main_script_global": 520,
+          "anm": "etama3.anm",
+          "texture_name": "data/etama/etama3.png",
+          "alpha_texture_name": null,
+          "sprite_local": 122,
+          "sprite_global": 634,
+          "color_count": 8,
+          "color_semantics": "consecutive source palette variants",
+          "colors": [
+            {
+              "color": 0,
+              "sprite_local": 122,
+              "sprite_global": 634,
+              "texture_rect": [
+                74.0,
+                1.0,
+                72.0,
+                72.0
+              ],
+              "logical_render_size": [
+                32.0,
+                32.0
+              ]
+            },
+            {
+              "color": 1,
+              "sprite_local": 123,
+              "sprite_global": 635,
+              "texture_rect": [
+                147.0,
+                1.0,
+                72.0,
+                72.0
+              ],
+              "logical_render_size": [
+                32.0,
+                32.0
+              ]
+            },
+            {
+              "color": 2,
+              "sprite_local": 124,
+              "sprite_global": 636,
+              "texture_rect": [
+                220.0,
+                1.0,
+                72.0,
+                72.0
+              ],
+              "logical_render_size": [
+                32.0,
+                32.0
+              ]
+            },
+            {
+              "color": 3,
+              "sprite_local": 125,
+              "sprite_global": 637,
+              "texture_rect": [
+                293.0,
+                1.0,
+                72.0,
+                72.0
+              ],
+              "logical_render_size": [
+                32.0,
+                32.0
+              ]
+            },
+            {
+              "color": 4,
+              "sprite_local": 126,
+              "sprite_global": 638,
+              "texture_rect": [
+                366.0,
+                1.0,
+                72.0,
+                72.0
+              ],
+              "logical_render_size": [
+                32.0,
+                32.0
+              ]
+            },
+            {
+              "color": 5,
+              "sprite_local": 127,
+              "sprite_global": 639,
+              "texture_rect": [
+                439.0,
+                1.0,
+                72.0,
+                72.0
+              ],
+              "logical_render_size": [
+                32.0,
+                32.0
+              ]
+            },
+            {
+              "color": 6,
+              "sprite_local": 128,
+              "sprite_global": 640,
+              "texture_rect": [
+                512.0,
+                1.0,
+                72.0,
+                72.0
+              ],
+              "logical_render_size": [
+                32.0,
+                32.0
+              ]
+            },
+            {
+              "color": 7,
+              "sprite_local": 129,
+              "sprite_global": 641,
+              "texture_rect": [
+                585.0,
+                1.0,
+                72.0,
+                72.0
+              ],
+              "logical_render_size": [
+                32.0,
+                32.0
+              ]
+            }
+          ],
+          "animation_frames": [
+            {
+              "frame": 0,
+              "sprite_local": 122
+            }
+          ],
+          "auto_rotate": true,
+          "unrotated_direction": "up",
+          "graze_size_xy": [
+            9.0,
+            9.0
+          ],
+          "radius": 4.5,
+          "radius_q16_nearest": 294912,
+          "radius_scope": "default template initialized from main ANM script logical sprite height; runtime source geometry is distinct from target radius-add collision"
+        },
+        {
+          "type": 9,
+          "alias": "BUBBLE",
+          "native_script_tuple": [
+            698,
+            700,
+            700,
+            700,
+            699
+          ],
+          "main_script_local": 0,
+          "main_script_global": 698,
+          "anm": "etama4.anm",
+          "texture_name": "data/etama/etama4.png",
+          "alpha_texture_name": null,
+          "sprite_local": 0,
+          "sprite_global": 698,
+          "color_count": 4,
+          "color_semantics": "consecutive source palette variants",
+          "colors": [
+            {
+              "color": 0,
+              "sprite_local": 0,
+              "sprite_global": 698,
+              "texture_rect": [
+                1.0,
+                1.0,
+                144.0,
+                144.0
+              ],
+              "logical_render_size": [
+                64.0,
+                64.0
+              ]
+            },
+            {
+              "color": 1,
+              "sprite_local": 1,
+              "sprite_global": 699,
+              "texture_rect": [
+                146.0,
+                1.0,
+                144.0,
+                144.0
+              ],
+              "logical_render_size": [
+                64.0,
+                64.0
+              ]
+            },
+            {
+              "color": 2,
+              "sprite_local": 2,
+              "sprite_global": 700,
+              "texture_rect": [
+                291.0,
+                1.0,
+                144.0,
+                144.0
+              ],
+              "logical_render_size": [
+                64.0,
+                64.0
+              ]
+            },
+            {
+              "color": 3,
+              "sprite_local": 3,
+              "sprite_global": 701,
+              "texture_rect": [
+                1.0,
+                146.0,
+                144.0,
+                144.0
+              ],
+              "logical_render_size": [
+                64.0,
+                64.0
+              ]
+            }
+          ],
+          "animation_frames": [
+            {
+              "frame": 0,
+              "sprite_local": 0
+            }
+          ],
+          "auto_rotate": false,
+          "unrotated_direction": null,
+          "graze_size_xy": [
+            32.0,
+            32.0
+          ],
+          "radius": 16.0,
+          "radius_q16_nearest": 1048576,
+          "radius_scope": "default template initialized from main ANM script logical sprite height; runtime source geometry is distinct from target radius-add collision"
+        }
+      ]
+    }
+  },
+  "evidence": {
+    "classic": {
+      "init": "th06.v1.02h/state/data/functions.jsonl:00416d60 BulletManager__on_registration; main script table 0x46a6e8; template grazeSize at +0x550/+0x554",
+      "cc0_source": "local/vendor/th06-decomp/src/BulletManager.cpp:1350-1430 init; :284-287 color offset; :1306-1308 autoRotate=pi/2-angle",
+      "collision": "Classic native player collision is axis-aligned box overlap; radius stores the scalar half-size for the target circle model, not full geometry equivalence.",
+      "archive": "/data/sunyunbo/www/renkolab/local/th06.v1.02h/th06_CM.DAT",
+      "archive_sha256": "a899853d04e214ae4df8090bad7fd42698527027aa9dfccb4650fbb1d7828a0a",
+      "alpha": "Both classic *_a.png masks are RGB with equal R/G/B channels and extrema 0..255; use one channel as the alpha mask."
+    },
+    "nc": {
+      "exports": "/data/sunyunbo/www/renkolab/local/th06nc/state/data/functions.jsonl",
+      "exports_sha256": "cc39f8c525af0997a63457cc921437d1f60de8f1c5202dd8605b79243c414418",
+      "load_anm": "0x1400020b0 AnmManager__LoadAnm",
+      "set_active_sprite": "0x140002980: vm+0x100 = anmManager+0x608+spriteIndex*0x40",
+      "sprite_fields": {
+        "sprite_base_in_anm_manager": "0x608 + spriteIndex*0x40",
+        "pixel_height": {
+          "manager_offset": "0x61c",
+          "sprite_relative_offset": "0x14"
+        },
+        "pixel_width": {
+          "manager_offset": "0x620",
+          "sprite_relative_offset": "0x18"
+        },
+        "logical_height": {
+          "manager_offset": "0x624",
+          "sprite_relative_offset": "0x1c"
+        },
+        "logical_width": {
+          "manager_offset": "0x628",
+          "sprite_relative_offset": "0x20"
+        }
+      },
+      "logical_dimension_source": "NC ANM sprite record +0x14/+0x18 override logical width/height. A zero override uses f32(pixel_extent*480/1080).",
+      "init": "0x140011f80: plVar3 starts at bulletManager+0xff710; plVar3[2] is vm+0x100; 0x14001223e MOVSS XMM0,[RCX+0x1c] reads logical height. grazeSize is written at bulletManager+type*0x5b0+0xffbc4/+0xffbc8.",
+      "spawn": "0x14000f870 copies template grazeSize to bullet+0x5f4/+0x5f8 before applying source palette sprite offset.",
+      "consumer": "0x140010870 passes bullet+0x5f4 to 0x14006a980 Player__CalcKillBoxCollision with mode=1; bullet circle radius=min(grazeSize.x,grazeSize.y)/2, native player radius=1.25.",
+      "correction": "The early investigation mislabeled Sprite+0x1c as pixel height by overlooking the Sprite base at manager+0x608. Absolute offsets and SetActiveSprite resolve it: +0x1c is logical height. NC radii match classic; enlarged texture rectangles do not enlarge collision."
+    },
+    "palette_scope": "Counts describe consecutive source sprite slots belonging to each shape. Spawn directly adds signed color to base sprite, without bounds validation; slots beyond the group are not promoted to valid colors. FIREBALL slots 118..121 are frames of one red animation, not four independent hues; shipped NC ECL uses initial offsets 0 and 1. Native script overwrites sprite every five frames.",
+    "rotation_scope": "Directional sprite scripts set autoRotate=1. Classic draw uses pi/2-angle; first-frame rice/kunai/shard/dagger point up in the source art. Fireball also auto-rotates but has a soft flame outline.",
+    "not_verified": [
+      "No native game execution or dynamic collision probe.",
+      "No external mod/asset override directory was inspected.",
+      "Birth slowdown and no-hit windows are intentionally outside this radius/source-frame catalog."
+    ]
+  },
+  "reproduce": {
+    "command": "python transcribe/work/th06nc-bullet-catalog-20261105/audit.py --check",
+    "requirements": "Existing local source archives/exe/exports plus six classic etama3/etama4 .anm/.png/*_a.png files extracted by existing thdat. Uses existing tooling/pe_read.py with explicit PE32/PE32+ image-base read; does not modify that shared tool.",
+    "summary": {
+      "classic_radius": [
+        2.0,
+        3.0,
+        2.0,
+        3.0,
+        2.5,
+        2.0,
+        8.0,
+        5.5,
+        4.5,
+        16.0
+      ],
+      "nc_radius": [
+        2.0,
+        3.0,
+        2.0,
+        3.0,
+        2.5,
+        2.0,
+        8.0,
+        5.5,
+        4.5,
+        16.0
+      ],
+      "palette_slots_per_game": 120,
+      "distinct_palette_hues_note": "Includes four fireball initial-frame aliases."
+    }
+  }
+}

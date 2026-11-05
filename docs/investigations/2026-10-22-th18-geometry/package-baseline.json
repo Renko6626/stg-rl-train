@@ -1,0 +1,12 @@
+{
+  "package": "th18-ai-probe-20261022-r3.zip",
+  "sha256": "f109e39a7dea898c59e343c6e46a6f54d717c3f774ec53c4ad78d64da7a59186",
+  "dll_sha256": "06d874ef8c2edd8db1fd16dd90921ad370eeb2073a5b80ee4956221eb1710aff",
+  "sources": {
+    "mods/th18.v1.00a/autoplay/native/th18_extract.c": "57db21b564c622252a636c86b3d8a24470fa7a3e6b097f10f89050c4bbdc1947",
+    "mods/th18.v1.00a/autoplay/native/th18_extract.h": "976165fafe3b7fb17a77d6f315afe08d2633cc5ff50399af621b12cd5e191883",
+    "mods/_shared/stg-ai/native/plugin.c": "1afbcf9ca2fcb9002afc3557aca7f94cf031923e07eff9953b9a054b0265b796",
+    "mods/th06nc/autoplay/native/policy_model.c": "7ce18c16db4b0db2c1fd95e7691755d90ffc04f9846a9ad070f22f5ae31d8801"
+  },
+  "model_sha256": "e47016c892fc7b0a9667b959d6e06ee10bff4261ea805022b7b8f4e04b7bc7f1"
+}

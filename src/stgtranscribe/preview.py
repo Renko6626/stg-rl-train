@@ -1,7 +1,7 @@
 """弹幕预览出图：用 release harness 的 `run --at F` 取帧，按真弹图集画成 PNG 拼图 / GIF。
 
     python -m stgtranscribe.preview                          # cards/ 全部卡 × 卡内全部档，每档一张 8 帧拼图
-    python -m stgtranscribe.preview cards/th06_s3_w12 --ranks 2-3 --gif
+    python -m stgtranscribe.preview cards/th06/th06_s3_w12 --ranks 2-3 --gif
     python -m stgtranscribe.preview --serve                  # 起静态页（127.0.0.1:8612），ssh -L 转发后浏览
 
 产物在 transcribe/work/preview/（gitignore；图集来自原作弹片，别提交）：
@@ -15,6 +15,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import math
 import os
 import re
@@ -31,7 +32,7 @@ from . import config
 
 FIELD_W, FIELD_H, HEADER_H = 384, 448, 18
 HALF_W = FIELD_W // 2
-CELL, ATLAS_COLS, ATLAS_ROWS = 16, 16, 12
+CELL, ATLAS_COLS = 64, 16
 PLAYER_XY = (0.0, 384.0)
 RANK_NAMES = "ENHLX"
 BG = (8, 8, 16)
@@ -192,11 +193,26 @@ def pick_frames(end: int, peak: int, n: int, start: int = 1) -> list[int]:
 
 # ── 图集 ─────────────────────────────────────────────────────────────────────
 
-def cell_box(sprite: int) -> tuple[int, int, int, int]:
-    """sprite 号 = 格号（行优先），越界回卷（同 godot/shaders/layer.gdshader）。"""
-    s = sprite % (ATLAS_COLS * ATLAS_ROWS)
-    col, row = s % ATLAS_COLS, s // ATLAS_COLS
-    return (col * CELL, row * CELL, (col + 1) * CELL, (row + 1) * CELL)
+def atlas_layout() -> dict:
+    path = config.engine_dir() / "godot/assets/bullet/atlas-layout.json"
+    return json.loads(path.read_text()) if path.exists() else {}
+
+
+def appearance_sprites() -> list[int]:
+    """RL keeps logical appearances; renderers consume physical atlas cells."""
+    return [row["sprite"] for row in atlas_layout().get("appearances", [])]
+
+
+def physical_sprite(appearance: int, sprites: list[int]) -> int:
+    return sprites[appearance] if 0 <= appearance < len(sprites) else appearance
+
+
+def cell_box(sprite: int, *, cell: int = CELL, cols: int = ATLAS_COLS,
+             rows: int | None = None) -> tuple[int, int, int, int]:
+    """Physical cell in row-major order; optional bounds wrap like the Godot shader."""
+    s = sprite % (cols * rows) if rows is not None else sprite
+    col, row = s % cols, s // cols
+    return (col * cell, row * cell, (col + 1) * cell, (row + 1) * cell)
 
 
 def pil_rotation(deg: float) -> float:
@@ -264,6 +280,10 @@ def draw_lasers(im: Image.Image, lasers) -> Image.Image:
 class Renderer:
     def __init__(self):
         self.atlas = Image.open(atlas_path()).convert("RGBA")
+        layout = atlas_layout()
+        self.cell = int(layout.get("cell_size", 16))
+        self.cols = int(layout.get("columns", self.atlas.width // self.cell))
+        self.rows = int(layout.get("rows", self.atlas.height // self.cell))
         pp = player_path()
         self.player = Image.open(pp).convert("RGBA") if pp.exists() else None
         self._rot: dict[tuple[int, int], Image.Image] = {}
@@ -273,7 +293,7 @@ class Renderer:
         key = (sprite, step)
         img = self._rot.get(key)
         if img is None:
-            cell = self.atlas.crop(cell_box(sprite))
+            cell = self.atlas.crop(cell_box(sprite, cell=self.cell, cols=self.cols, rows=self.rows))
             img = cell.rotate(pil_rotation(step * 360.0 / ROT_STEPS), resample=Image.BICUBIC, expand=True)
             self._rot[key] = img
         return img
@@ -361,13 +381,8 @@ def render_card(card: Path, rank: int, out_dir: Path = OUT_DIR, n_frames: int = 
 # ── 批量与静态页 ────────────────────────────────────────────────────────────
 
 def find_cards(paths: list[Path]) -> list[Path]:
-    found = []
-    for p in paths:
-        if (p / "main.ecl").exists():
-            found.append(p)
-        elif p.is_dir():
-            found += sorted(d for d in p.iterdir() if (d / "main.ecl").exists())
-    return found
+    from stgtrain.cards import discover
+    return [card.path for card in discover(paths).values()]
 
 
 def _ranks(spec: str) -> list[int]:
@@ -384,9 +399,11 @@ def _job(args: tuple) -> tuple[str, int, dict | str]:
 
 
 def write_index(out_dir: Path) -> Path:
+    from stgtrain.cards import discover
+    cards = discover(config.CARDS_DIR, include_disabled=True)
     rows = []
     for d in sorted(p for p in out_dir.iterdir() if p.is_dir()):
-        title = card_meta(config.CARDS_DIR / d.name).get("title", "")
+        title = cards[d.name].meta.get("title", "") if d.name in cards else ""
         rows.append(f"<h2>{d.name} <small>{title}</small></h2>")
         for sheet in sorted(d.glob("sheet_r*.png")):
             rank = sheet.stem.removeprefix("sheet_r")

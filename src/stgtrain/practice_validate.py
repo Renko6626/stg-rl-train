@@ -10,7 +10,7 @@ from pathlib import Path
 
 import stg_rl
 
-from .cards import discover, load_splits, source_ranges_overlap
+from .cards import discover, load_splits, source_ranges_overlap, synthetic_cards
 
 DIAGNOSTICS = ('task_faults', 'contract_viol', 'pool_full', 'hits_ovf', 'events_ovf', 'reqs_dropped')
 
@@ -136,11 +136,11 @@ def frame_errors(expected: dict, rows: list[dict], maximum: int) -> list[str]:
     return errors
 
 
-def validate(card_dir: Path, *, originals: Path = Path('cards'), splits: Path = Path('eval/splits-laser.toml'),
+def validate(card_dir: Path, *, originals: Path = Path('cards/th06'), splits: Path = Path('eval/splits-laser.toml'),
              harness: Path = Path('/data/sunyunbo/www/stg-engine/target/release/stg-harness'),
              seeds: tuple[int, ...] = (1, 7)) -> dict:
     from stgtranscribe.preview import parse_at
-    card = discover(card_dir.parent)[card_dir.name]
+    card = discover(card_dir, include_disabled=True)[card_dir.name]
     meta = card.meta
     try:
         machine_spec = strict_json_loads((card_dir / 'machine-spec.json').read_text())
@@ -309,9 +309,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('card', type=Path)
     parser.add_argument('--json', required=True, type=Path)
-    parser.add_argument('--all', action='store_true', help='逐卡验收目录下全部合成卡，--json指定报告目录')
+    parser.add_argument('--all', action='store_true', help='验收目录中启用的底子变体，--json指定报告目录')
     args = parser.parse_args()
-    paths = [card.path for card in discover(args.card).values()] if args.all else [args.card]
+    paths = [card.path for card in synthetic_cards(args.card, 'overlay').values()] if args.all else [args.card]
     if not paths:
         raise SystemExit('没有待验收卡')
     all_ok = True

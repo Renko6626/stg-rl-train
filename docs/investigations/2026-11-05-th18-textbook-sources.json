@@ -1,0 +1,590 @@
+{
+  "date": "2026-11-05",
+  "purpose": "Source collection and proposed textbook structure only; no TH18 mapping manuscript, pipeline or engine implementation",
+  "access": {
+    "search_and_github_connector": "connection failed",
+    "fallback": "urllib HTTPS for public primary sources plus existing local Git checkouts and project Ghidra exports",
+    "new_ghidra_session": false
+  },
+  "repositories": {
+    "priw8-site": {
+      "repository": "Priw8/priw8.github.io",
+      "observed_remote_head": "1c0276927ec203f7adfafca01ec157dba52c35a7",
+      "url": "https://github.com/Priw8/priw8.github.io/commit/1c0276927ec203f7adfafca01ec157dba52c35a7"
+    },
+    "eclmap": {
+      "repository": "Priw8/eclmap",
+      "observed_remote_head": "f146162e330c27d1b0a8880c3a41884615147a11",
+      "url": "https://github.com/Priw8/eclmap/commit/f146162e330c27d1b0a8880c3a41884615147a11",
+      "local_head": "f146162e330c27d1b0a8880c3a41884615147a11",
+      "local_matches_remote_head": true
+    },
+    "thtk": {
+      "repository": "thpatch/thtk",
+      "observed_remote_head": "917a3d3858850f01276b7fb5b9327e2c24d27d5b",
+      "url": "https://github.com/thpatch/thtk/commit/917a3d3858850f01276b7fb5b9327e2c24d27d5b",
+      "local_head": "892114a0fcaa0bbdaaecf3cb4ad56f758683fb40",
+      "local_matches_remote_head": false
+    },
+    "th-re-data": {
+      "repository": "exphp-share/th-re-data",
+      "observed_remote_head": "41cd633354f3bbc4ff11b3d315ef7243c990f227",
+      "url": "https://github.com/exphp-share/th-re-data/commit/41cd633354f3bbc4ff11b3d315ef7243c990f227",
+      "local_head": "824c621641c5b7d699f2cde1859e0139394c374c",
+      "local_matches_remote_head": false
+    },
+    "truth": {
+      "repository": "ExpHP/truth",
+      "observed_remote_head": "61ea9895a42a1ccedca36dd9db091a6af63d509f",
+      "url": "https://github.com/ExpHP/truth/commit/61ea9895a42a1ccedca36dd9db091a6af63d509f",
+      "local_head": "61ea9895a42a1ccedca36dd9db091a6af63d509f",
+      "local_matches_remote_head": true
+    },
+    "thpages": {
+      "repository": "ExpHP/thpages",
+      "observed_remote_head": "effc37824ff4373b8251bedcc516b08bd9d452d7",
+      "url": "https://github.com/ExpHP/thpages/commit/effc37824ff4373b8251bedcc516b08bd9d452d7",
+      "local_head": "effc37824ff4373b8251bedcc516b08bd9d452d7",
+      "local_matches_remote_head": true
+    }
+  },
+  "published_downloads": [
+    {
+      "file": "priw-site-tree.json",
+      "url": "https://api.github.com/repos/Priw8/priw8.github.io/git/trees/master?recursive=1",
+      "bytes": 28838,
+      "sha256": "d0fc006bf562f2b2d7236f9c8b09c4728068540aacf34ffff0bd220deab0615d",
+      "ok": true
+    },
+    {
+      "file": "priw-index.js",
+      "url": "https://priw8.github.io/js/index.js",
+      "bytes": 5669,
+      "sha256": "2c5dd7c73d1a0d0a38861f7d1d3f80b461b8b253654caf68b2ec826ff269bcf7",
+      "ok": true
+    },
+    {
+      "file": "priw-home.md",
+      "url": "https://priw8.github.io/content/index.md",
+      "bytes": 295,
+      "sha256": "ccb4a0034483bbffeada65c986d1feb08db86489f106acc98d4d2da228afe60d",
+      "ok": true
+    },
+    {
+      "file": "priw-ins.md",
+      "url": "https://priw8.github.io/content/modding/ins.md",
+      "bytes": 3264,
+      "sha256": "a7aab74ca909a1d7169c807a4703a43249c7b7f7dcdaa1196332adbb8b8824f6",
+      "ok": true
+    },
+    {
+      "file": "priw-vars.md",
+      "url": "https://priw8.github.io/content/modding/vars.md",
+      "bytes": 3066,
+      "sha256": "328b19d4f9f88ba298c7bd413ed3a842bf9021961397ee1f8977076792252d87",
+      "ok": true
+    },
+    {
+      "file": "exphp-thpages.json",
+      "url": "https://api.github.com/repos/ExpHP/thpages",
+      "bytes": 4954,
+      "sha256": "6ee161c4f029cf2a5cd0915d95d9c1e9229e334d282f804d550560e757c2e008",
+      "ok": true
+    },
+    {
+      "file": "exphp-truth.json",
+      "url": "https://api.github.com/repos/ExpHP/truth",
+      "bytes": 4877,
+      "sha256": "50350d7ac52c15e87de58ef52966d7775b2919d509ae432f017ed9cf80c80fd7",
+      "ok": true
+    },
+    {
+      "file": "th-re-data.json",
+      "url": "https://api.github.com/repos/exphp-share/th-re-data",
+      "bytes": 6295,
+      "sha256": "f3035cd98f7a9564c32943b40396e1962465b33e0ee650b9167502a8c2b14553",
+      "ok": true
+    },
+    {
+      "file": "priw-tutorial-0.md",
+      "url": "https://priw8.github.io/content/ecl-tutorial/0.md",
+      "bytes": 2732,
+      "sha256": "f44c6ef2b0c86eeaaf93632e8444b189de45a50beaafca3d65e4b69badfce695",
+      "ok": true
+    },
+    {
+      "file": "priw-tutorial-1.md",
+      "url": "https://priw8.github.io/content/ecl-tutorial/1.md",
+      "bytes": 5762,
+      "sha256": "0d06eb7317aa186cb0e25fc848c82f439097893d7411064f5c6a0179f6c15cb2",
+      "ok": true
+    },
+    {
+      "file": "priw-tutorial-2.md",
+      "url": "https://priw8.github.io/content/ecl-tutorial/2.md",
+      "bytes": 11864,
+      "sha256": "be7ac905ac0bab734c201df0a4e2853a8da50b42c0304cf943f8525345a4815d",
+      "ok": true
+    },
+    {
+      "file": "priw-tutorial-3.md",
+      "url": "https://priw8.github.io/content/ecl-tutorial/3.md",
+      "bytes": 8800,
+      "sha256": "b3114e558c54f130015f20c2fdf8346d53d0c13c7ad6bfa2eeec14a3d271b249",
+      "ok": true
+    },
+    {
+      "file": "priw-tutorial-3b.md",
+      "url": "https://priw8.github.io/content/ecl-tutorial/3b.md",
+      "bytes": 1851,
+      "sha256": "7a76995376f872c0ae73b7eba447ef2b575cbeceac00f1288a9b2e3e8fc196de",
+      "ok": true
+    },
+    {
+      "file": "priw-tutorial-4.md",
+      "url": "https://priw8.github.io/content/ecl-tutorial/4.md",
+      "bytes": 15751,
+      "sha256": "8d8d3c495d5b82efee623f9c067f2da55813c2714318b2e50ef6b826f40f5aae",
+      "ok": true
+    },
+    {
+      "file": "priw-tutorial-5.md",
+      "url": "https://priw8.github.io/content/ecl-tutorial/5.md",
+      "bytes": 8287,
+      "sha256": "4e96ed6e0bf6c5120f58c3e16345b3fc173e3739c4c86aaaba9333c36a7abe9d",
+      "ok": true
+    },
+    {
+      "file": "priw-tutorial-6.md",
+      "url": "https://priw8.github.io/content/ecl-tutorial/6.md",
+      "bytes": 8948,
+      "sha256": "74ef9df608aaddee611528833628aaca1ea36ecbdf8f1c80b82ef0548d7ea107",
+      "ok": true
+    },
+    {
+      "file": "priw-tutorial-7.md",
+      "url": "https://priw8.github.io/content/ecl-tutorial/7.md",
+      "bytes": 6734,
+      "sha256": "e6bf8444a8e1273450b843c5a5bebadbde8e0c3e5ee6aaa96569e653f7e7534c",
+      "ok": true
+    },
+    {
+      "file": "priw-tutorial-8.md",
+      "url": "https://priw8.github.io/content/ecl-tutorial/8.md",
+      "bytes": 10993,
+      "sha256": "ee766ba3604362c74832fd82e5e2c11a893c98c7a9971956c7a8db22fe723c85",
+      "ok": true
+    },
+    {
+      "file": "priw-tutorial-9.md",
+      "url": "https://priw8.github.io/content/ecl-tutorial/9.md",
+      "bytes": 2634,
+      "sha256": "8cad3ae1f53a8ada159675c6ebf00b83bd518dc9c945a6deb9bdbd33619ecbe1",
+      "ok": true
+    },
+    {
+      "file": "priw-tutorial-10.md",
+      "url": "https://priw8.github.io/content/ecl-tutorial/10.md",
+      "bytes": 5479,
+      "sha256": "7d05d516f06ec71af006f03975c66e725d4748dca32642b16e6433fe0279e8c0",
+      "ok": true
+    },
+    {
+      "file": "priw-tutorial-11.md",
+      "url": "https://priw8.github.io/content/ecl-tutorial/11.md",
+      "bytes": 3488,
+      "sha256": "89ee7bbe3b1fac88872990b1729c1708d9ca40fc47a296394f1956326af81257",
+      "ok": true
+    },
+    {
+      "file": "priw-tutorial-12.md",
+      "url": "https://priw8.github.io/content/ecl-tutorial/12.md",
+      "bytes": 9697,
+      "sha256": "53d19d995ffdba7ca8c6b4da915ec7c848bad8554acd37604cb4fbfd7a88f9cd",
+      "ok": true
+    },
+    {
+      "file": "priw-tutorial-13.md",
+      "url": "https://priw8.github.io/content/ecl-tutorial/13.md",
+      "bytes": 3619,
+      "sha256": "252c14e007c35e4a9fa5fe6ab1939ce2970167817365b27b1b9bc5ab43604da6",
+      "ok": true
+    },
+    {
+      "file": "priw-transforms.md",
+      "url": "https://priw8.github.io/content/modding/transforms.md",
+      "bytes": 4066,
+      "sha256": "b2a9017a78f05c8f181cd768b407848f87d1286f8930b6a1bc64e23525ba4666",
+      "ok": true
+    },
+    {
+      "file": "priw-ins.js",
+      "url": "https://priw8.github.io/js/ecl/ins.js",
+      "bytes": 162754,
+      "sha256": "207b59f83a33412dc52c239d5765ce82947e4ff7aa1447c06b791a4ccd87b0b5",
+      "ok": true
+    },
+    {
+      "file": "priw-vars.js",
+      "url": "https://priw8.github.io/js/ecl/vars.js",
+      "bytes": 44632,
+      "sha256": "21da50d9e8d1f3eac7d5528edcffbf2c6408a6e5847422a4b7d30da204916891",
+      "ok": true
+    },
+    {
+      "file": "priw-main.js",
+      "url": "https://priw8.github.io/js/ecl/main.js",
+      "bytes": 10389,
+      "sha256": "2ebba47e4c80b161e057fcf3ff3f176d26f65fb4dce949a6c4c00795701693a3",
+      "ok": true
+    },
+    {
+      "file": "truth-current-readme.md",
+      "url": "https://raw.githubusercontent.com/ExpHP/truth/main/README.md",
+      "bytes": 7094,
+      "sha256": "92d3d48a8b758923077b6029f153253fb1d29bce3bee989c115bfb722f691140",
+      "ok": true
+    },
+    {
+      "file": "thpages-current-index.md",
+      "url": "https://raw.githubusercontent.com/ExpHP/thpages/master/static/content/index.md",
+      "bytes": 2174,
+      "sha256": "c10ba51aabe4323c0c7ee727f76fc356c8e3aa1b6fa3312533903bc93c3f52a5",
+      "ok": true
+    },
+    {
+      "file": "th18-current.eclm",
+      "url": "https://raw.githubusercontent.com/Priw8/eclmap/master/eclmap/th18.eclm",
+      "bytes": 6407,
+      "sha256": "c81b39767f4024cbb7989dfda1a6461b0a90962e87718118da2e121df4413195",
+      "ok": true
+    },
+    {
+      "file": "priw-head.json",
+      "url": "https://api.github.com/repos/Priw8/priw8.github.io/commits/master",
+      "bytes": 16815,
+      "sha256": "f7f1fbece41b92ae73e87fe04b3f120165290df63097039accd2116563a62da3",
+      "ok": true
+    },
+    {
+      "file": "merlin-root.json",
+      "url": "https://api.github.com/repos/Priw8/merlin/contents",
+      "bytes": 3382,
+      "sha256": "382aaf09c4da501d7d2840a48416d813fd6a07442ce9703fdaad90c7fdb572e9",
+      "ok": true
+    },
+    {
+      "file": "priw-eclmap-head.json",
+      "url": "https://api.github.com/repos/Priw8/eclmap/commits/master",
+      "bytes": 19172,
+      "sha256": "513e4de9142764c1802a6002f8f3a435be821babab65dbd2cb40294516f75119",
+      "ok": true
+    },
+    {
+      "file": "thtk-head.json",
+      "url": "https://api.github.com/repos/thpatch/thtk/commits/master",
+      "bytes": 4378,
+      "sha256": "5e3c4fd9adf4e1e8c58ecf622ce096e4969a6b092ed3d01bfae73b5fcedcf2ec",
+      "ok": true
+    },
+    {
+      "file": "th-re-data-head.json",
+      "url": "https://api.github.com/repos/exphp-share/th-re-data/commits/master",
+      "bytes": 5368,
+      "sha256": "ebd443fe71a03c57b336adace5acd331679a04abc2e77a9253978e3de2b48c76",
+      "ok": true
+    },
+    {
+      "file": "truth-head.json",
+      "url": "https://api.github.com/repos/ExpHP/truth/commits/main",
+      "bytes": 4727,
+      "sha256": "5e8a9687c24b6146f6ce373540155e59a6214da4564c4d2f8bb84db6dc1dfd51",
+      "ok": true
+    },
+    {
+      "file": "thpages-head.json",
+      "url": "https://api.github.com/repos/ExpHP/thpages/commits/master",
+      "bytes": 41484,
+      "sha256": "ed72e1054869395226d31cb3b76e4cc47f169021c9cd021571aad22f0c0c0a5d",
+      "ok": true
+    },
+    {
+      "file": "merlin-readme.md",
+      "url": "https://raw.githubusercontent.com/Priw8/merlin/master/README.md",
+      "bytes": 3161,
+      "sha256": "307a8756fbf20958147a29a4d8ba6c70239bbc5d49ca0de01a12d5494d127529",
+      "ok": true
+    },
+    {
+      "file": "merlin-tree.json",
+      "url": "https://api.github.com/repos/Priw8/merlin/git/trees/master?recursive=1",
+      "bytes": 27987,
+      "sha256": "3ac9b4117936934e5ba69b2d655ace3d4c237e4b2693d7e073e81fdb98f38e3c",
+      "ok": true
+    },
+    {
+      "file": "th-re-data-current-readme.md",
+      "url": "https://raw.githubusercontent.com/exphp-share/th-re-data/master/README.md",
+      "bytes": 5837,
+      "sha256": "f7bdebdaed50cd7fb1c9fed2423c73a8472e7c34db83eb0bf5425bec6057ffbf",
+      "ok": true
+    },
+    {
+      "file": "thtk-current-man.txt",
+      "url": "https://raw.githubusercontent.com/thpatch/thtk/917a3d3858850f01276b7fb5b9327e2c24d27d5b/thecl/thecl.1",
+      "bytes": 4408,
+      "sha256": "f2b838f8447a8d6980fb35af2cfca2b2021fb1b424b87ffb993720629deb572d",
+      "ok": true
+    }
+  ],
+  "raw_download_directory": "transcribe/work/th18-doc-sources-20261105/",
+  "tutorial_pages": [
+    {
+      "file": "content/ecl-tutorial/0.md",
+      "headings": [
+        "# The ECL tutorial",
+        "### Chapter 1 - the basics",
+        "### Chapter 2 - going a bit deeper"
+      ],
+      "sha256": "f44c6ef2b0c86eeaaf93632e8444b189de45a50beaafca3d65e4b69badfce695"
+    },
+    {
+      "file": "content/ecl-tutorial/1.md",
+      "headings": [
+        "## Setting up the environment",
+        "### Setting up a local thcrap repo - the simplified guide",
+        "## thecl",
+        "### actually using thecl"
+      ],
+      "sha256": "0d06eb7317aa186cb0e25fc848c82f439097893d7411064f5c6a0179f6c15cb2"
+    },
+    {
+      "file": "content/ecl-tutorial/2.md",
+      "headings": [
+        "## Instructions and Subroutines",
+        "### Instructions",
+        "### Subroutines"
+      ],
+      "sha256": "be7ac905ac0bab734c201df0a4e2853a8da50b42c0304cf943f8525345a4815d"
+    },
+    {
+      "file": "content/ecl-tutorial/3.md",
+      "headings": [
+        "## The main subroutine",
+        "## More on flags",
+        "## Spawning more enemies"
+      ],
+      "sha256": "b3114e558c54f130015f20c2fdf8346d53d0c13c7ad6bfa2eeec14a3d271b249"
+    },
+    {
+      "file": "content/ecl-tutorial/3b.md",
+      "headings": [
+        "## How numbers work"
+      ],
+      "sha256": "7a76995376f872c0ae73b7eba447ef2b575cbeceac00f1288a9b2e3e8fc196de"
+    },
+    {
+      "file": "content/ecl-tutorial/4.md",
+      "headings": [
+        "## Bullet managers",
+        "## Bullet counts, aim modes",
+        "### Modes 0 and 1 - the \"fan\" modes",
+        "### Aim modes 2, 3, 4 and 5 - the ring modes",
+        "### Modes 6, 7, 8 - randomness",
+        "### The other aim modes"
+      ],
+      "sha256": "8d8d3c495d5b82efee623f9c067f2da55813c2714318b2e50ef6b826f40f5aae"
+    },
+    {
+      "file": "content/ecl-tutorial/5.md",
+      "headings": [
+        "## ECL - variables",
+        "### Subroutine variables",
+        "### Sub arguments",
+        "### Local variables",
+        "### Global variables"
+      ],
+      "sha256": "4e96ed6e0bf6c5120f58c3e16345b3fc173e3739c4c86aaaba9333c36a7abe9d"
+    },
+    {
+      "file": "content/ecl-tutorial/6.md",
+      "headings": [
+        "## Expressions, return types",
+        "### The current jank & inconsistent whitespace requirements",
+        "### Value and variable types in expressions",
+        "### Subroutine return values",
+        "### Where the heck can expressions be used?"
+      ],
+      "sha256": "74ef9df608aaddee611528833628aaca1ea36ecbdf8f1c80b82ef0548d7ea107"
+    },
+    {
+      "file": "content/ecl-tutorial/7.md",
+      "headings": [
+        "## ECL - the stack",
+        "### What is a stack?",
+        "### The thecl syntax for using the stack",
+        "### Rare cases where thecl gives up while decompiling (can't really blame it for that though!)"
+      ],
+      "sha256": "e6bf8444a8e1273450b843c5a5bebadbde8e0c3e5ee6aaa96569e653f7e7534c"
+    },
+    {
+      "file": "content/ecl-tutorial/8.md",
+      "headings": [
+        "## ECL - conditional statements",
+        "### The ternary operator",
+        "### The difficulty flags",
+        "### The difficulty switch",
+        "### The if / if-else statements",
+        "### The switch statement",
+        "### Variable scoping"
+      ],
+      "sha256": "ee766ba3604362c74832fd82e5e2c11a893c98c7a9971956c7a8db22fe723c85"
+    },
+    {
+      "file": "content/ecl-tutorial/9.md",
+      "headings": [
+        "## Loops and stuff",
+        "### The while loop",
+        "### The times loop",
+        "### Loops and scoping"
+      ],
+      "sha256": "8cad3ae1f53a8ada159675c6ebf00b83bd518dc9c945a6deb9bdbd33619ecbe1"
+    },
+    {
+      "file": "content/ecl-tutorial/10.md",
+      "headings": [
+        "## Enemy positioning",
+        "### Absolute and relative positions",
+        "### What is the purpose of having two positions?",
+        "### Movement limits",
+        "### \"modes\"",
+        "### All the numbers..."
+      ],
+      "sha256": "7d05d516f06ec71af006f03975c66e725d4748dca32642b16e6433fe0279e8c0"
+    },
+    {
+      "file": "content/ecl-tutorial/11.md",
+      "headings": [
+        "## Global definitions"
+      ],
+      "sha256": "89ee7bbe3b1fac88872990b1729c1708d9ca40fc47a296394f1956326af81257"
+    },
+    {
+      "file": "content/ecl-tutorial/12.md",
+      "headings": [
+        "## Compiler directives",
+        "## Combining multiple ECL files",
+        "### The `#include` directive",
+        "### Preventing the same file from being included multiple times",
+        "### The `ecli` list",
+        "### `#include` vs `ecli`"
+      ],
+      "sha256": "53d19d995ffdba7ca8c6b4da915ec7c848bad8554acd37604cb4fbfd7a88f9cd"
+    },
+    {
+      "file": "content/ecl-tutorial/13.md",
+      "headings": [
+        "## ECL extras #1 - The MERLIN library"
+      ],
+      "sha256": "252c14e007c35e4a9fa5fe6ab1939ce2970167817365b27b1b9bc5ab43604da6"
+    }
+  ],
+  "inspected_local_files": [
+    {
+      "path": "/data/sunyunbo/www/renkolab/local/vendor/thtk/thecl/thecl.1",
+      "sha256": "f2b838f8447a8d6980fb35af2cfca2b2021fb1b424b87ffb993720629deb572d"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/local/vendor/thtk/thecl/thecl10.c",
+      "sha256": "b741415d141493a249d5422b7273e29551eac150b7d705ced9d3e4ea54b15181"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/local/vendor/thtk/thecl/ecsparse.y",
+      "sha256": "68b138b2d8d6128df85ad8c72ac3cb64778f4abc583bac3bd956938859b143ba"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/local/vendor/thtk/thecl/ecsscan.l",
+      "sha256": "f4d9ec04df115aa23e864649893e2195bc13b7d8436060e394128f2e1ecd4082"
+    },
+    {
+      "path": "/data/sunyunbo/www/renkolab/local/vendor/eclmap/eclmap/th18.eclm",
+      "sha256": "c81b39767f4024cbb7989dfda1a6461b0a90962e87718118da2e121df4413195"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/docs/ecl-lang/1-hello-danmaku.md",
+      "sha256": "52031ac4fcbbd56f48531135dcc0a01aa9f5ec36f1d42fe5192c71572e512e32"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/docs/ecl-lang/2-tasks.md",
+      "sha256": "89d1cee2205252fd48d4f40adc7135074829ba1771297929e9c9f95455bc6b0e"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/docs/ecl-lang/3-enemy.md",
+      "sha256": "919ea007b0a247680d5cdbc83e6df4934cea350c7e7e3a9f6f9fcf205cdef3d0"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/docs/ecl-lang/4-bullets.md",
+      "sha256": "dc8df53d384eeddfabd8e835c5aa17b5f0d494a004ea310e8c80e589e0e4a01c"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/docs/ecl-lang/5-types.md",
+      "sha256": "15b63b023648c85e2d598cfdcb4ebda83310d460443579319b1b61866215b611"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/docs/ecl-lang/6-spell-and-stage.md",
+      "sha256": "0d838c74a8547d4140702dad24caebbaf374c4d667eeaa16ec84b21386043ab1"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/docs/ecl-lang/7-reference.md",
+      "sha256": "f17d64bba1857db07df5f96e46fd5e8f2639c9add071b1a84e55003fb38cd1b5"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/docs/ecl-lang/8-errors.md",
+      "sha256": "1e1183da828d0821a7ea4053faf9ff2dca6c88ba5912430d712ac0222793513e"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/docs/ecl-lang/9-lasers.md",
+      "sha256": "c309638df38bc0ac21a7f7c56321c80d683aa8ebf9ff144105f346dba6300c64"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/docs/easing-reference.md",
+      "sha256": "a75543266fab6a14644cd183cae98f671088dd7a6f879dc00d3acdeb0be0ea74"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/docs/stateful-interpolation-reference.md",
+      "sha256": "1544a82a463311f082b1a06914dbb6ccdc98f421f184703ff6cb2d531f6350b2"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-engine/crates/stg-ecl-compiler/src/lang/builtins.rs",
+      "sha256": "d64a37f06a8caf74a1978667ef494cfab56d7568dc3f33d3296c541ea63866b5"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-rl-train/transcribe/th06/mapping.md",
+      "sha256": "301cfb160b02d12391e155f4a102b046a3b76764454798469e86b0846a7e0d2b"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-rl-train/transcribe/th18/bullet-types.md",
+      "sha256": "e27c14949f295c77cdbabee94235cc1a45af7c8d5bcbd167eeeb0f724e531605"
+    },
+    {
+      "path": "/data/sunyunbo/www/stg-rl-train/transcribe/th18/ex-effects.md",
+      "sha256": "8c209e2d5f1d01b3fe2478a6022edd63a2a1a2fe3949b59a9c5a075ec4630ba3"
+    }
+  ],
+  "conclusions": [
+    "Priw8 tutorial covers modern ECL with TH17 examples, not TH18-specific verification.",
+    "Priw8 transforms article is scoped to TH13-17 and says 18 records; our TH18 Ghidra comparison establishes 24.",
+    "Current INS_18 is empty and inherits older descriptions; absence of overrides is not semantic equality.",
+    "Online TH18 eclmap byte-matches the local eclmap checkout; it has names and global types, no !ins_signatures section.",
+    "thtk source-format inheritance and parser grammar complement mnemonic mapfiles.",
+    "ExpHP thpages centers on ANM and links to Priw8 for ECL; truth syntax is distinct and its inspected README exposes no ECL tool.",
+    "MERLIN README lists TH16/17 support, useful as terminology reference rather than assumed TH18 dependency.",
+    "Local thtk and th-re-data HEADs differ from observed remote HEAD; local existing Ghidra work is not silently re-imported or updated."
+  ],
+  "validation": {
+    "download_hashes": true,
+    "online_local_eclmap_identical": true,
+    "no_game_assets_downloaded": true,
+    "no_original_game_execution": true
+  }
+}

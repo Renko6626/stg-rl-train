@@ -32,6 +32,34 @@ def test_decode_env_matches_rawobs(cfg):
         assert f.player == pytest.approx(tuple(obs.player_xy[i].tolist()))
 
 
+def test_decode_new_appearance_maps_physical_sprite_once():
+    import json
+    import stg_rl
+
+    layout_path = preview.config.engine_dir() / "godot/assets/bullet/atlas-layout.json"
+    if not layout_path.exists():
+        pytest.skip("没有新弹型图集布局")
+    layout = json.loads(layout_path.read_text())
+    logical = 192  # TH06 pellet first color
+    expected = layout["appearances"][logical]["sprite"]
+    assert expected != logical
+    image = stg_rl.compile_sources([("catalog.ecl", """
+sub main() {
+    _ = fire(192, 0, 10.0fx, 20.0fx, 0.0fx, 0deg, none, none);
+    wait(60);
+}
+""")])
+    buffers = stg_rl.alloc_buffers(1, 8, backend="torch", pin=False)
+    env = stg_rl.VecEnv(1, 1, {"catalog": image}, [stg_rl.Start("catalog")],
+                        warmup_max=0, max_frames=100, end_on=(), bullets_cap=8, buffers=buffers)
+    env.reset()
+    for _ in range(3):
+        env.step(torch.zeros(1, dtype=torch.int64))
+    got = R.decode_env(buffers, 0)
+    assert [(b.x, b.y, b.sprite) for b in got.bullets] == [(10.0, 20.0, expected)]
+    assert int(R._u16(buffers["bullets"][:1], R._off("bullets", "type"))[0]) == logical
+
+
 def test_decode_lasers_matches_rawobs_and_renders():
     import math
 

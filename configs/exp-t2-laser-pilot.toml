@@ -2,7 +2,7 @@
 #
 # 背景：引擎激光池（stg_rl 0.3.0 起 Tier 0 lasers 表）之前没进观测——模型看得见激光上挂的弹，看不见激光本身。
 # 原作卡池 166 张，其中 11 张激光卡；3 张留出（eval/splits-laser.toml）、8 张进训练。
-# cards-synthetic/ 当前另有 30 张合成激光变异，均只进训练；固定提交 SHA 是本次卡池快照。
+# cards/synthetic/ 当前另有 30 张合成激光变异，均只进训练；历史卡集合见本次配置。
 # 做法：envwrap 解码 lasers 表 → v7 在 v6 的输出之外加最近 k_lasers 条激光的 token（原始量、自机相对系）→
 # set_attn_v2 加一个激光集合编码器进主干。与 S1 只差这两处（S1 的判定点随机增大、运动层、reward 全照抄）。
 # 部署：ONNX 图版本 5（多 lasers / lasers_mask 两个输入），DLL 侧要跟着填激光表。
@@ -17,7 +17,8 @@ ckpt_every = 100
 eval_every = 250
 
 [env]
-cards_dir = ["cards", "cards-synthetic"]
+cards_dir = "cards"
+card_filter = { sources = ["th06", "synthetic"], exclude_synthetic_kinds = ["laser_specialist"] }
 eval_splits = "eval/splits-laser.toml"
 num_envs = 4096
 hit_extra = [0.0, 2.0]

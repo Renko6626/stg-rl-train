@@ -6,7 +6,7 @@
 >
 > **当前执行入口（2026-11-03）**：本文保留最初设计与历史实测，“本轮”“目前”等状态描述以当时日期为准。
 > 批量执行以 [`transcribe/README.md`](../transcribe/README.md)、[编排 skill](../.claude/skills/th06-transcribe/SKILL.md)、
-> `transcribe/contracts/` 和 [mapping](../transcribe/th06/mapping.md) 为准。激光已可转；训练已接入0.4.4/ENGINE_VER30，xform体内rand按三阶段抽样。
+> `transcribe/th06/contracts/` 和 [mapping](../transcribe/th06/mapping.md) 为准。激光已可转；训练已接入0.4.4/ENGINE_VER30，xform体内rand按三阶段抽样。
 > 动态 xform 按值绑定与三阶段取值见 mapping §5，旧“只收常量/统一占 locals”不再代表所有路径。
 > dsh 审核后的 Opus 抽检按现行契约保留；§13.1 的暂停是历史状态。派发前还需刷新目标单元的派生资料，见 skill。
 
@@ -158,7 +158,7 @@ stg-rl-train/
 
 - 驱动**逐个**调用 `~/.local/bin/dsh-flash --cwd <单元目录> --timeout 1800 --log <log>`
   （不用 `--batch`：它所有任务共用一个 cwd）。
-- 契约正文在 `transcribe/contracts/*.md`，brief 只含单元参数 + 契约与资料的**绝对路径**。
+- 契约正文在 `transcribe/th06/contracts/*.md`，brief 只含单元参数 + 契约与资料的**绝对路径**。
 - worker 先读契约、`mapping-excerpt.md` 和生成的 `builtins.md`。引擎手册与写作 skill 通过绝对路径按需检索，
   不整篇加载；动态 xform 的短例子与求值表直接随 mapping §5 进入摘录。以现行 worker 契约的阅读顺序为准。
 - 环境：`PYTHONDONTWRITEBYTECODE=1`；harness 用 release 二进制绝对路径；python 用训练仓 `.venv/bin/python`。

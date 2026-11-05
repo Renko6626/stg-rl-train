@@ -7,7 +7,7 @@ from pathlib import Path
 
 import torch
 
-from stgtrain.cards import discover, load_splits
+from stgtrain.cards import configured_cards, load_splits
 from stgtrain.checkpoint import load_checkpoint
 from stgtrain.config import from_dict
 from stgtrain.evaluate import evaluate
@@ -34,7 +34,7 @@ def main() -> None:
     torch.set_num_threads(int(cfg["run"]["torch_threads"]))
     images, starts, _, feat, factory = build_components(cfg, device)
     specs = load_splits(a.splits, cfg["eval"]["episodes"])
-    cards = discover(cfg["env"]["cards_dir"])
+    cards = configured_cards(cfg["env"])
     if len(specs) != 5 or len({s.card for s in specs}) != 5:
         raise ValueError("Expected five distinct specialist held-out layouts")
     for spec in specs:

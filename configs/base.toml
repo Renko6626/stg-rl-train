@@ -8,6 +8,7 @@ torch_threads = 2
 
 [env]
 cards_dir = "cards"
+card_filter = { sources = ["th06"] }
 eval_splits = "eval/splits.toml"
 num_envs = 2048
 threads = 0            # 0 = 本进程能用的全部 CPU（亲和性，不是宿主机核数）；先跑 --bench 选值

@@ -1,100 +1,74 @@
-# TH06 ECL 批量转写
+# 东方 ECL 模型转写
 
-把东方红魔乡（TH06，th06nc 解码）的原作 ECL 按**波次 / boss 段**切开，用 dsh（deepseek-flash）批量转写成 `cards/` 下的 RL 卡。
-设计：[`docs/2026-09-16-th06-transcribe-design.md`](../docs/2026-09-16-th06-transcribe-design.md)。
+将原作攻击转为 stg-engine 躲弹卡。按作品准备源材料与映射，经模型转写、自动验收、独立源语义审核和抽检后收卡。当前 TH06/NC 有批量工具，TH18 有切分指南和单攻击写审设施；多作品批量调度尚未实现。
 
-## 目录
+## 从这里进入
 
-```
+| 工作 | 入口 | 当前范围 |
+|---|---|---|
+| TH06/NC 批量转写 | [TH06 操作说明](th06/README.md) | 切分、摘录、转写、验收、审核、抽检清单、收卡 |
+| TH18 整关切分 / 单攻击写审 | [TH18 入口](th18/README.md) | 人工/AI切分记录、任务单准备、独立写审、共用单卡验收 |
+| 合成练习卡 | [synthetic 入口](synthetic/README.md) | 设计brief或底子卡、独立写审；成品与原作共用卡库 |
+| TH18 语法与机制 | [转写教材](th18/mapping.md) / [统一口径](th18/transcription-policy.md) | 本作已核语义、已批准差异、未支持机制 |
+| 单卡自动验收 | [TH18 编号与规则](th18/validation.md) | `stgtranscribe.validate` 支持 TH06、TH18；预算按来源区分 |
+| 目标卡试玩与出图 | [TH06 操作说明中的工具](th06/README.md#试玩) | `preview` / `play.sh` 从统一卡库发现启用卡，可按单卡预览 |
+| 历史现代 ECL 导入原型 | [原型说明](../tools/th18-import-prototype/README.md) | 独立实验；有限子集代码生成，不是模型转写入口 |
+
+TH06 契约在 `th06/contracts/`，TH18 契约在 `th18/contracts/`，合成契约在 `synthetic/contracts/`。成品统一进入 [cards/<source>/<id>](../cards/README.md)，不再新增根目录 cards-* 卡池。不要把 TH06 的坐标、色号、时序、激光规则或旧预算套到其他作品。
+
+## 目录与归属
+
+```text
 transcribe/
-  th06/config.toml        原文路径（环境变量可覆盖）、跳过规则、弹型映射
-  th06/mapping.md         ★ TH06 → 我方 .ecl 对照表（逐条读 th06-decomp 写的，语义唯一依据）
-  th06/examples/          4 张手转范例卡（波次 / 中 boss 非符 / boss 非符 / 符卡），每张带 notes.md
-  contracts/              dsh worker 契约：split.md / transcribe.md / review.md
-  work/                   gitignore：原文摘录、worker 工作目录、日志、state.jsonl
-src/stgtranscribe/        工具：thecl 解析 / 结构摘要 / 切分校验 / 摘录 / 验收 / 流水线
+  README.md                跨作品导航、工具边界与工作区约定
+  th06/                    本作操作说明、配置、映射、范例、contracts/
+  th18/                    本作教材、参考表、切分/验收规则、contracts/
+  synthetic/               合成设计、作者/审核契约
+  tools/claude-worker      现有 Sonnet 后备执行入口
+  play.sh                  目标卡试玩入口
+  work/                    本地工作资料与生成物，整个目录忽略
+src/stgtranscribe/         现有 Python 工具（范围见下表）
+tests/transcribe/          对应检查
+tools/th18-import-prototype/  历史导入原型，与模型写审分开
 ```
 
-## 前置
+| 工具 | 实际边界 |
+|---|---|
+| `pipeline` | TH06 批量驱动；提示词、来源路径、切分结构和状态选择仍固定 TH06 |
+| `thecl`、`structure`、`split_check`、`extract`、`mapping` | TH06 文本格式、依赖/切分规则与参考摘录，不能直接解析 TH18 |
+| `units` | 编号识别支持 TH06/TH18，其余闭包、来源与时限辅助仍有 TH06 规则 |
+| `validate` | 目标卡编译、运行、元数据与开场安全；支持 TH06/TH18，不证明原作等价 |
+| `preview` | 目标 harness 转储出图，不负责原作解析 |
+| `usage`、`notes`、`density` | 已有用量、便笺、密度辅助；调用与目录仍围绕现有流程 |
+| `config` | 引擎与工作区路径；引擎默认路径仍从 TH06 配置读取，可用 `STG_ENGINE_DIR` 覆盖 |
 
-- 本机有 renkolab 的 th06nc 解码原文（`STG_TH06_SRC`，默认见 `th06/config.toml`）。
-- stg-engine 里 `cargo build --release -p stg-harness`（`STG_ENGINE_DIR`）。
-- `~/.local/bin/dsh-flash`（`STG_DSH_BIN`）。
-- `uv sync --frozen`。
+## 工作区
 
-## 当前转写口径（2026-11-04）
+- `work/th18/stage01/`：当前 TH18 一面切分材料。后续单元目录按[单卡约定](th18/validation.md)建立；现有 `split.md` 的 W00/M1/C1 等为试切标签，派发前映射为最终 `th18_s…` 编号，不能直接当卡目录名。
+- `work/units/`、`review/`、`split/`、`logs/`、`state.jsonl`：现有 TH06 生产记录。`sample-s*.json` 与 `notes-triaged.txt` 也属于这套记录；不随临时调研清理，不当作 TH18 的任务状态。
+- `work/preview/`、`work/play/`：预览与试玩产物；弹型总览为 `work/preview/bullet-catalog.png`。
+- `work/archive/th06/`：已结束的批次脚本、A/B 试验、小机制探针、历史抽检和分诊材料。保留原内容及当时路径，仅供追溯；脚本不是当前操作入口，不能原样重放整批。
+- `work/th18-prototype/`：历史导入原型的镜像、轨迹与构建物。其工具仍引用这个位置，本轮不搬动。
 
-训练仓使用 `stg-rl==0.4.4`、ENGINE_VER30。带参 xform 从 ENGINE_VER28 起支持，单值 STEP 扩展从29起支持，模板体 rand 从30起支持；
-引擎源码、release harness 和 Python wheel 是三个需分别核对的状态，升级方法见
-[`stg-rl-wheel-sync.md`](../docs/agent-memory/stg-rl-wheel-sync.md)，本次来源与验证见
-[`stg-rl-044-adoption.json`](../docs/practice-cards/reports/stg-rl-044-adoption.json)。
+2026-11-05 整理：TH06 操作说明移到 `th06/README.md`，三份契约从 `transcribe/contracts/` 归入 `th06/contracts/`，驱动配置同步；18 项散落历史材料归档（89 个文件，内容保留）。旧 brief 中的契约路径保留为当时记录；重派用当前 `pipeline` 生成任务单，不直接重放旧 brief。没有改变卡内容、写审状态或来源记录。
 
-运行期变换参数优先按 mapping §5 转成 `NAME(args)`，在原 `bullet_effects` 配置点保存值，保留随机取样位置与共享范围。
-模板体 rand 按原求值标记选择绑定、每弹出生或操作进入时抽样；配置随机仍保持共享，STEP/等待中不重抽。
-`at_spawn` 保存每弹出生状态，`at_effect` 在进入操作时读取当前状态；`@N` 仍是字面量后置等待。
-旧卡的量化/取中值/逐弹任务不会随 wheel 或文档更新自动还原。当前契约针对 TH06/NC，不能直接套到其他作品的 EX 语义。
+调研、下载和一次性验证结束后，结论与来源位置与版本写进正式文档。只保留有追溯用途的过程资料；仍在使用的资料按作品/关卡/单元放置，避免长期堆日期目录。`docs/investigations/` 保存研究证据，`docs/practice-cards/` 保存训练/部署实验，不再把同一份机制规则复制到各处。
 
-修改对照表后，派发前按 [skill 的刷新步骤](../.claude/skills/th06-transcribe/SKILL.md#刷新已有单元输入)
-更新目标单元的 `mapping-excerpt.md` / `builtins.md`；`extract` 不覆盖已进入后续状态的单元。
-速查表只含内建签名，xform 的额外语法直接查摘录 §5。旧审核目录保留原记录，新一轮审核会复制刷新后的输入。
+## 运行与质量边界
 
-## 跑
+使用项目锁定环境 `uv sync --frozen`。训练仓目前声明 `stg-rl==0.4.5`；新弹型要求 ENGINE_VER31 配套表。源码、release harness 与已安装 wheel 须分别核验，见[升级约定](../docs/agent-memory/stg-rl-wheel-sync.md)。
 
 ```bash
-uv run --frozen python -m stgtranscribe.pipeline split      --stages 1-7            # 每关一个 dsh 切分 → 机械校验
-uv run --frozen python -m stgtranscribe.pipeline extract    --stages 1-7            # 原样摘录单元
-uv run --frozen python -m stgtranscribe.pipeline transcribe --stage 1 --jobs 16     # 转写 → 自动验收（失败带报告重派 ≤2）
-uv run --frozen python -m stgtranscribe.pipeline review     --stage 1 --jobs 16     # 审核（fail 带发现返工 ≤2 轮）
-uv run --frozen python -m stgtranscribe.pipeline transcribe --stage 1               # 处理返工（state = revise）
-uv run --frozen python -m stgtranscribe.pipeline review     --stage 1
-uv run --frozen python -m stgtranscribe.pipeline sample     --stage 1               # 生成 opus 抽检清单（在 Claude 会话里做）
-uv run --frozen python -m stgtranscribe.pipeline status     --stage 1
-uv run --frozen python -m stgtranscribe.pipeline collect    --stage 1               # 收进 cards/；提交、推送分别需用户授权
+# 两作共用的单卡验收，目录名必须是最终单元编号
+uv run --frozen python -m stgtranscribe.validate <卡目录> --json <报告路径>
+# 转写相关已有检查
+uv run --frozen pytest -q tests/transcribe
 ```
 
-中断后重跑同一命令即续跑。编排与分诊的完整步骤见 `.claude/skills/th06-transcribe/SKILL.md`。
-默认后端为 dsh-flash；按既有约定换 Sonnet 时，在仓库根目录设置 `STG_DSH_BIN="$PWD/transcribe/tools/claude-worker"`、`STG_CLAUDE_MODEL=sonnet`，
-并将并发降为 `--jobs 4`。dsh 审核后的 Opus 抽检与逐条复核仍须完成，不能把生成抽检清单视为已抽检。
+默认 worker 后端仍为 dsh-flash；Sonnet 后备入口与并发 4 约定见 [TH06 操作说明](th06/README.md#跑)。写与审分开，dsh 审核后的 Opus 抽检及逐条复核要求保留；生成抽检清单不等于完成抽检。自动验收不替代原作数值审核、动态对拍或训练效果检查。
 
-## 单元状态
+TH18 的奖励编队独立成波、尾部隔离、掉落/表现省略按[已批准口径](th18/transcription-policy.md)处理；曲线激光仍暂缓。只有当前攻击实际涉及的机制缺口需要补证据，不以其他攻击的未知项阻塞本单元。
 
-```
-pending → validated → reviewed → collected
-   ↘ blocked   ↘ revise（回 transcribe）/ needs_human
-excluded（切分判定跳过：不可转 ex_ins / 对话；激光 2026-09-25 起可转，见 mapping §14）
-```
+原作全文、摘录、素材和派生运行数据留在已忽略的 `work/` 或 renkolab `local/`。正式收卡、启动训练、提交和推送各按当前授权执行。
 
-## 试玩
-
-```bash
-transcribe/play.sh                  # 列出可试玩的卡（范例 / 流水线已验收 / cards 已收）
-transcribe/play.sh 3 [rank]         # 后台起 viewer（端口 PLAY_PORT，默认 8611），换卡再跑一次后刷新浏览器
-transcribe/play.sh status | stop
-```
-
-远程机器先开隧道 `ssh -L 8611:localhost:8611 <机器>`，浏览器开 `http://localhost:8611`。
-操作：方向键 · Z 射击 · Shift 低速；别按 X（训练用的机体 1 没有保命手段）。
-
-## 出图（弹幕预览 PNG / GIF）
-
-```bash
-uv run --frozen python -m stgtranscribe.preview                                   # cards/ 全部卡 × 卡内各档，每档一张 8 帧拼图（45 张卡约 5 秒）
-uv run --frozen python -m stgtranscribe.preview cards/th06_s3_w12 --ranks 2-3 --gif   # 指定卡 / 档，另出 GIF（20 fps，每个约 6–10 MB）
-uv run --frozen python -m stgtranscribe.preview --serve                           # 静态页 127.0.0.1:8612，远程 ssh -L 8612:localhost:8612 <机器>
-```
-
-产物在 `work/preview/<卡 id>/`（`sheet_r<档>.png`、`anim_r<档>.gif`）+ `work/preview/index.html`。
-拼图取「第一颗弹到最后一颗弹」时间窗均匀 8 帧，弹数峰值帧标题栏标红；贴图用 stg-engine `godot/assets/bullets.png`
-（原作弹片切的，产物别提交）。自机停在场底中心不动，自机狙都瞄这个点；harness `--at` 每帧最多列 1024 颗弹。
-
-## 手动工具
-
-```bash
-uv run --frozen python -m stgtranscribe.split_check <关> <split.json>     # 切分自检
-uv run --frozen python -m stgtranscribe.validate <卡目录>                 # 四层验收（目录名必须是卡 id）
-uv run --frozen pytest -q tests/transcribe                                # 对照表覆盖率 + 片段编译 + 工具测试
-```
-
-## 版权
-
-原文摘录只在 `work/`（gitignore）与 renkolab `local/`。入库的只有我方 `.ecl`、`meta.toml`、对照表与范例说明。
+目录整理与模型后端分开：新任务不要求反复计算输入/参考/目标hash，也不添加冻结或签名流程。必要编译运行与独立审核保留，行为变更只补受影响检查。

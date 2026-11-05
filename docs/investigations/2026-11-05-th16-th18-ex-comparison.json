@@ -1,0 +1,1999 @@
+{
+  "date": "2026-11-05",
+  "versions": [
+    "TH16 v1.00a",
+    "TH18 v1.00a"
+  ],
+  "scope": "ECL 609–612 to normal bullet EX; existing Ghidra database and exports reused; no engine or transcription implementation",
+  "method": {
+    "tools": [
+      "Python standard library: JSONL selection / hashing / report assembly",
+      "rg / sed / existing HTML",
+      "renkolab tooling/env.sh + tooling/ghidra/_driver.py open_program(tx=None)",
+      "Ghidra existing Listing instructions; no objdump/Capstone/custom disassembler"
+    ],
+    "mcp_ghidra_available": false,
+    "imports_or_symbol_writes": false,
+    "database_changed_before": false,
+    "database_changed_after": false,
+    "live_listing": "transcribe/work/th16-th18-ex-20261105/th18-listing.txt",
+    "live_listing_script": "transcribe/work/th16-th18-ex-20261105/read_listing.py",
+    "live_listing_sha256": "c7000ac60da13299d3efa4bc58da47220754275cd769343d91578a01f6170a6d",
+    "database_md5": "9969cac756098c1da05a81de45437a70"
+  },
+  "provenance": {
+    "th16": {
+      "files": [
+        {
+          "path": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/th16.exe",
+          "bytes": 683520,
+          "sha256": "c11776019f083978e66027e7394dafb1fb9543afca986f28049a49417e341929"
+        },
+        {
+          "path": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "bytes": 4148829,
+          "sha256": "ea63360440e9fb1878c85125e531bfabb516e858493e21fd3358b7327b373107"
+        }
+      ],
+      "named_functions_in_export": 1294,
+      "functions_in_export": 1764
+    },
+    "th18": {
+      "files": [
+        {
+          "path": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/th18.exe",
+          "bytes": 847360,
+          "sha256": "5aeb74b19939a29a8cf06e4fe7777aaf9139e93478507e039f43318171020e9f"
+        },
+        {
+          "path": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "bytes": 5297245,
+          "sha256": "84830f7198f721715e5ec3775df4328bbb1a56e33c9fff693c4bf21808b0a276"
+        }
+      ],
+      "named_functions_in_export": 1377,
+      "functions_in_export": 2333
+    }
+  },
+  "configuration": {
+    "opcodes": {
+      "609": "id,index,async,type,a,b,r,s",
+      "610": "id,index,async,type,a,b,c,d,r,s,m,n",
+      "611": "id,async,type,a,b,r,s",
+      "612": "id,async,type,a,b,c,d,r,s,m,n"
+    },
+    "record_words": [
+      "r",
+      "s",
+      "m",
+      "n",
+      "a",
+      "b",
+      "c",
+      "d",
+      "type",
+      "async",
+      "sub_string_pointer"
+    ],
+    "stride_bytes": 44,
+    "program_capacity": {
+      "th16": 18,
+      "th18": 24
+    },
+    "emitter_stride": {
+      "th16": 896,
+      "th18": 1160
+    },
+    "type_encoding": "raw legacy u32 value; not ordinal; no shift/conversion by ECL setters; single effect identifier, equality dispatch; arbitrary OR combinations are not valid effects",
+    "short_form": "does not overwrite c,d,m,n; preserve existing record content",
+    "append_cursor": "611/612 use per-emitter cursor, then increment; 609/610 set cursor=index+1",
+    "gate": "break if type==0 OR (async==0 AND (active_fx & ~0x100)!=0) OR ((type & active_fx)!=0)",
+    "evidence": [
+      "th16:0x4211b9 inside EnemyData__ecl_run_over_300 th16:0x41dcb0",
+      "th18:0x43488a inside FUN_00430d30 th18:0x430d30"
+    ]
+  },
+  "effects": [
+    {
+      "raw_type_hex": "0x1",
+      "raw_type_u32": 1,
+      "raw_type_i32": 1,
+      "aliases": [
+        "SPEEDUP"
+      ],
+      "parameters": {
+        "a": "未见读取",
+        "b": "未见读取",
+        "c": "未见读取",
+        "d": "未见读取",
+        "r": "未见读取",
+        "s": "未见读取",
+        "m": "未见读取",
+        "n": "未见读取"
+      },
+      "lifecycle": "进入清私有计时；tick在counter<17时叠加5-5*t/16速度；到期清位并允许同tick续跑。",
+      "comparison": "相同（已核子集）",
+      "transcription_notes": "不是永久改speed；保留初始冲量与16帧衰减。",
+      "unverified": "",
+      "handlers": {
+        "th16": "0x414ec0",
+        "th18": "0x423e10"
+      },
+      "evidence": [
+        {
+          "version": "th16.v1.00a",
+          "address": "0x413860",
+          "function": "bullet_vm_exec",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 239,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00413860.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th16.v1.00a",
+          "address": "0x414ec0",
+          "function": "bullet_beh_speed_boost",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 241,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00414ec0.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x425c60",
+          "function": "Bullet__run_ex",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 624,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00425c60.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x423e10",
+          "function": "Bullet__on_tick",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 616,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00423e10.html",
+          "reviewed": "existing Ghidra decompile export"
+        }
+      ],
+      "scope": "所列配置写入与控制流的静态比较；“相同”仅限所列已核子集，不是全效果/图形/原作逐帧等价认证。",
+      "async_index_append": "见共同配置与调度规则；逐条均沿用，不是每效果独立线程。",
+      "random_scope": "本行已核主路径未见RNG抽样；不对所调用子系统/ANM内部作无随机宣称。"
+    },
+    {
+      "raw_type_hex": "0x2",
+      "raw_type_u32": 2,
+      "raw_type_i32": 2,
+      "aliases": [
+        "ANIM"
+      ],
+      "parameters": {
+        "a": "ANM interrupt=7+low16(a)",
+        "b": "未见读取",
+        "c": "未见读取",
+        "d": "未见读取",
+        "r": "未见读取",
+        "s": "未见读取",
+        "m": "未见读取",
+        "n": "未见读取"
+      },
+      "lifecycle": "进入state=2，位置退4倍当前速度；state2半速移动，受8tick/ANM变量控制恢复active。出生首条有专门消费路径。",
+      "comparison": "相同（已核子集）",
+      "transcription_notes": "a=1的出生路径跳过interrupt；不能当普通静止delay。",
+      "unverified": "只核共同状态转换形状，未运行原作ANM。",
+      "handlers": {
+        "th16": "0x411e70",
+        "th18": "0x423e10"
+      },
+      "evidence": [
+        {
+          "version": "th16.v1.00a",
+          "address": "0x413860",
+          "function": "bullet_vm_exec",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 239,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00413860.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th16.v1.00a",
+          "address": "0x411e70",
+          "function": "bullet_tick",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 233,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00411e70.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x425c60",
+          "function": "Bullet__run_ex",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 624,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00425c60.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x423e10",
+          "function": "Bullet__on_tick",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 616,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00423e10.html",
+          "reviewed": "existing Ghidra decompile export"
+        }
+      ],
+      "scope": "所列配置写入与控制流的静态比较；“相同”仅限所列已核子集，不是全效果/图形/原作逐帧等价认证。",
+      "async_index_append": "见共同配置与调度规则；逐条均沿用，不是每效果独立线程。",
+      "random_scope": "本行已核主路径未见RNG抽样；不对所调用子系统/ANM内部作无随机宣称。"
+    },
+    {
+      "raw_type_hex": "0x4",
+      "raw_type_u32": 4,
+      "raw_type_i32": 4,
+      "aliases": [
+        "ACCEL"
+      ],
+      "parameters": {
+        "a": "持续时间",
+        "b": "未见读取",
+        "c": "未见读取",
+        "d": "未见读取",
+        "r": "加速度标量",
+        "s": "角参数；各版本解析不同",
+        "m": "TH18瞄准偏移/随机幅度；TH16瞄准偏移见既有一手记录",
+        "n": "未见读取"
+      },
+      "lifecycle": "进入解析方向并存固定加速度向量；tick向速度向量加accel*dt，同时更新标量；非零向量回算角/速；到期清位。",
+      "comparison": "不同",
+      "transcription_notes": "TH18用扩展角度helper；随机在进入采样，不能配置时统一采样。",
+      "unverified": "",
+      "handlers": {
+        "th16": "0x414fb0",
+        "th18": "0x427930"
+      },
+      "evidence": [
+        {
+          "version": "th16.v1.00a",
+          "address": "0x413860",
+          "function": "bullet_vm_exec",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 239,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00413860.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th16.v1.00a",
+          "address": "0x414fb0",
+          "function": "bullet_beh_accel_vec",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 242,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00414fb0.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x425c60",
+          "function": "Bullet__run_ex",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 624,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00425c60.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x427930",
+          "function": "FUN_00427930",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 626,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00427930.html",
+          "reviewed": "existing Ghidra decompile export"
+        }
+      ],
+      "scope": "所列配置写入与控制流的静态比较；“相同”仅限所列已核子集，不是全效果/图形/原作逐帧等价认证。",
+      "async_index_append": "见共同配置与调度规则；逐条均沿用，不是每效果独立线程。",
+      "random_scope": "逐弹私有状态；随机若启用消耗全局REPLAY_SAFE_RNG；详见角度小节。"
+    },
+    {
+      "raw_type_hex": "0x8",
+      "raw_type_u32": 8,
+      "raw_type_i32": 8,
+      "aliases": [
+        "ANGLE_ACCEL"
+      ],
+      "parameters": {
+        "a": "持续时间",
+        "b": "未见读取",
+        "c": "未见读取",
+        "d": "未见读取",
+        "r": "速度增量/帧",
+        "s": "角速度；每步 angle += s*dt",
+        "m": "未见读取",
+        "n": "未见读取"
+      },
+      "lifecycle": "进入存r/s及计时；每tick角+=s*dt、speed+=r*dt并重建向量；到期清位。",
+      "comparison": "相同（已核子集）",
+      "transcription_notes": "持续累积角度和速率，不是一次设角，也不是角速度再累加。",
+      "unverified": "",
+      "handlers": {
+        "th16": "0x4153e0",
+        "th18": "0x423e10"
+      },
+      "evidence": [
+        {
+          "version": "th16.v1.00a",
+          "address": "0x413860",
+          "function": "bullet_vm_exec",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 239,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00413860.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th16.v1.00a",
+          "address": "0x4153e0",
+          "function": "bullet_beh_turn_accel",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 244,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/004153e0.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x425c60",
+          "function": "Bullet__run_ex",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 624,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00425c60.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x423e10",
+          "function": "Bullet__on_tick",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 616,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00423e10.html",
+          "reviewed": "existing Ghidra decompile export"
+        }
+      ],
+      "scope": "所列配置写入与控制流的静态比较；“相同”仅限所列已核子集，不是全效果/图形/原作逐帧等价认证。",
+      "async_index_append": "见共同配置与调度规则；逐条均沿用，不是每效果独立线程。",
+      "random_scope": "本行已核主路径未见RNG抽样；不对所调用子系统/ANM内部作无随机宣称。"
+    },
+    {
+      "raw_type_hex": "0x10",
+      "raw_type_u32": 16,
+      "raw_type_i32": 16,
+      "aliases": [
+        "STEP",
+        "ANGLE"
+      ],
+      "parameters": {
+        "a": "每段持续时间",
+        "b": "段数上限",
+        "c": "角/速子模式0..7",
+        "d": "保存进私有状态；本轮未确定用途",
+        "r": "角参数；c=5/6为随机幅度",
+        "s": "目标速；<=-999990保留；c=7为当前速随机幅度",
+        "m": "TH18角helper偏移/幅度",
+        "n": "未见主路径读取"
+      },
+      "lifecycle": "进入取目标并清段计数；持续handler先降速，到段界更新角/速并重置计时；达到b段清位。",
+      "comparison": "不同",
+      "transcription_notes": "c5/6/7有进入时RNG；c1/6在段界另查玩家角。不能用单一线性角插值代替。",
+      "unverified": "d消费与TH16高角参数>=9999990的精确输出本轮未完成Listing复核。",
+      "handlers": {
+        "th16": "0x415570",
+        "th18": "0x427d50"
+      },
+      "evidence": [
+        {
+          "version": "th16.v1.00a",
+          "address": "0x413860",
+          "function": "bullet_vm_exec",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 239,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00413860.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th16.v1.00a",
+          "address": "0x415570",
+          "function": "bullet_beh_speed_angle_transition",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 245,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00415570.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x425c60",
+          "function": "Bullet__run_ex",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 624,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00425c60.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x427d50",
+          "function": "FUN_00427d50",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 628,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00427d50.html",
+          "reviewed": "existing Ghidra decompile export"
+        }
+      ],
+      "scope": "所列配置写入与控制流的静态比较；“相同”仅限所列已核子集，不是全效果/图形/原作逐帧等价认证。",
+      "async_index_append": "见共同配置与调度规则；逐条均沿用，不是每效果独立线程。",
+      "random_scope": "逐弹私有状态；随机若启用消耗全局REPLAY_SAFE_RNG；详见角度小节。"
+    },
+    {
+      "raw_type_hex": "0x40",
+      "raw_type_u32": 64,
+      "raw_type_i32": 64,
+      "aliases": [
+        "BOUNCE"
+      ],
+      "parameters": {
+        "a": "反弹事件次数上限",
+        "b": "墙mask U/D/L/R=1/2/4/8；0x10抑制反射；0x20自定义尺寸",
+        "c": "未见读取",
+        "d": "未见读取",
+        "r": "> -990时设置反弹处理后的speed，否则保留",
+        "s": "b&0x20时宽；否则384",
+        "m": "b&0x20时高；否则448",
+        "n": "未见读取"
+      },
+      "lifecycle": "进入挂计数/边界；tick越界镜像位置并反射角，累计事件；到a清位；manager边界可覆盖局部尺寸。",
+      "comparison": "相同（已核子集）",
+      "transcription_notes": "旧文档称r为“最小速”不准确：读取的代码是直接赋值；精确边界/角落计数仍需Listing。",
+      "unverified": "TH18内联后的extraout_EDX计数来源、同时越多墙的行为未逐指令对拍。",
+      "handlers": {
+        "th16": "0x415bb0",
+        "th18": "0x427f40"
+      },
+      "evidence": [
+        {
+          "version": "th16.v1.00a",
+          "address": "0x413860",
+          "function": "bullet_vm_exec",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 239,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00413860.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th16.v1.00a",
+          "address": "0x415bb0",
+          "function": "bullet_beh_wall_bounce",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 250,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00415bb0.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x425c60",
+          "function": "Bullet__run_ex",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 624,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00425c60.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x427f40",
+          "function": "FUN_00427f40",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 629,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00427f40.html",
+          "reviewed": "existing Ghidra decompile export"
+        }
+      ],
+      "scope": "所列配置写入与控制流的静态比较；“相同”仅限所列已核子集，不是全效果/图形/原作逐帧等价认证。",
+      "async_index_append": "见共同配置与调度规则；逐条均沿用，不是每效果独立线程。",
+      "random_scope": "本行已核主路径未见RNG抽样；不对所调用子系统/ANM内部作无随机宣称。"
+    },
+    {
+      "raw_type_hex": "0x80",
+      "raw_type_u32": 128,
+      "raw_type_i32": 128,
+      "aliases": [
+        "INVULN"
+      ],
+      "parameters": {
+        "a": "写入bullet+0x24计数",
+        "b": "未见读取",
+        "c": "未见读取",
+        "d": "未见读取",
+        "r": "未见读取",
+        "s": "未见读取",
+        "m": "未见读取",
+        "n": "未见读取"
+      },
+      "lifecycle": "进入写bomb取消免疫计数；触碰玩家时可保留弹自身，不能据此称无致死判定；两作递减位置不同，详见报告。",
+      "comparison": "不同",
+      "transcription_notes": "TH16 active效果循环内与函数尾各有递减；TH18仅尾部递减。a不能直接等同a个完整tick。",
+      "unverified": "",
+      "handlers": {
+        "th16": "0x411e70",
+        "th18": "0x423e10"
+      },
+      "evidence": [
+        {
+          "version": "th16.v1.00a",
+          "address": "0x413860",
+          "function": "bullet_vm_exec",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 239,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00413860.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th16.v1.00a",
+          "address": "0x411e70",
+          "function": "bullet_tick",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 233,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00411e70.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x425c60",
+          "function": "Bullet__run_ex",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 624,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00425c60.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x423e10",
+          "function": "Bullet__on_tick",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 616,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00423e10.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th16.v1.00a",
+          "address": "0x4124b0",
+          "function": "bullet_vs_player_collide",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 234,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/004124b0.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th16.v1.00a",
+          "address": "0x416d20",
+          "function": "BulletManager__cancel_radius_as_bomb",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 258,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00416d20.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x4248a0",
+          "function": "FUN_004248a0",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 617,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/004248a0.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x429370",
+          "function": "BulletManager__cancel_radius_as_bomb",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 636,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00429370.html",
+          "reviewed": "existing Ghidra decompile export"
+        }
+      ],
+      "scope": "所列配置写入与控制流的静态比较；“相同”仅限所列已核子集，不是全效果/图形/原作逐帧等价认证。",
+      "async_index_append": "见共同配置与调度规则；逐条均沿用，不是每效果独立线程。",
+      "random_scope": "本行已核主路径未见RNG抽样；不对所调用子系统/ANM内部作无随机宣称。"
+    },
+    {
+      "raw_type_hex": "0x100",
+      "raw_type_u32": 256,
+      "raw_type_i32": 256,
+      "aliases": [
+        "OFFSCREEN"
+      ],
+      "parameters": {
+        "a": "最长保活倒计时",
+        "b": "非0额外做视锥可见性检查",
+        "c": "未见读取",
+        "d": "未见读取",
+        "r": "未见读取",
+        "s": "未见读取",
+        "m": "未见读取",
+        "n": "未见读取"
+      },
+      "lifecycle": "进入置0x100；同步门特意忽略此位；每tick减计时并按可见性/时限清位。",
+      "comparison": "相同（已核子集）",
+      "transcription_notes": "不是单一“永不离屏删除”布尔值。",
+      "unverified": "复杂视锥投影数学未证明两作完全等价。",
+      "handlers": {
+        "th16": "0x4162d0",
+        "th18": "0x428970"
+      },
+      "evidence": [
+        {
+          "version": "th16.v1.00a",
+          "address": "0x413860",
+          "function": "bullet_vm_exec",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 239,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00413860.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th16.v1.00a",
+          "address": "0x4162d0",
+          "function": "bullet_beh_offscreen",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 254,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/004162d0.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x425c60",
+          "function": "Bullet__run_ex",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 624,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00425c60.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x428970",
+          "function": "FUN_00428970",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 632,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00428970.html",
+          "reviewed": "existing Ghidra decompile export"
+        }
+      ],
+      "scope": "所列配置写入与控制流的静态比较；“相同”仅限所列已核子集，不是全效果/图形/原作逐帧等价认证。",
+      "async_index_append": "见共同配置与调度规则；逐条均沿用，不是每效果独立线程。",
+      "random_scope": "本行已核主路径未见RNG抽样；不对所调用子系统/ANM内部作无随机宣称。"
+    },
+    {
+      "raw_type_hex": "0x200",
+      "raw_type_u32": 512,
+      "raw_type_i32": 512,
+      "aliases": [
+        "SETSPRITE"
+      ],
+      "parameters": {
+        "a": "弹型索引",
+        "b": "低15位颜色；0x8000触发ANM interrupt2",
+        "c": "未见读取",
+        "d": "未见读取",
+        "r": "未见读取",
+        "s": "未见读取",
+        "m": "未见读取",
+        "n": "未见读取"
+      },
+      "lifecycle": "进入直接刷新类型/颜色、半径、层桶、取消动画及ANM；不设持续位。",
+      "comparison": "相同（已核子集）",
+      "transcription_notes": "中断位在b，不是社区文案的c；弹型数据另见主线报告。",
+      "unverified": "贴图/ANM内容不是本报告的等价结论。",
+      "handlers": {
+        "th16": null,
+        "th18": null
+      },
+      "evidence": [
+        {
+          "version": "th16.v1.00a",
+          "address": "0x413860",
+          "function": "bullet_vm_exec",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 239,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00413860.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x425c60",
+          "function": "Bullet__run_ex",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 624,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00425c60.html",
+          "reviewed": "existing Ghidra decompile export"
+        }
+      ],
+      "scope": "所列配置写入与控制流的静态比较；“相同”仅限所列已核子集，不是全效果/图形/原作逐帧等价认证。",
+      "async_index_append": "见共同配置与调度规则；逐条均沿用，不是每效果独立线程。",
+      "random_scope": "本行已核主路径未见RNG抽样；不对所调用子系统/ANM内部作无随机宣称。"
+    },
+    {
+      "raw_type_hex": "0x400",
+      "raw_type_u32": 1024,
+      "raw_type_i32": 1024,
+      "aliases": [
+        "DELETE"
+      ],
+      "parameters": {
+        "a": "等于1时先把cancel script设-1",
+        "b": "未见读取",
+        "c": "未见读取",
+        "d": "未见读取",
+        "r": "未见读取",
+        "s": "未见读取",
+        "m": "未见读取",
+        "n": "未见读取"
+      },
+      "lifecycle": "进入调用cancel；非持续效果。",
+      "comparison": "相同（已核子集）",
+      "transcription_notes": "a=1抑制取消动画，不是无限寿命。",
+      "unverified": "",
+      "handlers": {
+        "th16": null,
+        "th18": null
+      },
+      "evidence": [
+        {
+          "version": "th16.v1.00a",
+          "address": "0x413860",
+          "function": "bullet_vm_exec",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 239,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00413860.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x425c60",
+          "function": "Bullet__run_ex",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 624,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00425c60.html",
+          "reviewed": "existing Ghidra decompile export"
+        }
+      ],
+      "scope": "所列配置写入与控制流的静态比较；“相同”仅限所列已核子集，不是全效果/图形/原作逐帧等价认证。",
+      "async_index_append": "见共同配置与调度规则；逐条均沿用，不是每效果独立线程。",
+      "random_scope": "本行已核主路径未见RNG抽样；不对所调用子系统/ANM内部作无随机宣称。"
+    },
+    {
+      "raw_type_hex": "0x800",
+      "raw_type_u32": 2048,
+      "raw_type_i32": 2048,
+      "aliases": [
+        "PLAYSOUND"
+      ],
+      "parameters": {
+        "a": "声音id",
+        "b": "未见读取",
+        "c": "未见读取",
+        "d": "未见读取",
+        "r": "未见读取",
+        "s": "未见读取",
+        "m": "未见读取",
+        "n": "未见读取"
+      },
+      "lifecycle": "进入播音；不设持续位。",
+      "comparison": "相同（已核子集）",
+      "transcription_notes": "副作用发生在bullet EX相位；未证明声库id跨作一致。",
+      "unverified": "",
+      "handlers": {
+        "th16": null,
+        "th18": null
+      },
+      "evidence": [
+        {
+          "version": "th16.v1.00a",
+          "address": "0x413860",
+          "function": "bullet_vm_exec",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 239,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00413860.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x425c60",
+          "function": "Bullet__run_ex",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 624,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00425c60.html",
+          "reviewed": "existing Ghidra decompile export"
+        }
+      ],
+      "scope": "所列配置写入与控制流的静态比较；“相同”仅限所列已核子集，不是全效果/图形/原作逐帧等价认证。",
+      "async_index_append": "见共同配置与调度规则；逐条均沿用，不是每效果独立线程。",
+      "random_scope": "本行已核主路径未见RNG抽样；不对所调用子系统/ANM内部作无随机宣称。"
+    },
+    {
+      "raw_type_hex": "0x1000",
+      "raw_type_u32": 4096,
+      "raw_type_i32": 4096,
+      "aliases": [
+        "WRAP"
+      ],
+      "parameters": {
+        "a": "传送次数上限",
+        "b": "墙mask U/D/L/R=1/2/4/8",
+        "c": "未见读取",
+        "d": "未见读取",
+        "r": "未见读取",
+        "s": "未见读取",
+        "m": "未见读取",
+        "n": "未见读取"
+      },
+      "lifecycle": "进入挂状态；运动/碰撞后、裁剪前按sprite尺寸越界传送，次数达a清位。",
+      "comparison": "相同（已核子集）",
+      "transcription_notes": "位移含sprite尺寸+384/448，不能只按坐标越界平移屏宽。",
+      "unverified": "各弹型sprite尺寸单独变化，未做视觉对拍。",
+      "handlers": {
+        "th16": "0x415d80",
+        "th18": "0x423e10"
+      },
+      "evidence": [
+        {
+          "version": "th16.v1.00a",
+          "address": "0x413860",
+          "function": "bullet_vm_exec",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 239,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00413860.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th16.v1.00a",
+          "address": "0x415d80",
+          "function": "bullet_beh_wrap",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 251,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00415d80.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x425c60",
+          "function": "Bullet__run_ex",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 624,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00425c60.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x423e10",
+          "function": "Bullet__on_tick",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 616,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00423e10.html",
+          "reviewed": "existing Ghidra decompile export"
+        }
+      ],
+      "scope": "所列配置写入与控制流的静态比较；“相同”仅限所列已核子集，不是全效果/图形/原作逐帧等价认证。",
+      "async_index_append": "见共同配置与调度规则；逐条均沿用，不是每效果独立线程。",
+      "random_scope": "本行已核主路径未见RNG抽样；不对所调用子系统/ANM内部作无随机宣称。"
+    },
+    {
+      "raw_type_hex": "0x2000",
+      "raw_type_u32": 8192,
+      "raw_type_i32": 8192,
+      "aliases": [
+        "SHOOTPREP",
+        "SHOOT"
+      ],
+      "parameters": {
+        "a": "aim模式",
+        "b": "子弹起始effect_index",
+        "c": "路数",
+        "d": "层数",
+        "r": "发射角/当前角/玩家角哨兵",
+        "s": "第二角",
+        "m": "首速；<=-999990保留父speed",
+        "n": "末速"
+      },
+      "lifecycle": "进入读紧随记录的sprite/color及delete参数；复制父整段EX到新描述符，立即发射；PC共前进2。",
+      "comparison": "不同",
+      "transcription_notes": "TH18仅[999990,1999990)为玩家角，>=1999990按字面角归一；TH16 >=999990走玩家角。",
+      "unverified": "发射模式逐项数学、子弹取消/容量满路径未全核。",
+      "handlers": {
+        "th16": "0x414da0",
+        "th18": "0x427810"
+      },
+      "evidence": [
+        {
+          "version": "th16.v1.00a",
+          "address": "0x413860",
+          "function": "bullet_vm_exec",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 239,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00413860.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th16.v1.00a",
+          "address": "0x414da0",
+          "function": "bullet_spawn_wrapper",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 240,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00414da0.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x425c60",
+          "function": "Bullet__run_ex",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 624,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00425c60.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x427810",
+          "function": "FUN_00427810",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 625,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00427810.html",
+          "reviewed": "existing Ghidra decompile export"
+        }
+      ],
+      "scope": "所列配置写入与控制流的静态比较；“相同”仅限所列已核子集，不是全效果/图形/原作逐帧等价认证。",
+      "async_index_append": "见共同配置与调度规则；逐条均沿用，不是每效果独立线程。",
+      "random_scope": "本行已核主路径未见RNG抽样；不对所调用子系统/ANM内部作无随机宣称。"
+    },
+    {
+      "raw_type_hex": "0x4000",
+      "raw_type_u32": 16384,
+      "raw_type_i32": 16384,
+      "aliases": [
+        "SHOOT_DATA"
+      ],
+      "parameters": {
+        "a": "配对记录：sprite",
+        "b": "配对记录：color",
+        "c": "配对记录：非0删除父弹",
+        "d": "未见读取",
+        "r": "未见读取",
+        "s": "未见读取",
+        "m": "未见读取",
+        "n": "未见读取"
+      },
+      "lifecycle": "由前一SHOOTPREP读取；单独到达该type未发现独立动作分支。",
+      "comparison": "相同（已核子集）",
+      "transcription_notes": "记录必须随相邻前项保留；配对消费不依赖此记录type先被独立执行。",
+      "unverified": "",
+      "handlers": {
+        "th16": null,
+        "th18": null
+      },
+      "evidence": [
+        {
+          "version": "th16.v1.00a",
+          "address": "0x413860",
+          "function": "bullet_vm_exec",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 239,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00413860.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x425c60",
+          "function": "Bullet__run_ex",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 624,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00425c60.html",
+          "reviewed": "existing Ghidra decompile export"
+        }
+      ],
+      "scope": "所列配置写入与控制流的静态比较；“相同”仅限所列已核子集，不是全效果/图形/原作逐帧等价认证。",
+      "async_index_append": "见共同配置与调度规则；逐条均沿用，不是每效果独立线程。",
+      "random_scope": "本行已核主路径未见RNG抽样；不对所调用子系统/ANM内部作无随机宣称。"
+    },
+    {
+      "raw_type_hex": "0x8000",
+      "raw_type_u32": 32768,
+      "raw_type_i32": 32768,
+      "aliases": [
+        "REACT"
+      ],
+      "parameters": {
+        "a": "写入反应编号字段",
+        "b": "未见读取",
+        "c": "未见读取",
+        "d": "未见读取",
+        "r": "未见读取",
+        "s": "未见读取",
+        "m": "未见读取",
+        "n": "未见读取"
+      },
+      "lifecycle": "进入写th16+0xc4c/th18+0x664并PC+1；不设持续位。",
+      "comparison": "未核（消费者）",
+      "transcription_notes": "仅确认配置与写入同形，不能宣称回调语义或删去它。",
+      "unverified": "两作消费者均未在本轮追完。",
+      "handlers": {
+        "th16": null,
+        "th18": null
+      },
+      "evidence": [
+        {
+          "version": "th16.v1.00a",
+          "address": "0x413860",
+          "function": "bullet_vm_exec",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 239,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00413860.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x425c60",
+          "function": "Bullet__run_ex",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 624,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00425c60.html",
+          "reviewed": "existing Ghidra decompile export"
+        }
+      ],
+      "scope": "所列配置写入与控制流的静态比较；“相同”仅限所列已核子集，不是全效果/图形/原作逐帧等价认证。",
+      "async_index_append": "见共同配置与调度规则；逐条均沿用，不是每效果独立线程。",
+      "random_scope": "本行已核主路径未见RNG抽样；不对所调用子系统/ANM内部作无随机宣称。"
+    },
+    {
+      "raw_type_hex": "0x10000",
+      "raw_type_u32": 65536,
+      "raw_type_i32": 65536,
+      "aliases": [
+        "GOTO",
+        "LOOP"
+      ],
+      "parameters": {
+        "a": "目标EX记录index",
+        "b": "<=0无条件跳；>0使用逐弹共享循环计数",
+        "c": "未见读取",
+        "d": "未见读取",
+        "r": "未见读取",
+        "s": "未见读取",
+        "m": "未见读取",
+        "n": "未见读取"
+      },
+      "lifecycle": "当前EX内改变PC并继续取指；b计数归零后落到下一记录。",
+      "comparison": "相同（已核子集）",
+      "transcription_notes": "计数器每颗弹仅一个，嵌套goto不等同独立栈；回跳本身不强制等下一帧。",
+      "unverified": "",
+      "handlers": {
+        "th16": null,
+        "th18": null
+      },
+      "evidence": [
+        {
+          "version": "th16.v1.00a",
+          "address": "0x413860",
+          "function": "bullet_vm_exec",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 239,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00413860.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x425c60",
+          "function": "Bullet__run_ex",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 624,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00425c60.html",
+          "reviewed": "existing Ghidra decompile export"
+        }
+      ],
+      "scope": "所列配置写入与控制流的静态比较；“相同”仅限所列已核子集，不是全效果/图形/原作逐帧等价认证。",
+      "async_index_append": "见共同配置与调度规则；逐条均沿用，不是每效果独立线程。",
+      "random_scope": "本行已核主路径未见RNG抽样；不对所调用子系统/ANM内部作无随机宣称。"
+    },
+    {
+      "raw_type_hex": "0x20000",
+      "raw_type_u32": 131072,
+      "raw_type_i32": 131072,
+      "aliases": [
+        "MOVE"
+      ],
+      "parameters": {
+        "a": "持续时间",
+        "b": "低8位插值模式；0x100相对坐标",
+        "c": "未见读取",
+        "d": "未见读取",
+        "r": "目标x",
+        "s": "目标y",
+        "m": "未见读取",
+        "n": "未见读取"
+      },
+      "lifecycle": "进入固定目标/原speed并启动3D插值；tick把插值差写速度，末端snap目标并恢复原speed、清位。",
+      "comparison": "相同（已核子集）",
+      "transcription_notes": "相对点在EX进入读取当前位置；不是etEx配置时绑定。",
+      "unverified": "全部插值模式数学未跨作穷核；z写入顺序不作3D等价宣称。",
+      "handlers": {
+        "th16": "0x415f90",
+        "th18": "0x428710"
+      },
+      "evidence": [
+        {
+          "version": "th16.v1.00a",
+          "address": "0x413860",
+          "function": "bullet_vm_exec",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 239,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00413860.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th16.v1.00a",
+          "address": "0x415f90",
+          "function": "bullet_beh_move_to_point",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 252,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00415f90.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x425c60",
+          "function": "Bullet__run_ex",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 624,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00425c60.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x428710",
+          "function": "FUN_00428710",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 631,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00428710.html",
+          "reviewed": "existing Ghidra decompile export"
+        }
+      ],
+      "scope": "所列配置写入与控制流的静态比较；“相同”仅限所列已核子集，不是全效果/图形/原作逐帧等价认证。",
+      "async_index_append": "见共同配置与调度规则；逐条均沿用，不是每效果独立线程。",
+      "random_scope": "本行已核主路径未见RNG抽样；不对所调用子系统/ANM内部作无随机宣称。"
+    },
+    {
+      "raw_type_hex": "0x40000",
+      "raw_type_u32": 262144,
+      "raw_type_i32": 262144,
+      "aliases": [
+        "VEL"
+      ],
+      "parameters": {
+        "a": "未见读取",
+        "b": "未见读取",
+        "c": "未见读取",
+        "d": "未见读取",
+        "r": "<-990保留角；[-990,990)字面；>=990朝玩家+r-999",
+        "s": "<-990保留speed，否则直接赋speed",
+        "m": "未见读取",
+        "n": "未见读取"
+      },
+      "lifecycle": "进入立即写角/speed并重建速度向量；不设持续位。",
+      "comparison": "相同（已核子集）",
+      "transcription_notes": "使用990/-990小阈值体系，不可套ACCEL百万哨兵。",
+      "unverified": "",
+      "handlers": {
+        "th16": null,
+        "th18": null
+      },
+      "evidence": [
+        {
+          "version": "th16.v1.00a",
+          "address": "0x413860",
+          "function": "bullet_vm_exec",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 239,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00413860.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x425c60",
+          "function": "Bullet__run_ex",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 624,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00425c60.html",
+          "reviewed": "existing Ghidra decompile export"
+        }
+      ],
+      "scope": "所列配置写入与控制流的静态比较；“相同”仅限所列已核子集，不是全效果/图形/原作逐帧等价认证。",
+      "async_index_append": "见共同配置与调度规则；逐条均沿用，不是每效果独立线程。",
+      "random_scope": "本行已核主路径未见RNG抽样；不对所调用子系统/ANM内部作无随机宣称。"
+    },
+    {
+      "raw_type_hex": "0x80000",
+      "raw_type_u32": 524288,
+      "raw_type_i32": 524288,
+      "aliases": [
+        "VELADD"
+      ],
+      "parameters": {
+        "a": "写私有时限",
+        "b": "未见读取",
+        "c": "未见读取",
+        "d": "未见读取",
+        "r": "附加位移方向",
+        "s": "附加位移速度",
+        "m": "未见读取",
+        "n": "未见读取"
+      },
+      "lifecycle": "进入置0x80000及固定向量；handler直接pos+=vec*dt，且成功步把自身计时重置0；结束分支清0x1|0x8而不清自身。",
+      "comparison": "相同（已核子集）",
+      "transcription_notes": "a>0不能按普通有限duration终止；保留原生清位异常，不私自“修正”。",
+      "unverified": "a<=0与其他效果组合可能重入；本轮只记录控制流，未运行坏/极端参数。",
+      "handlers": {
+        "th16": "0x4161f0",
+        "th18": "0x423e10"
+      },
+      "evidence": [
+        {
+          "version": "th16.v1.00a",
+          "address": "0x413860",
+          "function": "bullet_vm_exec",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 239,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00413860.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th16.v1.00a",
+          "address": "0x4161f0",
+          "function": "bullet_beh_add_displacement",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 253,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/004161f0.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x425c60",
+          "function": "Bullet__run_ex",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 624,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00425c60.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x423e10",
+          "function": "Bullet__on_tick",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 616,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00423e10.html",
+          "reviewed": "existing Ghidra decompile export"
+        }
+      ],
+      "scope": "所列配置写入与控制流的静态比较；“相同”仅限所列已核子集，不是全效果/图形/原作逐帧等价认证。",
+      "async_index_append": "见共同配置与调度规则；逐条均沿用，不是每效果独立线程。",
+      "random_scope": "本行已核主路径未见RNG抽样；不对所调用子系统/ANM内部作无随机宣称。"
+    },
+    {
+      "raw_type_hex": "0x100000",
+      "raw_type_u32": 1048576,
+      "raw_type_i32": 1048576,
+      "aliases": [
+        "BRIGHT"
+      ],
+      "parameters": {
+        "a": "1/2选择混合标志，其余清相应模式位",
+        "b": "未见读取",
+        "c": "未见读取",
+        "d": "未见读取",
+        "r": "未见读取",
+        "s": "未见读取",
+        "m": "未见读取",
+        "n": "未见读取"
+      },
+      "lifecycle": "进入改显示flags；不设持续位。",
+      "comparison": "相同（已核子集）",
+      "transcription_notes": "只是混合模式，不能代替尺寸/碰撞变化。",
+      "unverified": "",
+      "handlers": {
+        "th16": null,
+        "th18": null
+      },
+      "evidence": [
+        {
+          "version": "th16.v1.00a",
+          "address": "0x413860",
+          "function": "bullet_vm_exec",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 239,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00413860.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x425c60",
+          "function": "Bullet__run_ex",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 624,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00425c60.html",
+          "reviewed": "existing Ghidra decompile export"
+        }
+      ],
+      "scope": "所列配置写入与控制流的静态比较；“相同”仅限所列已核子集，不是全效果/图形/原作逐帧等价认证。",
+      "async_index_append": "见共同配置与调度规则；逐条均沿用，不是每效果独立线程。",
+      "random_scope": "本行已核主路径未见RNG抽样；不对所调用子系统/ANM内部作无随机宣称。"
+    },
+    {
+      "raw_type_hex": "0x200000",
+      "raw_type_u32": 2097152,
+      "raw_type_i32": 2097152,
+      "aliases": [
+        "VELTIME",
+        "ACCELWEIRD"
+      ],
+      "parameters": {
+        "a": "持续时间/计算斜坡的分母",
+        "b": "未见读取",
+        "c": "未见读取",
+        "d": "未见读取",
+        "r": "目标标量速",
+        "s": "角参数；各版本解析不同",
+        "m": "TH18瞄准偏移或随机幅度",
+        "n": "未见读取"
+      },
+      "lifecycle": "进入保存delta=(r-current_speed)/a和方向；tick向速度向量加固定delta向量，并标量+=delta*dt；到期清位。",
+      "comparison": "不同",
+      "transcription_notes": "它不是每帧向玩家追踪；角随机只在进入采样。标量速度不从向量长度回算。",
+      "unverified": "",
+      "handlers": {
+        "th16": "0x4151e0",
+        "th18": "0x427b60"
+      },
+      "evidence": [
+        {
+          "version": "th16.v1.00a",
+          "address": "0x413860",
+          "function": "bullet_vm_exec",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 239,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00413860.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th16.v1.00a",
+          "address": "0x4151e0",
+          "function": "bullet_beh_speed_ramp",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 243,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/004151e0.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x425c60",
+          "function": "Bullet__run_ex",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 624,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00425c60.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x427b60",
+          "function": "FUN_00427b60",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 627,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00427b60.html",
+          "reviewed": "existing Ghidra decompile export"
+        }
+      ],
+      "scope": "所列配置写入与控制流的静态比较；“相同”仅限所列已核子集，不是全效果/图形/原作逐帧等价认证。",
+      "async_index_append": "见共同配置与调度规则；逐条均沿用，不是每效果独立线程。",
+      "random_scope": "逐弹私有状态；随机若启用消耗全局REPLAY_SAFE_RNG；详见角度小节。"
+    },
+    {
+      "raw_type_hex": "0x400000",
+      "raw_type_u32": 4194304,
+      "raw_type_i32": 4194304,
+      "aliases": [
+        "SIZE"
+      ],
+      "parameters": {
+        "a": "插值结束时间",
+        "b": "插值模式",
+        "c": "未见读取",
+        "d": "未见读取",
+        "r": "初始尺寸",
+        "s": "最终尺寸",
+        "m": "未见读取",
+        "n": "未见读取"
+      },
+      "lifecycle": "进入创建标量插值并置缩放flags；tick在EX解释前推进；插值结束清active位，输出1时可清缩放flags。",
+      "comparison": "相同（已核子集）",
+      "transcription_notes": "EX_SIZE当次进入后主循环的最早推进相位与一般handler不同；影响判定及裁剪，不只是精灵。",
+      "unverified": "插值全模式及所有几何分支未证明等价；已有TH18几何报告另证。",
+      "handlers": {
+        "th16": "0x4171c0",
+        "th18": "0x423e10"
+      },
+      "evidence": [
+        {
+          "version": "th16.v1.00a",
+          "address": "0x413860",
+          "function": "bullet_vm_exec",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 239,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00413860.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th16.v1.00a",
+          "address": "0x4171c0",
+          "function": "bullet_size_interp",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 262,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/004171c0.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x425c60",
+          "function": "Bullet__run_ex",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 624,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00425c60.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x423e10",
+          "function": "Bullet__on_tick",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 616,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00423e10.html",
+          "reviewed": "existing Ghidra decompile export"
+        }
+      ],
+      "scope": "所列配置写入与控制流的静态比较；“相同”仅限所列已核子集，不是全效果/图形/原作逐帧等价认证。",
+      "async_index_append": "见共同配置与调度规则；逐条均沿用，不是每效果独立线程。",
+      "random_scope": "本行已核主路径未见RNG抽样；不对所调用子系统/ANM内部作无随机宣称。"
+    },
+    {
+      "raw_type_hex": "0x800000",
+      "raw_type_u32": 8388608,
+      "raw_type_i32": 8388608,
+      "aliases": [
+        "SAVE",
+        "SAVEANGLE"
+      ],
+      "parameters": {
+        "a": "未见读取",
+        "b": "未见读取",
+        "c": "未见读取",
+        "d": "未见读取",
+        "r": "未见读取",
+        "s": "未见读取",
+        "m": "未见读取",
+        "n": "未见读取"
+      },
+      "lifecycle": "进入复制当前xyz/angle/speed到逐弹快照；PC+1，无持续位。",
+      "comparison": "相同（已核子集）",
+      "transcription_notes": "由STEP c2/c3读取；快照不是发射器公共状态。",
+      "unverified": "",
+      "handlers": {
+        "th16": null,
+        "th18": null
+      },
+      "evidence": [
+        {
+          "version": "th16.v1.00a",
+          "address": "0x413860",
+          "function": "bullet_vm_exec",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 239,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00413860.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x425c60",
+          "function": "Bullet__run_ex",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 624,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00425c60.html",
+          "reviewed": "existing Ghidra decompile export"
+        }
+      ],
+      "scope": "所列配置写入与控制流的静态比较；“相同”仅限所列已核子集，不是全效果/图形/原作逐帧等价认证。",
+      "async_index_append": "见共同配置与调度规则；逐条均沿用，不是每效果独立线程。",
+      "random_scope": "本行已核主路径未见RNG抽样；不对所调用子系统/ANM内部作无随机宣称。"
+    },
+    {
+      "raw_type_hex": "0x1000000",
+      "raw_type_u32": 16777216,
+      "raw_type_i32": 16777216,
+      "aliases": [
+        "ENMCREATE",
+        "ENEMY"
+      ],
+      "parameters": {
+        "a": "子敌I0",
+        "b": "子敌I1",
+        "c": "子敌I2",
+        "d": "子敌I3",
+        "r": "子敌F0",
+        "s": "子敌F1",
+        "m": "子敌F2",
+        "n": "子敌F3"
+      },
+      "lifecycle": "进入用当前弹位置创建敌人；sub字符串来自记录+0x28（由额外ECL字符串指令配置），非a字段。",
+      "comparison": "相同（已核子集）",
+      "transcription_notes": "在bullet相位创建敌人，保留字符串和8个参数；不能只发同形子弹。",
+      "unverified": "子敌首次运行时点及管理器后续全部生命周期未在本轮复核。",
+      "handlers": {
+        "th16": null,
+        "th18": null
+      },
+      "evidence": [
+        {
+          "version": "th16.v1.00a",
+          "address": "0x413860",
+          "function": "bullet_vm_exec",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 239,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00413860.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x425c60",
+          "function": "Bullet__run_ex",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 624,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00425c60.html",
+          "reviewed": "existing Ghidra decompile export"
+        }
+      ],
+      "scope": "所列配置写入与控制流的静态比较；“相同”仅限所列已核子集，不是全效果/图形/原作逐帧等价认证。",
+      "async_index_append": "见共同配置与调度规则；逐条均沿用，不是每效果独立线程。",
+      "random_scope": "本行已核主路径未见RNG抽样；不对所调用子系统/ANM内部作无随机宣称。"
+    },
+    {
+      "raw_type_hex": "0x2000000",
+      "raw_type_u32": 33554432,
+      "raw_type_i32": 33554432,
+      "aliases": [
+        "LAYER"
+      ],
+      "parameters": {
+        "a": "渲染桶/层索引",
+        "b": "未见读取",
+        "c": "未见读取",
+        "d": "未见读取",
+        "r": "未见读取",
+        "s": "未见读取",
+        "m": "未见读取",
+        "n": "未见读取"
+      },
+      "lifecycle": "进入写层字段，PC+1，无持续位。",
+      "comparison": "相同（已核子集）",
+      "transcription_notes": "不同于EX程序index，也不同于ANM layer。",
+      "unverified": "",
+      "handlers": {
+        "th16": null,
+        "th18": null
+      },
+      "evidence": [
+        {
+          "version": "th16.v1.00a",
+          "address": "0x413860",
+          "function": "bullet_vm_exec",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 239,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00413860.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x425c60",
+          "function": "Bullet__run_ex",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 624,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00425c60.html",
+          "reviewed": "existing Ghidra decompile export"
+        }
+      ],
+      "scope": "所列配置写入与控制流的静态比较；“相同”仅限所列已核子集，不是全效果/图形/原作逐帧等价认证。",
+      "async_index_append": "见共同配置与调度规则；逐条均沿用，不是每效果独立线程。",
+      "random_scope": "本行已核主路径未见RNG抽样；不对所调用子系统/ANM内部作无随机宣称。"
+    },
+    {
+      "raw_type_hex": "0x4000000",
+      "raw_type_u32": 67108864,
+      "raw_type_i32": 67108864,
+      "aliases": [
+        "DELAY"
+      ],
+      "parameters": {
+        "a": "等待时间；<1直接前进",
+        "b": "未见读取",
+        "c": "未见读取",
+        "d": "未见读取",
+        "r": "未见读取",
+        "s": "未见读取",
+        "m": "未见读取",
+        "n": "未见读取"
+      },
+      "lifecycle": "进入置0x4000000；期间跳过EX解释并置0x200阻止通常运动/碰撞；到期清门且同tick可续跑。",
+      "comparison": "相同（已核子集）",
+      "transcription_notes": "已激活的其他handler仍处于派发循环，不能概括为冻结全部效果。",
+      "unverified": "",
+      "handlers": {
+        "th16": "0x411e70",
+        "th18": "0x423e10"
+      },
+      "evidence": [
+        {
+          "version": "th16.v1.00a",
+          "address": "0x413860",
+          "function": "bullet_vm_exec",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 239,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00413860.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th16.v1.00a",
+          "address": "0x411e70",
+          "function": "bullet_tick",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 233,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00411e70.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x425c60",
+          "function": "Bullet__run_ex",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 624,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00425c60.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x423e10",
+          "function": "Bullet__on_tick",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 616,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00423e10.html",
+          "reviewed": "existing Ghidra decompile export"
+        }
+      ],
+      "scope": "所列配置写入与控制流的静态比较；“相同”仅限所列已核子集，不是全效果/图形/原作逐帧等价认证。",
+      "async_index_append": "见共同配置与调度规则；逐条均沿用，不是每效果独立线程。",
+      "random_scope": "本行已核主路径未见RNG抽样；不对所调用子系统/ANM内部作无随机宣称。"
+    },
+    {
+      "raw_type_hex": "0x8000000",
+      "raw_type_u32": 134217728,
+      "raw_type_i32": 134217728,
+      "aliases": [
+        "LASER"
+      ],
+      "parameters": {
+        "a": "0线激光；1无限激光；其他值不创建",
+        "b": "sprite",
+        "c": "color",
+        "d": "a0:非0删除父；a1:flags及起始effect_index/删父打包",
+        "r": "角/哨兵",
+        "s": "speed/保留哨兵",
+        "m": "线:长度；无限:附加浮点字段（未核命名）",
+        "n": "线:长度相关字段；无限:长度"
+      },
+      "lifecycle": "进入消费下一记录并复制父EX，创建线/无限激光；PC+2；按d删父。",
+      "comparison": "不同",
+      "transcription_notes": "TH18高角哨兵上界与SHOOT相似；配对记录布局见正文。激光自己的EX支持范围需另核。",
+      "unverified": "线/无限完整消费者及TH18图形宽度/距离字段逐项效果未在本轮核完。",
+      "handlers": {
+        "th16": null,
+        "th18": null
+      },
+      "evidence": [
+        {
+          "version": "th16.v1.00a",
+          "address": "0x413860",
+          "function": "bullet_vm_exec",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 239,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00413860.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x425c60",
+          "function": "Bullet__run_ex",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 624,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00425c60.html",
+          "reviewed": "existing Ghidra decompile export"
+        }
+      ],
+      "scope": "所列配置写入与控制流的静态比较；“相同”仅限所列已核子集，不是全效果/图形/原作逐帧等价认证。",
+      "async_index_append": "见共同配置与调度规则；逐条均沿用，不是每效果独立线程。",
+      "random_scope": "本行已核主路径未见RNG抽样；不对所调用子系统/ANM内部作无随机宣称。"
+    },
+    {
+      "raw_type_hex": "0x20000000",
+      "raw_type_u32": 536870912,
+      "raw_type_i32": 536870912,
+      "aliases": [
+        "HITBOX"
+      ],
+      "parameters": {
+        "a": "未见读取",
+        "b": "未见读取",
+        "c": "未见读取",
+        "d": "未见读取",
+        "r": ">=0为动态半径；<0恢复当前弹型默认半径",
+        "s": "未见读取",
+        "m": "未见读取",
+        "n": "未见读取"
+      },
+      "lifecycle": "进入同时写两个半径字段；不设持续位。",
+      "comparison": "相同（已核子集）",
+      "transcription_notes": "sprite变换也会刷新半径，执行顺序须保留。",
+      "unverified": "",
+      "handlers": {
+        "th16": null,
+        "th18": null
+      },
+      "evidence": [
+        {
+          "version": "th16.v1.00a",
+          "address": "0x413860",
+          "function": "bullet_vm_exec",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 239,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00413860.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x425c60",
+          "function": "Bullet__run_ex",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 624,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00425c60.html",
+          "reviewed": "existing Ghidra decompile export"
+        }
+      ],
+      "scope": "所列配置写入与控制流的静态比较；“相同”仅限所列已核子集，不是全效果/图形/原作逐帧等价认证。",
+      "async_index_append": "见共同配置与调度规则；逐条均沿用，不是每效果独立线程。",
+      "random_scope": "本行已核主路径未见RNG抽样；不对所调用子系统/ANM内部作无随机宣称。"
+    },
+    {
+      "raw_type_hex": "0x80000000",
+      "raw_type_u32": 2147483648,
+      "raw_type_i32": -2147483648,
+      "aliases": [
+        "WAIT"
+      ],
+      "parameters": {
+        "a": "等待时间；<1直接前进",
+        "b": "未见读取",
+        "c": "未见读取",
+        "d": "未见读取",
+        "r": "未见读取",
+        "s": "未见读取",
+        "m": "未见读取",
+        "n": "未见读取"
+      },
+      "lifecycle": "进入置高位及计时；其他handler/运动继续；倒计时结束清位并允许同tick续跑。",
+      "comparison": "相同（已核子集）",
+      "transcription_notes": "有符号存储是-2147483648；不要把它解析成负的效果序号。",
+      "unverified": "",
+      "handlers": {
+        "th16": "0x411e70",
+        "th18": "0x423e10"
+      },
+      "evidence": [
+        {
+          "version": "th16.v1.00a",
+          "address": "0x413860",
+          "function": "bullet_vm_exec",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 239,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00413860.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th16.v1.00a",
+          "address": "0x411e70",
+          "function": "bullet_tick",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 233,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00411e70.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x425c60",
+          "function": "Bullet__run_ex",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 624,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00425c60.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x423e10",
+          "function": "Bullet__on_tick",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 616,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00423e10.html",
+          "reviewed": "existing Ghidra decompile export"
+        }
+      ],
+      "scope": "所列配置写入与控制流的静态比较；“相同”仅限所列已核子集，不是全效果/图形/原作逐帧等价认证。",
+      "async_index_append": "见共同配置与调度规则；逐条均沿用，不是每效果独立线程。",
+      "random_scope": "本行已核主路径未见RNG抽样；不对所调用子系统/ANM内部作无随机宣称。"
+    },
+    {
+      "raw_type_hex": "0x40000000",
+      "raw_type_u32": 1073741824,
+      "raw_type_i32": 1073741824,
+      "aliases": [
+        "HOMING（行为别名）"
+      ],
+      "parameters": {
+        "a": "持续时间",
+        "b": "未见读取",
+        "c": "未见读取",
+        "d": "未见读取",
+        "r": "目标速度",
+        "s": "瞄准角偏移",
+        "m": "每步速度向量混合系数",
+        "n": "未见读取"
+      },
+      "lifecycle": "TH16未见分派；TH18进入挂参数，每tick重读玩家，v+=(target_v-v)*m，更新angle/speed；到a清位。",
+      "comparison": "TH18新增",
+      "transcription_notes": "raw type=0x40000000。m是混合系数，社区把它叫target_x不能作为位置目标解释。",
+      "unverified": "未证明社区ordinal31在全部其他版本均映射此位；只对本TH18样本成立。",
+      "handlers": {
+        "th16": null,
+        "th18": "0x428460"
+      },
+      "evidence": [
+        {
+          "version": "th16.v1.00a",
+          "address": "0x413860",
+          "function": "bullet_vm_exec",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 239,
+          "html": "/data/sunyunbo/www/renkolab/local/th16.v1.00a/state/f/00413860.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x425c60",
+          "function": "Bullet__run_ex",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 624,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00425c60.html",
+          "reviewed": "existing Ghidra decompile export"
+        },
+        {
+          "version": "th18.v1.00a",
+          "address": "0x428460",
+          "function": "FUN_00428460",
+          "jsonl": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/data/functions.jsonl",
+          "jsonl_line": 630,
+          "html": "/data/sunyunbo/www/renkolab/local/th18.v1.00a/state/f/00428460.html",
+          "reviewed": "existing Ghidra decompile export"
+        }
+      ],
+      "scope": "所列配置写入与控制流的静态比较；“相同”仅限所列已核子集，不是全效果/图形/原作逐帧等价认证。",
+      "async_index_append": "见共同配置与调度规则；逐条均沿用，不是每效果独立线程。",
+      "random_scope": "本行已核主路径未见RNG抽样；不对所调用子系统/ANM内部作无随机宣称。"
+    }
+  ],
+  "extra_inventory": [
+    {
+      "raw_type_hex": "0x20",
+      "th16": "normal bullet EX分派未用；不能由位号推出效果",
+      "th18": "normal bullet EX分派未用；不能由位号推出效果"
+    },
+    {
+      "raw_type_hex": "0x10000000",
+      "alias": "LASER_DATA（社区名）",
+      "th16": "normal bullet到达时无独立动作；可作为LASER配对记录",
+      "th18": "normal bullet到达时无独立动作；可作为LASER配对记录"
+    },
+    {
+      "community_ordinal": 32,
+      "alias": "ACCEL_2",
+      "status": "本两作normal bullet分派未识别对应新增raw type；不可按名字移植"
+    },
+    {
+      "community_ordinal": 33,
+      "alias": "NO_GRAZE_EFFECT",
+      "status": "本两作normal bullet分派未识别对应新增raw type；不可按名字移植"
+    }
+  ],
+  "limitations": [
+    "Static inspection, no original-game execution or frame-by-frame golden replay",
+    "Existing exported decompilers retain missing XMM parameter annotations; live Listing used for key TH18 angle/new-bit branches",
+    "Not every helper or interpolation mode proved cross-version equivalent",
+    "No symbol import/reanalysis/database save; no production changes, no commit/push"
+  ],
+  "verification_command": "python transcribe/work/th16-th18-ex-20261105/verify_report.py",
+  "critical_findings": {
+    "th18_angle_helper": {
+      "address": "th18:0x425b40",
+      "abi": {
+        "ECX": "bullet position pointer",
+        "XMM0": "current angle",
+        "XMM2": "angle argument",
+        "XMM3": "offset or random amplitude m"
+      },
+      "branches": [
+        {
+          "range": "q<=-999990",
+          "result": "current angle"
+        },
+        {
+          "range": "-999990<q<999990",
+          "result": "q literal"
+        },
+        {
+          "range": "999990<=q<1999990",
+          "result": "angle from bullet to player + m"
+        },
+        {
+          "range": "1999990<=q<2999990",
+          "result": "q literal"
+        },
+        {
+          "range": "2999990<=q<3999990",
+          "result": "angle from bullet to player + m*U"
+        },
+        {
+          "range": "3999990<=q<4999990",
+          "result": "current angle + m*U"
+        },
+        {
+          "range": "q>=4999990",
+          "result": "atan2(boss0.y-bullet.y,boss0.x-bullet.x)"
+        }
+      ],
+      "rng": "th18:0x402810",
+      "shared_rng": "th18:0x4cf288",
+      "sampling": "on EX entry; saved per bullet, not per interpolation tick",
+      "listing_call_sites": {
+        "ACCEL": "th18:0x425e75",
+        "VELTIME": "th18:0x426eec",
+        "random_aim": "th18:0x425bab",
+        "random_current": "th18:0x425be0"
+      }
+    },
+    "invuln": {
+      "meaning": "bomb circle cancel immunity; collision may preserve bullet after player hit test, not player safety",
+      "decrement_difference": "TH16 active handler loop and function tail; TH18 function tail only",
+      "evidence": [
+        "th16:0x411e70",
+        "th18:0x423e10",
+        "th16:0x416d20",
+        "th18:0x429370",
+        "th18:0x4248a0"
+      ]
+    },
+    "data_record_note": "SHOOT/LASER consume the physically adjacent record; no independently executed normal-bullet action required for its type"
+  }
+}

@@ -10,7 +10,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 TRANSCRIBE_DIR = REPO_ROOT / "transcribe"
 TH06_DIR = TRANSCRIBE_DIR / "th06"
 WORK_DIR = TRANSCRIBE_DIR / "work"
-CONTRACTS_DIR = TRANSCRIBE_DIR / "contracts"
+CONTRACTS_DIR = TH06_DIR / "contracts"
 CARDS_DIR = REPO_ROOT / "cards"
 
 

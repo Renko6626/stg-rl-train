@@ -13,7 +13,7 @@ import stg_rl
 import torch
 
 from stgtrain import actions, evaluate
-from stgtrain.cards import discover
+from stgtrain.cards import configured_cards
 from stgtrain.checkpoint import load_checkpoint
 from stgtrain.config import deep_merge, from_dict
 from stgtrain.envwrap import EnvWrapper, RawObs, _off
@@ -158,7 +158,7 @@ def main():
         specs = [s for s in specs if s.card in a.cards]
     ppo = PPO(cfg, factory, device)
     ppo.load_state_dict(ck["state"])
-    cards = discover(cfg["env"]["cards_dir"])
+    cards = configured_cards(cfg["env"])
     manifest = {"status": "running", "mode": a.mode, "interval": a.interval,
                 "episodes_per_group": a.episodes, "config": cfg,
                 "checkpoint": str(a.checkpoint.resolve()), "checkpoint_sha256": sha(a.checkpoint),

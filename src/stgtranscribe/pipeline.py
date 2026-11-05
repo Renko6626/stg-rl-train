@@ -73,7 +73,7 @@ def states() -> dict[str, dict]:
 
 
 def stage_of(uid: str) -> int:
-    m = U.ID_RE.match(uid)
+    m = U.TH06_ID_RE.fullmatch(uid)
     return int(m.group(1)) if m else 0
 
 
@@ -361,7 +361,7 @@ def do_sample(stage: int, rate: float, seed: int = 0) -> list[str]:
 def do_collect(stage: int) -> list[str]:
     done = []
     for uid in _select(stage, {"reviewed"}, None):
-        dst = config.CARDS_DIR / uid
+        dst = config.CARDS_DIR / "th06" / uid
         if dst.exists():
             shutil.rmtree(dst)
         shutil.copytree(units_dir() / uid / "out", dst, ignore=shutil.ignore_patterns("report.md"))
@@ -389,7 +389,8 @@ def measure_density() -> list[dict]:
         return {"id": d.name, "rank": rank, "peak": parse_summary(out).peak_bullets,
                 "mean": round(sum(vals) / max(len(vals), 1), 1)}
 
-    cards = sorted(p for p in config.CARDS_DIR.iterdir() if (p / "meta.toml").exists())
+    from stgtrain.cards import discover
+    cards = [card.path for card in discover(config.CARDS_DIR / "th06").values()]
     jobs = [(d, r) for d in cards for r in (0, 1, 2, 3, 4)]   # 4 = Extra（meta.ranks 过滤）
     with ThreadPoolExecutor(max_workers=16) as ex:
         return [r for r in ex.map(one, jobs) if r]
@@ -411,7 +412,7 @@ def _usage_rows() -> list[dict]:
 
 def status_table(stage: int | None) -> str:
     st = states()
-    rows = sorted((u, r) for u, r in st.items() if U.ID_RE.match(u) and (stage is None or stage_of(u) == stage))
+    rows = sorted((u, r) for u, r in st.items() if U.TH06_ID_RE.fullmatch(u) and (stage is None or stage_of(u) == stage))
     counts: dict[str, int] = {}
     for _, r in rows:
         counts[r["state"]] = counts.get(r["state"], 0) + 1
@@ -453,7 +454,7 @@ def main(argv: list[str] | None = None) -> int:
     s = sub.add_parser("sample"); s.add_argument("--stage", type=int, required=True); s.add_argument("--rate", type=float, default=0.2)
     s = sub.add_parser("status"); s.add_argument("--stage", type=int)
     s = sub.add_parser("density"); s.add_argument("--rank", type=int, default=2)
-    s.add_argument("--out", default="cards/density.json")
+    s.add_argument("--out", default="cards/th06/density.json")
     s = sub.add_parser("notes"); s.add_argument("--all", action="store_true", help="含已分诊的")
     s.add_argument("--mark", action="store_true", help="把本次列出的标记为已分诊")
     s = sub.add_parser("usage"); s.add_argument("--stage", type=int); s.add_argument("--since", default=None,

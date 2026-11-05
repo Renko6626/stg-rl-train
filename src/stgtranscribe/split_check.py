@@ -30,7 +30,7 @@ def _ranks_ok(r, stage: int) -> str | None:
 
 
 def _id_ok(uid, stage: int, letter: str) -> str | None:
-    m = U.ID_RE.match(uid) if isinstance(uid, str) else None
+    m = U.TH06_ID_RE.fullmatch(uid) if isinstance(uid, str) else None
     if not m:
         return f"id {uid!r} 不合 th06_s<关>_<w|mb|b><序号>"
     if int(m.group(1)) != stage:

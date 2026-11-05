@@ -3,9 +3,9 @@
 ## 进入项目先读
 
 - 每次开始任务，先读 [项目记忆索引](docs/agent-memory/MEMORY.md)，再按任务打开相关条目；这些是跨会话保存的用户约定和项目经验。
-- 项目是 stg-engine 躲弹模型的 PPO 训练仓，同时包含 TH06 弹幕转写流水线。
+- 项目是 stg-engine 躲弹模型的 PPO 训练仓，同时包含 TH06 弹幕转写流水线与 TH18 单攻击转写参考。
 - 开发入口见 [README.md](README.md)；训练设计见 [设计文档](docs/2026-09-15-stg-rl-train-design.md)；实验经过与结论见 [实验记录](docs/experiments.md)。
-- Magnus 工作先读 [迁移说明](docs/magnus-migration.md)；转写工作先读 [转写说明](transcribe/README.md)、[转写设计](docs/2026-09-16-th06-transcribe-design.md) 和 `transcribe/contracts/` 中对应阶段的约定。
+- Magnus 工作先读 [迁移说明](docs/magnus-migration.md)。TH06/NC 转写先读 [转写总览](transcribe/README.md)、[TH06 操作说明](transcribe/th06/README.md)、[转写设计](docs/2026-09-16-th06-transcribe-design.md) 和 `transcribe/th06/contracts/` 中对应阶段的约定；TH18 先读[转写教材](transcribe/th18/mapping.md)，按[专用入口](transcribe/th18/README.md)查表，再读[skill](.claude/skills/th18-transcribe/SKILL.md)和 `transcribe/th18/contracts/`。单卡使用共用 validate 的 [TH18 规则](transcribe/th18/validation.md)，不沿用 TH06 批量切分/摘录命令。
 
 ## 用户约定
 
@@ -37,6 +37,8 @@ bash run.sh configs/smoke.toml smoke
 ## 转写与产物
 
 - 转写 worker 的现有后端是 dsh-flash；历史备用方案是 `transcribe/tools/claude-worker`，Sonnet 用 `--jobs 4`，dsh 审核后必须有 Opus 抽检与逐条复核，详见 [worker 记忆](docs/agent-memory/transcribe-claude-worker-fallback.md)。迁移项目指引不等于更换流水线后端或取消抽检要求。
+- 成品按 `cards/<th06|th18|synthetic>/<id>/` 放置，生产资料在 `transcribe/` 下同名目录；细分用metadata，暂停用 `enabled=false`，不再建根目录 `cards-*`。实验加载用 `configured_cards(cfg["env"])` 保留来源/标签筛选。
+- 新转写/合成任务不重复加入hash、冻结或签名要求；保留必要编译运行与独立审核，行为变化只补受影响检查。历史SHA流程不默认推广，引擎wheel交付一致性约定另行保留。
 - `transcribe/work/` 含原作 ECL 摘录，永不入库；`runs/`、`dist/`、虚拟环境和构建产物遵守现有 `.gitignore`。
 - ONNX 导出后检查自动 torch / onnxruntime 对拍；改图签名时训练侧与部署侧一起更新 `GRAPH_VERSION`。细节见 README。
 

@@ -17,7 +17,7 @@ from pathlib import Path
 import numpy as np
 import stg_rl
 
-from .cards import _specialist_metadata_errors
+from .cards import _specialist_metadata_errors, synthetic_cards
 
 
 DIAGNOSTICS = ("task_faults", "contract_viol", "pool_full", "hits_ovf", "events_ovf", "reqs_dropped")
@@ -811,13 +811,13 @@ def _validate_card(card_dir: Path, harness: Path, seeds: tuple[int, ...]) -> dic
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("root", type=Path, help="单张卡目录，或配合--all传入卡集合根目录")
-    parser.add_argument("--all", action="store_true", help="验收root下所有直接子目录")
+    parser.add_argument("--all", action="store_true", help="验收root中启用的laser_specialist卡")
     parser.add_argument("--json", required=True, type=Path, help="JSON报告文件；--all时作为报告目录")
     parser.add_argument("--harness", type=Path, default=Path("/data/sunyunbo/www/stg-engine/target/release/stg-harness"))
     parser.add_argument("--seeds", type=int, nargs="+", default=[1, 7])
     args = parser.parse_args(argv)
     if args.all:
-        cards = sorted(p for p in args.root.iterdir() if p.is_dir()) if args.root.is_dir() else []
+        cards = [card.path for card in synthetic_cards(args.root, "laser_specialist").values()]
     else:
         cards = [args.root]
     if not cards:

@@ -115,6 +115,7 @@ def mutate(fn):
 @pytest.mark.parametrize("fn, needle", [
     (lambda s: s.update(stage=2), "stage 应为 1"),
     (lambda s: s["waves"][0].update(id="th06_s1_x1"), "不合"),
+    (lambda s: s["waves"][0].update(id="th18_s1_w01"), "不合"),
     (lambda s: s["waves"][1].update(id="th06_s1_w01"), "重复"),
     (lambda s: s["waves"][0].update(t_end=110), "落在 0 个波次"),
     (lambda s: s["waves"][0].update(tail=2900), "> 3000"),

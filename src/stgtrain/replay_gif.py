@@ -28,7 +28,7 @@ from PIL import Image, ImageDraw
 from stgtranscribe import preview as P
 
 from . import actions
-from .cards import allowed_ranks, discover
+from .cards import allowed_ranks, configured_cards
 from .checkpoint import load_checkpoint
 from .config import deep_merge, from_dict
 from .envwrap import EnvWrapper, _fx, _i32, _off, _u16
@@ -73,7 +73,7 @@ class Episode:
     done: int = 0
 
 
-def decode_env(buf: dict, i: int) -> EnvFrame:
+def decode_env(buf: dict, i: int, sprites: list[int] | None = None) -> EnvFrame:
     """第 i 个 env 的原始缓冲（世界坐标、未镜像）→ 画面用的一帧。"""
     lo, hi = int(buf["bullets_offsets"][i]), int(buf["bullets_offsets"][i + 1])
     rows = buf["bullets"][lo:hi]
@@ -82,7 +82,10 @@ def decode_env(buf: dict, i: int) -> EnvFrame:
         xs, ys = _fx(rows, _off("bullets", "x")), _fx(rows, _off("bullets", "y"))
         ang = _u16(rows, _off("bullets", "angle")).to(torch.float32) * (360.0 / 65536.0)
         spr = _u16(rows, _off("bullets", "type"))
-        bullets = [P.Bullet(x, y, d, s) for x, y, d, s in zip(xs.tolist(), ys.tolist(), ang.tolist(), spr.tolist())]
+        if sprites is None:
+            sprites = P.appearance_sprites()
+        bullets = [P.Bullet(x, y, d, P.physical_sprite(s, sprites))
+                   for x, y, d, s in zip(xs.tolist(), ys.tolist(), ang.tolist(), spr.tolist())]
     ne = int(buf["enemies_count"][i])
     en = buf["enemies"][i, :ne]
     enemies = [P.Enemy(x, y, 0) for x, y in zip(_fx(en, _off("enemies", "x")).tolist(),
@@ -129,6 +132,7 @@ def record(cfg: dict, ppo, featurizer, image, card: str, rank: int, episodes: in
     eps = {i: Episode(card, rank, i, hold_r, envw.frame_skip) for i in indices}
     live = set(indices)
     obs = envw.reset()
+    sprites = P.appearance_sprites()
     step_cap = int(cfg["env"]["max_frames"]) // envw.frame_skip + 2
     if max_frames:
         step_cap = min(step_cap, max_frames // envw.frame_skip)
@@ -138,7 +142,7 @@ def record(cfg: dict, ppo, featurizer, image, card: str, rank: int, episodes: in
         frame_no = step * envw.frame_skip
         for i in live:
             t = envw.intent.target[i].tolist()
-            eps[i].frames.append(RecFrame(frame_no, decode_env(envw.buf, i), (t[0], t[1]), int(buttons[i])))
+            eps[i].frames.append(RecFrame(frame_no, decode_env(envw.buf, i, sprites), (t[0], t[1]), int(buttons[i])))
         obs, info = envw.step(action)
         done = info.done.cpu()
         for i in list(live):
@@ -254,7 +258,7 @@ def main(argv: list[str] | None = None) -> int:
     ppo.load_state_dict(ck["state"])
 
     split_n = {s.card: s.episodes for s in specs}
-    all_cards = discover(cfg["env"]["cards_dir"])
+    all_cards = configured_cards(cfg["env"])
     cards = a.cards.split(",") if a.cards else [s.card for s in specs]
     indices = [int(x) for x in a.episodes.split(",")]
     out_dir = Path(a.out) if a.out else ckp.parent.parent / "replay"

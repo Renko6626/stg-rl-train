@@ -19,7 +19,7 @@ import torch
 from tensordict import TensorDict
 
 from .config import deep_merge
-from .cards import discover, start_intent_mixes
+from .cards import configured_cards, start_intent_mixes
 from .envwrap import EnvWrapper, usable_cpus
 from .perf import machine_info
 from .ppo import PPO
@@ -75,7 +75,7 @@ def minibatch_seconds(cfg: dict, device: torch.device, featurizer, factory, obs)
 def run_bench(cfg: dict, out_dir: Path) -> dict:
     device = pick_device(cfg["run"]["device"])
     images, starts, _, featurizer, factory = build_components(cfg, device)
-    start_mixes = start_intent_mixes(discover(cfg["env"]["cards_dir"]), starts, cfg["intent"]["mix"],
+    start_mixes = start_intent_mixes(configured_cards(cfg["env"]), starts, cfg["intent"]["mix"],
                                      cfg["intent"].get("card_mix_enabled", False))
     model = factory().to(device).eval()
     cpu = usable_cpus()

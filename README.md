@@ -51,6 +51,10 @@ uv run --frozen python -m stgtrain.export_onnx runs/<run>/checkpoints/best.pt --
 
 v8导出使用**图版本6**：在版本5的激光表／mask之后追加 `laser_start_len: float32[L]`，必须与激光行对齐，填引擎的设定棒长，不能用当前长度代替。版本2–5的输入保持不变。TH06NC共享C部署接口已适配，T8四根激光模型与mod已[打包](docs/practice-cards/2026-10-02-t8-th06nc-package.md)；未做Windows游戏实机验收。其他部署调用方仍须按签名适配。
 
+## 卡库与生产入口
+
+成品统一放 `cards/th06/`、`cards/th18/`、`cards/synthetic/`，生产资料对应 `transcribe/` 下同名目录。题材与启用状态使用metadata，训练配置明确选择来源与标签。见[卡库说明](cards/README.md)和[生产总览](transcribe/README.md)。
+
 ## 开发
 
 ```bash

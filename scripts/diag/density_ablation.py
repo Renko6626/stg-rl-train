@@ -15,7 +15,7 @@ import stg_rl
 import tensordict
 import torch
 
-from stgtrain.cards import EvalSpec, discover, load_splits
+from stgtrain.cards import EvalSpec, configured_cards, load_splits
 from stgtrain.checkpoint import load_checkpoint
 from stgtrain.config import from_dict
 from stgtrain.envwrap import EnvWrapper
@@ -134,9 +134,9 @@ def main():
     assert len(original) == 13 and all(s.ranks == (2, 3) for s in original)
     assert len(specialist) == 5
     assert not {s.card for s in original + specialist} & {s.image for s in starts}
-    cards = discover(cfg["env"]["cards_dir"])
+    cards = configured_cards(cfg["env"])
     paths = sorted(set(Path("src/stgtrain").rglob("*.py")) |
-                   {Path(__file__), Path("cards/density.json"), Path("eval/splits-laser.toml"),
+                   {Path(__file__), Path("cards/th06/density.json"), Path("eval/splits-laser.toml"),
                     Path("eval/splits-laser-specialist.toml"),
                     Path("magnus/wheels/stg_rl-0.4.2-cp310-abi3-manylinux_2_34_x86_64.whl")} |
                    {p for c in cards.values() for p in c.path.rglob("*") if p.is_file()})

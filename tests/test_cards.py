@@ -95,7 +95,7 @@ def test_synthetic_shared_source_is_filtered_without_changing_original_pool(tmp_
 
 
 def test_standalone_specialist_metadata_exception_is_strict_and_heldout_is_always_excluded(tmp_path):
-    from stgtrain.cards import card_manifest
+    from stgtrain.cards import card_manifest, synthetic_cards
 
     root = tmp_path / 'cards'
     good = root / 'specialist_held'
@@ -124,6 +124,14 @@ tags = ["laser", "specialist"]
     cards = discover(root)
     assert [start.image for start in train_starts(cards, set(), [0, 3])] == ['specialist_train', 'specialist_train']
     assert card_manifest(cards)['specialist_held']['synthetic_kind'] == 'laser_specialist'
+
+    variant = root / 'variant'
+    variant.mkdir()
+    (variant / 'main.ecl').write_text('sub main() {}')
+    (variant / 'meta.toml').write_text('source="synthetic"\nbase_card="base"')
+    (good / 'meta.toml').write_text('enabled=false\n' + (good / 'meta.toml').read_text())
+    assert set(synthetic_cards(root, 'overlay')) == {'variant'}
+    assert set(synthetic_cards(root, 'laser_specialist')) == {'specialist_train'}
 
 
 @pytest.mark.parametrize('field,value,message', [
@@ -170,3 +178,53 @@ def test_ordinary_synthetic_still_requires_base_card(tmp_path):
     (card / 'meta.toml').write_text('source="synthetic"\ndata_kind="synthetic"')
     with pytest.raises(ValueError, match='base_card'):
         discover(tmp_path)
+
+
+def test_source_tree_filters_metadata_and_skips_disabled(tmp_path):
+    from stgtrain.cards import configured_cards
+
+    for folder, name, meta in [
+        ('th18', 'modern', 'source="th18"\ntags=["ring"]'),
+        ('synthetic', 'new_pattern', 'source="synthetic"\ngeneration_mode="standalone"\ntags=["laser"]'),
+        ('synthetic', 'paused', 'source="synthetic"\ngeneration_mode="standalone"\nenabled=false'),
+    ]:
+        card = tmp_path / folder / name
+        card.mkdir(parents=True)
+        (card / 'main.ecl').write_text('sub main() {}')
+        (card / 'meta.toml').write_text(meta)
+    assert set(discover(tmp_path)) == {'modern', 'new_pattern'}
+    assert discover(tmp_path)['modern'].data_kind == 'original'
+    assert set(discover(tmp_path, include_disabled=True)) == {'modern', 'new_pattern', 'paused'}
+    cards = configured_cards({'cards_dir': tmp_path, 'card_filter': {'sources': ['synthetic'], 'tags': ['laser']}})
+    assert list(cards) == ['new_pattern']
+    assert [s.image for s in train_starts(cards, set(), [2])] == ['new_pattern']
+
+
+def test_generic_standalone_heldout_and_variant_selection(tmp_path):
+    from stgtrain.cards import configured_cards
+
+    for name, extra in [('variant', 'base_card="base"'),
+                        ('held', 'generation_mode="standalone"\nsplit="held-out"'),
+                        ('special', 'generation_mode="standalone"\nsynthetic_kind="drill"')]:
+        card = tmp_path / name
+        card.mkdir()
+        (card / 'main.ecl').write_text('sub main() {}')
+        (card / 'meta.toml').write_text('source="synthetic"\n' + extra)
+    cards = configured_cards({'cards_dir': tmp_path, 'card_filter': {'exclude_synthetic_kinds': ['drill']}})
+    assert set(cards) == {'variant', 'held'}
+    assert [s.image for s in train_starts(cards, set(), [2])] == ['variant']
+    assert list(configured_cards({'cards_dir': tmp_path, 'card_filter': {'ids': ['held']}})) == ['held']
+
+
+def test_configured_card_order_preserves_original_variant_standalone_groups(tmp_path):
+    from stgtrain.cards import configured_cards
+
+    for source, name, extra in [('th06', 'z_original', ''),
+                                ('synthetic', 'b_variant', 'base_card="z_original"'),
+                                ('synthetic', 'a_standalone', 'generation_mode="standalone"')]:
+        card = tmp_path / source / name
+        card.mkdir(parents=True)
+        (card / 'main.ecl').write_text('sub main() {}')
+        (card / 'meta.toml').write_text(f'source="{source}"\n{extra}')
+    env = {'cards_dir': tmp_path, 'card_filter': {'sources': ['th06', 'synthetic']}}
+    assert list(configured_cards(env)) == ['z_original', 'b_variant', 'a_standalone']

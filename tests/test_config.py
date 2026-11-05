@@ -50,4 +50,17 @@ def test_load_config_overrides(tmp_path):
 def test_multiple_card_roots_round_trip(tmp_path):
     cfg = from_dict({'env': {'cards_dir': ['cards', 'cards-synthetic']}})
     dump_toml(cfg, tmp_path / 'config.toml')
-    assert load_config(tmp_path / 'config.toml')['env']['cards_dir'] == ['cards', 'cards-synthetic']
+    env = load_config(tmp_path / 'config.toml')['env']
+    assert env['cards_dir'] == 'cards'
+    assert env['card_filter']['sources'] == ['th06', 'synthetic']
+    assert env['card_filter']['exclude_synthetic_kinds'] == ['laser_specialist']
+
+
+def test_source_selection_keeps_old_checkpoint_pool_and_explicit_new_selection():
+    old = from_dict({'env': {'cards_dir': 'cards'}})['env']
+    assert old['card_filter']['sources'] == ['th06']
+    mixed = from_dict({'env': {'cards_dir': ['cards', 'cards-synthetic', 'cards-laser-specialist']}})['env']
+    assert mixed['card_filter']['sources'] == ['th06', 'synthetic']
+    assert mixed['card_filter']['exclude_synthetic_kinds'] == []
+    new = from_dict({'env': {'cards_dir': 'cards', 'card_filter': {'sources': ['th18']}}})['env']
+    assert new['card_filter']['sources'] == ['th18']
