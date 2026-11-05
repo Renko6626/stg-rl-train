@@ -35,7 +35,7 @@ description: Use when splitting TH18 stages into attacks, preparing or reviewing
 
 **曲线激光暂时不做。** 所选攻击实际依赖 `711 laserCuOn` / Curve几何时写 `status: blocked`、注明位置并暂缓；不删曲线、不用短线替代。其余独立攻击继续。
 
-**弹型/半径按作品区分，外观可以共用。** ENGINE_VER31追加TH06十型与TH18四十八型，新卡使用生成的 `TH18_*` 词表和原作色号，静态出生半径直接取表。当前沿用半径相加的碰撞公式，算法选择后置，不阻塞切分/转写/审核。出生减速和出生无判定窗口已准为性能省略。动态HITBOX/SIZE与换图刷新半径仍按实际支持情况记录，不能把新基础表当作已支持这些写口。适用边界见[统一口径](../../../transcribe/th18/transcription-policy.md#已批准按作品区分弹型碰撞算法选择后置)。
+新卡使用ENGINE_VER31及以后表中的`TH18_*`词表和原作色号；弹型/碰撞处理及出生阶段省略分别遵循[已批准口径](../../../transcribe/th18/transcription-policy.md#已批准按作品区分弹型碰撞算法选择后置)和[出生口径](../../../transcribe/th18/transcription-policy.md#已批准省略出生减速和无判定窗口)。静态基础表不代表动态半径/缩放写口已支持，派发时按实际使用的机制交代范围。
 
 ## 派发前
 
@@ -51,12 +51,9 @@ description: Use when splitting TH18 stages into attacks, preparing or reviewing
 
 ## 转写和审核要点
 
-- 编号先分域：ECL opcode、发射器 id、弹型 type、EX index、EX type。社区效果序号不直接作为原始 type；WAIT 的 signed 值是 -2147483648。
-- 共有弹型 0–43 可复用已核原作数据；TH18 的 44–47 另查表。不要套 TH06 色号换算、x 减 192、自动射击时序或激光宽度规则。
-- 609/611 短式覆盖不清 c/d/m/n；保留追加游标、整段 EX 副本及相邻数据记录。原作同敌跨 async 共享的发射状态须显式重组，不能直接变成我方互不相通的任务私有发射器。
-- 在原配置点保存配置表达式；效果内部的当前状态/随机量留到效果进入求值。动态参数优先按值 xform；`at_spawn`、`at_effect`、rand 的时点与共享范围按原文选择。`@N` 是字面量后置等待，STEP/WAIT_SIGNAL 停驻不重抽。
-- ACCEL/STEP/VELTIME、VEL、SHOOT/LASER 各自解析方向哨兵；先解码语义，再换算弧度/BAM。HOMING 是每 tick 追踪，不能用一次瞄准替代。
-- 未知语义、未支持机制或超出已接受范围的近似写清具体影响，交主会话分诊；不擅改引擎，也不凭“编译通过”删掉出生位移、碰撞门、缩放或曲线几何。
+将本攻击涉及的语义参考交给写审双方：作者按[转写契约](../../../transcribe/th18/contracts/transcribe.md#转写)恢复行为，审核者按[审核契约](../../../transcribe/th18/contracts/review.md#核对)独立核对。弹型、发射器、EX参数和取样规则由上面的主题资料维护。
+
+未知语义、未支持机制或超出已接受范围的近似须写清具体影响，交主会话分诊；不擅改引擎，也不凭“编译通过”删掉出生位移、碰撞门、缩放或曲线几何。
 
 ## 写审与交付
 
