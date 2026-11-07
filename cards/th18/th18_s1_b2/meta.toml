@@ -1,0 +1,12 @@
+title = "Stage 1 关底第一符 招符「弾幕万来」"
+source = "th18"
+origin = "TH18 v1.00a Stage 1，关底第一符 BossCard1"
+source_ref = "st01bs.ecl.txt:300-434,496-504"
+ranks = [0, 3]
+marks = [0]
+time_limit = 2222
+original_time_limit = 2100
+tags = ["aimed", "random", "stream"]
+laser_approx = false
+lower_half_blocked = false
+notes = "120帧外壳后保留源2100帧；源/卡帧对应和已接受差异见notes.md。Sol转写，主会话独立审核通过。"

@@ -1,7 +1,7 @@
 # TH18 发射模式：从 etAim 到目标几何
 
-> **版本**：TH18 v1.00a。裸地址属于本作；2026-11-05复用既有Ghidra导出核查。
-> **方法**：`FUN_00424fe0` `0x424fe0` 的逐弹分支，加包装 `FUN_00427810` `0x427810`；Priw8教程作交叉参照。
+适用TH18 v1.00a。
+公式区分静态几何与创建顺序，按本卡实际依赖选择。
 
 `etAim(id, mode)` 选择整波几何，配合 `etCount(id,N,M)`、`etAngle(id,alpha,delta)`、
 `etSpeed(id,s0,s1)`。N是路数，M是层数；下面的 `i=0..N-1`、`q=0..M-1` 都是零起索引。
@@ -49,12 +49,13 @@ mode9/10速度的索引是 `k=(q+(M%2)) & ~1`，M>1时
 ## 用 sh_* 表达同一静态点集
 
 以下完整程序对应mode2：12路、3层，速度3、2.5、2，每层角偏5°，以出弹口瞄自机。
-如只需要这一静态几何且生成序无消费者，配置后反复 `sh_fire` 即可。目标行32是环玉，见[弹型表](bullet-types.md)。
+如只需要这一静态几何且生成序无消费者，配置后反复 `sh_fire` 即可。目标TH18_RING_BALL是本作环玉，见[弹型表](bullet-types.md)。
 
 ```ecl
+const TH18_RING_BALL: int = 448;
 async sub ring_demo() {
     sh_reset(0);
-    sh_sprite(0, 32, 2);
+    sh_sprite(0, TH18_RING_BALL, 2);
     sh_ring(0, 1);
     sh_aim(0, 1);
     sh_count(0, 12, 3);
@@ -81,6 +82,7 @@ N=3、M=3，共9弹。mode0/1的路序为中、负1、正1；
 本例将所有角度换成BAM后计算，允许通常的浮点/定点量化差异。
 
 ```ecl
+const TH18_RING_BALL: int = 448;
 sub main() {
     var mode: int = 0;
     var n: int = 3;
@@ -110,7 +112,7 @@ sub main() {
             if mode == 0 || mode == 2 || mode == 4 {
                 a = a+(aim as int);
             }
-            _ = fire(32, 2, x, y, speed, a as angle, none, none);
+            _ = fire(TH18_RING_BALL, 2, x, y, speed, a as angle, none, none);
         }
     }
     wait(120);
@@ -121,9 +123,11 @@ sub main() {
 若触发BUDGET，不能加wait拆波而仍宣称保留原作同帧几何。可先将确定的mode分支静态化，
 再检查；仍超预算的具体攻击另列缺口。
 
+### 出生距离与ANIM退位移
+
 这段只处理固定出弹口，没有把 etDist 的每弹沿角出生距离藏进瞄准基点：原生A先从描述符出弹口求，
 之后逐弹沿实际角偏移出生位置。若源用了etDist，先算A，再对每弹加 `distance*cos(a)`、
-`distance*sin(a)`；不要将每弹偏移后的位置再拿来瞄一次。若目标使用sh_dist，另核其基点与顺序。
+`distance*sin(a)`；不要将每弹偏移后的位置再拿来瞄一次。若目标使用sh_dist，按引擎手册的基点/顺序组合。源同时带ANIM退位移时，参见[EX说明](ex-effects.md#配对记录与已核附加语义)：例如etDist=16、初速1.8，沿弹角的净出生距离为16−4×1.8=8.8px；瞄准仍从偏移前的描述符出弹口取一次。
 
 ## 6–8：随机值必须在逐弹循环里抽
 
@@ -134,6 +138,7 @@ sub main() {
 mode7删去角随机、改为表中环角，保留一次速度随机。
 
 ```ecl
+const TH18_RING_BALL: int = 448;
 sub main() {
     for q in 0..2 {
         for i in 0..4 {
@@ -143,7 +148,7 @@ sub main() {
             var a: angle = 90deg + (offset as angle);
             var rv: int = rand(65536);
             var u: fx = (rv-32768) as fx / 65536 + 0.5fx;
-            _ = fire(32, 2, 0fx, 96fx, 2fx+u, a, none, none);
+            _ = fire(TH18_RING_BALL, 2, 0fx, 96fx, 2fx+u, a, none, none);
         }
     }
     wait(120);
@@ -160,6 +165,7 @@ mode10、N=4、M=4示例会发16弹；q=0/1同速3，q=2/3同速 `3+(1-3)*2/3`�
 每层环方向整体反向，非逐颗交替。改mode9时只在最后给a加缓存的A。
 
 ```ecl
+const TH18_RING_BALL: int = 448;
 sub main() {
     var n: int = 4;
     var m: int = 4;
@@ -173,7 +179,7 @@ sub main() {
         for i in 0..n {
             var a: int = (i*65536)/n+h;
             if q%2 != 0 { a = -a; }
-            _ = fire(32, 2, 0fx, 96fx, speed, a as angle, none, none);
+            _ = fire(TH18_RING_BALL, 2, 0fx, 96fx, speed, a as angle, none, none);
         }
     }
     wait(120);
@@ -182,24 +188,16 @@ sub main() {
 
 ## 11/12已核到哪一步
 
-TH18 `0x424fe0` 的case11/12确实使用表列环角；然后调用 `FUN_004a9ea0`，
-再以绝对值参与速度调制。现有Ghidra反编译未正确表达该调用的SSE参数/返回，
-不能将残留的 `(1-abs(angle)*s1)*v(q)` 当作已核公式，也不能因社区称“peanut”就自行补sin。
-未解点只在这两行的方向调速函数及其s1有效域；0..10不因此整体待定。
+mode11/12的环角已核，方向调速函数和s1有效域尚无可用定义；实际需要时交主会话。不能猜sin或照反编译残式填速度。0–10不受此缺口影响。
 
-## 证据与复核入口
+## 发射器状态与取消的转换边界
 
-- TH18既有导出：renkolab `local/th18.v1.00a/state/data/functions.jsonl`，键 `addr=00424fe0/00427810`，保留已导入的社区类型和函数名；本轮未开库或改名。
-- 逐弹抽取：忽略目录 `transcribe/work/th16-th18-ex-20261105/th18-00424fe0.c`。包装确认整波一次A、同点90°、层外路内。
-- [Priw8第四课](https://priw8.github.io/#b=ecl-tutorial/&p=4)提供0..8的图示及参数解释；其TH17示例只作交叉参照，不替代本作分支核查。已下载正文见[来源清单](../../docs/investigations/2026-11-05-th18-textbook-sources.json)。
-- 我方行为来自 stg-engine `crates/stg-core/src/ecl/syscall/shooter.rs` 与 `docs/ecl-lang/4-bullets.md`。编译示例只验证目标语法；本轮未运行原作或做原作逐帧对拍。
+原作签名统一查[指令表](instructions.md)；以下保留组合目标程序时的限制，按本卡实际涉及的指令查阅。
 
-### 本页例子的实际检查
-
-2026-11-05：将本页每个 `ecl` 围栏单独抽为完整文件后，分别执行
-`stg-harness check <file>` 和 `stg-harness run <file> --frames 8 --at 3`，均退出0，
-`task_faults/contract_viol/pool_full` 均为0。各文件不能合在同一目录一次check，因为各自定义main。
-材料和逐例日志保存在忽略目录 `transcribe/work/th18-textbook-20261105/tables/`；只验证前8帧目标运行，
-未做原作实机或完整攻击验收。
-
-四个例子的峰值弹数依次为36、9、8、16，与路数×层数相符。
+- 600 `etNew`：在负责发射的目标任务里sh_reset，再显式写实际需要的字段；源16份配置、目标每任务4槽，不能直接全保留默认值
+- 603 `etOffset`；626 `etOffsetRad`；627 `etDist`；628 `etOffsetAbs`：先恢复实际出生点与坐标层；603常见偏移用sh_offset，628/626/627不能都当同一个offset。自机狙从实际口算
+- 614 `etCopy`：TH18复制整份et配置及两组偏移；不写单独EX追加游标。目标无sh_copy；有限静态字段可缓存重放，不能以sh_reset(dst)代替拷贝，更不能顺手清游标
+- 613 `etClearAll`：本作handler调BulletManager与LaserManager取消，**不是清空et配置**。目标clear_bullets是field，执行相位/激光/转星规则有差别
+- 615 `etCancel`；616 `etClear`：候选clear_bullets_at；半径、道具、激光部分取消和相位要对齐，本章未补全TH18取消消费者，不能直接套TH16转星规则
+- 635 `etCancel2`；636 `etClear2`；712 `etCancelRect`：712已核只处理普通弹矩形域，不是改弹判定；635/636逐样本核过滤，目标field不能自动覆盖源保护规则
+- 617 `etSpeedR3`；618 `etSpeedR5`；619 `etSpeedR2`；620 `etCountR3`；621 `etCountR5`；622 `etCountR2`；624 `etSpeedD`；625 `etCountD`：固定难度可先消解已核分支；原动态RANK不等于目标GVAR_RANK。[共享变量](mapping.md#33-局部变量不等于原作敌变量)

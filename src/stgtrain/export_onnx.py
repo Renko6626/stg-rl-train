@@ -44,6 +44,10 @@ C 侧照 th06nc 抽取器的激光口径填（`t_active` = 预警还剩几帧，
 
 旧图签名不变。版本6需部署调用方适配；本模块完成训练侧包装和torch/ORT对拍。
 
+**图版本 7（2026-10-22）**：沿用版本6的十二输入，原始子弹表扩大至2048行，
+`bullets_mask`同步扩大。图内仍只选择原配置的K颗子弹；密度图读取完整原始表。
+旧版本2–6的640行导出可用`--bullets-rows 640`保留。
+
 只有 v4 / v5 的 checkpoint 才导出成八 / 九输入；v2 / v3 仍是七输入的版本 2（整个输入没人读的话导出器会把它剪掉，
 所以没法像敌人速度那样「同一套签名、旧图不读」）。C 侧 `sa_onnx` 两种都收，并据此知道这张图是不是
 在运动层下练出来的。`prev_action` 在 v4 下的含义是上一步**实际执行**的动作（运动层之后的），不是策略想按的。
@@ -78,6 +82,7 @@ from .registry import FEATURIZERS, MODELS, load_builtins
 
 GRAPH_VERSION = 2          # 七输入（v2 / v3）
 GRAPH_VERSION_HELD = 3     # 八输入：多一个 dir_held（v4）。九输入（再加 slow_held，v5）= 4，即 GRAPH_VERSION + 「held 输入的个数」
+GRAPH_VERSION_BULLETS_2048 = 7  # 十二输入与版本6相同，原始子弹表2048行
 BULLET_COLS = 5
 ENEMY_COLS = 6
 PLAYER_COLS = 5
@@ -95,8 +100,9 @@ OUTPUT_NAMES = ("logits",)
 #: 而那一步检查本来就是多余的 —— 见 `DangerTopKV2Export._topk`。
 SENTINEL = 1.0e30
 
-# 训练侧每个弹池/敌池容量（th06nc 抽取器的上限）。契约仓 c/world.h 的 AP_MAX_*。
-DEPLOY_BULLETS_ROWS = 640
+# 部署原始表容量；子弹Top-K大小仍由checkpoint配置决定。契约仓 c/world.h 的 AP_MAX_*。
+LEGACY_BULLETS_ROWS = 640
+DEPLOY_BULLETS_ROWS = 2048
 DEPLOY_ENEMIES_ROWS = 256
 DEPLOY_LASERS_ROWS = 64    # = stg_rl.LASERS_CAP（训练侧每 env 至多给这么多条）
 
@@ -206,8 +212,13 @@ def extra_names(with_held: int, with_lasers: bool = False, with_start_len: bool 
     return held_names(with_held) + (LASER_INPUTS if with_lasers else ()) + (("laser_start_len",) if with_start_len else ())
 
 
-def graph_version(with_held: int, with_lasers: bool = False, with_start_len: bool = False) -> int:
+def graph_version(with_held: int, with_lasers: bool = False, with_start_len: bool = False,
+                  bullets_rows: int = LEGACY_BULLETS_ROWS) -> int:
     extra_names(with_held, with_lasers, with_start_len)
+    if bullets_rows == DEPLOY_BULLETS_ROWS:
+        if not (int(with_held) == 2 and with_lasers and with_start_len):
+            raise ValueError("2048行子弹表需要版本7的十二输入；旧图请用--bullets-rows 640")
+        return GRAPH_VERSION_BULLETS_2048
     return GRAPH_VERSION + int(with_held) + int(bool(with_lasers)) + int(bool(with_start_len))
 
 
@@ -374,6 +385,7 @@ def _inline_external_data(path: Path) -> None:
 
 def export_graph(wrap: DeployWrapper, example: tuple[Tensor, ...], out_path) -> Path:
     """导出定形图，权重内联成单文件。dynamo 导出器优先，失败退回 TorchScript 路径。"""
+    graph_version(wrap.with_held, wrap.with_lasers, wrap.with_start_len, wrap.bullets_rows)
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     names = INPUT_NAMES + extra_names(wrap.with_held, wrap.with_lasers, wrap.with_start_len)
@@ -424,7 +436,7 @@ def write_manifest(path, *, checkpoint, onnx, meta: dict, bullets_rows: int, ene
     with_lasers = bool(meta.get("with_lasers", False))
     with_start_len = bool(meta.get("with_start_len", False))
     payload = {
-        "graph_version": graph_version(with_held, with_lasers, with_start_len),
+        "graph_version": graph_version(with_held, with_lasers, with_start_len, bullets_rows),
         "opset": OPSET,
         "num_actions": NUM_ACTIONS,
         "action_table_version": meta.get("action_table_version", ACTION_TABLE_VERSION),

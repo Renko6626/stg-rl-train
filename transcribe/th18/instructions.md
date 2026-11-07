@@ -1,107 +1,382 @@
-# TH18 常用指令：定位与处理路径
+# TH18 原作 ECL 指令表
 
-> **版本**：TH18 v1.00a；目标 ENGINE_VER30，2026-11-05 静态核对。
+适用 **TH18 v1.00a**。按编号查名字、调用参数及参数语义；目标写法与复杂时序由链接的子系统专题解释。总体阅读入口见[纲要](README.md)。本表列出当前 eclmap 的命名项及已核的94、574，不把命名覆盖当作完整支持。
 
-这是单攻击转写的查表入口，不是全指令逆向或支持清单。名称精确采用 TH18 `th18.eclm`；功能以[教材](mapping.md)、各专表及本作原生证据为准。`unknown*` 保留原名，名字本身不证明语义。
+## 读表约定
 
-处理状态按**当前调用点**判定：`translate` 表示在所列条件下有转写路径，仍要验证时序/数值；`drop` 仅适用于已证明不影响攻击的语句；`需上下文` 表示要找前置状态、参数或消费者；`blocked` 表示当前目标不能保真表达所需行为，或用户明确暂不做。不存在“整组opcode都可删/都支持”的默认裁定。曲线激光暂不转写，不能默认拆短线替代。
+- 参数按原作调用顺序排列。`int` 为整数，`float` 为原作浮点，`str` 为程序名或字符串，`label` 为跳转目的；`&` 标记写回变量，不是源文本里要加的符号。`args…` 是可变实参。
+- 坐标／长度通常为像素，速度为像素/帧，角度为弧度，角速度为弧度/帧，时间为帧。特殊含义在条目中注明。空参数 `()` 不代表没有输入：算术指令从表达式栈取操作数。
+- `id`／`etId` 是源发射器槽，`laserId` 是源激光编号；源敌ID、任务用户ID、插值槽和目标句柄互不等同。EX 的 `type`、发射 `mode` 和插值 `mode` 分别查自己的表。
+- **本作**：已有本作规则或调查依据，适用边界仍见专题。**部分**：已有定义但存在明确未核字段／组合。**社区**：社区表的继承说明，未在本轮提升为本作原生验证。**待核**：只有名称／格式或关键语义未知。格式已知不等于行为已核，原作行为已核也不等于目标能够表达。
+- 社区说明也是可查阅的公开资料，不要求作者逐条重做原生验证；条目明确标出的未知参数、冲突或本卡缺失行为才需交回。
+- `p1/p2…` 仅表示位置，绝不表示已理解含义。实际攻击依赖未核项时交主会话；已批准的普通奖励／纯表现省略直接沿用[公共口径](transcription-policy.md)，无需重新证明。
 
-## 1. 控制流、时间与任务
+## 目录
 
-| opcode / 精确助记名 | 功能与路径 | 处理及边界 |
-|---|---|---|
-| 0 `nop` | 无副作用占位；保留其时间门 | `drop` 只删操作，不删等待 |
-| 1 `delete` | 结束当前上下文；敌主上下文结束使敌静默退场 | `translate`：目标结束当前任务；额外async结束不等于敌死，不能统一换 `die()`；见教材 §3.2 |
-| 10 `ret`；11 `call` | 同步返回/调用，源保存调用时钟与栈帧 | `translate`：静态非递归call图改普通sub，参数/时间先恢复；根ret为结束。目标禁递归，不能直接保留无限尾调用链 |
-| 12 `jmp`；13 `jmpEq`；14 `jmpNeq` | 分支/跳转还写源脚本时间；13判零、14判非零 | `translate`：按执行轨迹写if/while/goto+wait；不能仅保留PC跳转。教材 §3.1；本作VM `0x48b3a0` |
-| 15 `callAsync` | 同敌新增上下文、拷实参 | `translate`：`spawn helper(...)`，目标次帧首跑；同敌共享I/F不变成任务局部快照。教材 §3.2–3.3 |
-| 16 `callAsyncId`；17 `killAsync`；21 `killAllAsync` | 同敌async带用户ID创建、查ID取消、全async取消 | `需上下文`：有限已知集合可显式保留目标任务标识；源ID不是目标池索引，`KILL_CHILDREN`只及直系，不能覆盖同敌孙任务。一般动态ID取消 `blocked`；见[状态表 §4](enemy-state.md#4-同一敌人的段入口恢复状态而非重置模板) |
-| 23 `wait` | 推迟源脚本时间门 | `translate`：正常dt=1且整数等待可恢复为目标wait；与时间标签不可双算。教材 §3.1 |
-| 24 `waitf`；547 `gameSpeed` | 浮点等待/游戏速度影响源时钟 | `需上下文`；确有子帧或变速要求时无一般等价目标内建，`blocked`，不能默默取整 |
-| 40 `stackAlloc`；42 `pushi`；43 `seti`；44 `pushf`；45 `setf` | 原生局部/表达式栈读写 | `translate`：先恢复高层变量与求值顺序再写var/赋值；`[-1]`并非每次独立pop。教材 §2.1、§3.4 |
-| 50 `addi`、51 `addf`、52 `subi`、53 `subf`、54 `muli`、55 `mulf`、56 `divi`、57 `divf`、58 `modi` | 标量算术 | `translate`：int/fx/angle按物理量拆分，整数除法与float表达式不能混写；教材 §2.2 |
-| 59 `eqi`、60 `eqf`、61 `neqi`、62 `neqf`、63 `lessi`、64 `lessf`、65 `leqi`、66 `leqf`、67 `greateri`、68 `greaterf`、69 `geqi`、70 `geqf` | 比较 | `translate`：比较前保留源类型、角规范化与表达式副作用 |
-| 71 `noti`；72 `notf`；73 `or`；74 `and`；78 `deci` | 逻辑操作与自减 | `需上下文`：恢复原操作数求值后再写条件；目标&&/\|\|短路可能少消耗RAND，自减要保留旧值用途 |
-| 75 `xor`；76 `bit_or`；77 `bit_and` | 整数逐位操作 | `需上下文`：不能把一般掩码改成逻辑布尔；常量可在转写时算出，动态完整位运算的目标配方未在本表证明 |
-| 79 `stackSin`；80 `stackCos`；81 `circlePos`；82 `validRad`；83 `negi`；84 `negf`；85 `squareSum`；86 `squareSumRoot`；87 `getAngle`；88 `stackSqrt` | 数学/插值定位组 | `需上下文`：普通三角/向量可用sin/cos/atan2/dist；弧度先转BAM。89名字不能当“线性乘法”的证据；91/92任意变量写回、93随机分布及88一般sqrt尚无本表完整TH18配方，按样本读handler，插值见[模式表](interpolation-modes.md) |
-| 89 `linearFunc`；90 `pointRotate`；91 `floatTime`；92 `math92`；93 `math93` | 数学/插值定位组 | `需上下文`：普通三角/向量可用sin/cos/atan2/dist；弧度先转BAM。89名字不能当“线性乘法”的证据；91/92任意变量写回、93随机分布及88一般sqrt尚无本表完整TH18配方，按样本读handler，插值见[模式表](interpolation-modes.md) |
+[控制流与数学](#控制流与数学) / [敌创建与动画](#敌创建与动画) / [移动](#移动) / [敌状态与阶段](#敌状态与阶段) / [发射器与效果配置](#发射器与效果配置) / [激光](#激光) / [跨敌交互](#跨敌交互) / [调试与作品专用入口](#调试与作品专用入口)
 
-## 2. 敌创建、退场与查询
 
-| opcode / 精确助记名 | 功能与路径 | 处理及边界 |
-|---|---|---|
-| 300 `enmCreate`；301 `enmCreateA`；304 `enmCreateM`；305 `enmCreateAM`；309 `enmCreateF`；310 `enmCreateAF`；311 `enmCreateMF`；312 `enmCreateAMF` | 创建变体：相对/绝对、镜像、F条件；12敌变量快照 | `translate`/`需上下文`：完整变体表、父镜像处理顺序和初始化清单见[状态表 §2](enemy-state.md#2-创建子敌名字与继承顺序)。301不是`enmCreateAbs`，A不表示async |
-| 321 `enmMapleEnemy` | 特殊创建入口定位 | `需上下文`：不以名字将其当普通创建；本文未核专用消费者 |
-| 340 `enmDelete` | 按源ID指定目标敌退场的定位入口 | `需上下文`：先核该样本ID与本作handler；目标无通用按任意敌句柄静默删除写口，不能用全场kill代替 |
-| 525 `enmKillAll` | 敌人清场 | `需上下文`：已核525对通过过滤的敌执行setDeath回调；目标清场的豁免/模式仍不同，训练交接可按已准取舍处理。状态表 §6 |
-| 555 `enmAlive`；801 `enmPos`；324 `enmPos2` | 源敌ID存活/位置查询定位 | `需上下文`：要维护来源ID到目标不透明句柄的对应，并核查找失败规则；不照抄ID整数 |
-| 561 `die`；556 `setDeath` | 死亡相关入口 | `需上下文`：精确名字不保证561执行完整死亡逻辑；不得把它、1、340和目标die一概等同；556涉及回调不能按纯外观丢弃 |
+## 控制流与数学
 
-## 3. 常见移动与判定
+| 编号 | 名字与参数 | 参数语义／直接作用 | 依据与专题 |
+|---:|---|---|---|
+| 0 | `nop()` | 不执行操作；指令所在的时间门仍有效。 | 本作；[专题](mapping.md) |
+| 1 | `delete()` | 结束当前上下文；敌主上下文结束使敌退场，额外 async 结束不等于敌死亡。 | 本作；[专题](mapping.md) |
+| 10 | `ret()` | 同步返回；根调用栈返回则结束。 | 本作；[专题](mapping.md) |
+| 11 | `call(sub:str, args…)` | sub 为被调用程序，args 为按值实参；同步调用保存返回位置、时钟和栈帧。 | 本作；[专题](mapping.md) |
+| 12 | `jmp(target:label, time:int)` | 跳至 target，同时将脚本时间改为 time；并非只改程序位置。 | 本作；[专题](mapping.md) |
+| 13 | `jmpEq(target:label, time:int)` | 栈条件为零时跳转并改脚本时间；条件来自表达式栈。 | 本作；[专题](mapping.md) |
+| 14 | `jmpNeq(target:label, time:int)` | 栈条件非零时跳转并改脚本时间。 | 本作；[专题](mapping.md) |
+| 15 | `callAsync(sub:str, args…)` | 同敌创建额外执行上下文，实参按值传递；敌共享槽仍共享。 | 本作；[专题](mapping.md) |
+| 16 | `callAsyncId(sub:str, id:int, args…)` | 同敌异步调用，赋予用户 id；id 用于 killAsync，不是目标任务池索引。 | 本作；[专题](mapping.md) |
+| 17 | `killAsync(id:int)` | 取消同敌指定用户 id 的 async；重复 id／特殊 id 的完整匹配规则待核。 | 本作；[专题](enemy-state.md) |
+| 21 | `killAllAsync()` | 取消同敌 async；目标直系子任务取消不能直接覆盖其范围。 | 本作；[专题](enemy-state.md) |
+| 22 | `debug22(p1:int, p2:str)` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 23 | `wait(frames:int)` | 从脚本时钟减去 frames，推迟后续时间门；与时间标签一起恢复实际等待。 | 本作；[专题](mapping.md) |
+| 24 | `waitf(frames:float)` | 浮点时钟等待；子帧与 gameSpeed 的组合需按实际调用核。 | 本作；[专题](mapping.md) |
+| 27 | `unknown27(参数格式待核)` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 30 | `unknown30(format:str, args…)` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 31 | `unknown31(参数格式待核)` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 40 | `stackAlloc(bytes:int)` | 为局部栈预留空间；恢复高层局部变量后不逐条照搬。 | 社区；[专题](mapping.md) |
+| 42 | `pushi(value:int)` | 整数压栈；裸值表达式也会编译成压栈。 | 本作；[专题](mapping.md) |
+| 43 | `seti(out:int&)` | 取整数栈结果写入 out。 | 本作；[专题](mapping.md) |
+| 44 | `pushf(value:float)` | 浮点压栈。 | 本作；[专题](mapping.md) |
+| 45 | `setf(out:float&)` | 取浮点栈结果写入 out。 | 本作；[专题](mapping.md) |
+| 50 | `addi()` | 整数加法；操作数从表达式栈取，结果回栈。 | 本作；[专题](mapping.md) |
+| 51 | `addf()` | 浮点加法；操作数从表达式栈取，结果回栈。 | 本作；[专题](mapping.md) |
+| 52 | `subi()` | 整数减法；操作数从表达式栈取，结果回栈。 | 本作；[专题](mapping.md) |
+| 53 | `subf()` | 浮点减法；操作数从表达式栈取，结果回栈。 | 本作；[专题](mapping.md) |
+| 54 | `muli()` | 整数乘法；操作数从表达式栈取，结果回栈。 | 本作；[专题](mapping.md) |
+| 55 | `mulf()` | 浮点乘法；操作数从表达式栈取，结果回栈。 | 本作；[专题](mapping.md) |
+| 56 | `divi()` | 整数除法；操作数从表达式栈取，结果回栈。 | 本作；[专题](mapping.md) |
+| 57 | `divf()` | 浮点除法；操作数从表达式栈取，结果回栈。 | 本作；[专题](mapping.md) |
+| 58 | `modi()` | 整数余数；操作数从表达式栈取，结果回栈。 | 本作；[专题](mapping.md) |
+| 59 | `eqi()` | 整数等于；操作数／结果使用表达式栈。 | 本作；[专题](mapping.md) |
+| 60 | `eqf()` | 浮点等于；操作数／结果使用表达式栈。 | 本作；[专题](mapping.md) |
+| 61 | `neqi()` | 整数不等于；操作数／结果使用表达式栈。 | 本作；[专题](mapping.md) |
+| 62 | `neqf()` | 浮点不等于；操作数／结果使用表达式栈。 | 本作；[专题](mapping.md) |
+| 63 | `lessi()` | 整数小于；操作数／结果使用表达式栈。 | 本作；[专题](mapping.md) |
+| 64 | `lessf()` | 浮点小于；操作数／结果使用表达式栈。 | 本作；[专题](mapping.md) |
+| 65 | `leqi()` | 整数小于等于；操作数／结果使用表达式栈。 | 本作；[专题](mapping.md) |
+| 66 | `leqf()` | 浮点小于等于；操作数／结果使用表达式栈。 | 本作；[专题](mapping.md) |
+| 67 | `greateri()` | 整数大于；操作数／结果使用表达式栈。 | 本作；[专题](mapping.md) |
+| 68 | `greaterf()` | 浮点大于；操作数／结果使用表达式栈。 | 本作；[专题](mapping.md) |
+| 69 | `geqi()` | 整数大于等于；操作数／结果使用表达式栈。 | 本作；[专题](mapping.md) |
+| 70 | `geqf()` | 浮点大于等于；操作数／结果使用表达式栈。 | 本作；[专题](mapping.md) |
+| 71 | `noti()` | 整数逻辑非；操作数／结果使用表达式栈。 | 本作；[专题](mapping.md) |
+| 72 | `notf()` | 浮点逻辑非；操作数／结果使用表达式栈。 | 本作；[专题](mapping.md) |
+| 73 | `or()` | 逻辑或；操作数／结果使用表达式栈。 | 本作；[专题](mapping.md) |
+| 74 | `and()` | 逻辑与；操作数／结果使用表达式栈。 | 本作；[专题](mapping.md) |
+| 75 | `xor()` | 整数逐位异或；操作数／结果使用表达式栈。 | 本作；[专题](mapping.md) |
+| 76 | `bit_or()` | 整数逐位或；操作数／结果使用表达式栈。 | 本作；[专题](mapping.md) |
+| 77 | `bit_and()` | 整数逐位与；操作数／结果使用表达式栈。 | 本作；[专题](mapping.md) |
+| 78 | `deci(value:int&)` | 先将 value 的旧值压栈，再自减；不能丢掉旧值用途。 | 本作；[专题](mapping.md) |
+| 79 | `stackSin()` | 浮点正弦；操作数／结果使用表达式栈。 | 本作；[专题](mapping.md) |
+| 80 | `stackCos()` | 浮点余弦；操作数／结果使用表达式栈。 | 本作；[专题](mapping.md) |
+| 81 | `circlePos(x:float&, y:float&, angle:float, radius:float)` | 输出 x=radius*cos(angle)、y=radius*sin(angle)，不自动加敌位置。 | 社区；[专题](mapping.md) |
+| 82 | `validRad(angle:float&)` | 原地规范化弧度角；端点约定按调用用途核。 | 社区；[专题](mapping.md) |
+| 83 | `negi()` | 整数取负；操作数／结果使用表达式栈。 | 本作；[专题](mapping.md) |
+| 84 | `negf()` | 浮点取负；操作数／结果使用表达式栈。 | 本作；[专题](mapping.md) |
+| 85 | `squareSum(out:float&, x:float, y:float)` | 输出平方和 x²+y²。 | 社区；[专题](mapping.md) |
+| 86 | `squareSumRoot(out:float&, x:float, y:float)` | 输出 sqrt(x²+y²)。 | 社区；[专题](mapping.md) |
+| 87 | `getAngle(out:float&, x1:float, y1:float, x2:float, y2:float)` | 输出从 (x1,y1) 指向 (x2,y2) 的弧度角。 | 社区；[专题](mapping.md) |
+| 88 | `stackSqrt()` | 浮点平方根；操作数／结果使用表达式栈。 | 社区；[专题](mapping.md) |
+| 89 | `linearFunc(out:float&, a:float, x:float)` | 社区解释为 out=a*x；本作消费者未复核，不据名字扩大承诺。 | 社区；[专题](mapping.md) |
+| 90 | `pointRotate(outX:float&, outY:float&, x:float, y:float, angle:float)` | 将输入点绕原点旋转 angle，写两输出。 | 社区；[专题](mapping.md) |
+| 91 | `floatTime(slot:int, out:float&, frames:int, mode:int, start:float, goal:float)` | 用上下文槽 slot 插值并写回 out；mode 决定 goal 含义，输入在配置时求值。 | 本作；[专题](interpolation-modes.md#变量插值指令91与92) |
+| 92 | `math92(slot:int, out:float&, frames:int, mode:int, start:float, goal:float, extra1:float, extra2:float)` | 91 的额外参数版；mode8 取两切线，mode17 取 extra2 为初速。解码格式有来源冲突，见专题。 | 部分；[专题](interpolation-modes.md#变量插值指令91与92) |
+| 93 | `math93(outX:float&, outY:float&, r1:float, r2:float)` | 社区记录为随机取点；r1/r2 的几何意义、分布与取样规则未核。 | 待核；[专题](mapping.md) |
+| 94 | `ins_94(outX:float&, outY:float&, phi:float, radius:float, axis:float, ratio:float)` | 以 phi 取相位、axis 取轴角、ratio 缩放轴向分量，写相对原点坐标；无跨帧运动。 | 本作；[专题](circular-motion.md#94即时椭圆取点) |
 
-| opcode / 精确助记名 | 功能与路径 | 处理及边界 |
-|---|---|---|
-| 400 `movePos`；401 `movePosTime` | ABS位置立即写/定时移动 | `translate`：单层静止前置可用move_to；源400不保证硬停；源401的frames≤0只清位置插值，不是瞬移，不能改成目标move_to(0)。教材 §4.1、状态表 §3 |
-| 402 `movePosRel`；403 `movePosRelTime` | REL位置层写入/插值 | `需上下文`：REL是独立层，不是无条件加当前世界位置；保存ABS/REL后合成 |
-| 404 `moveVel`；405 `moveVelTime`；406 `moveVelRel`；407 `moveVelRelTime` | 各层速度设置/插值 | `translate`限已核单层；`move_vel`是极坐标插值，不能以move_vel_xy代替全部情况 |
-| 440 `moveAngle`；441 `moveAngleTime`；442 `moveAngleRel`；443 `moveAngleRelTime`；444 `moveSpeed`；445 `moveSpeedTime`；446 `moveSpeedRel`；447 `moveSpeedRelTime` | 角/速率独立更新 | `需上下文`：单层用move_angle/move_speed；最短弧、残余速率、镜像与层归属分别核 |
-| 424 `moveSetMirror`；558 `flagMirror`；428 `moveVelNM`；429 `moveVelNMTime`；430 `moveVelNMRel`；431 `moveVelNMRelTime` | 镜像与非镜像路径定位 | `需上下文`：424写镜像位已核；558具体入口不据名字外推。NM不能机械套同一水平反射；创建镜像顺序另见状态表 |
-| 418 `moveAdd`；419 `move419`；427 `moveReset`；436 `moveAddTime`；437 `moveAddRelTime` | 增量/重置相关定位 | `需上下文`：本文未给419或reset全部字段的TH18承诺；按实际handler恢复写入和在飞插值 |
-| 408 `moveCircle`；409 `moveCircleTime`；410 `moveCircleRel`；411 `moveCircleRelTime`；412 `moveRand`；413 `moveRandRel`；414 `moveBoss`；415 `moveBossRel` | 复杂轨迹定位组 | `需上下文`：查源参数/消费者并结合插值表；没有整组通用目标内建，也未全部逆向。移动曲线不等于711曲线激光 |
-| 420 `moveEllipse`；421 `moveEllipseTime`；422 `moveEllipseRel`；423 `moveEllipseRelTime`；425 `moveBezier`；426 `moveBezierRel` | 复杂轨迹定位组 | `需上下文`：查源参数/消费者并结合插值表；没有整组通用目标内建，也未全部逆向。移动曲线不等于711曲线激光 |
-| 432 `moveEnm`；433 `moveEnmRel`；434 `moveCurve`；435 `moveCurveRel`；438 `moveCurveAdd`；439 `moveCurveAddRel` | 复杂轨迹定位组 | `需上下文`：查源参数/消费者并结合插值表；没有整组通用目标内建，也未全部逆向。移动曲线不等于711曲线激光 |
-| 504 `moveLimit`；505 `moveLimitReset` | 设置/取消位置约束 | `需上下文`：每帧限位与只夹目标点不同；目标无常驻约束内建，触边速度/合成相位须核。状态表 §3 |
-| 500 `setHurtbox`；501 `setHitbox` | 受击框/体碰框 | `需上下文`：源宽高与目标半径不同，默认及已核普通受击半径见状态表 §1；非圆框有几何缺口 |
-| 502 `flagSet`；503 `flagClear` | 敌flag按掩码置/清 | `translate`仅已核子位；不能整掩码直传。源0x2禁体碰、0x10阻止扣血、0x20多门控等见状态表 §1 |
-| 515 `setInvuln`；541 `noHitboxDur`；563 `unknown563`；564 `hitboxRotate`；634 `setHitboxFunc` | 无敌、临时禁体碰及特殊几何定位 | `需上下文`：无敌与禁体碰分开；563保持未知名，不能因旧TH16调查就宣称本作完整形状切换支持；自定义碰撞/旋转框不能全删 |
+## 敌创建与动画
 
-## 4. 段、中断、表现与掉落
+| 编号 | 名字与参数 | 参数语义／直接作用 | 依据与专题 |
+|---:|---|---|---|
+| 300 | `enmCreate(sub:str, x:float, y:float, hp:int, score:int, item:int)` | 创建执行 sub 的敌；x/y 为父 FINAL 上的相对输入，hp 为血量，score 为分数，item 为掉落。子镜像初值0；父镜像另作用于最终出生坐标。 | 本作；[专题](enemy-state.md#2-创建子敌名字与继承顺序) |
+| 301 | `enmCreateA(sub:str, x:float, y:float, hp:int, score:int, item:int)` | 创建执行 sub 的敌；x/y 为绝对输入坐标，hp 为血量，score 为分数，item 为掉落。子镜像初值0；父镜像另作用于最终出生坐标。 | 本作；[专题](enemy-state.md#2-创建子敌名字与继承顺序) |
+| 302 | `anmSelect(anmIndex:int)` | anmIndex 选择后续动画文件。 | 社区；[专题](enemy-state.md) |
+| 303 | `anmSetSprite(slot:int, script:int)` | slot 为动画槽，script 为脚本号，使用已选动画文件。 | 社区；[专题](enemy-state.md) |
+| 304 | `enmCreateM(sub:str, x:float, y:float, hp:int, score:int, item:int)` | 创建执行 sub 的敌；x/y 为父 FINAL 上的相对输入，hp 为血量，score 为分数，item 为掉落。子镜像初值1；父镜像另作用于最终出生坐标。 | 本作；[专题](enemy-state.md#2-创建子敌名字与继承顺序) |
+| 305 | `enmCreateAM(sub:str, x:float, y:float, hp:int, score:int, item:int)` | 创建执行 sub 的敌；x/y 为绝对输入坐标，hp 为血量，score 为分数，item 为掉落。子镜像初值1；父镜像另作用于最终出生坐标。 | 本作；[专题](enemy-state.md#2-创建子敌名字与继承顺序) |
+| 306 | `anmSetMain(slot:int, script:int)` | slot 为主动画槽，script 为静止基准脚本；移动状态切换附属动画。 | 社区；[专题](enemy-state.md) |
+| 307 | `anmPlay(anmIndex:int, script:int)` | anmIndex/script 选择在敌当前位置播放的独立动画。 | 社区；[专题](enemy-state.md) |
+| 308 | `anmPlayAbs(anmIndex:int, script:int)` | anmIndex/script 选择在原点播放的独立动画。 | 社区；[专题](enemy-state.md) |
+| 309 | `enmCreateF(sub:str, x:float, y:float, hp:int, score:int, item:int)` | 创建执行 sub 的敌；x/y 为父 FINAL 上的相对输入，hp 为血量，score 为分数，item 为掉落。子镜像初值0；F 门：boss0 存在时跳过。父镜像另作用于最终出生坐标。 | 本作；[专题](enemy-state.md#2-创建子敌名字与继承顺序) |
+| 310 | `enmCreateAF(sub:str, x:float, y:float, hp:int, score:int, item:int)` | 创建执行 sub 的敌；x/y 为绝对输入坐标，hp 为血量，score 为分数，item 为掉落。子镜像初值0；F 门：boss0 存在时跳过。父镜像另作用于最终出生坐标。 | 本作；[专题](enemy-state.md#2-创建子敌名字与继承顺序) |
+| 311 | `enmCreateMF(sub:str, x:float, y:float, hp:int, score:int, item:int)` | 创建执行 sub 的敌；x/y 为父 FINAL 上的相对输入，hp 为血量，score 为分数，item 为掉落。子镜像初值1；F 门：boss0 存在时跳过。父镜像另作用于最终出生坐标。 | 本作；[专题](enemy-state.md#2-创建子敌名字与继承顺序) |
+| 312 | `enmCreateAMF(sub:str, x:float, y:float, hp:int, score:int, item:int)` | 创建执行 sub 的敌；x/y 为绝对输入坐标，hp 为血量，score 为分数，item 为掉落。子镜像初值1；F 门：boss0 存在时跳过。父镜像另作用于最终出生坐标。 | 本作；[专题](enemy-state.md#2-创建子敌名字与继承顺序) |
+| 313 | `anmSelectedPlay(script:int)` | script 为已选文件中的动画脚本。 | 社区；[专题](enemy-state.md) |
+| 314 | `anmPlayHigh(anmIndex:int, script:int)` | anmIndex/script 指定高层动画；具体层规则未核。 | 社区；[专题](enemy-state.md) |
+| 315 | `anmPlayRotate(anmIndex:int, script:int, angle:float)` | anmIndex/script 指定动画，angle 为旋转角。 | 社区；[专题](enemy-state.md) |
+| 316 | `anm316(p1:int, p2:int)` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 317 | `anmSwitch(slot:int, switch:int)` | slot 指定动画槽，switch 指定动画中断编号。 | 社区；[专题](enemy-state.md) |
+| 318 | `anmReset()` | 重置部分动画状态；字段范围未核。 | 社区；[专题](enemy-state.md) |
+| 319 | `anmRotate(slot:int, r:float)` | slot 为动画槽，r 为旋转角。 | 社区；[专题](enemy-state.md) |
+| 320 | `anmMove(slot:int, x:float, y:float)` | slot 为动画槽，x/y 为依附敌的局部位置。 | 社区；[专题](enemy-state.md) |
+| 321 | `enmMapleEnemy(sub:str, x:int, y:int, hp:int, score:int, item:int)` | 特殊敌创建入口；与普通创建的差异未核。 | 社区；[专题](enemy-state.md) |
+| 322 | `enm322(p1:int, p2:int)` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 323 | `deathAnm(anmIndex:int, script:int)` | anmIndex/script 配置死亡动画。 | 社区；[专题](enemy-state.md) |
+| 324 | `enmPos2(p1:int)` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 325 | `anmColor(slot:int, R:int, G:int, B:int)` | slot 为动画槽，R/G/B 为0–255颜色分量。 | 社区；[专题](enemy-state.md) |
+| 326 | `anmColorTime(slot:int, time:int, mode:int, R:int, G:int, B:int)` | slot 指定动画，time/mode 指定插值，R/G/B 为目标颜色。 | 社区；[专题](enemy-state.md) |
+| 327 | `anmAlpha(slot:int, alpha:int)` | slot 指定动画，alpha 为0–255透明度。 | 社区；[专题](enemy-state.md) |
+| 328 | `anmAlphaTime(slot:int, time:int, mode:int, alpha:int)` | slot 指定动画，time/mode 指定插值，alpha 为目标透明度。 | 社区；[专题](enemy-state.md) |
+| 329 | `anmScale(slot:int, w:float, h:float)` | slot 指定动画，w/h 为横纵缩放。 | 社区；[专题](enemy-state.md) |
+| 330 | `anmScaleTime(slot:int, time:int, mode:int, w:float, h:float)` | slot 指定动画，time/mode 指定插值，w/h 为目标缩放。 | 社区；[专题](enemy-state.md) |
+| 331 | `anmAlpha2(slot:int, alpha:int)` | slot 指定动画，alpha 为第二透明度通道。 | 社区；[专题](enemy-state.md) |
+| 332 | `anmAlpha2Time(slot:int, time:int, mode:int, alpha:int)` | slot 指定动画，time/mode 指定插值，alpha 为第二通道目标。 | 社区；[专题](enemy-state.md) |
+| 333 | `anm333(p1:int, p2:int, p3:int, p4:float, p5:float)` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 334 | `anm334(p1:int)` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 335 | `anmScale2(slot:int, w:float, h:float)` | slot 指定动画，w/h 为相乘缩放因子。 | 社区；[专题](enemy-state.md) |
+| 336 | `anmLayer(slot:int, layer:int)` | slot 指定动画，layer 为显示层。 | 社区；[专题](enemy-state.md) |
+| 337 | `anmBlendMode(slot:int, b:int)` | slot 指定动画，b 为混合模式；枚举未核。 | 社区；[专题](enemy-state.md) |
+| 338 | `anmPlayPos(anmIndex:int, script:int, x:float, y:float, z:float)` | anmIndex/script 选择动画，x/y/z 为偏移；3D细节未核。 | 社区；[专题](enemy-state.md) |
+| 339 | `anm339(p1:int, p2:int, p3:int)` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 340 | `enmDelete(id:int)` | 指定源敌 ID 退场；过滤及退场消费者完整行为待核。 | 部分；[专题](enemy-state.md) |
 
-| opcode / 精确助记名 | 功能与路径 | 处理及边界 |
-|---|---|---|
-| 511 `lifeSet`；512 `setBoss`；513 `timerReset`；514 `setInterrupt`；521 `setTimeout`；800 `enmCall`；802 `broadcastInterrupt` | 段状态、计时/HP中断、跨敌切换定位 | `需上下文`：同敌换段保留对象状态；八槽中断不等于目标spell_begin。只有任务单明确裁剪段外流程且证明不影响攻击才 `drop`。状态表 §4 |
-| 522 `spellEx`；523 `spellEnd`；537 `spell`；538 `spell2`；539 `spell3`；540 `stars`；542 `spellTimeout` | 符卡声明/结束/UI与耐久标记 | `需上下文`：目标用phase/spell外壳组织；名字/星数不能当攻击终止证据，也不能把段末清弹/子敌处理一起删。教材完整攻击章 |
-| 518 `dialogRead`；519 `dialogWait`；520 `bossWait`；548 `diffWait` | 对话、等待及难度等待定位 | `需上下文`：独立段外壳可裁剪对话，但要保留首发延迟；不得看到wait字样就丢弃 |
-| 302 `anmSelect`；303 `anmSetSprite`；306 `anmSetMain`；307 `anmPlay`；308 `anmPlayAbs`；317 `anmSwitch`；323 `deathAnm`；516 `playSound`；517 `setScreenShake` | 常见表现入口 | `drop`仅限已证明纯表现；ANM尺寸、状态读取、回调/位置或碰撞依赖须恢复，不能整300组丢弃 |
-| 506 `dropClear`；507 `dropExtra`；508 `dropArea`；509 `dropItems`；510 `dropMain`；562 `dropItemsSp` | 掉落入口定位 | `需上下文`：单段无敌练习可按外壳约定裁剪；掉落可能消耗RNG、影响条件/实体，未获准就不统一drop |
-| 569 `unknown569`；570 `unknown570` | 已补核章内计数权重登记/结算，原名保留 | 独立躲弹卡按非攻击统计省略；不凭unknown名称阻塞切分，见[补核证据](enemy-state.md#6-stage01试切后补核的非阻塞项) |
-| 573 `unknown573`；574（未命名，thecl显示ins_574） | 限时击破奖励的掉落配置及窗口/计时 | `drop`：普通道具奖励省略；不是发弹/脚本wait，见[统一口径](transcription-policy.md#系统性省略与外壳接管) |
-| 632 `funcSet`；637 `funcCall`；639 `funcSet2` | 原生特殊函数/回调入口 | `需上下文`：按实际函数号恢复行为；未核则 `blocked`。不能当普通无害call删除 |
+## 移动
 
-## 5. 发射器配置、复制与取消
+| 编号 | 名字与参数 | 参数语义／直接作用 | 依据与专题 |
+|---:|---|---|---|
+| 400 | `movePos(x:float, y:float)` | 写 ABS 位置层；REL 独立于 ABS，不能当作给最终位置加偏移。 | 本作；[专题](enemy-state.md#3-绝对相对镜像与限位如何组合) |
+| 401 | `movePosTime(frames:int, mode:int, x:float, y:float)` | 对 ABS 位置插值到 x/y；mode 查插值表。401 的 frames≤0 只取消插值。 | 本作；[专题](interpolation-modes.md) |
+| 402 | `movePosRel(x:float, y:float)` | 写 REL 位置层；REL 独立于 ABS，不能当作给最终位置加偏移。 | 本作；[专题](enemy-state.md#3-绝对相对镜像与限位如何组合) |
+| 403 | `movePosRelTime(frames:int, mode:int, x:float, y:float)` | 对 REL 位置插值到 x/y；mode 查插值表。401 的 frames≤0 只取消插值。 | 本作；[专题](interpolation-modes.md) |
+| 404 | `moveVel(angle:float, speed:float)` | 设置 ABS 的极坐标方向和线速度。 | 本作；[专题](enemy-state.md) |
+| 405 | `moveVelTime(frames:int, mode:int, angle:float, speed:float)` | 插值 ABS 角／速；普通 mode 为目标值，mode7 为增量。普通转角走最短弧。 | 本作；[专题](interpolation-modes.md) |
+| 406 | `moveVelRel(angle:float, speed:float)` | 设置 REL 的极坐标方向和线速度。 | 本作；[专题](enemy-state.md) |
+| 407 | `moveVelRelTime(frames:int, mode:int, angle:float, speed:float)` | 插值 REL 角／速；普通 mode 为目标值，mode7 为增量。普通转角走最短弧。 | 本作；[专题](interpolation-modes.md) |
+| 408 | `moveCircle(phase:float, omega:float, radius:float, radialSpeed:float)` | ABS 圆周运动；相位 rad、角速度 rad/帧、半径 px、径向增量 px/帧。圆心快照见专题。 | 本作；[专题](circular-motion.md) |
+| 409 | `moveCircleTime(frames:int, mode:int, omega:float, radius:float, radialSpeed:float)` | 插值 ABS 的角速度、半径和径向增量；没有目标相位参数。 | 本作；[专题](circular-motion.md) |
+| 410 | `moveCircleRel(phase:float, omega:float, radius:float, radialSpeed:float)` | REL 圆周运动；相位 rad、角速度 rad/帧、半径 px、径向增量 px/帧。圆心快照见专题。 | 本作；[专题](circular-motion.md) |
+| 411 | `moveCircleRelTime(frames:int, mode:int, omega:float, radius:float, radialSpeed:float)` | 插值 REL 的角速度、半径和径向增量；没有目标相位参数。 | 本作；[专题](circular-motion.md) |
+| 412 | `moveRand(frames:int, angleMode:int, speed:float)` | ABS 随机移动；speed 为起始速，angleMode 不覆盖速度插值槽的 mode。已核入口及限位见配方。 | 本作；[专题](movement.md) |
+| 413 | `moveRandRel(frames:int, mode:int, speed:float)` | REL 随机移动入口；完整本作选择规则与 mode 继承未核。 | 部分；[专题](movement.md) |
+| 414 | `moveBoss()` | 读取 Boss 的 ABS 位置；Boss 缺失行为未核。 | 社区；[专题](movement.md) |
+| 415 | `moveBossRel()` | 读取 Boss 的 REL 位置；Boss 缺失行为未核。 | 社区；[专题](movement.md) |
+| 416 | `movePos3d(x:float, y:float, z:float)` | x/y/z 为 ABS 三维位置；z 的消费未核。 | 社区；[专题](movement.md) |
+| 417 | `movePos3dRel(x:float, y:float, z:float)` | x/y/z 为 REL 三维位置；z 的消费未核。 | 社区；[专题](movement.md) |
+| 418 | `moveAdd(x:float, y:float)` | x/y 为 ABS 位置增量。 | 社区；[专题](movement.md) |
+| 419 | `move419(x:float, y:float)` | x/y 的 REL 增量解释存在社区疑问，消费者待核。 | 社区；[专题](movement.md) |
+| 420 | `moveEllipse(phase:float, omega:float, radius:float, radialSpeed:float, axis:float, ratio:float)` | ABS 椭圆运动；前四参同圆周，axis 为轴角快照，ratio 为该轴缩放。 | 本作；[专题](circular-motion.md) |
+| 421 | `moveEllipseTime(frames:int, mode:int, omega:float, radius:float, radialSpeed:float, axis:float, ratio:float)` | ABS Time 配置；axis/ratio 槽不被普通 tick 消费，不能按名字假定完整椭圆插值。 | 部分；[专题](circular-motion.md#未覆盖的time变体) |
+| 422 | `moveEllipseRel(phase:float, omega:float, radius:float, radialSpeed:float, axis:float, ratio:float)` | REL 椭圆运动；前四参同圆周，axis 为轴角快照，ratio 为该轴缩放。 | 本作；[专题](circular-motion.md) |
+| 423 | `moveEllipseRelTime(frames:int, mode:int, omega:float, radius:float, radialSpeed:float, axis:float, ratio:float)` | REL Time 配置；axis/ratio 槽不被普通 tick 消费，不能按名字假定完整椭圆插值。 | 部分；[专题](circular-motion.md#未覆盖的time变体) |
+| 424 | `moveSetMirror(enabled:int)` | 置清敌镜像位；各指令怎样使用镜像见敌状态专题。 | 本作；[专题](enemy-state.md) |
+| 425 | `moveBezier(frames:int, tangent0X:float, tangent0Y:float, x:float, y:float, tangent1X:float, tangent1Y:float)` | ABS Hermite 位置路径；起点为当前层位置，中间一对为终点，首尾两对为归一化时间切线，非两控制点。 | 本作；[专题](interpolation-modes.md#mode8hermite端点与切线) |
+| 426 | `moveBezierRel(frames:int, tangent0X:float, tangent0Y:float, x:float, y:float, tangent1X:float, tangent1Y:float)` | REL Hermite 位置路径；起点为当前层位置，中间一对为终点，首尾两对为归一化时间切线，非两控制点。 | 本作；[专题](interpolation-modes.md#mode8hermite端点与切线) |
+| 427 | `moveReset()` | 重置移动状态；具体字段范围待核。 | 社区；[专题](movement.md) |
+| 428 | `moveVelNM(angle:float, speed:float)` | 设置 ABS 的极坐标方向和线速度。NM 的镜像差异按调用点核。 | 部分；[专题](enemy-state.md) |
+| 429 | `moveVelNMTime(frames:int, mode:int, angle:float, speed:float)` | 插值 ABS 角／速；普通 mode 为目标值，mode7 为增量。NM 镜像分支待核。 | 部分；[专题](interpolation-modes.md) |
+| 430 | `moveVelNMRel(angle:float, speed:float)` | 设置 REL 的极坐标方向和线速度。NM 的镜像差异按调用点核。 | 部分；[专题](enemy-state.md) |
+| 431 | `moveVelNMRelTime(frames:int, mode:int, angle:float, speed:float)` | 插值 REL 角／速；普通 mode 为目标值，mode7 为增量。NM 镜像分支待核。 | 部分；[专题](interpolation-modes.md) |
+| 432 | `moveEnm(id:int)` | id 为源敌ID，读取其 ABS 位置；失败行为未核。 | 社区；[专题](movement.md) |
+| 433 | `moveEnmRel(id:int)` | id 为源敌ID，读取其 REL 位置；失败行为未核。 | 社区；[专题](movement.md) |
+| 434 | `moveCurve(time:int, mode:int, c:int, x:float, y:float)` | time/mode 控制 ABS 路径，x/y 为目标，c 的轨迹意义未核。 | 社区；[专题](movement.md) |
+| 435 | `moveCurveRel(time:int, mode:int, c:int, x:float, y:float)` | time/mode 控制 REL 路径，x/y 为目标，c 的轨迹意义未核。 | 社区；[专题](movement.md) |
+| 436 | `moveAddTime(time:int, mode:int, x:float, y:float)` | time/mode 控制 ABS 增量插值，x/y 为增量。 | 社区；[专题](movement.md) |
+| 437 | `moveAddRelTime(time:int, mode:int, x:float, y:float)` | time/mode 控制 REL 增量插值，x/y 为增量。 | 社区；[专题](movement.md) |
+| 438 | `moveCurveAdd(time:int, mode:int, c:int, x:float, y:float)` | 434 的 ABS 增量入口；c 的轨迹意义未核。 | 社区；[专题](movement.md) |
+| 439 | `moveCurveAddRel(time:int, mode:int, c:int, x:float, y:float)` | 435 的 REL 增量入口；c 的轨迹意义未核。 | 社区；[专题](movement.md) |
+| 440 | `moveAngle(angle:float)` | 独立更新 ABS 方向，速率另存。 | 本作；[专题](enemy-state.md) |
+| 441 | `moveAngleTime(frames:int, mode:int, angle:float)` | 插值 ABS 方向；特殊 mode、镜像和残余状态按调用点处理。 | 本作；[专题](interpolation-modes.md) |
+| 442 | `moveAngleRel(angle:float)` | 独立更新 REL 方向，速率另存。 | 本作；[专题](enemy-state.md) |
+| 443 | `moveAngleRelTime(frames:int, mode:int, angle:float)` | 插值 REL 方向；特殊 mode、镜像和残余状态按调用点处理。 | 本作；[专题](interpolation-modes.md) |
+| 444 | `moveSpeed(speed:float)` | 独立更新 ABS 线速度，方向另存。 | 本作；[专题](enemy-state.md) |
+| 445 | `moveSpeedTime(frames:int, mode:int, speed:float)` | 插值 ABS 速率；普通 mode 为目标速度。 | 本作；[专题](interpolation-modes.md) |
+| 446 | `moveSpeedRel(speed:float)` | 独立更新 REL 线速度，方向另存。 | 本作；[专题](enemy-state.md) |
+| 447 | `moveSpeedRelTime(frames:int, mode:int, speed:float)` | 插值 REL 速率；普通 mode 为目标速度。 | 本作；[专题](interpolation-modes.md) |
 
-| opcode / 精确助记名 | 功能与路径 | 处理及边界 |
-|---|---|---|
-| 600 `etNew` | 初始化指定et配置及辅助偏移/游标状态 | `translate`：在负责发射的目标任务里sh_reset，再显式写实际需要的字段；源16份配置、目标每任务4槽，不能直接全保留默认值 |
-| 601 `etOn` | 读取当前配置建弹 | `translate`：sh_fire或按原序显式fire；出生角/速度/顺序/随机范围见教材 §5与[瞄准表](aim-modes.md) |
-| 602 `etSprite` | 弹型与色 | `translate`按[弹型表](bullet-types.md)，源type不是目标appearance |
-| 603 `etOffset`；626 `etOffsetRad`；627 `etDist`；628 `etOffsetAbs` | 出弹位置/距离配置定位 | `需上下文`：先恢复实际出生点与坐标层；603常见偏移用sh_offset，628/626/627不能都当同一个offset。自机狙从实际口算 |
-| 604 `etAngle`；605 `etSpeed`；606 `etCount`；607 `etAim` | 方向、首末速度、颗数/层数与模式 | `translate`：sh_angle、sh_speed、sh_count、sh_aim/sh_ring；源首末速度须转层步长，见教材 §5与瞄准表 |
-| 608 `etSound` | 发射声音配置 | `drop`限不参与所选攻击逻辑的音效 |
-| 609 `etExSet`；610 `etExSet2`；611 `etEx`；612 `etEx2` | 指定槽/追加短长EX记录 | `translate`/`blocked`逐EX判断；短式不清未写字段，24条EX与追加游标要保存，见[EX表](ex-effects.md)、教材 §6 |
-| 614 `etCopy` | 复制源et描述符及辅助偏移到目标et | `需上下文`：TH18本作0x430d30 case0x7f复制0x488字节及两组偏移；不写单独EX追加游标。目标无sh_copy；有限静态字段可缓存重放，不能以sh_reset(dst)代替拷贝，更不能顺手清游标 |
-| 613 `etClearAll` | 全场普通弹及激光取消 | `需上下文`：本作handler调BulletManager与LaserManager取消，**不是清空et配置**。目标clear_bullets是field，执行相位/激光/转星规则有差别 |
-| 615 `etCancel`；616 `etClear` | 敌位置圆域取消，原handler传不同mode | `需上下文`：候选clear_bullets_at；半径、道具、激光部分取消和相位要对齐，本表未补全TH18取消消费者，不能直接套TH16转星规则 |
-| 635 `etCancel2`；636 `etClear2`；712 `etCancelRect` | 其他圆域/矩形取消入口 | `需上下文`：712已核只处理普通弹矩形域，不是改弹判定；635/636逐样本核过滤，目标field不能自动覆盖源保护规则 |
-| 617 `etSpeedR3`；618 `etSpeedR5`；619 `etSpeedR2`；620 `etCountR3`；621 `etCountR5`；622 `etCountR2`；624 `etSpeedD`；625 `etCountD` | 按rank/难度选值的配置入口 | `需上下文`：固定难度可先消解已核分支；原动态RANK不等于目标GVAR_RANK。教材 §3.3 |
-| 623 `angleToPlayer`；640 `etExSub`；641 `etExSubtract` | 角度查询及EX相关定位 | `需上下文`：623从实际取样位置/时点核方向；640/641不得仅凭名当已支持EX重排 |
+## 敌状态与阶段
 
-## 6. 直线激光与明确阻塞项
+| 编号 | 名字与参数 | 参数语义／直接作用 | 依据与专题 |
+|---:|---|---|---|
+| 500 | `setHurtbox(width:float, height:float)` | 设置受击框；普通圆形分支用第一值×0.5 为半径，矩形另核。 | 本作；[专题](enemy-state.md#1-敌默认判定与-flags) |
+| 501 | `setHitbox(width:float, height:float)` | 设置敌撞自机的体碰框；普通圆形分支用第一值×0.5。 | 本作；[专题](enemy-state.md#1-敌默认判定与-flags) |
+| 502 | `flagSet(mask:int)` | 按 mask 置敌 flags，原位不能直接传给目标 flag API。 | 本作；[专题](enemy-state.md) |
+| 503 | `flagClear(mask:int)` | 按 mask 清敌 flags；其他禁碰原因仍可能有效。 | 本作；[专题](enemy-state.md) |
+| 504 | `moveLimit(centerX:float, centerY:float, width:float, height:float)` | 设置逐帧位置限位矩形；width/height 是完整宽高。 | 本作；[专题](movement.md#限位与执行顺序) |
+| 505 | `moveLimitReset()` | 取消位置限位。 | 本作；[专题](enemy-state.md) |
+| 506 | `dropClear()` | 清额外掉落配置。 | 社区；[专题](enemy-state.md) |
+| 507 | `dropExtra(type:int, amount:int)` | type 为掉落类型，amount 为数量。 | 社区；[专题](enemy-state.md) |
+| 508 | `dropArea(w:float, h:float)` | w/h 为掉落分布区域宽高。 | 社区；[专题](enemy-state.md) |
+| 509 | `dropItems()` | 发放当前掉落配置；公共口径省略普通奖励。 | 社区；[专题](enemy-state.md) |
+| 510 | `dropMain(type:int)` | type 为主掉落类型。 | 社区；[专题](enemy-state.md) |
+| 511 | `lifeSet(hp:int)` | 设置当前与最大血量。 | 社区；[专题](enemy-state.md) |
+| 512 | `setBoss(bossId:int)` | 登记 Boss 槽；社区记 -1 结束 Boss 模式，其他值的完整本作行为待核。 | 社区；[专题](enemy-state.md) |
+| 513 | `timerReset()` | 重置段计时相关状态；不表示清空 TIME、脚本时钟及所有计时器。 | 本作；[专题](enemy-state.md) |
+| 514 | `setInterrupt(slot:int, hp:int, time:int, sub:str)` | 设置中断槽的血量阈值、超时阈值和跳转 sub；活动计时基点／取消范围沿入口恢复。 | 部分；[专题](enemy-state.md#4-同一敌人的段入口恢复状态而非重置模板) |
+| 515 | `setInvuln(frames:int)` | 设置无敌计时；无敌不自动关闭敌体碰。 | 本作；[专题](enemy-state.md) |
+| 516 | `playSound(id:int)` | id 为音效编号。 | 社区；[专题](enemy-state.md) |
+| 517 | `setScreenShake(time:int, startIntensity:int, endIntensity:int)` | time 为震屏时长，startIntensity/endIntensity 为起止强度。 | 社区；[专题](enemy-state.md) |
+| 518 | `dialogRead(dialogueId:int)` | dialogueId 为对话条目；可能有清场副作用，不能仅按纯表现删除。 | 社区；[专题](enemy-state.md) |
+| 519 | `dialogWait()` | 等待对话结束条件。 | 社区；[专题](enemy-state.md) |
+| 520 | `bossWait()` | 等待 Boss 不再存活。 | 社区；[专题](enemy-state.md) |
+| 521 | `setTimeout(slot:int, sub:str)` | 设置对应中断槽的超时目标；第二参是程序名，不是时长。 | 社区；[专题](enemy-state.md#4-同一敌人的段入口恢复状态而非重置模板) |
+| 522 | `spellEx(id:int, time:int, type:int, name:str)` | id 为符卡编号，time 为声明时长，type 的完整含义待核，name 为标题。 | 社区；[专题](enemy-state.md) |
+| 523 | `spellEnd()` | 结束符卡声明；攻击结束另看中断与任务。 | 社区；[专题](enemy-state.md) |
+| 524 | `setChapter(a:int)` | a 为章节／UI相关参数，具体作用随作品不同。 | 社区；[专题](enemy-state.md) |
+| 525 | `enmKillAll()` | 对通过过滤的敌执行死亡路径及非空 setDeath 回调；与直接删除不同。 | 本作；[专题](enemy-state.md) |
+| 526 | `etProtectRange(r:float)` | r 为自机附近禁止出生的半径。 | 社区；[专题](enemy-state.md) |
+| 527 | `lifeMarker(slot:int, hp:float, c:int)` | slot 为血条标记槽，hp 为标记血量，c 为颜色相关值（用途未核）。 | 社区；[专题](enemy-state.md) |
+| 528 | `spellUnused(id:int, time:int, type:int, name:str)` | 符卡声明入口，id/time/type/name；本作与522的差异未核。 | 社区；[专题](enemy-state.md) |
+| 529 | `rankF3(var:float&, a:float, b:float, c:float)` | 按动态 RANK 档位选择值，阈值未核；var 为写回目标，后续参数为候选值。 | 社区；[专题](mapping.md#35-游戏内变量与随机伪变量) |
+| 530 | `rankF5(var:float&, a:float, b:float, c:float, d:float, e:float)` | 按动态 RANK 档位选择值，阈值未核；var 为写回目标，后续参数为候选值。 | 社区；[专题](mapping.md#35-游戏内变量与随机伪变量) |
+| 531 | `rankF2(var:float&, a:float, b:float)` | 按动态 RANK 档位选择值，阈值未核；var 为写回目标，后续参数为候选值。 | 社区；[专题](mapping.md#35-游戏内变量与随机伪变量) |
+| 532 | `rankI3(var:int&, a:int, b:int, c:int)` | 按动态 RANK 档位选择值，阈值未核；var 为写回目标，后续参数为候选值。 | 社区；[专题](mapping.md#35-游戏内变量与随机伪变量) |
+| 533 | `rankI5(var:int&, a:int, b:int, c:int, d:int, e:int)` | 按动态 RANK 档位选择值，阈值未核；var 为写回目标，后续参数为候选值。 | 社区；[专题](mapping.md#35-游戏内变量与随机伪变量) |
+| 534 | `rankI2(var:int&, a:int, b:int)` | 按动态 RANK 档位选择值，阈值未核；var 为写回目标，后续参数为候选值。 | 社区；[专题](mapping.md#35-游戏内变量与随机伪变量) |
+| 535 | `diffI(var:int&, E:int, N:int, H:int, L:int)` | 按难度 E/N/H/L 选择值；var 为写回目标，后续参数为候选值。 | 社区；[专题](mapping.md#35-游戏内变量与随机伪变量) |
+| 536 | `diffF(var:float&, E:float, N:float, H:float, L:float)` | 按难度 E/N/H/L 选择值；var 为写回目标，后续参数为候选值。 | 社区；[专题](mapping.md#35-游戏内变量与随机伪变量) |
+| 537 | `spell(id:int, time:int, mode:int, name:str)` | id/time/mode/name 为符卡编号、声明时长、模式、标题；mode 未全核，声明时长不能替代中断时限。 | 社区；[专题](enemy-state.md) |
+| 538 | `spell2(id:int, time:int, mode:int, name:str)` | 符卡声明变体；id/time/mode/name，编号修正规则须按本作确认。 | 社区；[专题](enemy-state.md) |
+| 539 | `spell3(id:int, time:int, mode:int, name:str)` | 符卡声明变体；id/time/mode/name，编号修正规则须按本作确认。 | 社区；[专题](enemy-state.md) |
+| 540 | `stars(cnt:int)` | cnt 为显示星数。 | 社区；[专题](enemy-state.md) |
+| 541 | `noHitboxDur(frames:int)` | 独立临时禁体碰计时；不等于无敌或关闭受击。 | 本作；[专题](enemy-state.md) |
+| 542 | `spellTimeout()` | 标记耐久符卡；不直接定义任务退出时刻。 | 社区；[专题](enemy-state.md) |
+| 543 | `unknown543()` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 544 | `unknown544(p1:int)` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 545 | `laserCancel()` | 取消激光；本作过滤与取消相位待核。 | 社区；[专题](enemy-state.md) |
+| 546 | `bombShield(a:int, script:int)` | a 为炸弹保护开关，script 为关联动画脚本；槽及保护细节待核。 | 社区；[专题](enemy-state.md) |
+| 547 | `gameSpeed(scale:float)` | 改变游戏速度倍率；浮点时钟和 dt 相关行为不能直接取整。 | 社区；[专题](mapping.md) |
+| 548 | `diffWait(easy:int, normal:int, hard:int, lunatic:int)` | 按当前难度选等待帧数；与动态 RANK 区分。 | 社区；[专题](mapping.md) |
+| 549 | `unknown549(p1:int)` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 550 | `unknown550(p1:int)` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 551 | `unknown551(p1:int)` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 552 | `zIndex(layers:int)` | layers 为动画显示层增量。 | 社区；[专题](enemy-state.md) |
+| 553 | `hitSound(id:int)` | id 为受击音效号。 | 社区；[专题](enemy-state.md) |
+| 554 | `stageLogo()` | 显示关卡标题动画。 | 社区；[专题](enemy-state.md) |
+| 555 | `enmAlive(out:int&, id:int)` | 按源敌 ID 查询存活并写 out；失败／特殊 ID 的本作规则待核。 | 社区；[专题](enemy-state.md) |
+| 556 | `setDeath(sub:str)` | 设置死亡回调程序；攻击内部回调副作用仍需保留。 | 本作；[专题](enemy-state.md) |
+| 557 | `fogTime(time:int, mode:int, color:int, start:float, end:float)` | time/mode 为雾插值，color 为颜色，start/end 为距离参数。 | 社区；[专题](enemy-state.md) |
+| 558 | `flagMirror(state:int)` | state 为镜像开关；与424是否完全同路未作本作承诺。 | 社区；[专题](enemy-state.md) |
+| 559 | `enmLimit(limit:int)` | limit 为敌数量上限，后续创建可能被拒绝。 | 社区；[专题](enemy-state.md) |
+| 560 | `unknown560(p1:float, p2:float)` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 561 | `die()` | 触发死亡相关入口；与 delete/enmDelete 的本作完整差异待核。 | 社区；[专题](enemy-state.md) |
+| 562 | `dropItemsSp()` | 练习模式掉落入口；普通奖励已准省略。 | 社区；[专题](enemy-state.md) |
+| 563 | `unknown563(flagState:int)` | flagState 为形状相关开关；本作圆／矩形完整路径未核，不套别作定义。 | 社区；[专题](enemy-state.md) |
+| 564 | `hitboxRotate(angle:float)` | angle 为碰撞形状旋转角；形状及消费者需本作定义。 | 社区；[专题](enemy-state.md) |
+| 565 | `bombInvuln(red:float)` | red 为炸弹伤害倍率；本作细节待核。 | 社区；[专题](enemy-state.md) |
+| 566 | `unknown566()` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 567 | `unknown567(p1:int)` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 568 | `spellMode(state:int)` | state 为符卡减伤开关；具体本作规则待核。 | 社区；[专题](enemy-state.md) |
+| 569 | `unknown569(weight:int)` | 登记／增加章节统计权重；独立躲弹卡按公共口径省略非攻击统计。 | 本作；[专题](transcription-policy.md) |
+| 570 | `unknown570()` | 章节匹配时结算并清零统计。 | 本作；[专题](transcription-policy.md) |
+| 571 | `unknown571()` | 另一敌清场路径，先清死亡回调；完整过滤仍待核。 | 部分；[专题](enemy-state.md) |
+| 572 | `lifeNow(hp:int)` | hp 为当前血量，不改最大血量。 | 社区；[专题](enemy-state.md) |
+| 573 | `unknown573(p1:int, p2:int)` | 限时击破奖励掉落配置；逐参字段名未核，普通奖励按公共口径省略。 | 部分；[专题](transcription-policy.md) |
+| 574 | `ins_574(p1:int)` | 奖励窗口／计时配置；具体字段意义待核，不是脚本等待。 | 部分；[专题](transcription-policy.md) |
 
-| opcode / 精确助记名 | 功能与路径 | 处理及边界 |
-|---|---|---|
-| 700 `laserNew`；701 `laserTiming` | 配置几何与时长 | `translate`限[激光表](lasers.md)列出的子集；源四段到目标三段，扩宽期已危险，不能全部算warn |
-| 702 `laserOn` | 发飞行直线Line | `translate`/`需上下文`：laser+lz_speed/lz_start；近远端裁剪、width分段、EX复制与初长须分别核 |
-| 703 `laserStOn` | 发带编号Infinite | `translate`限静态几何等已列子集；保存目标句柄，原编号可能对应多条 |
-| 704 `laserOffset`；705 `laserTrajectory`；706 `laserStLength`；707 `laserStWidth` | 原点/附加向量/增长率/宽度写入 | `需上下文`：705不是连续漂移，706不是立即改总长；707动态宽度无目标写口，所需行为 `blocked` |
-| 708 `laserStAngle`；709 `laserStRotation`；710 `laserStEnd` | 绝对角、角速度与按编号取消 | `translate`限已知实例：差角lz_rotate、lz_omega、lz_cancel；fade和同编号多实例边界见激光表 |
-| 711 `laserCuOn` | 发带历史轨迹的Curve | **`blocked`：用户明确暂不转写曲线激光**。真实依赖曲线的攻击先隔离，不默认分段短线或其他形状替代 |
-| 713 `unknown713`；714 `unknown714` | kind=3分配及实体虚函数控制定位 | `blocked`：消费者未核，不能因在700组就映射成已有直线激光 |
+## 发射器与效果配置
 
-## 7. 使用与证据范围
+| 编号 | 名字与参数 | 参数语义／直接作用 | 依据与专题 |
+|---:|---|---|---|
+| 600 | `etNew(id:int)` | 重置指定发射器及辅助偏移／游标；同敌有16份配置。 | 本作；[专题](aim-modes.md) |
+| 601 | `etOn(id:int)` | 读取当前配置生成整波；配置共享、创建顺序和随机取样见专题。 | 本作；[专题](aim-modes.md) |
+| 602 | `etSprite(id:int, type:int, color:int)` | 设置弹型与色号，不立即发弹；原 type 不是目标 appearance。 | 本作；[专题](bullet-types.md) |
+| 603 | `etOffset(id:int, x:float, y:float)` | 设置相对发射口偏移；从敌 FINAL 合成实际出生点。 | 本作；[专题](aim-modes.md) |
+| 604 | `etAngle(id:int, angle:float, spread:float)` | 设置基础角和第二角；第二角随 aim 表示路间距、层偏转或随机幅度。 | 本作；[专题](aim-modes.md) |
+| 605 | `etSpeed(id:int, speed0:float, speed1:float)` | 普通模式为首末层速；随机速度模式7/8中 speed1 为幅度。 | 本作；[专题](aim-modes.md) |
+| 606 | `etCount(id:int, count:int, layers:int)` | 设置路数和层数；任一不为正时不发弹。 | 本作；[专题](aim-modes.md) |
+| 607 | `etAim(id:int, mode:int)` | 设置发射模式0–12；几何、速度和创建顺序查模式表。 | 本作；[专题](aim-modes.md) |
+| 608 | `etSound(id:int, fireSound:int, changeSound:int)` | 设置发射／变换音效编号；纯音效按公共口径省略。 | 社区；[专题](transcription-policy.md) |
+| 609 | `etExSet(id:int, index:int, async:int, type:int, a:int, b:int, r:float, s:float)` | 指定 index 写 EX 记录并推进游标；async 为并行门，type 为效果值，a…n 查效果表。短式保留 c/d/m/n。 | 本作；[专题](ex-effects.md) |
+| 610 | `etExSet2(id:int, index:int, async:int, type:int, a:int, b:int, c:int, d:int, r:float, s:float, m:float, n:float)` | 指定 index 写 EX 记录并推进游标；async 为并行门，type 为效果值，a…n 查效果表。 | 本作；[专题](ex-effects.md) |
+| 611 | `etEx(id:int, async:int, type:int, a:int, b:int, r:float, s:float)` | 按追加游标写 EX 记录并推进游标；async 为并行门，type 为效果值，a…n 查效果表。短式保留 c/d/m/n。 | 本作；[专题](ex-effects.md) |
+| 612 | `etEx2(id:int, async:int, type:int, a:int, b:int, c:int, d:int, r:float, s:float, m:float, n:float)` | 按追加游标写 EX 记录并推进游标；async 为并行门，type 为效果值，a…n 查效果表。 | 本作；[专题](ex-effects.md) |
+| 613 | `etClearAll()` | 取消全场普通弹及激光；不清空发射器配置。 | 本作；[专题](aim-modes.md) |
+| 614 | `etCopy(dst:int, src:int)` | 将 src 发射器配置及两组偏移复制到 dst；不复制单独 EX 追加游标。参数方向来自社区表及本地调用，复制范围已有本作证据。 | 本作；[专题](aim-modes.md) |
+| 615 | `etCancel(radius:float)` | 以敌位置为中心的圆域消弹；各入口的 mode／保护过滤不同，完整本作取消消费者待核。 | 部分；[专题](aim-modes.md) |
+| 616 | `etClear(radius:float)` | 以敌位置为中心的圆域消弹；各入口的 mode／保护过滤不同，完整本作取消消费者待核。 | 部分；[专题](aim-modes.md) |
+| 617 | `etSpeedR3(etId:int, spd1l:float, spd1m:float, spd1h:float, spd2l:float, spd2m:float, spd2h:float)` | 按动态 RANK 档位选择值，阈值未核；etId 为发射器，先列第一字段各档值，再列第二字段各档值；spd为速度，cnt为路数／层数。 | 社区；[专题](mapping.md#35-游戏内变量与随机伪变量) |
+| 618 | `etSpeedR5(etId:int, spd1l:float, spd1ml:float, spd1m:float, spd1mh:float, spd1h:float, spd2l:float, spd2ml:float, spd2m:float, spd2mh:float, spd2h:float)` | 按动态 RANK 档位选择值，阈值未核；etId 为发射器，先列第一字段各档值，再列第二字段各档值；spd为速度，cnt为路数／层数。 | 社区；[专题](mapping.md#35-游戏内变量与随机伪变量) |
+| 619 | `etSpeedR2(etId:int, spd1l:float, spd1h:float, spd2l:float, spd2h:float)` | 按动态 RANK 档位选择值，阈值未核；etId 为发射器，先列第一字段各档值，再列第二字段各档值；spd为速度，cnt为路数／层数。 | 社区；[专题](mapping.md#35-游戏内变量与随机伪变量) |
+| 620 | `etCountR3(etId:int, cnt1l:int, cnt1m:int, cnt1h:int, cnt2l:int, cnt2m:int, cnt2h:int)` | 按动态 RANK 档位选择值，阈值未核；etId 为发射器，先列第一字段各档值，再列第二字段各档值；spd为速度，cnt为路数／层数。 | 社区；[专题](mapping.md#35-游戏内变量与随机伪变量) |
+| 621 | `etCountR5(etId:int, cnt1l:int, cnt1ml:int, cnt1m:int, cnt1mh:int, cnt1h:int, cnt2l:int, cnt2ml:int, cnt2m:int, cnt2mh:int, cnt2h:int)` | 按动态 RANK 档位选择值，阈值未核；etId 为发射器，先列第一字段各档值，再列第二字段各档值；spd为速度，cnt为路数／层数。 | 社区；[专题](mapping.md#35-游戏内变量与随机伪变量) |
+| 622 | `etCountR2(etId:int, cnt1l:int, cnt1h:int, cnt2l:int, cnt2h:int)` | 按动态 RANK 档位选择值，阈值未核；etId 为发射器，先列第一字段各档值，再列第二字段各档值；spd为速度，cnt为路数／层数。 | 社区；[专题](mapping.md#35-游戏内变量与随机伪变量) |
+| 623 | `angleToPlayer(out:float&, x:float, y:float)` | 输出从指定 (x,y) 朝玩家的弧度角；按调用时点取样。 | 社区；[专题](aim-modes.md) |
+| 624 | `etSpeedD(etId:int, spd1e:float, spd1n:float, spd1h:float, spd1l:float, spd2e:float, spd2n:float, spd2h:float, spd2l:float)` | 按难度 E/N/H/L 选择值；etId 为发射器，先列第一字段各档值，再列第二字段各档值；spd为速度，cnt为路数／层数。 | 社区；[专题](mapping.md#35-游戏内变量与随机伪变量) |
+| 625 | `etCountD(etId:int, cnt1e:int, cnt1n:int, cnt1h:int, cnt1l:int, cnt2e:int, cnt2n:int, cnt2h:int, cnt2l:int)` | 按难度 E/N/H/L 选择值；etId 为发射器，先列第一字段各档值，再列第二字段各档值；spd为速度，cnt为路数／层数。 | 社区；[专题](mapping.md#35-游戏内变量与随机伪变量) |
+| 626 | `etOffsetRad(id:int, angle:float, radius:float)` | 设置极坐标发射偏移；与603的合成顺序／状态关系仍按本作调用核。 | 社区；[专题](aim-modes.md) |
+| 627 | `etDist(id:int, distance:float)` | 沿每弹出生方向再偏移 distance；与 ANIM 的4倍初速退位移合成。 | 本作；[专题](aim-modes.md#出生距离与anim退位移) |
+| 628 | `etOffsetAbs(id:int, x:float, y:float)` | 设置绝对发射位置配置；与相对偏移的覆盖／合成细节未在本书完整核清。 | 社区；[专题](aim-modes.md) |
+| 629 | `fog(r:float, color:int)` | r 为雾半径，color 为颜色。 | 社区；[专题](enemy-state.md) |
+| 630 | `callSTD(switch:int)` | switch 为 STD 中断编号。 | 社区；[专题](enemy-state.md) |
+| 631 | `lifeHide(time:int)` | time 为隐藏血条时长。 | 社区；[专题](enemy-state.md) |
+| 632 | `funcSet(functionId:int)` | 原生特殊函数入口；632/639配置持续函数，637调用一次（社区）；具体 functionId 的本作行为需单独定义。 | 部分；[专题](enemy-state.md) |
+| 633 | `flagExtDmg(state:int)` | state 为外部伤害开关；读哪个共享槽及执行顺序待核。 | 社区；[专题](enemy-state.md) |
+| 634 | `setHitboxFunc(functionId:int)` | 选择特殊碰撞函数；函数号的本作几何含义需单独定义。 | 部分；[专题](enemy-state.md) |
+| 635 | `etCancel2(radius:float)` | 以敌位置为中心的圆域消弹；各入口的 mode／保护过滤不同，完整本作取消消费者待核。 | 部分；[专题](aim-modes.md) |
+| 636 | `etClear2(radius:float)` | 以敌位置为中心的圆域消弹；各入口的 mode／保护过滤不同，完整本作取消消费者待核。 | 部分；[专题](aim-modes.md) |
+| 637 | `funcCall(functionId:int)` | 原生特殊函数入口；632/639配置持续函数，637调用一次（社区）；具体 functionId 的本作行为需单独定义。 | 部分；[专题](enemy-state.md) |
+| 638 | `scoreAdd(n:int)` | n 为分数增量。 | 社区；[专题](enemy-state.md) |
+| 639 | `funcSet2(functionId:int)` | 原生特殊函数入口；632/639配置持续函数，637调用一次（社区）；具体 functionId 的本作行为需单独定义。 | 部分；[专题](enemy-state.md) |
+| 640 | `etExSub(id:int, index:int, sub:str)` | 给指定 EX 记录设置程序名字符串；不等于普通同步 call。 | 社区；[专题](ex-effects.md) |
+| 641 | `etExSubtract(id:int)` | 社区记为追加游标减1，最低0；本作边界行为未复核。 | 社区；[专题](ex-effects.md) |
 
-先用opcode与精确名定位，再读对应节恢复参数/前置状态；在单卡报告中逐项写实际 `translate/drop/blocked/需上下文` 结论、已接受差异及证据。表中仅“定位”的条目不算已支持，也不要求为了补表把整套VM重做。
+## 激光
 
-本轮复用 `/data/sunyunbo/www/renkolab/local/vendor/eclmap/eclmap/th18.eclm` 与本作既有 `state/data/functions.jsonl`：VM `0x48b3a0`，高位分派 `0x430d30`，创建 `0x4369e0`，敌逻辑 `0x42ed40`。详细行号/地址见[状态表证据](enemy-state.md#5-证据与本轮检查)与激光/EX专表；[2026-11-02能力调查](../../docs/investigations/2026-11-02-ecl-capability-audit/modern-vm.md)的主体版本为TH16，不能把其类别原封外推成TH18验证结果。
+| 编号 | 名字与参数 | 参数语义／直接作用 | 依据与专题 |
+|---:|---|---|---|
+| 700 | `laserNew(id:int, initialLength:float, targetLength:float, lengthLimit:float, width:float)` | 配置初长、目标长度、Line路程裁剪参数和显示宽度；判定几何需换算。 | 本作；[专题](lasers.md) |
+| 701 | `laserTiming(id:int, startup:int, expand:int, hold:int, shrink:int, flags:int)` | Infinite 四段时长与初始 flags；Curve 的 startup 槽为轨迹长度。 | 本作；[专题](lasers.md) |
+| 702 | `laserOn(id:int)` | 生成 Line 并复制发射器 EX。 | 本作；[专题](lasers.md) |
+| 703 | `laserStOn(id:int, laserId:int)` | 生成 Infinite，赋予可重复使用的源编号。 | 本作；[专题](lasers.md) |
+| 704 | `laserOffset(laserId:int, x:float, y:float)` | 写激光原点及保存基点。 | 本作；[专题](lasers.md) |
+| 705 | `laserTrajectory(laserId:int, x:float, y:float)` | 写附加向量；每tick从基点恢复后加一次，不是连续累加漂移。 | 本作；[专题](lasers.md) |
+| 706 | `laserStLength(laserId:int, speed:float)` | 写长度增长速率，不是立即设置总长。 | 本作；[专题](lasers.md) |
+| 707 | `laserStWidth(laserId:int, width:float)` | 写当前宽，随后可能被 phase 更新覆盖。 | 本作；[专题](lasers.md) |
+| 708 | `laserStAngle(laserId:int, angle:float)` | 写绝对弧度角。 | 本作；[专题](lasers.md) |
+| 709 | `laserStRotation(laserId:int, omega:float)` | 写每帧角速度，单位 rad/帧。 | 本作；[专题](lasers.md) |
+| 710 | `laserStEnd(laserId:int)` | 取消并解除编号，遍历全部同编号实例。 | 本作；[专题](lasers.md) |
+| 711 | `laserCuOn(id:int)` | 生成带轨迹历史的 Curve；当前用户明确暂缓。 | 本作；[专题](lasers.md) |
+| 712 | `etCancelRect(width:float, height:float)` | 以敌位置取消矩形区域普通弹；不处理全部激光。 | 本作；[专题](lasers.md) |
+| 713 | `unknown713(id:int, laserId:int)` | 进入 kind=3 分配路径；消费者未核。thecl 参数格式存在冲突，见资料说明。 | 部分；[专题](lasers.md) |
+| 714 | `unknown714(laserId:int, value:int)` | 对对应实体调用控制入口，value 的具体含义未核。 | 部分；[专题](lasers.md) |
 
-本文没有完整目标程序；不新增永久测试、不启动训练、不重建原作导出。临时原文与检查在已忽略的 `transcribe/work/th18-supplement-20261105/instructions-state/`。文档检查只证明名字/链接与范围说明一致，不能代替实际攻击的独立harness check、短run、数值锚点和原文审核。
+## 跨敌交互
+
+| 编号 | 名字与参数 | 参数语义／直接作用 | 依据与专题 |
+|---:|---|---|---|
+| 800 | `enmCall(id:int, sub:str)` | 请求指定源敌切换程序；实际生效调度与取消范围按调用点核。 | 社区；[专题](enemy-state.md) |
+| 801 | `enmPos(outX:float&, outY:float&, id:int)` | 查询源敌位置，写 outX/outY；查询失败行为未核。 | 社区；[专题](enemy-state.md) |
+| 802 | `broadcastInterrupt(slot:int)` | 社区记为触发各存活 Boss 的对应中断槽；本作过滤与时序未完整核。 | 社区；[专题](enemy-state.md) |
+
+## 调试与作品专用入口
+
+| 编号 | 名字与参数 | 参数语义／直接作用 | 依据与专题 |
+|---:|---|---|---|
+| 900 | `debug900(p1:int)` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 901 | `debug901()` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 902 | `debug902()` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 903 | `debug903(参数格式待核)` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 904 | `debug904(p1:float)` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 1000 | `spec0()` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 1001 | `spec1(p1:int)` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 1002 | `spec2(p1:float)` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 1003 | `spec3(p1:int)` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 1004 | `spec4()` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 1005 | `spec5(p1:int)` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 1006 | `spec6(p1:float)` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 1007 | `spec7(p1:int)` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 1008 | `spec8(p1:int)` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 1009 | `spec9(p1:int)` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 1010 | `spec10(p1:float)` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 1011 | `spec11(p1:int)` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 1012 | `spec12(p1:int)` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 1013 | `spec13()` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 1014 | `spec14(p1:int)` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 1015 | `spec15(参数格式待核)` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 1016 | `spec16(参数格式待核)` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 1017 | `spec17(参数格式待核)` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 1018 | `spec18(参数格式待核)` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 1019 | `spec19(参数格式待核)` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+| 1020 | `spec20(参数格式待核)` | 参数含义及本作行为待核；不从名字推断。 | 待核 |
+
+## 资料与版本
+
+助记名取本机已使用的 [Priw8 TH18 eclmap](https://github.com/Priw8/eclmap/blob/f146162e330c27d1b0a8880c3a41884615147a11/eclmap/th18.eclm)。参数名称参考 [Priw8 指令表数据](https://priw8.github.io/js/ecl/ins.js)（2026-11-07读取；TH18条目继承较早版本，不能视为全部已核）；格式对照本机 [thecl10.c](https://github.com/thpatch/thtk/blob/892114a0fcaa0bbdaaecf3cb4ad56f758683fb40/thecl/thecl10.c) 的TH18回退链。本作已核专题优先于社区的旧解释，特别是412速度mode、705附加向量、421/423和94。
+
+两处格式冲突单独保留：本机thecl的92为 `SfSSff`，社区表和既有TH18原生研究为带两个extra的八参；713本机格式为 `S`，既有本作研究及社区参数为两个整数。表中给出有依据的语义参数，不能据此保证该版thecl可正确解码／编译这些调用；准备者遇到实际使用须核输入。27、31、903及部分spec入口在该格式链中无定义，保留未知。
+
+其他原生依据由[维护记录](../../docs/investigations/2026-11-07-th18-reference-provenance.md)追溯。worker无需阅读维护记录或外部网站；实际所需定义应随本书交付。不同作品可复用表格格式，编号、参数和行为按作品分别核验。

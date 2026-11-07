@@ -1,0 +1,12 @@
+title = "Stage 1 关底第二符 招符「弾災招福」"
+source = "th18"
+origin = "TH18 v1.00a Stage 1，关底第二符 BossCard2"
+source_ref = "st01bs.ecl.txt:505-696"
+ranks = [0, 3]
+marks = [0]
+time_limit = 2222
+original_time_limit = 2100
+tags = ["ring", "aimed", "random"]
+laser_approx = false
+lower_half_blocked = false
+notes = "源/卡时轴及STEP单段适用条件见notes.md；Sol转写、主会话独立审核通过。harness与wheel0.4.6同为ENGINE_VER34。"

@@ -1,5 +1,7 @@
 # 多作品模型转写流水线
 
+> 2026-11-06：用户已批准更薄的headless脚本路线，见[新设计](2026-11-06-headless-transcribe-design.md)和[重做计划](../plans/2026-11-06-headless-transcribe-rebuild.md)。本页已完成的目录整理继续有效；尚未实施的pipeline状态机扩展、作品适配模块和out/card双份目录方案不再作为新实现依据。
+
 2026-11-05。用户已选择“共用流程＋作品适配”，沿用文件记录和现有模型后端，先接 TH18，再逐步迁移 TH06。用户随后认可基本架构，并要求纳入 synthetic 与卡产物的后续使用，明确反对重复hash和过度防御性验证。用户已确认cards与transcribe按th06/th18/synthetic统一分目录。目录、metadata选择及现有消费端迁移已实施，见[实施记录](../plans/2026-11-05-card-source-layout.md)；下文共用批量调度、TH18 prepare等仍是后续实施设计，不代表已经可用。
 
 ## 目标与范围

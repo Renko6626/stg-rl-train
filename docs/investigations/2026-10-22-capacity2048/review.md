@@ -1,0 +1,15 @@
+# TH18 2048-row successor review — 2026-10-22
+
+No blocking findings in the approved 2048-row / graph7 successor.
+
+Reviewed canonical `stg-agent-proto/c/{world.h,sa_model.h,sa_onnx.c,sa_onnx.h}`, training `src/stgtrain/export_onnx.py` and `tests/test_export_v8.py`, and the TH18 production extractor/test. Independently checked that all20 frozen runtime input hashes and every exporter freeze hash still match current files. Runtime DLL identity is `4387c9d748cc81dea8b69485c83e4485beec56a8d70ed1fb3280ec9d31d72033`; ONNX identity is `2986d382b868ad5b802256b563a7d8ece650f91331b0fb3e65d25bd672d678cf`.
+
+- World and model input capacity agree at2048. TH18 directly emits eligible circular bullets in native traversal order, with the existing2002-node walk bound. The previous candidate array, distance comparators and adapter `qsort` are removed. The revised2000-object regression checks every actual world/fill row, including the near object at1500, zero drops, and the unused-row mask. Laser state normalization, raw native probe states, the narrow thaw gate and existing geometry paths remain intact.
+- Graph7 requires2048 bullet rows and twelve inputs. Legacy640-row graphs2–6 remain accepted with their original input counts. Loader signature validation adjusts both the bullet tensor shape/byte count and its separate mask shape/byte count, while each tensor points to its own field in the enlarged static input structure. No legacy struct-offset/prefix mistake was found. Mismatched masks,1024 rows and2048 rows with an older profile are rejected. Version reporting distinguishes graph6 from graph7 despite both having twelve inputs.
+- Exported640-row versions keep their previous numbering;2048 export rejects older profiles. The new model manifest pins the same B/u1000 checkpoint (`8b3824871e18ca4a5fd052e758ef13833a0303d856513ebe58e6d604f0a19c88`), unchanged TopK sizes64/8/8, graph7 and2048-row bullets/mask. No training or model-weight change is represented by this export.
+
+Inspected evidence: exporter suite54 passed; strict CLI self-check maximum deviation4.29e-6; real C ORT1.22 versus Python ORT1.30 maximum deviation9.536743e-6 for graph7 and4.686415e-6 for graph6. Changing row2000 affects graph7 logits by12.093597 and leaves legacy graph6 unchanged, supporting correct expanded/prefix bindings. The contract harness exercises accepted graph versions2–7 and malformed capacity/mask/profile rejection. The2000-object regression calls the real production extractor and canonical fill.
+
+The additional seeded torch/ORT scene remains1.335144e-5 for both old and new graphs; padded old/new ONNX logits are identical in all three inspected scenes, with unchanged actions. The strict threshold was retained, so this is recorded as an existing numerical limitation rather than reported as a universal torch/ORT pass.
+
+This review ran no new tests or builds and wrote only this report. Final package contents/alias wiring and Windows gameplay acceptance remain with the main task; no Windows runtime acceptance is implied.

@@ -81,7 +81,7 @@
 worker 用 stg-engine HEAD 的 harness 自检，与训练仓 wheel（`rl-v0.1.0`）的编译结果一致。
 `stg-harness check` 与 `stg_rl.compile_dir` 报同一套错误（`文件:行:列: 消息` + 源行 + `^`，一次报出全部错误）。
 这不是当前版本相同的证明。引擎升级 wheel 时核对已安装 `stg_rl.build_info()`、构建 harness 的来源和编译结果，
-并按 [wheel 同步约定](agent-memory/stg-rl-wheel-sync.md) 更新四处依赖。
+并按 [wheel 同步约定与来源](magnus-migration.md#项目自有-wheel) 更新四处依赖。
 
 ## 4. 目录布局
 

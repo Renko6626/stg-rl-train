@@ -1,0 +1,20 @@
+{
+  "7": {
+    "max_c_python_abs": 9.5367431640625e-06,
+    "late_row2000_logit_change": 12.093597412109375
+  },
+  "6": {
+    "max_c_python_abs": 4.686415195465088e-06,
+    "late_row2000_logit_change": 0.0
+  },
+  "legacy2": "accepted version 2",
+  "legacy3": "accepted version 3",
+  "legacy4": "accepted version 4",
+  "legacy5": "accepted version 5",
+  "legacy6": "accepted version 6",
+  "graph7": "accepted version 7",
+  "mask640": "图签名不符：输入 bullets_mask 是 bool[640]，应为 bool[2048]（图与 sa_model.h 的版本不匹配？）",
+  "mask2048": "图签名不符：输入 bullets_mask 是 bool[2048]，应为 bool[640]（图与 sa_model.h 的版本不匹配？）",
+  "rows1024": "图签名不符：输入 bullets 是 float32[1024,5]，应为 float32[2048,5]（图与 sa_model.h 的版本不匹配？）",
+  "oldprofile2048": "图签名不符：2048 行子弹表要求十二输入（图版本 7），实际为 9 个"
+}

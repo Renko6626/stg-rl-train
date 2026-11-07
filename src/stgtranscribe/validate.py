@@ -1,8 +1,8 @@
-"""TH06 / TH18 转写卡自动验收四层（TH06 spec §8；TH18 transcribe/th18/validation.md）。
+"""TH06 / TH16 / TH18 转写卡自动验收四层（TH06 spec §8；TH18 transcribe/th18/validation.md）。
 
     python -m stgtranscribe.validate <卡目录> [--json 输出文件] [--skip-rl]
 
-退出码 0 = 全过；1 = 有错误；2 = 用法错误。转写 worker 自检和 pipeline 收卡用的是同一个入口。
+退出码 0 = 全过；1 = 有错误；2 = 用法错误。由统一 runner 调用；也可独立检查单卡。
 """
 from __future__ import annotations
 
@@ -26,8 +26,8 @@ META_REQUIRED = {
     "time_limit": int, "original_time_limit": int, "tags": list, "laser_approx": bool, "lower_half_blocked": bool,
 }
 PEAK_LIMIT = 1024
-# phase_begin / spell_begin 的引擎计时字段为 u16；TH18 不套 TH06 练习时长上限。
-TH18_MAX_TIME_LIMIT = 65535
+# phase_begin / spell_begin 的引擎计时字段为 u16；TH16/TH18 不套 TH06 练习时长上限。
+MODERN_MAX_TIME_LIMIT = 65535
 SEG_EARLIEST = U.OPENING_BUFFER
 SEG_SLACK = 60
 OPENING_FRAMES = 120
@@ -59,7 +59,7 @@ def lint(card: Path) -> tuple[list[str], dict]:
     meta: dict = {}
     source = U.source_of(card.name)
     if source is None:
-        errs.append(f"目录名 {card.name!r} 不合 th06_s<关>_<w|mb|b><序号> 或 th18_s<关>_<w|mb|b><序号>")
+        errs.append(f"目录名 {card.name!r} 不合 th06_s<关>_<w|mb|b><序号> 、th16_s<关>_<w|mb|b><序号> 或 th18_s<关>_<w|mb|b><序号>")
     mp = card / "meta.toml"
     if not mp.exists():
         return errs + ["缺 meta.toml"], meta
@@ -72,8 +72,8 @@ def lint(card: Path) -> tuple[list[str], dict]:
             errs.append(f"meta.toml 缺 {k}")
         elif not isinstance(meta[k], ty) or (ty is int and isinstance(meta[k], bool)):
             errs.append(f"meta.toml 的 {k} 应为 {ty.__name__}")
-    if meta.get("source") not in ("th06", "th18"):
-        errs.append('meta.toml source 应为 "th06" 或 "th18"')
+    if meta.get("source") not in ("th06", "th16", "th18"):
+        errs.append('meta.toml source 应为 "th06"、"th16" 或 "th18"')
     elif source is not None and meta["source"] != source:
         errs.append(f'meta.toml source 应为 "{source}"，与目录编号一致')
     r = meta.get("ranks")
@@ -82,7 +82,7 @@ def lint(card: Path) -> tuple[list[str], dict]:
     if meta.get("marks") not in ([0], None):
         errs.append("meta.toml marks 应为 [0]")
     tl = meta.get("time_limit")
-    max_time = TH18_MAX_TIME_LIMIT if source == "th18" else U.MAX_TIME_LIMIT
+    max_time = MODERN_MAX_TIME_LIMIT if source in ("th16", "th18") else U.MAX_TIME_LIMIT
     if isinstance(tl, int) and not (0 < tl <= max_time):
         errs.append(f"time_limit {tl} 应在 (0, {max_time}]")
     if isinstance(meta.get("tags"), list) and (bad := set(meta["tags"]) - ALLOWED_TAGS):
@@ -155,7 +155,7 @@ def check_runs(report: Report, card: Path, meta: dict) -> None:
         if r["diag"].get("pool_full", 0):
             report.errors.append(f"rank {rank}: pool_full {r['diag']['pool_full']}（池被打满，场上少了东西）")
         if r["diag"].get("contract_viol", 0):
-            report.warnings.append(f"rank {rank}: contract_viol {r['diag']['contract_viol']}（有调用被吞成 no-op）")
+            report.errors.append(f"rank {rank}: contract_viol {r['diag']['contract_viol']}（有调用被吞成 no-op）")
         seg = r["seg_end"]
         if seg is None:
             report.errors.append(f"rank {rank}: {tl + 300} 帧内没有段结束事件")

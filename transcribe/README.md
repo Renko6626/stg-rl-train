@@ -1,74 +1,118 @@
-# 东方 ECL 模型转写
+# ECL 转写与独立审核
 
-将原作攻击转为 stg-engine 躲弹卡。按作品准备源材料与映射，经模型转写、自动验收、独立源语义审核和抽检后收卡。当前 TH06/NC 有批量工具，TH18 有切分指南和单攻击写审设施；多作品批量调度尚未实现。
+一份任务清单，一个命令。执行器按卡依次启动作者、完整机器验收、独立审核；卡之间并发。作者和审核者都是新的headless会话，失败停止该卡，不自动重试或换模型。
 
-## 从这里进入
+## 运行
 
-| 工作 | 入口 | 当前范围 |
-|---|---|---|
-| TH06/NC 批量转写 | [TH06 操作说明](th06/README.md) | 切分、摘录、转写、验收、审核、抽检清单、收卡 |
-| TH18 整关切分 / 单攻击写审 | [TH18 入口](th18/README.md) | 人工/AI切分记录、任务单准备、独立写审、共用单卡验收 |
-| 合成练习卡 | [synthetic 入口](synthetic/README.md) | 设计brief或底子卡、独立写审；成品与原作共用卡库 |
-| TH18 语法与机制 | [转写教材](th18/mapping.md) / [统一口径](th18/transcription-policy.md) | 本作已核语义、已批准差异、未支持机制 |
-| 单卡自动验收 | [TH18 编号与规则](th18/validation.md) | `stgtranscribe.validate` 支持 TH06、TH18；预算按来源区分 |
-| 目标卡试玩与出图 | [TH06 操作说明中的工具](th06/README.md#试玩) | `preview` / `play.sh` 从统一卡库发现启用卡，可按单卡预览 |
-| 历史现代 ECL 导入原型 | [原型说明](../tools/th18-import-prototype/README.md) | 独立实验；有限子集代码生成，不是模型转写入口 |
-
-TH06 契约在 `th06/contracts/`，TH18 契约在 `th18/contracts/`，合成契约在 `synthetic/contracts/`。成品统一进入 [cards/<source>/<id>](../cards/README.md)，不再新增根目录 cards-* 卡池。不要把 TH06 的坐标、色号、时序、激光规则或旧预算套到其他作品。
-
-## 目录与归属
-
-```text
-transcribe/
-  README.md                跨作品导航、工具边界与工作区约定
-  th06/                    本作操作说明、配置、映射、范例、contracts/
-  th18/                    本作教材、参考表、切分/验收规则、contracts/
-  synthetic/               合成设计、作者/审核契约
-  tools/claude-worker      现有 Sonnet 后备执行入口
-  play.sh                  目标卡试玩入口
-  work/                    本地工作资料与生成物，整个目录忽略
-src/stgtranscribe/         现有 Python 工具（范围见下表）
-tests/transcribe/          对应检查
-tools/th18-import-prototype/  历史导入原型，与模型写审分开
-```
-
-| 工具 | 实际边界 |
-|---|---|
-| `pipeline` | TH06 批量驱动；提示词、来源路径、切分结构和状态选择仍固定 TH06 |
-| `thecl`、`structure`、`split_check`、`extract`、`mapping` | TH06 文本格式、依赖/切分规则与参考摘录，不能直接解析 TH18 |
-| `units` | 编号识别支持 TH06/TH18，其余闭包、来源与时限辅助仍有 TH06 规则 |
-| `validate` | 目标卡编译、运行、元数据与开场安全；支持 TH06/TH18，不证明原作等价 |
-| `preview` | 目标 harness 转储出图，不负责原作解析 |
-| `usage`、`notes`、`density` | 已有用量、便笺、密度辅助；调用与目录仍围绕现有流程 |
-| `config` | 引擎与工作区路径；引擎默认路径仍从 TH06 配置读取，可用 `STG_ENGINE_DIR` 覆盖 |
-
-## 工作区
-
-- `work/th18/stage01/`：当前 TH18 一面切分材料。后续单元目录按[单卡约定](th18/validation.md)建立；现有 `split.md` 的 W00/M1/C1 等为试切标签，派发前映射为最终 `th18_s…` 编号，不能直接当卡目录名。
-- `work/units/`、`review/`、`split/`、`logs/`、`state.jsonl`：现有 TH06 生产记录。`sample-s*.json` 与 `notes-triaged.txt` 也属于这套记录；不随临时调研清理，不当作 TH18 的任务状态。
-- `work/preview/`、`work/play/`：预览与试玩产物；弹型总览为 `work/preview/bullet-catalog.png`。
-- `work/archive/th06/`：已结束的批次脚本、A/B 试验、小机制探针、历史抽检和分诊材料。保留原内容及当时路径，仅供追溯；脚本不是当前操作入口，不能原样重放整批。
-- `work/th18-prototype/`：历史导入原型的镜像、轨迹与构建物。其工具仍引用这个位置，本轮不搬动。
-
-2026-11-05 整理：TH06 操作说明移到 `th06/README.md`，三份契约从 `transcribe/contracts/` 归入 `th06/contracts/`，驱动配置同步；18 项散落历史材料归档（89 个文件，内容保留）。旧 brief 中的契约路径保留为当时记录；重派用当前 `pipeline` 生成任务单，不直接重放旧 brief。没有改变卡内容、写审状态或来源记录。
-
-调研、下载和一次性验证结束后，结论与来源位置与版本写进正式文档。只保留有追溯用途的过程资料；仍在使用的资料按作品/关卡/单元放置，避免长期堆日期目录。`docs/investigations/` 保存研究证据，`docs/practice-cards/` 保存训练/部署实验，不再把同一份机制规则复制到各处。
-
-## 运行与质量边界
-
-使用项目锁定环境 `uv sync --frozen`。训练仓目前声明 `stg-rl==0.4.5`；新弹型要求 ENGINE_VER31 配套表。源码、release harness 与已安装 wheel 须分别核验，见[升级约定](../docs/agent-memory/stg-rl-wheel-sync.md)。
+使用项目锁定环境，准备好官方CLI的登录/模型配置及stg-engine release harness。命令中使用当前账号支持的模型名。
 
 ```bash
-# 两作共用的单卡验收，目录名必须是最终单元编号
-uv run --frozen python -m stgtranscribe.validate <卡目录> --json <报告路径>
-# 转写相关已有检查
-uv run --frozen pytest -q tests/transcribe
+uv sync --frozen
+uv run --frozen python transcribe/run.py transcribe/work/batch/tasks.json --dry-run
+uv run --frozen python transcribe/run.py transcribe/work/batch/tasks.json --jobs 6
+# 指定卡返工：重新执行完整链，保留旧代码和审核证据
+uv run --frozen python transcribe/run.py transcribe/work/batch/tasks.json --ids th18_s1_b2
+# 分步：write只写，check只验，review先验再审
+uv run --frozen python transcribe/run.py transcribe/work/batch/tasks.json --ids th18_s1_b2 --step review
 ```
 
-默认 worker 后端仍为 dsh-flash；Sonnet 后备入口与并发 4 约定见 [TH06 操作说明](th06/README.md#跑)。写与审分开，dsh 审核后的 Opus 抽检及逐条复核要求保留；生成抽检清单不等于完成抽检。自动验收不替代原作数值审核、动态对拍或训练效果检查。
+`--timeout`是每个agent进程的秒数，默认3600；`--jobs`默认2，按实际资源调整。`--engine-dir`或`STG_ENGINE_DIR`指定引擎位置。同一任务不要同时启动两条命令，运行期间不要手工修改卡或参考；改过代码后重新check/review。Ctrl+C或SIGTERM停止已启动的worker进程组并跳过未开始的任务；正在执行的本地机器验收结束后退出，不再派审核。脚本不自动收卡、训练或提交。
 
-TH18 的奖励编队独立成波、尾部隔离、掉落/表现省略按[已批准口径](th18/transcription-policy.md)处理；曲线激光仍暂缓。只有当前攻击实际涉及的机制缺口需要补证据，不以其他攻击的未知项阻塞本单元。
+## 一份清单
 
-原作全文、摘录、素材和派生运行数据留在已忽略的 `work/` 或 renkolab `local/`。正式收卡、启动训练、提交和推送各按当前授权执行。
+`tasks.json`示例；dir和references来源路径相对清单。writer/reviewer直接是官方命令的argv数组，单卡可用同名字段替换整条命令，没有模型别名、复杂度分流或参数翻译。
 
-目录整理与模型后端分开：新任务不要求反复计算输入/参考/目标hash，也不添加冻结或签名流程。必要编译运行与独立审核保留，行为变更只补受影响检查。
+```json
+{
+  "writer": ["codex", "exec", "--sandbox", "workspace-write", "--model", "gpt-6-luna", "-c", "model_reasoning_effort=\"medium\"", "--json", "-"],
+  "reviewer": ["dsh", "--profile", "headless", "--json", "-"],
+  "references": {
+    "transcribe/th18": "../../th18",
+    "engine/docs/ecl-lang.md": "/path/to/stg-engine/docs/ecl-lang.md",
+    "engine/docs/ecl-lang": "/path/to/stg-engine/docs/ecl-lang",
+    "engine/docs/xform-ops.md": "/path/to/stg-engine/docs/xform-ops.md"
+  },
+  "tasks": [
+    {"id": "th18_s1_b2", "dir": "th18_s1_b2"},
+    {"id": "th18_s1_b4", "dir": "th18_s1_b4"}
+  ]
+}
+```
+
+DSH模型由其官方配置决定；不要把旧包装器的`--model/--reasoning/--cwd`传给官方headless子命令。Codex审核也可直接用另一条`codex exec`命令。参数配置文件使用绝对路径，确保切换worker cwd后仍可读。认证沿用CLI自身设置，不把密钥放清单、argv或参考副本。
+
+CLI登录、模型和权限按官方工具配置，执行器不做参数转换。旧版本的具体命令与试跑证据见[DSH记录](../docs/investigations/2026-11-06-headless-dsh-flash-smoke.md)和[QoderCN记录](../docs/investigations/2026-11-06-headless-qodercn-flash-smoke.md)；其中模型名须以当前CLI实际识别结果为准，不默默回退Auto。
+
+执行器通过stdin发送提示词，以子进程cwd选择任务目录，保存stdout/stderr和退出码。它不解析各厂商事件协议；过程退出成功还必须满足交付、机器校验及审核要求。权限由CLI实际配置决定：Codex示例显式workspace-write，DSH沿用其官方profile策略；提示词的文件职责不是沙箱隔离证明。需要交互批准而无法继续时，该任务按CLI失败处理，不绕过批准。
+
+## 每卡材料
+
+```text
+batch/
+  tasks.json
+  th18_s1_b2/
+    task.md                  任务说明
+    source.txt               带原文件/行号的实际摘录
+    card/th18_s1_b2/          唯一工作代码：main.ecl、meta.toml、辅助.ecl
+    report.md                作者说明，首行status: done或blocked
+    review/verdict.json      独立审核及review/内的数值日志
+    result.json              最近一次执行结果和日志位置
+    logs/<运行时间>/          输入、调用、验收和旧代码/报告备份
+  logs/<运行时间>/            批次清单、参考副本、环境说明和汇总
+```
+
+## 准备工作包
+
+操作者先确定单卡范围，再按[任务模板](templates/task.md)填task.md，source.txt保留原文件、行号及必要闭包。TH06沿用[源准备工具](th06/README.md)，TH18尚未切分时用[切分指南](th18/splitting.md)。切分完成只代表边界已定位；派发前还需整理本卡依赖、必需入口状态、时限依据和真实未决项。
+
+作者常规输入只有四类：执行器注入的角色说明、task/source、本作语义与转写规则书、引擎ECL手册。准备者完成以下工作：
+
+- 给出入口、结束边界、难度、必要初始化的值或明确源位置；不预先替作者计算全卡答案。原文优先给本卡闭包，整文件可作为标明用途的备用上下文。boundary.md仅在有额外事实时使用，不要求作者通读整关split和主审履历。
+- 指定源/卡时间关系、开场缓冲、时限依据和一个适用外壳。TH18外壳见[卡格式附录](th18/validation.md#训练外壳)；不再把旧引擎rl-card-pool.md作为TH18默认参考。
+- task给出两本书在本批references中的实际路径及相关章节线索。通用角色说明已在stdin内，不再复制一份让worker重读；流程README、skill和研究记录不作为作者必读。
+- 同批参考复制一次，保留相对结构。TH18默认提供下例文件；其他公开手册按实际使用附入。必要规则不能只在未随包提供的旧notes/研究链接中，缺口先补到规则书或明确交回。
+- 确认harness可运行、wheel及参考对应的能力版本，路径和结果在工作包/批次记录中给出。只做已有工具核验，不让每个作者查源码版本或重建工具。
+- 已解决的旧“待补”在新task中明确当前结论，真实缺口列影响；已批准简化引用规则书，本卡特殊取舍单列。原文和参考副本留work，不入库。
+
+TH18清单的references示例（将来源路径替换为本机实际目录，目标键维持下面的布局）：
+
+```json
+{
+  "transcribe/th18": "/path/to/stg-rl-train/transcribe/th18",
+  "engine/docs/ecl-lang.md": "/path/to/stg-engine/docs/ecl-lang.md",
+  "engine/docs/ecl-lang": "/path/to/stg-engine/docs/ecl-lang",
+  "engine/docs/xform-ops.md": "/path/to/stg-engine/docs/xform-ops.md",
+  "engine/docs/easing-reference.md": "/path/to/stg-engine/docs/easing-reference.md",
+  "engine/docs/stateful-interpolation-reference.md": "/path/to/stg-engine/docs/stateful-interpolation-reference.md",
+  "engine/docs/fixed-point-corners.md": "/path/to/stg-engine/docs/fixed-point-corners.md",
+  "engine/docs/bullet-catalog.md": "/path/to/stg-engine/docs/bullet-catalog.md",
+  "engine/touhou-bullets.ecl": "/path/to/stg-engine/godot/ecl/game/touhou-bullets.ecl"
+}
+```
+
+TH18规则书入口为references/transcribe/th18/README.md，引擎手册入口为references/engine/docs/ecl-lang.md。普通内建签名查第7篇；xform操作的参数与行为查同包engine/docs/xform-ops.md，保持它与ecl-lang/的相对位置，供第4篇链接访问。书中的维护者/历史链接不必随包提供，也不属于worker查阅范围；作为使用依据的章节和API必须可达。参考目录是查阅库，不是通读清单。其他作品同样使用任务模板和通用角色说明，不复制调度程序。
+
+## 检查与结果
+
+- 完整机器验收由执行器对最终卡做一次，包含编译、各rank运行、段结束、元数据/外壳、实体池耗尽、contract_viol和开场安全。作者只做必要调试；审核不重复整套验收。
+- 作者自检、停止条件和报告格式只由[作者说明](contracts/transcribe.md)维护；独立审核、抽查范围和verdict格式只由[审核说明](contracts/review.md)维护。作品知识分别见[TH06](th06/README.md)、[TH16](th16/README.md)、[TH18](th18/README.md)。
+- 作者报告blocked时执行器记failed并停止该卡；这是缺口交回，不等于CLI崩溃，也不要求作者强行完成。
+- 结果为written、validated、reviewed、failed或cancelled；前三种分别对应已写、机器通过、独立审核通过。reviewed仍是待收卡，不表示原作动态对拍或训练验收。退出码0表示所选步骤全部完成，1表示有卡失败，2表示参数/清单错误，130表示批次被中断。
+- DSH审核后的既有Opus抽检和旧批次主会话复核要求保留，不能冒名完成。新模型组合的额外抽检另行明确，不在执行器里硬编码模型层级。
+
+## 既有批次的 Opus 抽检
+
+历史 DSH 审核曾照抄卡内注释作期望值并漏掉严重问题，因此既有批次收卡前的 Opus 抽检和逐条复核要求继续保留。抽检须由实际 Opus 对照原文、检查必要的数值锚点，并逐条处理发现；没有 Opus 就如实标明该项未完成，不能用生成清单或其他模型冒名完成。新模型组合不自动增加同一套审核层级，其额外抽检按当次约定执行。
+
+## 可复现与历史资料
+
+保留任务/source、实际提示词、命令、参考副本、CLI/引擎信息、产物和日志，便于重新执行与追查。云端模型输出不保证逐字一致；外部CLI配置和认证需自行保持，未知版本如实记未知。每次返工将旧代码及报告留在previous，当前可执行代码只有card一份，不做hash、签名或冻结。
+
+旧`pipeline`只保留TH06源准备入口；`codex-batch.py`已退役。2026-11-07按用户授权删除旧工作副本、批次脚本和过程日志，未另存归档；现存待收卡结果见[work入口](work/README.md)及[TH18任务](work/th18/README.md)。历史调查文档保留结论，原work路径可能已删除。以后运行按现行格式留必要输入、结果和检查，不将旧状态当作新流程通过。原文和运行数据仍留work，不入库。
+
+```bash
+uv run --frozen pytest -q tests/transcribe
+uv run --frozen python -m stgtranscribe.validate <card目录> --json <报告路径>
+```
+
+试玩和出图仍用`transcribe/play.sh`与`python -m stgtranscribe.preview`，成品按[cards约定](../cards/README.md)收录。

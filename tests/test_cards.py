@@ -180,11 +180,12 @@ def test_ordinary_synthetic_still_requires_base_card(tmp_path):
         discover(tmp_path)
 
 
-def test_source_tree_filters_metadata_and_skips_disabled(tmp_path):
+@pytest.mark.parametrize("original_source", ["th16", "th18"])
+def test_source_tree_filters_metadata_and_skips_disabled(tmp_path, original_source):
     from stgtrain.cards import configured_cards
 
     for folder, name, meta in [
-        ('th18', 'modern', 'source="th18"\ntags=["ring"]'),
+        (original_source, 'modern', f'source="{original_source}"\ntags=["ring"]'),
         ('synthetic', 'new_pattern', 'source="synthetic"\ngeneration_mode="standalone"\ntags=["laser"]'),
         ('synthetic', 'paused', 'source="synthetic"\ngeneration_mode="standalone"\nenabled=false'),
     ]:

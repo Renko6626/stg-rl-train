@@ -9,7 +9,7 @@ from pathlib import Path
 DEFAULTS: dict = {
     "run": {"seed": 1, "device": "auto", "total_updates": 2000, "ckpt_every": 50, "eval_every": 50,
             "torch_threads": 2, "max_minutes": 0.0},
-    "env": {"cards_dir": "cards/th06", "card_filter": {"sources": [], "tags": [], "ids": [], "exclude_synthetic_kinds": []},
+    "env": {"cards_dir": "cards", "card_filter": {"sources": ["th06"], "tags": [], "ids": [], "exclude_synthetic_kinds": []},
             "eval_splits": "eval/splits.toml", "num_envs": 2048, "threads": 0,
             "frame_skip": 1, "max_frames": 3600, "warmup_max": 120, "bullets_cap": 1024, "ranks": [2],
             "mirror": True,
@@ -157,6 +157,10 @@ def from_dict(d: dict) -> dict:
         elif roots == ["cards-laser-specialist"]:
             filters["tags"] = ["specialist"]
         d = {**d, "env": {**env, "cards_dir": "cards", "card_filter": filters}}
+    elif roots is not None:
+        # 自定义目录沿用原有的不过滤行为，不继承仓库默认的 TH06 来源选择。
+        filters = {"sources": [], **env.get("card_filter", {})}
+        d = {**d, "env": {**env, "card_filter": filters}}
     cfg = deep_merge(DEFAULTS, d)
     validate(cfg)
     return cfg

@@ -1,60 +1,37 @@
-# 转写契约（transcribe worker）
+# TH06 作者补充
 
-适用 TH06/NC。TH18 使用[专用转写契约](../../th18/contracts/transcribe.md)，不套用本页的坐标、弹型、时序和激光换算。
+通用职责、权限和交付见[作者约定](../../contracts/transcribe.md)。完整validate由执行器做一次，代码直接写card/<id>/。
+
+适用 TH06/NC。TH18 使用[TH18规则书](../../th18/README.md)，不套用本页的坐标、弹型、时序和激光换算。
 
 你负责**一个单元**：把 cwd 里 `source.txt` 摘录的 TH06 原文，翻成一张本引擎的 RL 卡（`.ecl` + `meta.toml`）。
 保真度要求是**弹型节奏忠实**：弹数、速度、角度、时序、四档难度差异照原作换算；定点取整、判定半径可以有出入。
 
-## 你能动的
+输入为task.md、source.txt及任务提供的unit.json/mapping-excerpt.md。摘录器添加的//@是辅助注释，原文与映射是语义依据；存在冲突时报告，不盲抄。
 
-- **只写** cwd 下的 `out/`（产出）和 `card/`（自检用的临时副本）。其余一律只读。
-- cwd 里的输入：
-  - `source.txt`：原文逐字摘录。行尾 `//@` 之后是摘录器加的注释：`[生效难度]`、`x0=…`（换算后的 x）、`a6=5.625°=1024bam`（弧度换算）、`弹型→…`。**数值照抄注释，别心算**。
-  - `unit.json`：单元参数（`time_limit` 已钳好、`ranks`、`kind`、`spell_name`、`entry`/`start_label`、`examples` 范例卡路径）。
-  - `mapping-excerpt.md`：对照表里本单元用到的节。
-  - `feedback.md`（只在返工时有）：上一轮验收失败 / 审核发现，**逐条改掉**。
+## 阅读范围
 
-## 必读（按顺序）
+优先读task.md列出的相关章节。提供了mapping-excerpt.md/builtins.md就使用；未提供时直接按指令名在mapping.md和目标7-reference.md中定位有关段，不搜索不存在的文件，也不通读1500行映射。最多看一个范例的相关函数/外壳，不把全部范例作为必读。
 
-1. `mapping-excerpt.md` 全文——语义只认它，别凭 ZUN 指令名猜。
-2. `unit.json` 里 `examples` 指向的范例卡：`main.ecl` + `notes.md`。外壳和结构参照范例；动态变换按新版 mapping §5，旧卡的常量模板/任务绕法不作为当前能力限制。
-3. 我方语言：cwd 里的 `builtins.md`（内建签名速查，**看这个，别整篇读参考手册**）。
-   `NAME(args)`、`at_spawn` / `at_effect` 是 xform 语法，速查不含完整说明；以 mapping §5 的求值表和例子为准。
-   语法 / 静默坑拿不准时，用 `rg -n 关键词 <文件>` + `sed -n 'A,Bp'` 取需要的十几行，
-   目标文件见 prompt 的「省 token 的硬规矩」。
-
-## 省 token（硬规矩）
-
-上下文里每多 1k token，后面每一步都要重发一遍，代价随步数二次增长。所以：
-
-- **禁止整篇 `read`**：ECL 手册、`SKILL.md`、`rl-card-pool.md`、th06-decomp 源码，一律先 `grep -n` 再按行号取。
-- **禁止读验收器源码**：判据就是下面「自检循环」里那几条，跑一次 `validate` 看输出即可。
-- **自检有上限**：每档最多 `run` 一次；`--at` 弹表 dump **最多 4 次**（挑最值得核的帧，优先多层 / 带变换 / 难度差异）。
-  改完卡重跑时，只重跑**受影响**的那一档，不要四档全刷。
-- 想不清楚就先写下来再动手，别靠反复跑 harness 试探。
+`NAME(args)`、`at_spawn`、`at_effect`的求值时点按mapping §5，仅在本卡使用时查阅。难度前缀见§2.2，时间/跳转见§2.4，发射见§4；不为已经明确的转换重查原作VM或目标引擎实现。
 
 ## 产出
 
-### `out/main.ecl`（单文件）
+### `card/<id>/main.ecl`（单文件）
 
 - **外壳照抄** mapping §13：波次卡用 §13.1（导演敌 + `phase_begin`），非符用 §13.2 改成 `phase_begin`，符卡用 `spell_begin`。
 - `const TIME_LIMIT: int = <unit.json 的 time_limit>;`
 - **所有敌人**（boss、导演敌、每只小怪）第一句 `set_invuln(65535);`。小怪还要 `spawn oob_guard();`（§6.2）。
-  > **为什么连小怪也无敌**（2026-09-20 拍板，别再「顺手改回去」）：这不是图省事。躲弹模型的
-  > 职责只有「到指挥点 + 别死」，**火力站位是上层意图模型的职责**。小怪若能打死且收益明显，
-  > 躲弹模型就会自己长出「往敌群靠能减压」的议程，在指挥点与敌群不一致时偷偷违抗指令 ——
-  > 目标污染。无敌把两层的职责边界焊进训练分布里。副作用是训练压力是**上界**（部署时真实
-  > 压力更低），误差方向安全。代价是难度画像会高估道中卡、模型学不到「再撑 2 秒这波就没了」，
-  > 已知且接受。**真实关卡（部署用的卡）另论** —— 那里小怪本来就该能打死。
+  无敌是已批准的训练外壳要求，不在单卡任务重新论证。
 - **激光**（单元里有 `laser_*` 时）：通读 mapping §14。四条最容易错：宽度写**原作值 / 2**；`laser_rotate` / `laser_offset`
   **逐帧照翻**成 `lz_rotate` / `lz_origin`（别自作主张改成 `lz_omega` / `lz_anchor`）；自机狙用 `laser(… 0bam …)` 后立刻 `lz_aim(lz, a)`；
   原点 = 敌位置 + **当时生效的** `shoot_offset`。report 的「映射」表里每条激光单独一行，写清换算后的 `len / width / warn / active / fade`。
-  自检用 `--at` 看「活激光」表核 state / timer / 角度（仍计入 4 次上限）。
+  自检用 `--at` 看「活激光」表核 state / timer / 角度（遵循通用作者的两次上限）。
 - **开场缓冲**：卡开始后 120 帧内不能有致命弹到达自机出生点 `(0, 384)` 附近。波次卡导演先 `wait(120)`；boss 段原文开场有移动 / 宣言前奏的通常够，不够就在开头补等待，并写进 report。
 - `start_label` 有值时：entry sub 里该时间点之前的是登场设置，只取位置 / 出弹口 / 边界这类状态，攻击从该时间点开始。
 - 弹型名常量抄进卡里（§3 表）。文件头两行注释写单元 id、卡名、原文出处。
 
-### `out/meta.toml`
+### `card/<id>/meta.toml`
 
 ```toml
 title = "<符卡名 unit.json spell_name，或「Stage N 道中 第 k 波」「Stage N boss 非符 k」>"
@@ -71,7 +48,7 @@ lower_half_blocked = <下半屏被长时间大面积封死就 true>
 notes = "<一句话：近似 / 特殊处理>"
 ```
 
-### `out/report.md`
+### `report.md`
 
 ```markdown
 status: done            ← 或 blocked
@@ -81,7 +58,7 @@ status: done            ← 或 blocked
 ## 近似
 - 逐条列出所有与原作不一致的地方（取整以外）
 ## 自检
-- validate 输出摘要、你用 --at 核过的帧
+- 必要自检命令及结果、你用 --at 核过的帧（完整validate由脚本负责）
 ```
 
 **blocked**：原文用到了对照表标 skip-unit 的东西、或对照表里没有的指令、或确实表达不了（写清原因）。blocked 就不用硬写卡。
@@ -99,40 +76,6 @@ status: done            ← 或 blocked
 - 角度写 `bam` 整数（照抄注释），x 坐标减 192（注释已算好）。
 - 小怪镜像只取反水平速度，弹角度不镜像（§6.1）。
 
-## 便笺 `notes.md`（只在「可能影响别的单元」时写）
+## 共性问题
 
-撞上**不只属于这一单元**的问题时，在 `out/notes.md` 写一条便笺，主会话会分诊后决定要不要改全局。
-判据是「换一个单元还会再撞一次吗」——会，就写；不会，写进 `out/report.md` 的「近似」 即可。
-
-典型该写的：对照表某条与 decomp 源码不符 / 引擎缺某个机制导致只能近似 / 契约没讲清导致你猜了 /
-某个换算在摘录注释里就是错的。**典型不该写的**：这一单元的近似、你自己的实现取舍、拿不准但没证据的猜测。
-
-格式（一条一个二级标题，宁缺毋滥，通常 0 条）：
-
-```markdown
-## 一句话标题
-影响面：只此单元 | 疑似同关 | 疑似全池
-证据：文件:行 或 命令 + 实测输出（必须能复现，光说「我觉得」不算）
-建议：改对照表 §X / 改契约 / 引擎侧 / 只是提醒
-```
-
-## 自检循环（全绿才算完成）
-
-```bash
-H=<harness>; TL=<time_limit>
-$H check out
-for r in <ranks 里每一档>; do $H run out --rank $r --frames $((TL + 300)); done
-#   看：退出码 0、「段结束：」有帧且在 TL 附近、弹峰值 ≤ 1024
-$H run out --rank 3 --frames 600 --at <你想核的帧>      # 核一轮弹的颗数 / 速度 / 角度
-rm -rf card && mkdir -p card && cp -r out card/<单元 id>
-cd <训练仓> && PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m stgtranscribe.validate <cwd>/card/<单元 id>
-```
-
-`validate` 输出 `OK` 才算完成；它就是流水线收卡用的同一个验收器（编译 / 各档运行 / 卡池 lint / 段结束帧 / 开场安全）。
-
-**卡帧对照**：`main` 在第 1 帧建 boss（或导演），boss 主任务第 2 帧跑、`spell_begin`/`phase_begin` 起的 `pattern` 第 3 帧跑。
-所以 `pattern` 里 `wait(N)` 之后的开火出现在 `run --at 3+N` 附近（新弹当帧建、下一帧能看到）。
-
-## 完成时
-
-最后一条回复写：`status`、validate 结果一行、近似条数、你拿不准的地方。
+确有会影响其他卡的映射缺口，记在report.md的未决项中，给源位置和具体疑问即可；不额外写notes.md、研究报告或自行修全局规则。报告遵循通用契约的短格式。

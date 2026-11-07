@@ -1,0 +1,53 @@
+{
+  "target": {
+    "game": "th18",
+    "build": "v1.00a",
+    "md5": "9969cac756098c1da05a81de45437a70",
+    "sha256": "5aeb74b19939a29a8cf06e4fe7777aaf9139e93478507e039f43318171020e9f"
+  },
+  "adapter": {
+    "file": "th18-autoplay-thcrap-20261022-draft.zip",
+    "sha256": "da71d5daa9ff0335334b6a13e64ee4b57c7ee9308dce61784753aee7e41876c6"
+  },
+  "inputs": {
+    "thcrap-2026-09-04.zip": {
+      "url": "https://github.com/thpatch/thcrap/releases/download/2026-09-04/thcrap.zip",
+      "sha256": "bf19885693ea57e9a0db1375c10c2e2691bf8669cbbf580ef983f33f9b5e69db",
+      "version": "2026-09-04"
+    },
+    "vc_redist.x86.exe": {
+      "url": "https://aka.ms/vc14/vc_redist.x86.exe",
+      "sha256": "f0bab33a302b3cdb2e11113760d016f54fd3d2632c65ba7834fac4f0abd7f1a3",
+      "version": "14.51.36247"
+    },
+    "directx_Jun2010_redist.exe": {
+      "url": "https://download.microsoft.com/download/8/4/a/84a35bf1-dafe-4ae8-82af-ad2ae20b6b14/directx_Jun2010_redist.exe",
+      "sha256": "053f76dcbb28802e23341b6a787e3b0791c0fa5c8d4d011b1044172dbf89c73b",
+      "version": "June2010 9.29.1974.1"
+    },
+    "jansson-LICENSE": {
+      "url": "https://raw.githubusercontent.com/akheron/jansson/master/LICENSE",
+      "sha256": "150d90904cd8de73609bb177b42edd3867b07b4b7b786dbba319f30de39fcda2"
+    },
+    "win32_utf8-UNLICENSE.txt": {
+      "url": "https://raw.githubusercontent.com/thpatch/win32_utf8/master/UNLICENSE.txt",
+      "sha256": "7e12e5df4bae12cb21581ba157ced20e1986a0508dd10d0e8a4ab9a4cf94e85c"
+    },
+    "zlib-ng-LICENSE.md": {
+      "url": "https://raw.githubusercontent.com/zlib-ng/zlib-ng/develop/LICENSE.md",
+      "sha256": "6c9f0d975b41afaa34d22f55bb8986ce69e5cb7ad327cb2b28820cd425edf5ee"
+    },
+    "VC-License.html": {
+      "url": "https://aka.ms/VCRedistLicense",
+      "sha256": "14f06f0656a6e96eb94b350fb8c25e75d4ce15664308231200db8b16c58bf62e"
+    },
+    "directx-license.txt": {
+      "url": "embedded LICENSE resource from directx_Jun2010_redist.exe",
+      "sha256": "efbbcd2f9b8f0ac7e2a3e4a749450e5f84a0942be904c0dc38aed63483e10195"
+    },
+    "thcrap-UNLICENSE.txt": {
+      "url": "https://github.com/thpatch/thcrap/blob/e2e315e25b121ba0daad1cbea809aac3924b54ad/UNLICENSE.txt",
+      "sha256": "7e12e5df4bae12cb21581ba157ced20e1986a0508dd10d0e8a4ab9a4cf94e85c"
+    }
+  }
+}

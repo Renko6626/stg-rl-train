@@ -20,7 +20,7 @@ class Card:
     def data_kind(self) -> str:
         """来源标签只用于数据管理，不进入策略观测；未知来源不冒充原作。"""
         source = self.meta.get("source")
-        inferred = {"th06": "original", "th18": "original", "synthetic": "synthetic"}.get(source, "unknown")
+        inferred = {"th06": "original", "th16": "original", "th18": "original", "synthetic": "synthetic"}.get(source, "unknown")
         explicit = self.meta.get("data_kind", inferred)
         if explicit not in ("original", "synthetic", "unknown") or explicit != inferred:
             raise ValueError(f"{self.id}: data_kind 与 source 不一致")

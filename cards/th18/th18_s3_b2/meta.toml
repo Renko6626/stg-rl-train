@@ -1,0 +1,12 @@
+title = "Stage 3 关底第一符 山符「動天の雲間草」"
+source = "th18"
+origin = "TH18 v1.00a Stage 3 BossCard1；Hard/Lunatic为山怪「驚愕の雲間草」"
+source_ref = "st03bs.ecl.txt:512-622"
+ranks = [0, 3]
+marks = [0]
+time_limit = 2522
+original_time_limit = 2400
+tags = ["ring", "aimed", "dense"]
+laser_approx = false
+lower_half_blocked = false
+notes = "源时轴、已接受差异和独立审核见notes.md；wheel0.4.7/ENGINE_VER35完整验收通过，尚未训练。"

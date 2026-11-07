@@ -1,0 +1,17 @@
+{
+  "dll": "/tmp/sunyunbo/capacity2048-20261022/runtime/renkolab/mods/_shared/stg-ai/native/stg_ai.dll",
+  "sha256": "4387c9d748cc81dea8b69485c83e4485beec56a8d70ed1fb3280ec9d31d72033",
+  "size": 284160,
+  "format": "/tmp/sunyunbo/capacity2048-20261022/runtime/renkolab/mods/_shared/stg-ai/native/stg_ai.dll: PE32 executable (DLL) (GUI) Intel 80386, for MS Windows",
+  "exports": [
+    "BP_stg_ai_tick",
+    "thcrap_plugin_init"
+  ],
+  "imports": [
+    "KERNEL32.dll",
+    "USER32.dll",
+    "msvcrt.dll"
+  ],
+  "source_inputs_byteidentical_and_older_than_dll": 20,
+  "flags": "-std=c11 -O2 -Wall -Wextra -Werror -msse2 -mfpmath=sse"
+}

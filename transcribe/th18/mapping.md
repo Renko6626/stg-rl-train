@@ -1,6 +1,6 @@
-# TH18 → stg-engine ECL 转写入门
+# TH18 基础语义与转写入门
 
-这份教材面向会基本编程、尚不熟悉东方 ECL 的读者和转写 AI。按顺序读完，可以把一段 TH18 v1.00a 攻击从原作文本改写成我方脚本，并用编译器和运行转储检查结果。示例全部为自写教学程序，不是原作关卡摘录。
+这份教材面向会基本编程、尚不熟悉东方 ECL 的读者和转写 AI。按本卡涉及的机制查询，不需要通读。示例全部为自写教学程序，不是原作关卡摘录。
 
 主文讲语法、执行模型和转换方法；需要查编号时使用下列参考。原作功能、目标写法与差异在表内分别列出。
 
@@ -11,13 +11,13 @@
 | 移动/EX 的 mode、`EASE_*` 与状态型插值 | [插值模式](interpolation-modes.md) |
 | EX 原始 type、参数、方向哨兵及目标配方 | [EX 效果](ex-effects.md) |
 | 700–714 相关指令、直线/无限/曲线激光与几何 | [激光](lasers.md) |
-| 从main编排、符卡声明和中断链确定转写单元 | [高版本切分指南](splitting.md) |
-| 常用普通 opcode 的含义、处理方式与阅读位置 | [指令索引](instructions.md) |
+| 原作opcode的名字、顺序参数和参数语义 | [原作指令表](instructions.md) |
 | 敌人判定、移动组合、同敌段入口与前置状态 | [敌人状态与段入口](enemy-state.md) |
+| Stage01 BossCard1的moveRand、速度mode继承与逐帧限位 | [本卡移动配方](movement.md) |
 | 时钟循环、共享发射器、原作激光配置的完整转换 | [转换案例](conversion-examples.md) |
 | 已确定写法、需任务单确认的差异与暂缓范围 | [统一转写口径](transcription-policy.md) |
 
-本文基于 2026-11-05 检查的引擎源码 `2f24d86`、release harness 和训练 wheel 0.4.4 / ENGINE_VER30。版本更新后重新核实可用内建与行为；文末说明证据范围。写单个攻击时，另读[转写契约](contracts/transcribe.md)；它负责权限、产出与交接，不能替代本教程。
+本作规则目录见[规则书](README.md)。目标API查任务给出的引擎手册；工具路径和版本由工作包给出。
 
 ## 1. 先分清两个语言、三种文件
 
@@ -27,28 +27,7 @@
 
 为了避免交错编译，本教材用 `tecl` 代码块表示完整原作侧合成程序，用 `ecl` 表示完整目标程序，用 `text` 表示不能单独编译的片段。把代码保存为文件时，原作文本暂用 `.tecl`，编译输出另用 `.bin.ecl`。
 
-### 1.1 编译一个最小原作程序
-
-```tecl
-void main() {
-    wait(60);
-}
-```
-
-这里的 `main` 是原作控制敌的入口；子程序执行完，所属敌的主调用栈结束。它不包含任何渲染资源，也没有创建敌人或发弹。
-
-以下为本机已用过的工具路径，换机器时替换变量值：
-
-```bash
-THECL=/data/sunyunbo/www/renkolab/local/vendor/thtk/build/thecl/thecl
-ECLMAP=/data/sunyunbo/www/renkolab/local/vendor/eclmap/eclmap/th18.eclm
-"$THECL" -c 18 -m "$ECLMAP" lesson.tecl lesson.bin.ecl
-"$THECL" -d 18 -m "$ECLMAP" lesson.bin.ecl lesson.roundtrip.tecl
-```
-
-`-c 18` 选择 TH18 编译，`-d 18` 选择反编译；`-m` 指定同一份映射。要读较原始的栈指令，可在反编译时加 `-r`。不要用其他社区工具的参数或语法替换这套命令。
-
-编译成功证明文本和本版本指令格式可接受；它不证明资源齐全，也不证明程序在游戏内达到预期。
+原作解码和依赖准备由主会话完成，作者读取工作包给出的文本。
 
 ### 1.2 编译并运行最小目标程序
 
@@ -61,7 +40,7 @@ sub main() {
 我方必须有且只有一个零参、非 `async` 的 `sub main()`。它是关卡任务，owner 是 STAGE，不是一只隐形敌人。`loop { wait(1); }` 让这条任务每帧恢复一次，保持关卡流程存在。
 
 ```bash
-HARNESS=/data/sunyunbo/www/stg-engine/target/release/stg-harness
+HARNESS=<任务提供的harness路径>
 "$HARNESS" check lesson.ecl
 "$HARNESS" run lesson.ecl --frames 120 --seed 1 --rank 2
 "$HARNESS" run lesson.ecl --frames 120 --seed 1 --rank 2 --at 60
@@ -99,12 +78,12 @@ void main() {
 目标把不同物理量分成 `int`、`fx`、`angle`，不能隐式混用。下面是对应的完整程序：
 
 ```ecl
-const OUTLINE: int = 32;
+const TH18_RING_BALL: int = 448;
 const RED: int = 2;
 
 sub emit(count: int, speed: fx) {
     sh_reset(0);
-    sh_sprite(0, OUTLINE, RED);
+    sh_sprite(0, TH18_RING_BALL, RED);
     sh_ring(0, 1);
     sh_aim(0, 0);
     sh_count(0, count, 1);
@@ -126,7 +105,7 @@ sub main() {
 }
 ```
 
-源 type6 是环玉；本例使用目标行基值32，同形色序与基础半径4对应，原作动画及碰撞公式仍有差异，详见[弹型表](bullet-types.md)。`OUTLINE`、`RED` 是本程序自己声明的常量，名称不由引擎自动注入。不要把源 type6 直接填进 `fire` 的 appearance 参数。
+源 type6 是环玉；本例使用TH18_RING_BALL（448）、原作色号和基础半径4，原作动画及碰撞公式仍有差异，详见[弹型表](bullet-types.md)。`TH18_RING_BALL`、`RED` 是本程序自己声明的常量，名称不由引擎自动注入。不要把源 type6 直接填进 `fire` 的 appearance 参数。
 
 检查出生时应有 8 颗等速 2px/frame 的整周弹。目标 `emit` 是同步 sub，发射器属于调用它的任务；敌人的主任务 180 帧后结束，敌静默退场，已经发出的弹继续存在。
 
@@ -175,9 +154,10 @@ sub main() {
 原作 `helper();` 对应目标普通 sub 调用；原作 `helper() async;` 通常对应目标 `spawn helper();`，并将定义改成 `async sub helper()`。新任务在下一帧首跑，原任务继续执行。
 
 ```ecl
+const TH18_RING_BALL: int = 448;
 async sub shoot() {
     loop {
-        _ = fire(32, 2, $self_x, $self_y, 2fx, aim_player(), none, none);
+        _ = fire(TH18_RING_BALL, 2, $self_x, $self_y, 2fx, aim_player(), none, none);
         wait(30);
     }
 }
@@ -212,11 +192,90 @@ sub main() {
 
 ### 3.4 读反编译时要识别栈和依赖
 
-thecl 高层表达式背后是 VM 栈。反编译中的 `[-1]` / `[-1.0f]` 是栈顶引用；一条指令的多个参数可能读同一个栈顶，统一收栈由指令头控制。不能“每读到一个 `[-1]` 就 pop 一次”。遇到低层表达式先恢复它的值和求值顺序，再写目标表达式。
+#### 难度标记先决定执行哪些指令
+
+在本教材使用的TH18 thecl文本中，`!E`、`!N`、`!H`、`!L`分别标记Easy、Normal、Hard、Lunatic。标记写在指令前，并用于其后指令，直到下一个难度标记；`!*`恢复全难度。它们是指令的执行掩码，不是变量名，也不是把各档数值依次赋给同一个变量。
+
+组合标记取并集：例如`!HL`覆盖Hard和Lunatic；`!LO`中的L是Lunatic，O是thecl命名的Overdrive位。普通四档任务只取其中的L，**不能把H分支的值沿用到L**，也不因此增加一个目标难度。本文的位名依据本项目所用thecl10.c的RANK定义及输出逻辑，不外推到其他作品的未核标记。
+
+读一段难度分叉时，先固定一个目标rank，只保留该档会执行的指令，再恢复变量/栈值。例如三组分别写`!E 8; !N 10; !H 12; !LO 16;`时，Lunatic选16，不是前面的12。
+
+#### 裸值是压栈，方括号是取栈中的值
+
+thecl高层表达式背后是VM栈。反编译中单独出现的`2.0f;`会把这个浮点值压入表达式栈（raw形式对应pushf）；它不是注释，也不是可以丢掉的“无用表达式”。同理，裸整数可来自pushi。`$A`/`%A`这样的变量引用与栈引用要分开理解。
+
+- `[-1]`/`[-1.0f]`读取栈顶，`[-2]`/`[-2.0f]`读取再下面一项；整数/浮点形式按原参数类型解释。
+- **最后压入的值在栈顶。参数顺序由方括号索引决定，不能按裸值在文件里的先后顺序填。**
+- 一条指令的多个参数可能引用同一个栈顶，统一收栈由指令头控制；不能“每读到一个`[-1]`就pop一次”。普通负数字面量和方向/速度哨兵也不能与方括号引用混为一谈。
+
+下面是自写的两档速度配置示例，不是原作摘录：
+
+```tecl
+!E
+    2.0f;
+!NHL
+    4.0f;
+!E
+    3.0f;
+!NHL
+    6.0f;
+!*
+    etSpeed(0, [-1.0f], [-2.0f]);
+```
+
+| 目标难度 | 实际压入顺序（先→后） | 调用前栈（底→顶） | 实际指令参数 |
+|---|---|---|---|
+| Easy | 2.0，再3.0 | `[2.0, 3.0]` | `etSpeed(0, 3.0, 2.0)` |
+| Normal/Hard/Lunatic | 4.0，再6.0 | `[4.0, 6.0]` | `etSpeed(0, 6.0, 4.0)` |
+
+接着才应用[双端点速度规则](#52-双端点速度转层步长)：单层只取第一个速度参数，因此本例Easy是3.0，其他三档是6.0；目标单层调用分别为`sh_speed(0, 3fx, 0fx)`和`sh_speed(0, 6fx, 0fx)`。难度筛选、栈取值、目标参数转换按这个顺序完成，不能跳过中间一步。
+
+遇到其他表达式、调用或跳转时，只跟踪实际执行路径上有关值的来源。上述已明确的语法按规则处理，不为每张卡重新调查VM实现；确有缺失的压栈路径或未知指令时，指出具体缺口。
+
+#### 依赖与目标容量
 
 原作 `#include` 是编译期包含文本，`ecli` 是运行时加载其他 ECL 的依赖声明。摘录一个入口时，沿 call、async、创建子敌和 ecli 找齐依赖；单独一个漂亮的弹幕 sub 不保证能独立解释。我方 harness 可把目录里的 `.ecl` 组成一个编译单元；其中只能有一个 `main`，也不能直接使用原作 `ecli`。
 
 目标中单任务每帧有指令预算，locals和表达式栈也有编译容量限制。大颗数同帧循环应使用发射器或合理拆解；不能靠 `wait(0)` 解决超预算，因为它仍在同帧执行。
+
+### 3.5 游戏内变量与随机伪变量
+
+2026-11-07补充。语义来源为用户指定的[Priw8游戏内变量表](https://priw8.github.io/#s=modding/vars)，页面选择 **TH18**；页面数据在[vars.js](https://priw8.github.io/js/ecl/vars.js)，名称/编号另与本项目使用的`th18.eclm !gvar_names`核对。下表集中列转写常用项；其他游戏专用项、未确认项不因编号相近就套入TH18。变量名是反编译别名，不是目标引擎内建。
+
+| 源名（省略`$`/`%`类型前缀） | 编号 | 语义及转写要点 |
+|---|---|---|
+| RAND | −10000 | 大范围随机整数；该表未限定具体位宽、正负或端点，不能直接认定等于`rand(n)`。按源后续取模/运算核实际用途。 |
+| RANDF | −9999 | 0到1的随机浮点数。 |
+| RANDRAD | −9998 | −π到π的随机弧度角；转BAM时保留完整角域，不能当0到1。 |
+| RANDF2 | −9987 | **−1到1的随机浮点数**；例如`%RANDF2 * 32`表示双向约±32的偏移，不能替成0到32。 |
+| FINAL_X / FINAL_Y | −9997 / −9996 | 敌人的最终位置。 |
+| ABS_X / ABS_Y；REL_X / REL_Y | −9995 / −9994；−9993 / −9992 | 敌人的绝对/相对位置层；不能把每层都当最终位置，合成见[敌人状态](enemy-state.md)。 |
+| PLAYER_X / PLAYER_Y | −9991 / −9990 | 玩家位置，按原读取时点取值。 |
+| ANGLE_PLAYER | −9989 | 敌人朝玩家的角度；源角单位为弧度，目标可用对应瞄准读口。 |
+| TIME | −9988 | 自敌人生成以来的帧数；不是当前sub的脚本时间，不能在每个helper开始时归零。 |
+| TIMEOUT | −9986 | 超时发生时由引擎置1的标志，不是超时长度。 |
+| I0–I3；F0–F3 | −9985…−9982；−9981…−9978 | 敌人持有的整数/浮点变量，创建子敌时继承；同敌跨sub/async访问的共享状态，不是每个sub独立的栈局部量。不能因进入新函数就将这些槽置零；创建与共享细节见敌人状态表。 |
+| FINAL_X2 / FINAL_Y2；ABS_X2 / ABS_Y2；REL_X2 / REL_Y2 | −9977…−9972 | 分别是上面对应位置变量的别名。 |
+| ABS_ANGLE / REL_ANGLE；ABS_SPEED / REL_SPEED | −9971 / −9970；−9969 / −9968 | 绝对/相对移动层各自的角度和速度。 |
+| ABS_ORIGIN_DIST / REL_ORIGIN_DIST | −9967 / −9966 | 对应层圆周运动距圆心的距离，不是到玩家距离。 |
+| PLAYER_X2 / PLAYER_Y2；BOSS_X / BOSS_Y | −9965 / −9964；−9963 / −9962 | 前者是玩家位置别名，后者为Boss最终位置。 |
+| RANK；DIFF | −9960；−9959 | **RANK是动态rank值，DIFF才是难度枚举**。普通四档DIFF=0/1/2/3，EX=4、Overdrive=5；本批普通六面只用0–3。目标`global(GVAR_RANK)`是项目的难度选择，通常对应源DIFF，不能用它直接代替源动态RANK。动态RANK的具体TH18范围/入口值按任务资料核。 |
+| FINAL_ANGLE；ABS_ANGLE_PLAYER / REL_ANGLE_PLAYER | −9958；−9956 / −9955 | 最终移动角；分别从ABS/REL位置层朝玩家的角度。 |
+| TRUE；LIFE | −9957；−9954 | 常量1；当前敌人HP。LIFE驱动攻击仍按本段明确的入口/过程处理，不随意固定为满血。 |
+| EASY / NORMAL / HARD / LUNATIC | −9953…−9950 | 对应难度成立为1，否则0；不是各难度的编号常量。 |
+| MISS_COUNT / BOMB_COUNT；CAPTURE | −9949 / −9948；−9947 | 玩家死亡/使用炸弹的计数；CAPTURE为符卡获取状态，失败事件会清零，不能当难度或HP。 |
+| ENM_CNT_REAL；ENM_CNT | −9946；−9908 | 前者包含main/MapleEnemy等存活敌，后者统计可击破敌；不能互换来驱动补怪。具体`enmAlive`指令的计数规则仍查本作对应配方。 |
+| SHOTTYPE；DIST_PLAYER | −9945；−9944 | 玩家机体类型编号；敌人与玩家的距离。 |
+| BI0–BI3；BF0–BF3 | −9943…−9940；−9939…−9936 | Boss0的I0–I3/F0–F3；不是当前敌私有状态。 |
+| F4–F7 | −9935…−9932 | 额外敌人浮点槽，也随子敌创建继承。 |
+| LAST_ENM_ID；ID | −9931；−9914 | 最近创建敌的源ID；当前敌源ID。不是目标不透明敌句柄，跨敌访问需建立对应关系。 |
+| POWER | −9930 | 玩家火力整数值，例如4.00表示400。 |
+| GI0–GI3；GF0–GF7 | −9926…−9923；−9922…−9915 | 全局整数/浮点变量；不能转换成每敌独立变量。 |
+| −9898（当前eclmap未列名称） | −9898 | TH18页面记录为当前屏上活动子弹数。 |
+
+随机浮点的精确开闭端点、原作RNG算法和随机整数位宽不在该表承诺范围内；上表范围不等于已证明与目标逐位同序列。目标按已批准定点/BAM取舍表达，保留范围、原读取时点、次数与共享关系。源先把随机量存变量再复用，就抽一次后复用；不能合并原本独立的读取，也不能为核数值多抽一次。
+
+用到这些变量时先查此表及对应机制章节，不再逐卡扫描vendor、虚拟环境或引擎源码寻找已有定义。表中没有覆盖且实际影响攻击的语义，报告具体源位置交主会话补齐。
 
 ## 4. 先有一只会动的敌人
 
@@ -252,7 +311,7 @@ sub main() {
 }
 ```
 
-假设进入时没有残余速度，两边都从(0,96)在60帧内到(120,96)，早段快、末段慢。归一化 `u=t/60` 时，理想连续式为 `x=120×(2u−u²)`，中点为90。实际目标起动/积分帧与浮点→定点误差，用运行锚点单独核对。
+假设进入时没有残余速度，两边都从(0,96)在60帧内到(120,96)，早段快、末段慢。归一化 `u=t/60` 时，理想连续式为 `x=120×(2u−u²)`，中点为90。具体卡按角色说明抽查主要行为，不需重证已核缓动或精算舍入。
 
 `move_to` 立即返回，不自动等待；少写 `wait(60)`，后续移动会在同帧覆盖它。原作绝对/相对位置层、极坐标速度可以共存，目标发起 `move_to` 时会清掉此前速度意图、停止旧速度补间；在位置补间活跃时直接写位置，不叠加vx/vy位移。在 `move_to` 之后重新发起的速度操作仍可推进，位置补间结束后才恢复对位移的影响；要到点继续飘，速度操作必须写在 `move_to` 之后。不能把原作多位置层直接当成相同的目标叠加；先画清每层贡献、覆盖及恢复时点。
 
@@ -263,11 +322,12 @@ sub main() {
 例如每帧把标量增加0.25，不是从起点到终点的一条普通缓动。目标可这样保存并读取状态：
 
 ```ecl
+const TH18_RING_BALL: int = 448;
 sub main() {
     accum_start(0, 1fx, 0.25fx, 4);
     wait(4);
     var result: fx = accum_value(0);
-    _ = fire(32, 2, 0fx, 96fx, result, 90deg, none, none);
+    _ = fire(TH18_RING_BALL, 2, 0fx, 96fx, result, 90deg, none, none);
     loop { wait(1); }
 }
 ```
@@ -284,7 +344,7 @@ sub main() {
 
 主任务在异步射击期间改配置的完整重组见[转换案例](conversion-examples.md)的案例二；要保留每次读取的是新状态还是旧快照。
 
-源弹型/色号应先查[弹型表](bullet-types.md)。目标 `fire(base,color,...)` 的 base 是我方形轴起点，颜色单独为0–15；源端有些弹型不是16色，不能统一认为 color值天然相同。对已核共享图集行可直接保留色号，其余查表；半径不相同须记录，默认不视为用户已接受近似。
+源弹型查[弹型表](bullet-types.md)，使用TH18常量并保留原color；有效色槽按具体弹型。换型与动态几何的限制见表，不套旧12形换色规则。
 
 ### 5.2 双端点速度转层步长
 
@@ -306,9 +366,10 @@ void main() {
 常规模式下，源 `etSpeed(s1,s2)` 定义首末速度。层数 M>1 时，层 j 的速度为 `s1+j×(s2−s1)/(M−1)`；M=1时只取s1。这里是1、1.5、2，总共24颗。目标 `sh_speed(id,start,step)` 第二个速度是**每层增量**，因此写0.5：
 
 ```ecl
+const TH18_RING_BALL: int = 448;
 async sub enemy() {
     sh_reset(0);
-    sh_sprite(0, 32, 2);
+    sh_sprite(0, TH18_RING_BALL, 2);
     sh_aim(0, 0);
     sh_ring(0, 1);
     sh_count(0, 8, 3);
@@ -368,13 +429,14 @@ void main() {
 目标 xform 是每颗弹自己的变换序列，不额外占一条弹任务。先写一个独立的目标示例，检查它的自身时序：
 
 ```ecl
+const TH18_RING_BALL: int = 448;
 xformdef SLOW_AFTER {
     @30 add_speed(0fx);
     set_speed(1fx);
 }
 
 sub main() {
-    _ = fire(32, 2, 0fx, 96fx, 2fx, 90deg, SLOW_AFTER, none);
+    _ = fire(TH18_RING_BALL, 2, 0fx, 96fx, 2fx, 90deg, SLOW_AFTER, none);
     loop { wait(1); }
 }
 ```
@@ -395,6 +457,7 @@ turn(90deg);
 现在引擎已支持按值参数和表达式，不需要因为原作参数是动态的就量化成许多静态模板。
 
 ```ecl
+const TH18_RING_BALL: int = 448;
 xformdef LATE_AIM(extra: fx, offset: angle) {
     @30 add_speed(0fx);
     set_speed(at_spawn($self_speed + extra));
@@ -403,7 +466,7 @@ xformdef LATE_AIM(extra: fx, offset: angle) {
 
 async sub enemy() {
     sh_reset(0);
-    sh_sprite(0, 32, 2);
+    sh_sprite(0, TH18_RING_BALL, 2);
     sh_ring(0, 1);
     sh_count(0, 8, 1);
     sh_speed(0, 2fx, 0fx);
@@ -466,7 +529,7 @@ sub main() {
 }
 ```
 
-它先预警30帧（无碰撞），生效60帧，再消退10帧（无碰撞）。等待预警后才设置每帧64 BAM的角速度，因此预警线固定，随后扫动。本例在全局第32帧末仍为预警，第33帧生效；设置角速度与碰撞切换的边界不能只按等待字面量猜测。若建线后立刻调用 `lz_omega`，预警阶段也转；不要把“预警”理解成暂停所有运动。状态切换的实际帧锚点同样要检查。
+它先预警30帧（无碰撞），生效60帧，再消退10帧（无碰撞）。等待预警后才设置每帧64 BAM的角速度，因此预警线固定，随后扫动。本例在全局第32帧末仍为预警，第33帧生效；设置角速度与碰撞切换的边界不能只按等待字面量猜测。若建线后立刻调用 `lz_omega`，预警阶段也转；不要把“预警”理解成暂停所有运动。审核涉及此行为时可选状态切换作抽查点。
 
 一次自机狙可在建线时给角度；原点偏离owner时，建线后用 `lz_aim(beam,offset)` 从激光原点瞄。持续追踪则要明确每帧/每几帧重算，不可把一次瞄准当成追踪。
 
@@ -494,84 +557,22 @@ TH18直线/无限激光各有碰撞截头尾和宽度阶段，曲线又有节点
 
 ## 8. 组合成一个可验证的攻击
 
-把前面知识连起来：敌在固定位置，每30帧发一个环；弹在延迟后减速并朝下。下面是教学目标程序，带训练所需的段结束信号，**不是某张原作卡的正式转写**。
+按任务给出的入口状态组织当前攻击，内部call/async及共享状态按本书表达；入口资料缺失交准备者补齐。[卡格式附录](validation.md)给出meta字段和可直接使用的训练外壳。外壳缓冲与原攻击周期分别计时。
 
-```ecl
-xformdef FALL_AFTER(delay_speed: fx) {
-    @30 add_speed(0fx);
-    set_speed(delay_speed);
-    set_angle(90deg);
-}
-
-async sub pattern() {
-    var n: int = 8;
-    if global(GVAR_RANK) >= 2 { n = 12; }
-    sh_reset(0);
-    sh_sprite(0, 32, 2);
-    sh_aim(0, 0);
-    sh_ring(0, 1);
-    sh_count(0, n, 1);
-    sh_angle(0, 0deg, 0deg);
-    sh_speed(0, 2fx, 0fx);
-    sh_xform(0, FALL_AFTER(1fx));
-    loop {
-        sh_fire(0);
-        wait(30);
-    }
-}
-
-async sub boss() {
-    set_invuln(65535);
-    wait(120);
-    phase_begin(0, pattern, 600, 0);
-    wait_spell();
-    loop { wait(1); }
-}
-
-sub main() {
-    _ = spawn_enemy(0fx, 96fx, 10000, 0, 0, 0, boss);
-    loop { wait(1); }
-}
-```
-
-`main` 创建boss；boss等120帧开场缓冲，再由 `phase_begin` 开600帧非符段；新pattern下一帧首跑。Easy/Normal为8路，Hard/Lunatic为12路。每30帧发一波，每颗初速2，第一效果后30帧改为速1、朝下。段结束会结束绑定pattern及其任务后代；已发弹的owner不同，不能假定pattern结束就自动终止它们所有行为。
-
-开场缓冲、无敌、段事件是躲弹训练外壳。正式转写的 `report.md` 必须注明源攻击起点怎样平移到目标首发帧；不得将缓冲算进原作攻击周期。`phase_begin` 是非符段；真正符卡可按任务要求使用 `spell_begin` 并保留原作时限/结束条件。改变HP以维持无敌练习的做法也应写在外壳差异里。
-
-开段前要沿同一只敌的上游调用/中断链恢复位置、变量、移动、发射器、活动任务及判定配置；具体步骤见[段入口重建](enemy-state.md)。训练外壳、数值实现差异、物理近似和暂缓项分别按[统一转写口径](transcription-policy.md)记录，不能把TH06已接受的差异直接搬来。
-
-元数据的基本形状如下，仅为填写说明，值须按真实任务来源替换：
-
-```toml
-title = "TH18教材合成例"
-source = "th18"
-origin = ""
-source_ref = "自写教材合成例；无原作摘录"
-ranks = [0, 3]
-marks = [0]
-time_limit = 600
-original_time_limit = 600
-tags = ["ring"]
-laser_approx = false
-lower_half_blocked = false
-```
-
-这里不把教学例收进卡池。TH18 单卡已接入 `stgtranscribe.validate`，目录使用 `th18_s…`，source 如实写 `th18`；编号、时限和完整命令见[单元编号与验收](validation.md)。`stgtranscribe.pipeline`、摘录器与切分检查仍限定 TH06，批量接入另行推进。
-
-## 9. 如何证明写对了
+## 9. 如何核对转写行为
 
 ### 9.1 先从源程序写预期，再看转储
 
-语法检查、正常运行、原作行为一致是三件事。对一个真实任务，先在 `report.md` 写源位置与目标位置对应，并独立推导：
+语法检查、正常运行、源语义核对分别承担不同职责。作者在相关代码旁标明源与目标对应关系，报告只留必要交接信息。审核先对照源参数与已核映射检查本攻击实际使用的机制，再选运行抽查点；以下按涉及的行为查阅，不是每卡都要完成的证明清单：
 
 1. 第一波何时发生，路数×层数是多少，后续周期是多少。
 2. 出生坐标、角网格和速度层，瞄准从哪里算、抽样几次。
-3. 效果进入前后一帧的速度/方向，补间终点和等待是否重叠。
+3. 效果前后的主要速度/方向、缓动类型，补间与等待是否重叠。
 4. 激光预警结束、碰撞段、宽度和近远端，段结束何时发出。
 
-然后选少量锚点：例如第5章应在第一波刚出生时看见24颗、8个方向、每方向1/1.5/2三速；第6章SLOW_AFTER应在改变前仍为2，改变后为1；激光例应在预警内无碰撞态，在转换后生效。不要先看转储，再把它抄成“原作预期”。
+例如可用以下现象区分常见错误：第5章应在第一波刚出生时看见24颗、8个方向、每方向1/1.5/2三速；第6章SLOW_AFTER应在改变前仍为2，改变后为1；激光例应在预警内无碰撞态，在转换后生效。简短记录源参数、观察值和日志位置即可。不要先看转储，再把它抄成“原作预期”。
 
-`--at` 的角度/BAM、速度和实体状态用于核数学结果；相邻帧的积分相位仍需考虑。玩家按固定种子运行时的位置也要记录，因为自机狙/追踪会受其影响。同seed重复运行只能证明我方确定性，不代表已复现原作RNG。
+`--at` 用于观察关键行为。移动重点看方向、转向时刻、缓动类型和大致位置，无需重建逐帧积分或计算精确坐标来证明已有映射。仅在发现实质不符时再定位具体偏差；已批准的舍入差异沿用任务口径。核对自机狙/追踪时采用实际玩家位置。同seed重复运行只说明我方确定性，不代表已复现原作RNG。具体执行范围由已注入的角色说明规定。
 
 ### 9.2 常见错误如何定位
 
@@ -589,14 +590,12 @@ lower_half_blocked = false
 
 遇到未知参数或无对应写口，说明具体影响和证据缺口；不要默认取中值、漏掉记录或改判定以凑出可运行程序。未用到的未知机制不阻止本攻击继续转写。
 
-### 9.3 本教材的验证与来源边界
+## 普通指令转换边界
 
-本轮完整原作合成例使用指定thecl18+eclmap编译，完整目标例使用当前release harness检查；关键波形、效果和激光另有运行锚点，实际命令和结果见[验证记录](../../docs/investigations/2026-11-05-th18-textbook-verification.md)。代码片段不宣称可独立编译。
+原作签名统一查[指令表](instructions.md)；以下保留组合目标程序时的限制，按本卡实际涉及的指令查阅。
 
-原作运行语义优先取自TH18自身已导入命名/类型的Ghidra资料。复核方法与结论见[TH16/TH18 EX比较](../../docs/investigations/2026-11-05-th16-th18-ex-comparison.md)、[弹型来源](../../docs/investigations/2026-11-05-th16-th18-bullet-types.json)。教学组织借鉴[TH06 mapping](../th06/mapping.md)，具体编号、色序、坐标和激光规则逐项按本作核。
-
-学习thecl文本可继续读 [Priw8教程](https://priw8.github.io/#b=ecl-tutorial/&p=1)、[指令表](https://priw8.github.io/#b=modding/&p=ins&table=18)、[EX说明](https://priw8.github.io/#s=modding/transforms)。教程主要以TH17举例，EX旧文的18条容量不能套TH18的24条；TH18继承页面描述也不能替代本作执行证据。助记符来自 [Priw8/eclmap TH18文件](https://github.com/Priw8/eclmap/blob/f146162e330c27d1b0a8880c3a41884615147a11/eclmap/th18.eclm)，文本语法/编译格式参考 [thtk/thecl](https://github.com/thpatch/thtk/tree/917a3d3858850f01276b7fb5b9327e2c24d27d5b/thecl)。
-
-[ExpHP th-re-data](https://github.com/exphp-share/th-re-data)提供逆向命名与结构入口；[thpages](https://exphp.github.io/thpages/)主要讲ANM，[truth](https://github.com/ExpHP/truth)的所查版本不能直接替代本教材的thecl ECL工具。所有读取版本、URL和hash见[资料清单](../../docs/investigations/2026-11-05-th18-textbook-sources.json)与[准备记录](../../docs/investigations/2026-11-05-th18-textbook-preparation.md)。这些来源各司其职，不把ANM语法或其他工具方言混入ECL。
-
-目标更完整的作者手册在邻仓 stg-engine `docs/ecl-lang.md`，xform见 `docs/xform-ops.md`，状态型插值见 `docs/stateful-interpolation-reference.md`。转写worker除本教材与所需表外，还应拿到任务单给出的当前内建签名和工具路径。本文只验证合成例与已核映射，不声称完成原作动态对拍、全卡验收、训练接入或未知机制逆向。
+- 24 `waitf`；547 `gameSpeed`：确有子帧或变速要求时无一般等价目标内建，`blocked`，不能默默取整
+- 50 `addi`、51 `addf`、52 `subi`、53 `subf`、54 `muli`、55 `mulf`、56 `divi`、57 `divf`、58 `modi`：int/fx/angle按物理量拆分，整数除法与float表达式不能混写；[类型与单位](mapping.md#22-字面量和-cast)
+- 59 `eqi`、60 `eqf`、61 `neqi`、62 `neqf`、63 `lessi`、64 `lessf`、65 `leqi`、66 `leqf`、67 `greateri`、68 `greaterf`、69 `geqi`、70 `geqf`：比较前保留源类型、角规范化与表达式副作用
+- 71 `noti`；72 `notf`；73 `or`；74 `and`；78 `deci`：恢复原操作数求值后再写条件；目标 `&&` / `||`短路可能少消耗RAND，自减要保留旧值用途
+- 75 `xor`；76 `bit_or`；77 `bit_and`：不能把一般掩码改成逻辑布尔；常量可在转写时算出，一般动态位运算的目标表达需查引擎公开API

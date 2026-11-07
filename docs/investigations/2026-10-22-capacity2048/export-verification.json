@@ -1,0 +1,59 @@
+{
+  "checkpoint_sha256": "8b3824871e18ca4a5fd052e758ef13833a0303d856513ebe58e6d604f0a19c88",
+  "old_onnx_sha256": "e47016c892fc7b0a9667b959d6e06ee10bff4261ea805022b7b8f4e04b7bc7f1",
+  "new_onnx_sha256": "2986d382b868ad5b802256b563a7d8ece650f91331b0fb3e65d25bd672d678cf",
+  "padded_scene_parity": [
+    {
+      "seed": 13,
+      "old640_new2048_maxabs": 0.0,
+      "torch640_old640_maxabs": 1.33514404296875e-05,
+      "torch2048_new2048_maxabs": 1.33514404296875e-05,
+      "argmax": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "torch_ort_strict_1e5_pass": false
+    },
+    {
+      "seed": 29,
+      "old640_new2048_maxabs": 0.0,
+      "torch640_old640_maxabs": 7.62939453125e-06,
+      "torch2048_new2048_maxabs": 7.62939453125e-06,
+      "argmax": [
+        3,
+        3,
+        3,
+        3
+      ],
+      "torch_ort_strict_1e5_pass": true
+    },
+    {
+      "seed": 43,
+      "old640_new2048_maxabs": 0.0,
+      "torch640_old640_maxabs": 5.9604644775390625e-06,
+      "torch2048_new2048_maxabs": 5.9604644775390625e-06,
+      "argmax": [
+        3,
+        3,
+        3,
+        3
+      ],
+      "torch_ort_strict_1e5_pass": true
+    }
+  ],
+  "late_bullets": {
+    "near_row": 1500,
+    "near_selected": true,
+    "near_density_count_increment": 1.0,
+    "near_density_approach_increment": 0.19006578624248505,
+    "near_logits_maxabs": 14.0757417678833,
+    "far_row": 1600,
+    "far_selected": false,
+    "far_topk_unchanged": true,
+    "far_density_count_increment": 1.0,
+    "far_density_approach_increment": 0.11593916267156601,
+    "far_logits_maxabs": 0.020101547241210938
+  }
+}

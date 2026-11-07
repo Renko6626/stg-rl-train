@@ -1,6 +1,6 @@
 # TH18 激光：从发射器配置到目标几何
 
-> **版本**：TH18 v1.00a 原作，裸地址属于该版本；目标为当前 stg-engine ECL。2026-11-05 复用现有 Ghidra JSONL/HTML 与已有几何调查，只读核查，未运行原作。
+适用TH18 v1.00a；使用结论限本页注明的子集。
 
 读原作激光时，先分清三个实体：`702 laserOn` 创建飞行直线 LaserLine，`703 laserStOn` 创建带编号的 LaserInfinite，`711 laserCuOn` 创建带历史轨迹的 LaserCurve。目标 `laser()` 只提供一条射线上的直线段。它能组合出静止射线、扫射与飞棒，不能表示弯曲轨迹。
 
@@ -8,29 +8,29 @@
 
 ## 700–714：本作名称、参数与落点
 
-名称采用本作 eclmap 的可读名，`unknown713/714` 保持未知名。签名中 S 是原作 int，f 是原作 float；这不是目标语言的类型拼写。下表语义以 `FUN_00430d30` 分派及本作 initialize/tick 为依据；Priw8 的继承项仅辅助查名，不把其较早作品说明当成本作执行结果。
+700–714的原作顺序参数、类型和直接作用统一查[指令表](instructions.md#激光)。下表只列目标转换路径，具体成立条件见后文。
 
-| 编号 / 名称 | 原作签名与参数 | 本作关键含义 | 目标路径 |
-|---|---|---|---|
-| 700 laserNew | `Sffff (etId, initialLength, targetLength, lengthLimit, width)` | 配发射器激光几何；第三浮点在线激光限制末端路程 | `laser` + `lz_start/lz_speed`，先换算实际判定段 |
-| 701 laserTiming | `SSSSSS (etId,startup,expand,hold,shrink,flags)` | Infinite 四段；Curve 把 startup 槽用作轨迹长度 | 静态宽度子集转三段时长；扩宽期另见下文 |
-| 702 laserOn | `S (etId)` | 创建 Line，复制发射器 EX | 飞棒/增长线组合；无通用 EX 复制入口 |
-| 703 laserStOn | `SS (etId,laserId)` | 创建 Infinite 并给实例编号 | 保存 `laser()` 返回句柄 |
-| 704 laserOffset | `Sff (laserId,x,y)` | 写当前原点及保存的基点；本作函数 `0x42d700` | `lz_origin`；若依附敌人则明确使用 `lz_anchor` |
-| 705 laserTrajectory | `Sff (laserId,x,y)` | 写 Infinite 的附加向量 `+0x794/+0x798` | 按本作每 tick 原点公式组合；不能直接当持续匀速平移 |
-| 706 laserStLength | `Sf (laserId,value)` | 写 `+0x78`：长度增长速率，不是立即设总长度 | 有限增长路径可评估 `lz_speed`，注意它会重设 end |
-| 707 laserStWidth | `Sf (laserId,width)` | 写当前宽 `+0x74`；phase 随后可能再次覆盖 | 目标无当前宽度写口，不能直接还原动态改宽 |
-| 708 laserStAngle | `Sf (laserId,angle)` | 写当前角 `+0x6c`，单位弧度 | 用当前 `lz_angle` 算差后 `lz_rotate` |
-| 709 laserStRotation | `Sf (laserId,omega)` | 写角速度 `+0x7a4`，tick 持续积分 | `lz_omega`，弧度/帧转 BAM/帧 |
-| 710 laserStEnd | `S (laserId)` | 找到该编号实体，调用取消并解除编号，循环至无匹配 | `lz_cancel`；原作同编号多条须保存全部句柄 |
-| 711 laserCuOn | `S (etId)` | 创建 Curve，保存逐段运动历史 | 暂不转写；命中曲线依赖则blocked |
-| 712 etCancelRect | `ff (w,h)` | 以当前敌位置取消矩形内普通弹 | 不能当作“清所有激光”；目标清弹形状另核 |
-| 713 unknown713 | `SS (etId,laserId)` | 分派调用激光 kind=3 的分配路径 | kind=3 后续实体消费者未核，不能宣称可用 beam |
-| 714 unknown714 | `SS (laserId,value)` | 找实体后调用 vtable+8，传第二参数 | 未核该调用具体行为；无确定目标映射 |
+| 原作入口 | 目标路径与限制 |
+|---|---|
+| 700 laserNew | `laser` + `lz_start/lz_speed`，先换算实际判定段 |
+| 701 laserTiming | 静态宽度子集转三段时长；扩宽期另见下文 |
+| 702 laserOn | 飞棒/增长线组合；无通用 EX 复制入口 |
+| 703 laserStOn | 保存 `laser()` 返回句柄 |
+| 704 laserOffset | `lz_origin`；若依附敌人则明确使用 `lz_anchor` |
+| 705 laserTrajectory | 按本作每 tick 原点公式组合；不能直接当持续匀速平移 |
+| 706 laserStLength | 有限增长路径可评估 `lz_speed`，注意它会重设 end |
+| 707 laserStWidth | 目标无当前宽度写口，不能直接还原动态改宽 |
+| 708 laserStAngle | 用当前 `lz_angle` 算差后 `lz_rotate` |
+| 709 laserStRotation | `lz_omega`，弧度/帧转 BAM/帧 |
+| 710 laserStEnd | `lz_cancel`；原作同编号多条须保存全部句柄 |
+| 711 laserCuOn | 暂不转写；命中曲线依赖则blocked |
+| 712 etCancelRect | 不能当作“清所有激光”；目标清弹形状另核 |
+| 713 unknown713 | kind=3 后续实体消费者未核，不能宣称可用 beam |
+| 714 unknown714 | 未核该调用具体行为；无确定目标映射 |
 
 700 的 `lengthLimit` 是按 Line tick 的 `travel+length` 裁剪用途命名。其默认值、负值和特殊 flags 的完整组合没有逐项动态验证；不要把它当成固定“近端留空”。Curve 的长度参数来自 701 而非 700 的前两个长度。
 
-705 尤其容易误读：Infinite tick `0x44cae0` 每帧先从保存基点恢复当前原点（特定 flags 下改用 boss0 位置），然后加一次该向量乘 dt，再加沿当前角的距离偏移。仅凭社区“每帧移动”的描述，把 `(x,y)` 连续累加到世界原点，会产生本作没有的漂移。这里已核公式顺序，但这些 flags 的完整用途及所有来源指令仍未全解。
+705 尤其容易误读：Infinite每帧先从保存基点恢复当前原点（特定 flags 下改用 boss0 位置），然后加一次附加向量乘 dt，再加沿当前角的距离偏移。仅凭社区“每帧移动”的描述，把 `(x,y)` 连续累加到世界原点，会产生本作没有的漂移。这里已核公式顺序，但这些 flags 的完整用途及所有来源指令仍未全解。
 
 ## 把画面长度换成判定段
 
@@ -40,11 +40,11 @@
 
 | 原作实体与条件 | 原作判定段 | 目标静态段填法 |
 |---|---|---|
-| Line，flags `+0x7bc & 2 == 0` | 原点沿角前移 L/10，判定长度 0.8L | 原点保留，`start=0.1L,end=0.9L` |
+| Line，flags的0x2位未设 | 原点沿角前移 L/10，判定长度 0.8L | 原点保留，`start=0.1L,end=0.9L` |
 | Line，该位非零 | 从原点开始，长度 L | `start=0,end=L` |
 | Infinite | 从当前原点开始，长度 0.9L | `start=0,end=0.9L` |
 
-这是本作 `LaserLine__check_graze_or_kill 0x44a950`、`LaserInfinite__check_graze_or_kill 0x44ce80` 的几何。Line 另有 `L>16` 与 `w>3` 门；Infinite 要 `L>16` 且处于原生状态 2 或 4。目标没有这些原作数值门，短小激光不得不经判断就设成 active。
+Line还要求L>16且w>3；Infinite要求L>16且处于原作状态2或4。目标没有这些数值门，短小激光需按本卡参数安排生效时点，不能无条件设active。
 
 原作宽度 w 对应下列半高 h，目标应填 `width=2h`：
 
@@ -55,13 +55,11 @@
 
 因此 w=16 时目标 width=8；w=40 时 Line width=12，Infinite width≈21.3333。不能统一沿用 TH06“宽度除二”。宽度处于 phase 扩张中时，应对当帧宽度使用相应分支；尤其跨 32 的路径不能只缩放一个最终数值。
 
-宽度分段依据已有[TH18 几何调查](../../docs/investigations/2026-10-22-th18-geometry/encoding-lasers.md)记录的原生 Listing：Line `0x44aa25..43`、Infinite `0x44ced4..f5` 与几何消费者 `0x45cea0`。原作玩家使用局部矩形，与目标玩家圆形相交仍有独立判定差异；匹配激光矩形不等于完整碰撞等价。
-
 ## 四段 Infinite 与目标三段时间
 
 原作 Infinite 初始化为状态 3：startup 预警；到时切 4：expand 扩宽；再切 2：hold 全宽；最后状态 5：shrink 收缩。**状态 4 已参与碰撞，状态 5 不参与。** 因此不能把 startup+expand 全部塞入目标 warn，否则会少掉扩张期间的危险区。
 
-目标 `laser(color,x,y,angle,len,width,warn,active,fade)` 创建静止线，初始 start=0、end=len、speed=0。目标状态 0=预警、1=生效、2=收缩；仅 1 判定。预警没有原作 Infinite 的四段宽度插值；fade 表示无判定的退出期。目标没有 `lz_width`。即便expand=0也要经过状态4；初始化当前宽为2，切换状态的下一tick才进入全宽路径，可能产生薄一帧的判定。因此不能把startup/hold/shrink参数不经推导就照抄为warn/active/fade。先核当前宽的设置点、状态切换、计时器先比较后推进及出生tick，再组合目标三段；[转换案例](conversion-examples.md)给出用707显式设当前宽的静态子集及完整帧边界。expand>0 使用恒宽 active 是几何近似，必须写明提前扩满了多少帧，不能称精确复现。
+目标 `laser(color,x,y,angle,len,width,warn,active,fade)` 创建静止线，初始 start=0、end=len、speed=0。目标状态 0=预警、1=生效、2=收缩；仅 1 判定。预警没有原作 Infinite 的四段宽度插值；fade 表示无判定的退出期。目标没有 `lz_width`。即便expand=0也要经过状态4；初始化当前宽为2，切换状态的下一tick才进入全宽路径，可能产生薄一帧的判定。因此不能把startup/hold/shrink参数不经推导就照抄为warn/active/fade。按给定ECL确定当前宽设置点，使用已核状态时序组合目标三段；本书未覆盖的组合交主会话补规则；[转换案例](conversion-examples.md)给出用707显式设当前宽的静态子集及完整帧边界。expand>0 使用恒宽 active 是几何近似，必须写明提前扩满了多少帧，不能称精确复现。
 
 Line 没有这套预警四态。它先增长到目标长度，再平移，并可按 `lengthLimit` 裁短直至结束。目标 `lz_speed(h,speed,rodLength)` 的规则是每帧 end+=speed，start=max(start,end-rodLength,0)，能表达从零长出再飞走的棒子；它**调用时把 end 重设为 start**。原作有非零初长、不同首尾增长速率、动态裁边、EX 改速时，应逐段检查，不能把 700 的两个长度都当 rodLength。
 
@@ -130,22 +128,3 @@ sub main() {
 ## 验证与证据
 
 目标脚本在相位 2 发出写口；激光在相位 5 更新挂靠、角度、近远端与状态，再由相位 6 碰撞。`run --at F` 查看推进完对应帧的表；读取 `lz_x/y/angle/near/far` 时则得到脚本调用当刻的状态。不要把脚本看到的上一帧末态与 dump 的本帧末态混在一起。
-
-三个完整程序的实际编译及取样记录留在忽略目录 `transcribe/work/th18-textbook-20261105/ex-lasers/`。用 release harness `check <file>`，再 `run <file> --frames 110 --at F` 核 state、width、start/end、speed、三段时长；具体结果由教材验证记录汇总。没有原作动态对拍，也没有验收成训练卡。
-
-本次实测，三个程序的激光都出生于全局帧 3（关卡主任务先创建敌人，敌任务随后启动）：
-
-| 程序 / `--at` | 已观察的几何与状态 |
-|---|---|
-| sweep / 32 | angle=90°，start/end=0/400，width=8，state=0，timer=30 |
-| sweep / 33 | angleBAM=16566（约91°），omega=182，state=1，timer=1 |
-| sweep / 92 | angleBAM=27304（约150°），state=1，timer=60 |
-| sweep / 93 | state=2，timer=1；进入无判定退出期，omega 仍在推进 |
-| aimed / 3 | origin=(48,96)，angle≈109.46°，start/end=0/360，width=8，state=0 |
-| spear / 3 | start/end=0/4，width=6，speed=4，state=1 |
-| spear / 50 | start/end=0/192，达到棒长 |
-| spear / 60 | start/end=40/232，保持棒长192 |
-
-上述 110 帧运行均报告 `task_faults 0 / contract_viol 0 / pool_full 0`。例如命令为 `stg-harness run transcribe/work/th18-textbook-20261105/ex-lasers/lasers-1.ecl --frames 110 --at 33`；检查命令为 `stg-harness check <抽出的 .ecl 文件>`。完整 stdout 在该忽略目录的 `*.check.txt` 与 `*-at*.txt`。
-
-原作依据为 renkolab 现有 `local/th18.v1.00a/state/data/functions.jsonl`：分派 `0x430d30`，Line initialize `0x4490d0` / tick `0x44a4f0`，Infinite initialize `0x44c870` / tick `0x44cae0`，Curve initialize `0x44ed70` / tick `0x44f450`。目标依据为 stg-engine `docs/ecl-lang/9-lasers.md`、`crates/stg-core/src/world/laser.rs`、`integrate.rs` 与 `collide.rs`；手册末尾以 TH06 为背景的统一宽度换算不得覆盖本表的 TH18 分段规则。EX 复制参数见[EX 表](ex-effects.md)与[原生比较报告](../../docs/investigations/2026-11-05-th16-th18-ex-comparison.md)。

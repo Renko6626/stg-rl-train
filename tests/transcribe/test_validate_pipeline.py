@@ -63,13 +63,15 @@ def test_lint_dir_name(tmp_path):
     assert any("目录名" in e for e in lint_errs(make_card(tmp_path, name="orig_ring")))
 
 
-@pytest.mark.parametrize("name", ["th18_s1_w01", "th18_s1_mb1", "th18_s6_b12", "th18_s7_b1"])
-def test_lint_th18_ids(tmp_path, name):
-    assert lint_errs(make_card(tmp_path, name=name, source='"th18"')) == []
+@pytest.mark.parametrize("source", ["th16", "th18"])
+@pytest.mark.parametrize("suffix", ["s1_w01", "s1_mb1", "s6_b12", "s7_b1"])
+def test_lint_modern_ids(tmp_path, source, suffix):
+    assert lint_errs(make_card(tmp_path, name=f"{source}_{suffix}", source=f'"{source}"')) == []
 
 
 @pytest.mark.parametrize("name, source", [
     ("th18_s1_w01", '"th06"'),
+    ("th16_s1_w01", '"th18"'),
     ("th06_s1_w01", '"th18"'),
     ("th18_s1_w01", '"th19"'),
 ])
@@ -84,6 +86,7 @@ def test_lint_invalid_modern_id(tmp_path, name):
 
 @pytest.mark.parametrize("source, limit, valid", [
     ("th06", 3500, False), ("th18", 3500, True),
+    ("th16", 3500, True), ("th16", 65535, True), ("th16", 65536, False),
     ("th18", 65535, True), ("th18", 65536, False), ("th18", 0, False),
 ])
 def test_time_limit_by_source(tmp_path, source, limit, valid):
@@ -104,26 +107,30 @@ def test_th06_batch_does_not_select_th18(work):
     assert "th18_s1_w01" not in pipeline.status_table(None)
 
 
-@pytest.mark.parametrize("source, pool_full, expected_ok", [
-    ("th06", 0, False), ("th18", 0, True), ("th18", 1, False),
+@pytest.mark.parametrize("source, pool_full, contract_viol, expected_ok", [
+    ("th06", 0, 0, False), ("th18", 0, 0, True), ("th18", 1, 0, False),
+    ("th18", 0, 1, False), ("th16", 0, 0, True), ("th16", 1, 0, False),
 ])
-def test_peak_policy_keeps_pool_exhaustion_error(tmp_path, monkeypatch, source, pool_full, expected_ok):
+def test_peak_policy_keeps_pool_exhaustion_error(tmp_path, monkeypatch, source, pool_full, contract_viol, expected_ok):
     monkeypatch.setattr(validate, "harness_run", lambda *args: {
-        "exit": 0, "peak_bullets": 1100, "diag": {"pool_full": pool_full}, "seg_end": 1403,
+        "exit": 0, "peak_bullets": 1100, "diag": {"pool_full": pool_full, "contract_viol": contract_viol}, "seg_end": 1403,
     })
     report = validate.Report(card=str(tmp_path))
     validate.check_runs(report, tmp_path, {"source": source, "ranks": [0, 0], "time_limit": 1400})
     assert report.ok == expected_ok
     if pool_full:
         assert any("pool_full" in e for e in report.errors)
+    elif contract_viol:
+        assert any("contract_viol" in e for e in report.errors)
     elif not expected_ok:
         assert any("弹峰值" in e for e in report.errors)
 
 
 @pytest.mark.skipif(not HAS_HARNESS, reason="没有 stg-engine release harness")
-def test_th18_cli_all_layers_with_native_bullets(tmp_path):
+@pytest.mark.parametrize("source", ["th16", "th18"])
+def test_modern_cli_all_layers_with_native_bullets(tmp_path, source):
     """自写合成卡验证新词表、旧预算之外的运行和 JSON；不冒充原作转写。"""
-    d = make_card(tmp_path, name="th18_s1_w01", source='"th18"', ranks="[0, 0]", time_limit="3500")
+    d = make_card(tmp_path, name=f"{source}_s1_w01", source=f'"{source}"', ranks="[0, 0]", time_limit="3500")
     shutil.copyfile(config.engine_dir() / "godot/ecl/game/touhou-bullets.ecl", d / "touhou-bullets.ecl")
     (d / "main.ecl").write_text("""
 const TIME_LIMIT: int = 3500;
@@ -195,72 +202,6 @@ def fake_unit(uid="th06_s1_w01"):
     return d
 
 
-class Rep:
-    def __init__(self, ok):
-        self.ok, self.card, self.errors, self.warnings, self.runs, self.opening_death_rate = ok, "", [] if ok else ["boom"], [], {}, {}
-
-
-def test_transcribe_retries_then_validates(work, monkeypatch):
-    d = fake_unit()
-    calls = []
-    monkeypatch.setattr(validate, "asdict", lambda r: {"errors": r.errors})
-
-    def worker(cwd, prompt, log, kind="transcribe"):
-        calls.append(prompt)
-        (cwd / "out" / "main.ecl").write_text("// x\n")
-
-    results = iter([False, True])
-    assert pipeline.transcribe_one("th06_s1_w01", validator=lambda c: Rep(next(results)), worker=worker) == "validated"
-    assert len(calls) == 2 and "返工" in calls[1]
-    assert "验收失败" in (d / "feedback.md").read_text()
-    assert pipeline.states()["th06_s1_w01"]["state"] == "validated"
-
-
-def test_transcribe_blocked_after_retries(work, monkeypatch):
-    fake_unit()
-    monkeypatch.setattr(validate, "asdict", lambda r: {"errors": r.errors})
-    res = pipeline.transcribe_one("th06_s1_w01", validator=lambda c: Rep(False),
-                                  worker=lambda cwd, p, log, kind="transcribe": (cwd / "out" / "main.ecl").write_text("x"))
-    assert res == "blocked"
-
-
-def test_worker_reported_blocked(work):
-    fake_unit()
-
-    def worker(cwd, prompt, log, kind="transcribe"):
-        (cwd / "out" / "report.md").write_text("status: blocked\n原因：用了激光\n")
-
-    assert pipeline.transcribe_one("th06_s1_w01", validator=lambda c: Rep(True), worker=worker) == "blocked"
-
-
-def verdict(v, findings=(), volleys=3):
-    return {"verdict": v, "findings": list(findings), "volleys": [{"frame": i} for i in range(volleys)]}
-
-
-def test_review_pass_fail_and_rounds(work):
-    d = fake_unit()
-    pipeline.record("th06_s1_w01", "validated")
-    fail = verdict("fail", [{"severity": "major", "src_line": 3, "ecl_line": 9, "expected": "16", "actual": "8"}])
-
-    def worker_with(v):
-        return lambda cwd, p, log, kind="review": (cwd / "verdict.json").write_text(json.dumps(v))
-
-    assert pipeline.review_one("th06_s1_w01", worker=worker_with(fail)) == "revise"
-    assert "期望 16，实际 8" in (d / "feedback.md").read_text()
-    assert pipeline.states()["th06_s1_w01"]["round"] == 1
-    pipeline.record("th06_s1_w01", "validated", round=1)
-    assert pipeline.review_one("th06_s1_w01", worker=worker_with(fail)) == "needs_human"
-    pipeline.record("th06_s1_w01", "validated", round=0)
-    assert pipeline.review_one("th06_s1_w01", worker=worker_with(verdict("pass"))) == "reviewed"
-
-
-def test_pass_verdict_without_volleys_is_rejected(work):
-    fake_unit()
-    pipeline.record("th06_s1_w01", "validated")
-    w = lambda cwd, p, log, kind="review": (cwd / "verdict.json").write_text(json.dumps(verdict("pass", volleys=1)))  # noqa: E731
-    assert pipeline.review_one("th06_s1_w01", worker=w) == "needs_human"
-
-
 def test_select_sample_collect_status(work):
     for i in range(1, 6):
         d = fake_unit(f"th06_s1_w0{i}")
@@ -285,24 +226,3 @@ def test_usage_rows_do_not_mask_unit_state(work):
     pipeline.record("th06_s7_w01", "pending")
     pipeline.record("th06_s7_w01", "usage", kind="transcribe", steps=0)
     assert pipeline.states()["th06_s7_w01"]["state"] == "pending"
-
-
-def test_run_worker_aborts_whole_batch_on_provider_quota(work, monkeypatch, tmp_path):
-    """DeepSeek 余额 / 限流错误时整批中止，不回写任何单元状态（2026-09-25 两次余额耗尽都把状态搞乱，
-    还让没真正返工的旧卡进了审核）。"""
-    fake = tmp_path / "fake-dsh"
-    fake.write_text("#!/bin/sh\necho 'dsh-flash: worker failed (exit 1)'\necho 'dsh: QUOTA: Insufficient Balance (request_id: x)'\nexit 1\n")
-    fake.chmod(0o755)
-    monkeypatch.setattr(pipeline, "dsh_bin", lambda: str(fake))
-
-    class Abort(Exception):
-        pass
-
-    def boom(msg):
-        raise Abort(msg)
-
-    monkeypatch.setattr(pipeline, "_abort_provider", boom)
-    d = tmp_path / "unit"
-    d.mkdir()
-    with pytest.raises(Abort, match="QUOTA"):
-        pipeline.run_worker(d, "x", tmp_path / "logs" / "u.transcribe.0.log")

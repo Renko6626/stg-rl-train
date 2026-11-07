@@ -4,7 +4,7 @@
 
 ## 从这里阅读
 
-- **引擎已更新**：2026-11-03只读核实stg-engine main的`85c042e`已交付ENGINE_VER28动态xform，支持按值参数、绑定/出生/效果求值，World净增44KiB。下文常量限制及候选方案是更新前调查；当前用法看相邻引擎`docs/ecl-lang/4-bullets.md`，接入状态见[项目记忆](../../agent-memory/ecl-capability-audit.md)。2026-11-04已接入ENGINE_VER30及0.4.4 wheel，三阶段rand可用；精确源码身份与验证见[接入记录](../../practice-cards/reports/stg-rl-044-adoption.json)，旧卡未迁移。
+- **引擎已更新**：2026-11-03只读核实stg-engine main的`85c042e`已交付ENGINE_VER28动态xform，支持按值参数、绑定/出生/效果求值，World净增44KiB。下文常量限制及候选方案是更新前调查；当前用法看相邻引擎`docs/ecl-lang/4-bullets.md`，接入状态见[现行能力与证据入口](../../agent-memory/evidence-map.md#引擎与转写)。2026-11-04已接入ENGINE_VER30及0.4.4 wheel，三阶段rand可用；精确源码身份与验证见[接入记录](../../practice-cards/reports/stg-rl-044-adoption.json)，旧卡未迁移。
 - **2026-11-03更新**：[按整段LLM转写复核实际缺口](gap-recheck-2026-11-03.md)。当前优先级以此为准；初版第五类是接口对照候选，不能整批当引擎必做需求。
 - **动态xform进一步核查**：[代码路径、TH06NC实卡影响与两条候选路线](../2026-11-03-parameterized-xform-investigation.md)。已找到旧卡因接口限制改为粗化/固定值的历史记录；后续用户确认并实现动态xform及三阶段rand，当前状态见上述项目记忆。
 - [首轮结论与后续边界](results.md)：五类代表行为、TH06NC旧卡余量、资料冲突及待取舍项。

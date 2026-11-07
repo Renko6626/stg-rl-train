@@ -10,7 +10,7 @@ from . import config
 from .thecl import EclFile, Instr, closure, unquote
 
 # 共用卡编号；后续原文解析、闭包和切分辅助仍是 TH06 专用。
-ID_RE = re.compile(r"^th(?:06|18)_s([1-7])_(w|mb|b)(\d{1,2})$")
+ID_RE = re.compile(r"^th(?:06|16|18)_s([1-7])_(w|mb|b)(\d{1,2})$")
 TH06_ID_RE = re.compile(r"^th06_s([1-7])_(w|mb|b)(\d{1,2})$")
 OPENING_BUFFER = 120
 MAX_TIME_LIMIT = 3000

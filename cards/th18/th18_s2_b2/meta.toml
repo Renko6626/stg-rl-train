@@ -1,0 +1,12 @@
+title = "Stage 2 关底第一符 森符「木隠れの技術」"
+source = "th18"
+origin = "TH18 v1.00a Stage 2，关底第一符 BossCard1；Hard/极、Lunatic/真标题同源分支"
+source_ref = "st02bs.ecl.txt:371-539"
+ranks = [0, 3]
+marks = [0]
+time_limit = 2222
+original_time_limit = 2100
+tags = ["spiral", "stream", "random"]
+laser_approx = false
+lower_half_blocked = false
+notes = "源时轴、屏外保活与差异见notes.md；要求ENGINE_VER35/wheel0.4.7。Sol转写、主会话独立审核及四档完整验收通过，尚未训练。"
